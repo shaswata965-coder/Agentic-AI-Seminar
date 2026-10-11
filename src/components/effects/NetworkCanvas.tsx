@@ -7,8 +7,12 @@ import { cn } from "@/lib/cn";
  * Subtle "agent network" background: drifting nodes linked when close, gently
  * attracted to the pointer. Desktop only; paused off-screen, in background
  * tabs and for reduced motion.
+ *
+ * `avoid` is a selector for elements (inside the canvas's parent) the network
+ * keeps clear of, with a soft edge: `data-graph-avoid="text"` clears just the
+ * lines of text, any other value the element's whole box.
  */
-export function NetworkCanvas({ className, density = 1 }: { className?: string; density?: number }) {
+export function NetworkCanvas({ className, density = 1, avoid }: { className?: string; density?: number; avoid?: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -21,7 +25,9 @@ export function NetworkCanvas({ className, density = 1 }: { className?: string; 
 
     let w = 0;
     let h = 0;
+    let dpr = 1;
     let raf = 0;
+    let holes: DOMRect[] = [];
     let visible = true;
     const pointer = { x: -9999, y: -9999 };
     type Node = { x: number; y: number; vx: number; vy: number; r: number; c: number };
@@ -34,7 +40,7 @@ export function NetworkCanvas({ className, density = 1 }: { className?: string; 
     };
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
       const rect = canvas.getBoundingClientRect();
       w = rect.width;
       h = rect.height;
@@ -57,6 +63,7 @@ export function NetworkCanvas({ className, density = 1 }: { className?: string; 
     const step = () => {
       raf = 0;
       if (!visible || document.hidden) return;
+      if (frame++ % 30 === 0) measure();
       ctx.clearRect(0, 0, w, h);
       const max = 130;
       for (const n of nodes) {
@@ -109,7 +116,40 @@ export function NetworkCanvas({ className, density = 1 }: { className?: string; 
         ctx.fill();
       }
       ctx.globalAlpha = 1;
+      // Rub the network out behind text, feathered so lines fade instead of stopping dead.
+      if (holes.length) {
+        ctx.save();
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = "#000";
+        ctx.shadowColor = "#000";
+        ctx.shadowBlur = 24 * dpr;
+        ctx.beginPath();
+        for (const r of holes) {
+          if (ctx.roundRect) ctx.roundRect(r.x, r.y, r.width, r.height, 16);
+          else ctx.rect(r.x, r.y, r.width, r.height);
+        }
+        ctx.fill();
+        ctx.restore();
+      }
       raf = requestAnimationFrame(step);
+    };
+
+    // Re-read twice a second: text reflows on resize, when fonts load and when content swaps.
+    const pad = 14;
+    let frame = 0;
+    const measure = () => {
+      if (!avoid) return;
+      const origin = canvas.getBoundingClientRect();
+      const targets = Array.from(canvas.parentElement?.querySelectorAll<HTMLElement>(avoid) ?? []);
+      holes = targets.flatMap((el) => {
+        let rects: DOMRect[];
+        if (el.dataset.graphAvoid === "text") {
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          rects = Array.from(range.getClientRects());
+        } else rects = [el.getBoundingClientRect()];
+        return rects.filter((r) => r.width && r.height).map((r) => new DOMRect(r.left - origin.left - pad, r.top - origin.top - pad, r.width + pad * 2, r.height + pad * 2));
+      });
     };
     const start = () => {
       if (!raf) raf = requestAnimationFrame(step);
@@ -128,7 +168,10 @@ export function NetworkCanvas({ className, density = 1 }: { className?: string; 
       pointer.x = -9999;
       pointer.y = -9999;
     };
-    const ro = new ResizeObserver(resize);
+    const ro = new ResizeObserver(() => {
+      resize();
+      measure();
+    });
     ro.observe(canvas);
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
@@ -150,7 +193,7 @@ export function NetworkCanvas({ className, density = 1 }: { className?: string; 
       document.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [density]);
+  }, [density, avoid]);
 
   return <canvas ref={ref} aria-hidden className={cn("pointer-events-none h-full w-full", className)} />;
 }

@@ -25,7 +25,6 @@ export interface SiteSettings {
   venueName: string;
   venueHall: string;
   venueAddress: string;
-  heroNote: string;
 
   workshopStatus: RegistrationStatus;
   workshopDeadline: string;

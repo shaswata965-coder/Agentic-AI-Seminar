@@ -36,10 +36,10 @@ This guide is for the organising team of the **Agentic AI Workshop 2026**. It ex
 **Site settings → Event details**
 - Event name, short name, tagline, short description (used by search engines and social media), organised by. The event name appears everywhere the event is named: the logo, the home page title, page titles, e-mails, calendar invites and the programme PDF. A few texts mention the name in their own words (*Workshop motivation* under *About & themes*, and *Sponsorship introduction* under *Partners & kiosks*); update those by hand when the name changes.
 - **Starts / Ends** (Indian Standard Time). The countdown on the home page counts down to the start time.
-- Venue, hall/building (leave blank to show "to be announced"), full address, and the small badge above the title (e.g. "Registrations are open").
+- Venue, hall/building (leave blank to show "to be announced") and full address.
 
 **Site settings → Registration**
-- **Workshop registration:** *Opening soon*, *Open* or *Closed*, plus the deadline. The deadline appears on the website, and the form closes automatically once it passes. Afterwards, also set the status to *Closed* and update the badge text in *Event details*.
+- **Workshop registration:** *Opening soon*, *Open* or *Closed*, plus the deadline. The deadline appears on the website, and the form closes automatically once it passes. The home page shows the same status under the title (*Open until …*, *Opening soon* or *Closed*). Afterwards, also set the status to *Closed*.
 - **External form (optional):** paste a Google Form / Unstop / Devfolio link to send people there instead of the built-in form.
 - **Fees:** add one row per category (e.g. Students, Academia, Industry), plus an optional note.
 - **Confirmation e-mail text:** extra lines added to the confirmation e-mail, for example what to bring.

@@ -18,7 +18,6 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   venueName: "IIT Delhi, Hauz Khas, New Delhi",
   venueHall: "",
   venueAddress: "Indian Institute of Technology Delhi, Hauz Khas, New Delhi 110016, India",
-  heroNote: "Registrations are open",
 
   workshopStatus: "open",
   workshopDeadline: "",

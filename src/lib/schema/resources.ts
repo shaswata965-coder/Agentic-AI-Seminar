@@ -503,7 +503,6 @@ export const SETTINGS_DEF: SingletonDef = {
         text("venueName", "Venue", { width: "half" }),
         text("venueHall", "Hall / building", { width: "half", help: "Leave blank to show “to be announced”." }),
         textarea("venueAddress", "Full address", { rows: 2 }),
-        text("heroNote", "Hero badge text", { placeholder: "Registrations opening soon", help: "Small badge above the title on the home page." }),
       ],
     },
     {
@@ -515,7 +514,7 @@ export const SETTINGS_DEF: SingletonDef = {
           { value: "soon", label: "Opening soon" },
           { value: "open", label: "Open" },
           { value: "closed", label: "Closed" },
-        ], { width: "half" }),
+        ], { width: "half", help: "Also shown under the title on the home page." }),
         datetime("workshopDeadline", "Workshop registration deadline", { width: "half" }),
         url("workshopUrl", "External workshop form (optional)", { help: "Leave blank to use the built-in registration form." }),
         objects("fees", "Fees", "Fee", [
