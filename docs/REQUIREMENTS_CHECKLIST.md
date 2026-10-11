@@ -107,3 +107,16 @@ Each pending item has a placeholder and an admin screen ready for it:
 | Registration links, fees, deadlines | Site settings → Registration |
 | Organiser photos and profile links; volunteer list | Organisers & volunteers |
 | Sponsors / partners and contact e-mail | Partners & sponsors; Site settings → Contact & social |
+
+## How it was checked
+
+Checked on a production build (`npm run build && npm start`) with MongoDB and the sample content loaded:
+
+- **End-to-end flows** (43 automated checks, Playwright/Chromium): every hero button, countdown, theme toggle (persists), *Ask Aura* (Ctrl/⌘ + K), skip link, programme filters (kept in the URL), *My agenda*, per-session calendar file, day tabs, speaker pop-up (keyboard ← →, Escape, focus return, deep links), workshop and hackathon registration (validation, success ID, duplicate e-mail), contact and exhibitor enquiries, automatic closing after a deadline, admin edits appearing at once, post-event switches, PDF reflecting edits. All also pass when hosted under a sub-path (`NEXT_PUBLIC_BASE_PATH=/agentic-ai-workshop`).
+- **Accessibility:** axe-core reports no WCAG 2.1 A/AA violations on any public page, in light and dark mode, at desktop and phone sizes. Lighthouse accessibility is 100 on the home, programme, speakers, hackathon and registration pages.
+- **Performance** (Lighthouse, mobile, applied 4G throttling with 4× CPU slowdown): largest contentful paint 1.7–2.1 s on those pages. Performance score 91–97, except the home page at about 80: it holds the most interactive elements, which take longest to start up. Layout shift ≈ 0.
+- **Responsive:** no horizontal scrolling at 320, 360, 390 and 768 px on any page; admin panel usable on phones.
+- **E-mail:** sent to a local SMTP test server. Confirmation with registration ID and calendar invite, resend on duplicate registration, team confirmation (CC to all members), enquiry acknowledgement and organiser notices.
+- **Deployment:** Docker image built and run against MongoDB (health check healthy, first sign-in creates the administrator, default content stored on first start); `docker compose` configuration validated.
+
+**Still to do before launch:** this testing used Chromium only. Check the site on real Android and iOS phones and in Safari and Firefox, as the brief asks.
