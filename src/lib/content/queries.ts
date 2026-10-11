@@ -1,7 +1,8 @@
 import { cacheLife, cacheTag } from "next/cache";
-import { connectDb, isDbConfigured, isDuplicateKeyError, once } from "@/lib/db";
+import { connectDb, isDbConfigured, once } from "@/lib/db";
 import { getCollectionModel, Singleton } from "@/lib/models";
 import { COLLECTION_MAP } from "@/lib/schema/resources";
+import { ensureDefaultContent } from "./bootstrap";
 import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS } from "./defaults";
 import { fillDefaults, mergeDefaults, toPlain } from "./normalize";
 import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from "./types";
@@ -19,41 +20,12 @@ async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
   if (!isDbConfigured()) return { ok: false };
   try {
     await connectDb();
-    await once(bootstrapDefaults);
+    await once(async () => void (await ensureDefaultContent()));
     return { ok: true, data: await fn() };
   } catch (err) {
     console.warn(`[content] using fallback content: ${(err as Error).message}`);
     return { ok: false };
   }
-}
-
-/** First run on an empty database: store the default content so it can be edited. */
-async function bootstrapDefaults() {
-  let created = false;
-  try {
-    const res = await Singleton.updateOne(
-      { key: "settings" },
-      { $setOnInsert: { key: "settings", data: DEFAULT_SETTINGS } },
-      { upsert: true },
-    );
-    created = res.upsertedCount > 0;
-  } catch (err) {
-    if (!isDuplicateKeyError(err)) throw err;
-  }
-  try {
-    await Singleton.updateOne(
-      { key: "hackathon" },
-      { $setOnInsert: { key: "hackathon", data: DEFAULT_HACKATHON } },
-      { upsert: true },
-    );
-  } catch (err) {
-    if (!isDuplicateKeyError(err)) throw err;
-  }
-  if (!created) return;
-  const People = getCollectionModel("people");
-  if ((await People.countDocuments()) === 0) await People.insertMany(DEFAULT_PEOPLE);
-  const Faqs = getCollectionModel("faqs");
-  if ((await Faqs.countDocuments()) === 0) await Faqs.insertMany(DEFAULT_FAQS);
 }
 
 export async function getSettings(): Promise<SiteSettings> {

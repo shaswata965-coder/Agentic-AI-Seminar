@@ -6,7 +6,7 @@ import { connectDb } from "@/lib/db";
 import { slugify } from "@/lib/format";
 import { getCollectionModel, Singleton } from "@/lib/models";
 import { COLLECTION_MAP, flattenFields, SINGLETONS, type CollectionDef } from "@/lib/schema/resources";
-import { objectSchema } from "./field-validation";
+import { objectSchema } from "@/lib/schema/field-validation";
 import { zodFieldErrors } from "./http";
 import { expireTags } from "./revalidate";
 

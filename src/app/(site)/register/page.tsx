@@ -2,6 +2,7 @@ import { ExternalLink, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import { Aura } from "@/components/aura/Aura";
 import { Deadline } from "@/components/forms/Deadline";
+import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { PageHero } from "@/components/layout/PageHero";
 import { Badge } from "@/components/ui/Badge";
@@ -22,15 +23,20 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RegisterPage() {
   const s = await getSettings();
+  const closedBadge = (
+    <Badge tone="blush" dot>
+      Registration closed
+    </Badge>
+  );
   const status =
     s.workshopStatus === "open" ? (
-      <Badge tone="mint" dot>
-        Registration open
-      </Badge>
+      <DeadlineGate deadline={s.workshopDeadline} closed={closedBadge}>
+        <Badge tone="mint" dot>
+          Registration open
+        </Badge>
+      </DeadlineGate>
     ) : s.workshopStatus === "closed" ? (
-      <Badge tone="blush" dot>
-        Registration closed
-      </Badge>
+      closedBadge
     ) : (
       <Badge tone="butter" dot>
         Opening soon
@@ -75,27 +81,11 @@ export default async function RegisterPage() {
                 </div>
               </div>
             ) : s.workshopStatus === "open" ? (
-              <RegistrationForm calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
+              <DeadlineGate deadline={s.workshopDeadline} closed={<StatusCard closed />}>
+                <RegistrationForm calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
+              </DeadlineGate>
             ) : (
-              <div className="card flex flex-col items-center gap-5 p-8 text-center sm:flex-row sm:text-left">
-                <Aura variant={s.workshopStatus === "closed" ? "sleep" : "countdown"} size={160} interactive />
-                <div>
-                  <h2 className="font-display text-2xl font-bold text-fg">{s.workshopStatus === "closed" ? "Registration is closed" : "Registration opens soon"}</h2>
-                  <p className="mt-2 max-w-lg text-muted">
-                    {s.workshopStatus === "closed"
-                      ? "Thank you for your interest! Registration for this edition has closed. Follow the announcements for updates."
-                      : "We're getting everything ready. Registration details, fees and deadlines will be announced here — check the announcements for the opening date."}
-                  </p>
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <ButtonLink href="/#news" variant="soft">
-                      See announcements
-                    </ButtonLink>
-                    <ButtonLink href="/#contact" variant="outline" icon={<Mail size={17} aria-hidden />}>
-                      Contact us
-                    </ButtonLink>
-                  </div>
-                </div>
-              </div>
+              <StatusCard closed={s.workshopStatus === "closed"} />
             )}
           </div>
 
@@ -151,5 +141,30 @@ export default async function RegisterPage() {
         </div>
       </section>
     </>
+  );
+}
+
+/** Shown instead of the form while registration is not open. */
+function StatusCard({ closed }: { closed: boolean }) {
+  return (
+    <div className="card flex flex-col items-center gap-5 p-8 text-center sm:flex-row sm:text-left">
+      <Aura variant={closed ? "sleep" : "countdown"} size={160} interactive />
+      <div>
+        <h2 className="font-display text-2xl font-bold text-fg">{closed ? "Registration is closed" : "Registration opens soon"}</h2>
+        <p className="mt-2 max-w-lg text-muted">
+          {closed
+            ? "Thank you for your interest! Registration for this edition has closed. Follow the announcements for updates."
+            : "We're getting everything ready. Registration details, fees and deadlines will be announced here — check the announcements for the opening date."}
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <ButtonLink href="/#news" variant="soft">
+            See announcements
+          </ButtonLink>
+          <ButtonLink href="/#contact" variant="outline" icon={<Mail size={17} aria-hidden />}>
+            Contact us
+          </ButtonLink>
+        </div>
+      </div>
+    </div>
   );
 }

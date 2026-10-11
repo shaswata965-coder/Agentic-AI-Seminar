@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { toPlain } from "@/lib/content/normalize";
+import { demoItemCount } from "@/lib/demo-content";
 import { Enquiry, getCollectionModel, HackathonRegistration, Registration } from "@/lib/models";
 import { COLLECTIONS } from "@/lib/schema/resources";
 import { requireAdmin } from "@/lib/server/admin-auth";
@@ -10,7 +11,7 @@ export async function GET(req: NextRequest) {
   const user = await requireAdmin(req);
   if (user instanceof Response) return user;
   const weekAgo = new Date(Date.now() - 7 * 86_400_000);
-  const [workshop, workshopWeek, teams, enquiriesNew, enquiriesTotal, byCategory, recentRegs, recentEnquiries, counts] = await Promise.all([
+  const [workshop, workshopWeek, teams, enquiriesNew, enquiriesTotal, byCategory, recentRegs, recentEnquiries, counts, demoItems] = await Promise.all([
     Registration.countDocuments(),
     Registration.countDocuments({ createdAt: { $gte: weekAgo } }),
     HackathonRegistration.countDocuments(),
@@ -20,6 +21,7 @@ export async function GET(req: NextRequest) {
     Registration.find({}, { regId: 1, name: 1, organisation: 1, category: 1, createdAt: 1 }).sort({ createdAt: -1 }).limit(6).lean(),
     Enquiry.find({}, { type: 1, name: 1, organisation: 1, status: 1, createdAt: 1 }).sort({ createdAt: -1 }).limit(6).lean(),
     Promise.all(COLLECTIONS.map(async (c) => [c.key, await getCollectionModel(c.key).countDocuments()] as const)),
+    demoItemCount(),
   ]);
   return json({
     data: {
@@ -33,6 +35,7 @@ export async function GET(req: NextRequest) {
       recentEnquiries: recentEnquiries.map((r) => toPlain(r)),
       counts: Object.fromEntries(counts),
       mail: mailConfigured(),
+      demoItems,
     },
   });
 }

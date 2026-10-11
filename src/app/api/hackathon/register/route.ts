@@ -2,6 +2,7 @@ import { after, type NextRequest } from "next/server";
 import { THEME_META } from "@/lib/content/constants";
 import { getHackathon, getSettings } from "@/lib/content/queries";
 import { connectDb, isDuplicateKeyError } from "@/lib/db";
+import { deadlinePassed } from "@/lib/event";
 import { HackathonRegistration } from "@/lib/models";
 import { hackathonEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
 import { clientIp, error, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
@@ -25,6 +26,7 @@ export async function POST(req: NextRequest) {
   const [s, h] = await Promise.all([getSettings(), getHackathon()]);
   if (s.hackathonUrl) return error(409, `Hackathon registration happens on ${s.hackathonPlatform || "the external platform"}.`);
   if (s.hackathonStatus !== "open") return error(403, s.hackathonStatus === "closed" ? "Hackathon registration is closed." : "Hackathon registration has not opened yet.");
+  if (deadlinePassed(s.hackathonDeadline)) return error(403, "Hackathon registration is closed — the deadline has passed.");
 
   const parsed = hackathonSchema.safeParse(body);
   if (!parsed.success) {

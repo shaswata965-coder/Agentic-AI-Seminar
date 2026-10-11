@@ -1,6 +1,7 @@
 import { ArrowUpRight, Award, BookOpen, Cpu, Database, ExternalLink, KeyRound, Medal, ScrollText, ShieldCheck, Trophy, Users, Wrench } from "lucide-react";
 import type { Metadata } from "next";
 import { Aura } from "@/components/aura/Aura";
+import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { HackathonTimeline } from "@/components/hackathon/Timeline";
 import { FaqList } from "@/components/home/FaqList";
 import { PageHero } from "@/components/layout/PageHero";
@@ -35,15 +36,20 @@ export default async function HackathonPage() {
   const hackFaqs = faqs.filter((f) => f.category === "hackathon");
   const registerHref = hackathonRegistrationHref(s);
   const external = Boolean(s.hackathonUrl);
+  const closedBadge = (
+    <Badge tone="blush" dot>
+      Registration closed
+    </Badge>
+  );
   const statusBadge =
     s.hackathonStatus === "open" ? (
-      <Badge tone="mint" dot>
-        Registration open{s.hackathonDeadline ? ` · closes ${formatDateTime(s.hackathonDeadline)} IST` : ""}
-      </Badge>
+      <DeadlineGate deadline={s.hackathonDeadline} closed={closedBadge}>
+        <Badge tone="mint" dot>
+          Registration open{s.hackathonDeadline ? ` · closes ${formatDateTime(s.hackathonDeadline)} IST` : ""}
+        </Badge>
+      </DeadlineGate>
     ) : s.hackathonStatus === "closed" ? (
-      <Badge tone="blush" dot>
-        Registration closed
-      </Badge>
+      closedBadge
     ) : (
       <Badge tone="butter" dot>
         Registration opens soon

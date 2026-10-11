@@ -2,13 +2,23 @@
   "name": "agentic-ai-workshop",
   "version": "0.1.0",
   "private": true,
+  "description": "Website for the Agentic AI Workshop 2026 (IIT Delhi & Yardi School of Artificial Intelligence) — Next.js, Node.js and MongoDB.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run lint && npm run typecheck",
+    "seed": "tsx scripts/seed.ts",
+    "seed:demo": "tsx scripts/seed-demo.ts",
+    "create-admin": "tsx scripts/create-admin.ts"
+  },
+  "engines": {
+    "node": ">=20.9.0"
   },
   "dependencies": {
+    "@next/env": "16.4.0",
     "bcryptjs": "^3.0.3",
     "jose": "^6.2.12",
     "lucide-react": "^1.55.0",

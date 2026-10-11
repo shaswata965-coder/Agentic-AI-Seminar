@@ -21,7 +21,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     title: "Event details, dates & registration",
     steps: [
       ["Site settings → Event details", "Name, tagline, dates (the countdown uses the start date), venue and hall."],
-      ["Site settings → Registration", "Open or close workshop and hackathon registration, set deadlines and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
+      ["Site settings → Registration", "Open or close workshop and hackathon registration, set deadlines (forms close automatically once a deadline passes) and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
       ["Site settings → Branding", "Upload the official IIT Delhi and ScAI logos and set the brand colour."],
       ["Site settings → Contact & social", "Official e-mail, phone and social links shown in the footer and contact section."],
     ],

@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // `standalone` output is used by the Docker image (see Dockerfile).
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
+  // Fonts read from disk by the social preview images.
+  outputFileTracingIncludes: {
+    "/opengraph-image": ["./assets/fonts/*.woff"],
+    "/twitter-image": ["./assets/fonts/*.woff"],
+  },
   cacheLife: {
     // Content managed from the admin panel. Saving in the admin expires the
     // relevant tags immediately; the time-based values are only a safety net

@@ -1,11 +1,12 @@
 import "server-only";
-import bcrypt from "bcryptjs";
 import type { NextRequest } from "next/server";
 import { AUTH_COOKIE, SESSION_DAYS, verifySession } from "@/lib/auth-token";
 import { connectDb } from "@/lib/db";
 import { User } from "@/lib/models";
 import { BASE_PATH } from "@/lib/paths";
 import { error, isSameOrigin } from "./http";
+
+export { hashPassword, PASSWORD_MIN, verifyPassword } from "@/lib/password";
 
 export interface AdminUser {
   id: string;
@@ -41,9 +42,6 @@ export async function requireAdmin(req: NextRequest, opts: { role?: "admin" } = 
   return user;
 }
 
-export const hashPassword = (password: string) => bcrypt.hash(password, 12);
-export const verifyPassword = (password: string, hash: string) => bcrypt.compare(password, hash);
-
 export function sessionCookie(token: string) {
   return {
     name: AUTH_COOKIE,
@@ -60,4 +58,3 @@ export function clearedSessionCookie() {
   return { ...sessionCookie(""), maxAge: 0 };
 }
 
-export const PASSWORD_MIN = 10;

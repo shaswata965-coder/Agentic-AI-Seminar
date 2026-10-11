@@ -57,6 +57,13 @@ export function eventCalendarLinks(s: SiteSettings): CalendarLinks {
   };
 }
 
+/** True once a registration deadline (ISO date-time) has passed. */
+export function deadlinePassed(iso: string | null | undefined, now = Date.now()): boolean {
+  if (!iso) return false;
+  const t = Date.parse(iso);
+  return !Number.isNaN(t) && now >= t;
+}
+
 export function registrationHref(s: SiteSettings) {
   return s.workshopUrl || "/register";
 }

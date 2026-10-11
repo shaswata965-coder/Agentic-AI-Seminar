@@ -2,6 +2,7 @@ import { ExternalLink } from "lucide-react";
 import type { Metadata } from "next";
 import { Aura } from "@/components/aura/Aura";
 import { Deadline } from "@/components/forms/Deadline";
+import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { HackathonForm } from "@/components/forms/HackathonForm";
 import { PageHero } from "@/components/layout/PageHero";
 import { Badge } from "@/components/ui/Badge";
@@ -18,17 +19,22 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function HackathonRegisterPage() {
   const [s, h] = await Promise.all([getSettings(), getHackathon()]);
   const tracks = h.tracks.map((t) => ({ value: t.theme, label: `${t.title} (${(THEME_META[t.theme] ?? THEME_META.general).short})` }));
+  const closedBadge = (
+    <Badge tone="blush" dot>
+      Registration closed
+    </Badge>
+  );
   return (
     <>
       <PageHero tone="aqua" crumb="Hackathon registration" eyebrow="Hackathon" title="Register your team" aura="hackathon" description={<p>{h.registrationNote}</p>}>
         {s.hackathonStatus === "open" ? (
-          <Badge tone="mint" dot>
-            Registration open
-          </Badge>
+          <DeadlineGate deadline={s.hackathonDeadline} closed={closedBadge}>
+            <Badge tone="mint" dot>
+              Registration open
+            </Badge>
+          </DeadlineGate>
         ) : s.hackathonStatus === "closed" ? (
-          <Badge tone="blush" dot>
-            Registration closed
-          </Badge>
+          closedBadge
         ) : (
           <Badge tone="butter" dot>
             Opening soon
@@ -52,27 +58,36 @@ export default async function HackathonRegisterPage() {
               </div>
             </div>
           ) : s.hackathonStatus === "open" ? (
-            <HackathonForm tracks={tracks} />
+            <DeadlineGate deadline={s.hackathonDeadline} closed={<StatusCard closed />}>
+              <HackathonForm tracks={tracks} />
+            </DeadlineGate>
           ) : (
-            <div className="card flex flex-col items-center gap-6 p-8 text-center sm:flex-row sm:text-left">
-              <Aura variant={s.hackathonStatus === "closed" ? "sleep" : "countdown"} size={170} interactive />
-              <div>
-                <h2 className="font-display text-2xl font-bold text-fg">{s.hackathonStatus === "closed" ? "Hackathon registration is closed" : "Hackathon registration opens soon"}</h2>
-                <p className="mt-2 max-w-lg text-muted">
-                  {s.hackathonStatus === "closed"
-                    ? "Thanks to everyone who registered! Shortlisted teams will be contacted by e-mail."
-                    : "Start forming your team! When registration opens you will need a team name, your preferred track, member details and a short idea summary."}
-                </p>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <ButtonLink href="/hackathon" variant="soft">
-                    Read the hackathon details
-                  </ButtonLink>
-                </div>
-              </div>
-            </div>
+            <StatusCard closed={s.hackathonStatus === "closed"} />
           )}
         </div>
       </section>
     </>
+  );
+}
+
+/** Shown instead of the form while hackathon registration is not open. */
+function StatusCard({ closed }: { closed: boolean }) {
+  return (
+    <div className="card flex flex-col items-center gap-6 p-8 text-center sm:flex-row sm:text-left">
+      <Aura variant={closed ? "sleep" : "countdown"} size={170} interactive />
+      <div>
+        <h2 className="font-display text-2xl font-bold text-fg">{closed ? "Hackathon registration is closed" : "Hackathon registration opens soon"}</h2>
+        <p className="mt-2 max-w-lg text-muted">
+          {closed
+            ? "Thanks to everyone who registered! Shortlisted teams will be contacted by e-mail."
+            : "Start forming your team! When registration opens you will need a team name, your preferred track, member details and a short idea summary."}
+        </p>
+        <div className="mt-5 flex flex-wrap gap-3">
+          <ButtonLink href="/hackathon" variant="soft">
+            Read the hackathon details
+          </ButtonLink>
+        </div>
+      </div>
+    </div>
   );
 }

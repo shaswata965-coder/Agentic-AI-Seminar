@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CalendarDays, Download, Inbox, Mail, Megaphone, Mic, Settings, Ticket, Trophy } from "lucide-react";
+import { ArrowRight, CalendarDays, Download, FlaskConical, Inbox, Mail, Megaphone, Mic, Settings, Ticket, Trophy } from "lucide-react";
 import Link from "next/link";
 import { Aura } from "@/components/aura/Aura";
 import { Badge } from "@/components/ui/Badge";
@@ -22,6 +22,7 @@ interface Stats {
   recentEnquiries: { id: string; type: string; name: string; organisation: string; status: string; createdAt: string }[];
   counts: Record<string, number>;
   mail: boolean;
+  demoItems: number;
 }
 
 export function Dashboard() {
@@ -45,6 +46,15 @@ export function Dashboard() {
     <div>
       <PageTitle title={`Welcome${me?.name ? `, ${me.name.split(" ")[0]}` : ""}!`} description="Here's what's happening with the Agentic AI Workshop 2026." />
       {error ? <p className="card mb-6 p-4 text-blush-ink">{error}</p> : null}
+      {data?.demoItems ? (
+        <div role="alert" className="tone-blush card mb-6 flex items-start gap-3 p-4 text-sm">
+          <FlaskConical size={18} aria-hidden className="mt-0.5 shrink-0 text-blush-ink" />
+          <p className="text-fg">
+            <strong>Sample content is loaded ({data.demoItems} items).</strong> It was added to preview the design and is marked “sample”. Remove it before launch with{" "}
+            <code className="rounded bg-surface-2 px-1.5 py-0.5 text-[13px]">npm run seed:demo -- --remove</code> (your own content is kept), or delete the items here.
+          </p>
+        </div>
+      ) : null}
       {data && !data.mail ? (
         <div className="tone-butter card mb-6 flex items-start gap-3 p-4 text-sm">
           <Mail size={18} aria-hidden className="mt-0.5 shrink-0 text-butter-ink" />

@@ -1,6 +1,7 @@
 import { after, type NextRequest } from "next/server";
 import { getSettings } from "@/lib/content/queries";
 import { connectDb, isDuplicateKeyError } from "@/lib/db";
+import { deadlinePassed } from "@/lib/event";
 import { Registration } from "@/lib/models";
 import { registrationEmail } from "@/lib/server/emails";
 import { clientIp, error, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
@@ -23,6 +24,7 @@ export async function POST(req: NextRequest) {
   const s = await getSettings();
   if (s.workshopUrl) return error(409, "Registration is handled through the official external form.");
   if (s.workshopStatus !== "open") return error(403, s.workshopStatus === "closed" ? "Registration is closed." : "Registration has not opened yet.");
+  if (deadlinePassed(s.workshopDeadline)) return error(403, "Registration is closed — the deadline has passed.");
 
   const parsed = registrationSchema.safeParse(body);
   if (!parsed.success) return error(422, "Please check the highlighted fields.", { fieldErrors: zodFieldErrors(parsed.error) });

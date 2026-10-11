@@ -1,0 +1,71 @@
+# Website + MongoDB in two containers.
+#
+#   cp .env.example .env        # then set AUTH_SECRET, ADMIN_EMAIL, ADMIN_PASSWORD, NEXT_PUBLIC_SITE_URL …
+#   docker compose up -d --build
+#
+# Scripts (seed, sample content, users) run in the `tools` container:
+#   docker compose run --rm tools seed
+#   docker compose run --rm tools create-admin -- --email you@iitd.ac.in
+#   docker compose run --rm tools seed:demo            # sample content; remove with: seed:demo -- --remove
+#
+# Put the site behind Nginx/Apache with HTTPS in production (see README.md).
+
+x-build: &build
+  context: .
+  args:
+    NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL:-http://localhost:3000}
+    NEXT_PUBLIC_BASE_PATH: ${NEXT_PUBLIC_BASE_PATH:-}
+    NEXT_PUBLIC_GA_ID: ${NEXT_PUBLIC_GA_ID:-}
+
+services:
+  mongo:
+    image: mongo:8
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    # Not published to the host. To reach it from the host for backups, add:
+    # ports: ["127.0.0.1:27017:27017"]
+
+  web:
+    build: *build
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:3000"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/aaiw
+      AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env (32+ random characters)}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      COOKIE_SECURE: ${COOKIE_SECURE:-true}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_SECURE: ${SMTP_SECURE:-}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-8}
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  tools:
+    profiles: ["tools"]
+    build:
+      <<: *build
+      target: build
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/aaiw
+    entrypoint: ["npm", "run", "--silent"]
+    command: ["seed"]
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mongo-data:
