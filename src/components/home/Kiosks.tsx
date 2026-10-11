@@ -21,7 +21,7 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
               icon={<Store size={18} aria-hidden />}
             />
             {s.contactEmail ? (
-              <a className="mi-link text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent("Exhibitor enquiry — Agentic AI Workshop 2026")}`}>
+              <a className="mi-link text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Exhibitor enquiry — ${s.eventName}`)}`}>
                 or e-mail {s.contactEmail}
               </a>
             ) : null}

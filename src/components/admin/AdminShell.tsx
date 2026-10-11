@@ -45,6 +45,10 @@ export interface AdminMe {
 const MeContext = createContext<AdminMe | null>(null);
 export const useMe = () => useContext(MeContext);
 
+const EventNameContext = createContext("");
+/** The event name from Site settings. */
+export const useEventName = () => useContext(EventNameContext);
+
 interface Item {
   href: string;
   label: string;
@@ -158,7 +162,7 @@ function NavItems({ me, onNavigate, pathname }: NavProps & { pathname: string | 
   );
 }
 
-export function AdminShell({ children }: { children: ReactNode }) {
+export function AdminShell({ eventName, shortName, children }: { eventName: string; shortName: string; children: ReactNode }) {
   const { data: me } = useApi<AdminMe>("/auth/me");
   const [open, setOpen] = useState(false);
 
@@ -173,7 +177,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         <AuraHead size={30} />
       </span>
       <span className="leading-tight">
-        <span className="block font-display text-[15px] font-bold text-fg">AAIW 2026</span>
+        <span className="block font-display text-[15px] font-bold text-fg">{shortName || eventName}</span>
         <span className="block text-xs font-semibold text-subtle">Content manager</span>
       </span>
     </Link>
@@ -233,7 +237,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
         ) : null}
 
         <main id="main" className="min-w-0 px-4 py-6 sm:px-8 sm:py-8">
-          {children}
+          <EventNameContext.Provider value={eventName}>{children}</EventNameContext.Provider>
         </main>
       </div>
     </MeContext.Provider>

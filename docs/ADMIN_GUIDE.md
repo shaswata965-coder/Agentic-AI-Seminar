@@ -34,7 +34,7 @@ This guide is for the organising team of the **Agentic AI Workshop 2026**. It ex
 ## 3. Event details, dates and registration
 
 **Site settings → Event details**
-- Event name, short name, tagline, short description (used by search engines and social media), organised by.
+- Event name, short name, tagline, short description (used by search engines and social media), organised by. The event name appears everywhere the event is named: the logo, the home page title, page titles, e-mails, calendar invites and the programme PDF. A few texts mention the name in their own words (*Workshop motivation* under *About & themes*, and *Sponsorship introduction* under *Partners & kiosks*); update those by hand when the name changes.
 - **Starts / Ends** (Indian Standard Time). The countdown on the home page counts down to the start time.
 - Venue, hall/building (leave blank to show "to be announced"), full address, and the small badge above the title (e.g. "Registrations are open").
 

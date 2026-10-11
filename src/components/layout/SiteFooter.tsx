@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Aura } from "@/components/aura/Aura";
 import { InstagramIcon, LinkedInIcon, XIcon, YouTubeIcon } from "@/components/ui/BrandIcons";
 import type { SiteSettings } from "@/lib/content/types";
-import { hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
+import { brandName, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { PRIMARY_NAV, SECTION_NAV, postEventNav } from "@/lib/nav";
 import { BrandMark } from "./BrandMark";
@@ -53,7 +53,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
       <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
       <div className="container-site relative grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
-          <BrandMark shortName={s.shortName} />
+          <BrandMark {...brandName(s)} />
           <p className="mt-4 max-w-sm text-[15px] text-muted">{s.tagline}</p>
           <ul className="mt-5 space-y-2 text-[15px] text-muted">
             <li className="flex gap-2">

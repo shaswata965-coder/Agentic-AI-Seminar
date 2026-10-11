@@ -493,8 +493,8 @@ export const SETTINGS_DEF: SingletonDef = {
       key: "general",
       title: "Event details",
       fields: [
-        text("eventName", "Event name", { required: true, width: "half" }),
-        text("shortName", "Short name", { width: "half" }),
+        text("eventName", "Event name", { required: true, width: "half", help: "Used in the logo, page titles, e-mails and calendar invites. A year at the end (e.g. 2026) appears under the logo." }),
+        text("shortName", "Short name", { width: "half", help: "Used where space is tight: the admin panel and the name of the site when installed as an app." }),
         text("tagline", "Tagline"),
         textarea("description", "Short description", { help: "Used for search engines and social media previews.", maxLength: 300 }),
         text("organisedBy", "Organised by"),

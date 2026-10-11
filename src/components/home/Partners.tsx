@@ -105,7 +105,7 @@ export function Partners({ s, sponsors }: { s: SiteSettings; sponsors: Sponsor[]
             </ButtonLink>
           ) : null}
           {s.contactEmail ? (
-            <a className="mi-underline text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent("Sponsorship enquiry — Agentic AI Workshop 2026")}`}>
+            <a className="mi-underline text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Sponsorship enquiry — ${s.eventName}`)}`}>
               Sponsor enquiries: {s.contactEmail}
             </a>
           ) : null}

@@ -7,7 +7,8 @@ import { getSettings } from "@/lib/content/queries";
 import { formatDateRange } from "@/lib/format";
 import { svgDataUri, toSvgString } from "@/lib/svg-string";
 
-export const alt = "Agentic AI Workshop 2026 — IIT Delhi & Yardi School of Artificial Intelligence";
+// A static string, so it describes the card rather than naming the event (the name is edited in the admin).
+export const alt = "Event title, dates and tagline beside Aura, the robot guide — IIT Delhi & Yardi School of Artificial Intelligence";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 

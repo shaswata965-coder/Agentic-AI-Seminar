@@ -6,7 +6,7 @@ import { ShareButtons } from "@/components/share/ShareButtons";
 import { ButtonLink } from "@/components/ui/Button";
 import { Img } from "@/components/ui/Img";
 import type { SiteSettings } from "@/lib/content/types";
-import { eventCalendarLinks, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
+import { eventCalendarLinks, hackathonRegistrationHref, registrationHref, splitEventName, venueLine } from "@/lib/event";
 import { formatDate, formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 import { Countdown } from "./Countdown";
@@ -49,6 +49,10 @@ const THEME_CHIPS = [
 export function Hero({ s }: { s: SiteSettings }) {
   const dates = formatDateRange(s.startDate, s.endDate);
   const links = eventCalendarLinks(s);
+  // "Agentic AI Workshop 2026" → highlighted "Agentic AI", then "Workshop", then a muted "2026".
+  const { title, year } = splitEventName(s.eventName);
+  const lead = title.split(/\s+/);
+  const last = lead.pop();
   return (
     <section className="relative isolate overflow-hidden" aria-labelledby="hero-title">
       {/* Background: pastel mesh + dotted grid + live agent network */}
@@ -69,13 +73,19 @@ export function Hero({ s }: { s: SiteSettings }) {
             </p>
           ) : null}
           <h1 id="hero-title" className="mt-5 font-display text-[2.6rem] leading-[1.02] font-extrabold tracking-tight text-fg sm:text-6xl lg:text-[4.4rem]">
-            {s.eventName.replace(/\s*20\d\d\s*$/, "") === "Agentic AI Workshop" ? (
+            {lead.length ? (
               <>
-                <span className="text-gradient animate-gradient">Agentic AI</span> Workshop <span className="text-muted">2026</span>
+                <span className="text-gradient animate-gradient">{lead.join(" ")}</span> {last}
               </>
             ) : (
-              s.eventName
+              <span className="text-gradient animate-gradient">{last}</span>
             )}
+            {year ? (
+              <>
+                {" "}
+                <span className="text-muted">{year}</span>
+              </>
+            ) : null}
           </h1>
           <p className="mt-5 max-w-xl text-lg text-muted sm:text-xl">{s.tagline}</p>
 

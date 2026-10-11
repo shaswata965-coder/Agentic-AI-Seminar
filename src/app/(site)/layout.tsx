@@ -6,7 +6,7 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getSettings } from "@/lib/content/queries";
 import { buildAssistantIndex } from "@/lib/content/search";
-import { hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
+import { brandName, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { postEventNav } from "@/lib/nav";
 
@@ -22,7 +22,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         Skip to content
       </a>
       {s.bannerText ? <SiteBanner text={s.bannerText} link={s.bannerLink} /> : null}
-      <SiteHeader shortName={s.shortName} registerHref={registrationHref(s)} extraNav={postEventNav(s)} />
+      <SiteHeader brand={brandName(s)} registerHref={registrationHref(s)} extraNav={postEventNav(s)} />
       <main id="main" tabIndex={-1} className="outline-none">
         {children}
       </main>

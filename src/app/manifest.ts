@@ -1,11 +1,13 @@
 import type { MetadataRoute } from "next";
+import { getSettings } from "@/lib/content/queries";
 import { BASE_PATH } from "@/lib/paths";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const s = await getSettings();
   return {
-    name: "Agentic AI Workshop 2026 · IIT Delhi",
-    short_name: "AAIW 2026",
-    description: "Agentic AI Workshop 2026 at IIT Delhi — talks, tutorials, demos, kiosks and a hackathon. 15–16 December 2026.",
+    name: `${s.eventName} · IIT Delhi`,
+    short_name: s.shortName || s.eventName,
+    description: s.description || s.tagline,
     start_url: `${BASE_PATH}/`,
     display: "standalone",
     background_color: "#f6f8fc",

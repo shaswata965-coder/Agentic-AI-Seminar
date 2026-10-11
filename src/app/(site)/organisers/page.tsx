@@ -39,7 +39,7 @@ function Grid({ people, label, tone }: { people: Person[]; label: string; tone: 
 }
 
 export default async function OrganisersPage() {
-  const people = await getPeople();
+  const [s, people] = await Promise.all([getSettings(), getPeople()]);
   const faculty = people.filter((p) => p.group === "faculty");
   const students = people.filter((p) => p.group === "student");
   const volunteers = people.filter((p) => p.group === "volunteer");
@@ -50,7 +50,7 @@ export default async function OrganisersPage() {
         crumb="Organisers"
         eyebrow="The team"
         title="Organisers"
-        description={<p>The Agentic AI Workshop 2026 is organised by the Indian Institute of Technology Delhi and the Yardi School of Artificial Intelligence (ScAI), IIT Delhi.</p>}
+        description={<p>The {s.eventName} is organised by the Indian Institute of Technology Delhi and the Yardi School of Artificial Intelligence (ScAI), IIT Delhi.</p>}
         auraNode={
           <div className="flex items-end">
             <Aura variant="organisers" size={120} overrides={{ eyeColor: AURA_EYES.lilac, effects: [] }} entrance="load" entranceFrom="left" entranceDelay={0.45} className="-mr-6" />

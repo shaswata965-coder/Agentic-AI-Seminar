@@ -1,6 +1,6 @@
 import { googleCalendarUrl, outlookCalendarUrl } from "./calendar";
 import type { SiteSettings } from "./content/types";
-import { eventDayDate, formatDateRange, istDateTime } from "./format";
+import { eventDayDate, formatDate, formatDateRange, istDateTime } from "./format";
 import { absoluteUrl } from "./paths";
 
 export interface EventDay {
@@ -29,6 +29,18 @@ export function eventDays(s: SiteSettings): EventDay[] {
       end: istDateTime(date, endTime) ?? end,
     };
   });
+}
+
+/** "Agentic AI Workshop 2026" → { title: "Agentic AI Workshop", year: "2026" }. Names without a trailing year keep it empty. */
+export function splitEventName(name: string): { title: string; year: string } {
+  const m = name.trim().match(/^(.+?)\s+(20\d\d)$/);
+  return m ? { title: m[1], year: m[2] } : { title: name.trim(), year: "" };
+}
+
+/** Event name and year for the logo: the year comes from the name, or else from the start date. */
+export function brandName(s: SiteSettings): { title: string; year: string } {
+  const { title, year } = splitEventName(s.eventName);
+  return { title, year: year || formatDate(s.startDate, { year: "numeric" }) };
 }
 
 export function venueLine(s: SiteSettings) {

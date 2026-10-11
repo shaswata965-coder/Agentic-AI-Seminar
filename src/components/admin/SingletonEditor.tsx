@@ -1,6 +1,7 @@
 "use client";
 
 import { ExternalLink, Save } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -17,6 +18,7 @@ type Values = Record<string, unknown>;
 export function SingletonEditor({ kind }: { kind: "settings" | "hackathon" }) {
   const def = SINGLETONS[kind];
   const toast = useToast();
+  const router = useRouter();
   const { data, error, loading, setData } = useApi<{ data: Values; updatedAt: string | null }>(`/singleton/${kind}`);
   const [draft, setDraft] = useState<Values | null>(null);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -49,6 +51,7 @@ export function SingletonEditor({ kind }: { kind: "settings" | "hackathon" }) {
       setData(res);
       setDraft(null);
       setSavedAt(res.updatedAt);
+      router.refresh(); // the admin sidebar and tab titles show the event name too
       toast("Saved — the website now shows your changes.", "success");
     } catch (e) {
       if (e instanceof ApiError) {

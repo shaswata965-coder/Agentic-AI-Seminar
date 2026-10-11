@@ -10,7 +10,7 @@ import { ATTENDEE_CATEGORY_META } from "@/lib/content/constants";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
 import { COLLECTIONS } from "@/lib/schema/resources";
-import { PageTitle, useMe } from "./AdminShell";
+import { PageTitle, useEventName, useMe } from "./AdminShell";
 import { api, useApi } from "./api";
 
 interface Stats {
@@ -29,6 +29,7 @@ interface Stats {
 
 export function Dashboard() {
   const me = useMe();
+  const eventName = useEventName();
   const { data, error } = useApi<Stats>("/stats");
   const tiles = [
     { label: "Workshop registrations", value: data?.workshop, note: data ? `+${data.workshopWeek} this week` : "", Icon: Ticket, tone: "tone-peach", href: "/admin/registrations" },
@@ -46,7 +47,7 @@ export function Dashboard() {
 
   return (
     <div>
-      <PageTitle title={`Welcome${me?.name ? `, ${me.name.split(" ")[0]}` : ""}!`} description="Here's what's happening with the Agentic AI Workshop 2026." />
+      <PageTitle title={`Welcome${me?.name ? `, ${me.name.split(" ")[0]}` : ""}!`} description={`Here's what's happening with the ${eventName}.`} />
       {error ? <p className="card mb-6 p-4 text-blush-ink">{error}</p> : null}
       {data?.demoItems ? (
         <div role="alert" className="tone-blush card mb-6 flex items-start gap-3 p-4 text-sm">

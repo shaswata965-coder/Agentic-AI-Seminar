@@ -12,7 +12,8 @@ import { BrandMark } from "./BrandMark";
 import { ThemeToggle } from "./ThemeToggle";
 
 export interface SiteHeaderProps {
-  shortName: string;
+  /** From `brandName()`. */
+  brand: { title: string; year: string };
   registerHref: string;
   extraNav: NavItem[];
 }
@@ -22,7 +23,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProps) {
+export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -93,7 +94,7 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
     >
       <div className="container-site flex h-16 items-center gap-3 lg:h-[72px]">
         <Link href="/" className="rounded-2xl">
-          <BrandMark shortName={shortName} srSuffix=", home page" />
+          <BrandMark {...brand} srSuffix=", home page" />
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden items-center gap-0.5 lg:flex">
@@ -195,7 +196,7 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
           <div className="flex min-h-full flex-col">
             <div className="container-site flex h-16 items-center justify-between">
               <Link href="/" onClick={() => setMenuOpen(false)}>
-                <BrandMark shortName={shortName} srSuffix=", home page" />
+                <BrandMark {...brand} srSuffix=", home page" />
               </Link>
               <div className="flex items-center gap-2">
                 <ThemeToggle />

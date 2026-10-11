@@ -9,7 +9,7 @@ import { useUrlParam } from "@/lib/client-hooks";
 import { withBase } from "@/lib/paths";
 import { api, ApiError } from "./api";
 
-export function LoginForm() {
+export function LoginForm({ eventName }: { eventName: string }) {
   const next = useUrlParam("next");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -35,7 +35,7 @@ export function LoginForm() {
       <div className="flex flex-col items-center text-center">
         <Aura variant="admin" size={130} />
         <h1 className="mt-2 font-display text-2xl font-bold text-fg">Organiser sign-in</h1>
-        <p className="mt-1 text-sm text-muted">Manage the Agentic AI Workshop 2026 website.</p>
+        <p className="mt-1 text-sm text-muted">Manage the {eventName} website.</p>
       </div>
       <form onSubmit={onSubmit} className="mt-6 grid gap-4">
         <TextField label="E-mail" type="email" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />
