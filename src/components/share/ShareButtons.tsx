@@ -19,7 +19,7 @@ export function ShareButtons({ url, text, className, label = "Share" }: { url: s
     { name: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`, Icon: FacebookIcon },
   ];
   const btn =
-    "grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-brand";
+    "grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-muted transition hover:-translate-y-1 hover:border-brand hover:text-brand hover:shadow-card";
 
   async function copy() {
     try {
@@ -34,16 +34,18 @@ export function ShareButtons({ url, text, className, label = "Share" }: { url: s
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       <span className="mr-1 text-sm font-semibold text-subtle">{label}</span>
       {canShare ? (
-        <button type="button" className={btn} aria-label="Share via your device" onClick={() => navigator.share({ title: text, url }).catch(() => {})}>
+        <button type="button" className={btn} data-ripple="" aria-label="Share via your device" onClick={() => navigator.share({ title: text, url }).catch(() => {})}>
           <Share2 size={17} aria-hidden />
         </button>
       ) : null}
       {targets.map(({ name, href, Icon }) => (
-        <a key={name} href={href} target="_blank" rel="noopener noreferrer" className={btn} aria-label={`Share on ${name} (opens in a new tab)`}>
-          <Icon size={17} />
+        <a key={name} href={href} target="_blank" rel="noopener noreferrer" className={btn} data-ripple="" aria-label={`Share on ${name} (opens in a new tab)`}>
+          <span className="btn-ico-l">
+            <Icon size={17} />
+          </span>
         </a>
       ))}
-      <button type="button" className={btn} aria-label="Copy link" onClick={copy}>
+      <button type="button" className={btn} data-ripple="" data-pop="" aria-label="Copy link" onClick={copy}>
         <Link2 size={17} aria-hidden />
       </button>
     </div>

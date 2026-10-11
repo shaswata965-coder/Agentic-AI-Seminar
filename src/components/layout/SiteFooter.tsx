@@ -25,9 +25,12 @@ export function SocialLinks({ s, className }: { s: SiteSettings; className?: str
             target="_blank"
             rel="noopener noreferrer"
             aria-label={`${label} (opens in a new tab)`}
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-brand"
+            data-ripple=""
+            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-muted transition hover:-translate-y-1 hover:border-brand hover:text-brand hover:shadow-card"
           >
-            <Icon size={17} />
+            <span className="btn-ico-l">
+              <Icon size={17} />
+            </span>
           </a>
         </li>
       ))}
@@ -36,7 +39,8 @@ export function SocialLinks({ s, className }: { s: SiteSettings; className?: str
 }
 
 export function SiteFooter({ s }: { s: SiteSettings }) {
-  const linkCls = "text-[15px] text-muted transition-colors hover:text-fg";
+  // mi-underline draws the underline in and handles the colour transition too.
+  const linkCls = "mi-underline text-[15px] text-muted hover:text-fg";
   const involve = [
     { href: registrationHref(s), label: "Register for the workshop" },
     { href: hackathonRegistrationHref(s), label: "Join the hackathon" },
@@ -63,7 +67,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
             {s.contactEmail ? (
               <li className="flex gap-2">
                 <Mail size={18} aria-hidden className="mt-0.5 shrink-0 text-subtle" />
-                <a className="hover:text-fg" href={`mailto:${s.contactEmail}`}>
+                <a className="mi-underline hover:text-fg" href={`mailto:${s.contactEmail}`}>
                   {s.contactEmail}
                 </a>
               </li>
@@ -71,7 +75,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
             {s.contactPhone ? (
               <li className="flex gap-2">
                 <Phone size={18} aria-hidden className="mt-0.5 shrink-0 text-subtle" />
-                <a className="hover:text-fg" href={`tel:${s.contactPhone.replace(/\s+/g, "")}`}>
+                <a className="mi-underline hover:text-fg" href={`tel:${s.contactPhone.replace(/\s+/g, "")}`}>
                   {s.contactPhone}
                 </a>
               </li>
@@ -130,10 +134,10 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
             © 2026 {s.organisedBy.includes("IIT Delhi") ? "IIT Delhi · Yardi School of Artificial Intelligence" : s.organisedBy}. All rights reserved.
           </p>
           <p className="flex flex-wrap gap-x-4 gap-y-1">
-            <Link className="hover:text-fg" href="/meet-aura">
+            <Link className="mi-underline hover:text-fg" href="/meet-aura">
               Meet Aura, our mascot
             </Link>
-            <Link className="hover:text-fg" href="/admin" prefetch={false}>
+            <Link className="mi-underline hover:text-fg" href="/admin" prefetch={false}>
               Organiser login
             </Link>
           </p>

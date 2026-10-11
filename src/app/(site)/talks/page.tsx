@@ -22,7 +22,7 @@ export default async function TalksPage() {
           {talks.length ? (
             <ul className="grid gap-6 md:grid-cols-2">
               {talks.map((t) => (
-                <li key={t.id} className="card flex flex-col overflow-hidden">
+                <li key={t.id} data-glow="" className="card flex flex-col overflow-hidden transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">
                   {t.videoUrl ? (
                     <div className="p-3 pb-0">
                       <VideoEmbed url={t.videoUrl} title={t.title} />

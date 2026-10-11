@@ -45,8 +45,8 @@ export function About({ s }: { s: SiteSettings }) {
         <h3 className="font-display text-2xl font-bold text-fg sm:text-3xl">Who should attend</h3>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {s.audience.map((a, i) => (
-            <li key={a.title} data-reveal style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties} className={`tone-${TONES[i % 6]} card p-5 transition-transform duration-300 hover:-translate-y-1`}>
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink">
+            <li key={a.title} data-reveal data-glow="" style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties} className={`tone-${TONES[i % 6]} card group p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6">
                 <CmsIcon name={a.icon} size={21} />
               </span>
               <p className="mt-4 font-display text-lg font-semibold text-fg">{a.title}</p>
@@ -63,7 +63,8 @@ export function About({ s }: { s: SiteSettings }) {
             <li key={a.title} data-reveal style={{ "--reveal-delay": `${i * 60}ms` } as CSSProperties}>
               <Link
                 href={activityHref(a.title)}
-                className={`tone-${TONES[(i + 2) % 6]} card group flex h-full items-start gap-4 p-5 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}
+                data-glow=""
+                className={`tone-${TONES[(i + 2) % 6]} card group flex h-full items-start gap-4 p-5 transition-[translate,scale,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}
               >
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                   <CmsIcon name={a.icon} size={22} />

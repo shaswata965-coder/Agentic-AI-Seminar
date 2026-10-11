@@ -54,9 +54,9 @@ function FieldInput({ field: f, value, onChange, errors, path }: { field: FieldD
     case "boolean":
       return (
         <div>
-          <label htmlFor={id} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 has-[:checked]:border-brand has-[:checked]:bg-brand-soft">
+          <label htmlFor={id} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 hover:border-border-strong has-[:checked]:border-brand has-[:checked]:bg-brand-soft">
             <input {...common} type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
-            <span aria-hidden className="relative h-6 w-11 shrink-0 rounded-full bg-border-strong transition peer-checked:bg-brand peer-focus-visible:ring-4 peer-focus-visible:ring-[color-mix(in_oklab,var(--brand)_25%,transparent)] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition peer-checked:after:translate-x-5" />
+            <span aria-hidden className="relative h-6 w-11 shrink-0 rounded-full bg-border-strong transition peer-checked:bg-brand peer-focus-visible:ring-4 peer-focus-visible:ring-[color-mix(in_oklab,var(--brand)_25%,transparent)] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-[translate] after:duration-300 after:ease-[cubic-bezier(0.34,1.56,0.64,1)] peer-checked:after:translate-x-5" />
             <span className="text-sm font-semibold text-fg">{f.label}</span>
           </label>
           {help}

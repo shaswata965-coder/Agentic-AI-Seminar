@@ -47,9 +47,10 @@ function Chip({ on, onClick, children, tone }: { on: boolean; onClick: () => voi
       type="button"
       aria-pressed={on}
       onClick={onClick}
+      data-ripple=""
       className={cn(
         tone,
-        "rounded-full px-3 py-1.5 text-sm font-semibold transition",
+        "rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5",
         on ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_55%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
       )}
     >
@@ -178,12 +179,13 @@ export function ProgrammeView({
               aria-selected={on}
               aria-controls="programme-panel"
               onClick={() => setDay(d.day)}
+              data-ripple=""
               className={cn(
                 "group flex items-center gap-3 rounded-2xl border px-5 py-3 text-left transition",
-                on ? "border-brand bg-brand text-brand-fg shadow-card" : "border-border bg-surface text-fg hover:border-border-strong",
+                on ? "border-brand bg-brand text-brand-fg shadow-card" : "border-border bg-surface text-fg hover:-translate-y-0.5 hover:border-border-strong hover:shadow-card",
               )}
             >
-              <span className="font-display text-2xl font-extrabold">D{d.day}</span>
+              <span className={cn("font-display text-2xl font-extrabold transition-[scale,rotate] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]", on ? "scale-110 -rotate-3" : "group-hover:-rotate-3")}>D{d.day}</span>
               <span className="leading-tight">
                 <span className="block text-sm font-bold">Day {d.day}</span>
                 <span className={cn("block text-xs", on ? "opacity-85" : "text-subtle")}>
@@ -213,8 +215,9 @@ export function ProgrammeView({
             type="button"
             aria-pressed={agendaOnly}
             onClick={() => setAgendaOnly((v) => !v)}
+            data-ripple=""
             className={cn(
-              "tone-butter inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition",
+              "tone-butter inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition hover:-translate-y-0.5",
               agendaOnly ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_55%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
             )}
           >
@@ -229,9 +232,9 @@ export function ProgrammeView({
                 setQ("");
                 setAgendaOnly(false);
               }}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline"
+              className="group/clear mi-link inline-flex animate-pop items-center gap-1 text-sm font-semibold text-brand"
             >
-              <X size={15} aria-hidden /> Clear filters
+              <X size={15} aria-hidden className="transition-transform duration-300 group-hover/clear:rotate-90" /> Clear filters
             </button>
           ) : null}
         </div>
@@ -288,10 +291,11 @@ export function ProgrammeView({
                       <li
                         key={s.id}
                         id={`session-${s.id}`}
+                        data-glow={isBreak ? undefined : ""}
                         className={cn(
                           `tone-${(SESSION_TYPE_META[s.type] ?? SESSION_TYPE_META.other).tone}`,
-                          "scroll-mt-28 rounded-3xl border p-5 transition-shadow",
-                          isBreak ? "border-dashed border-border-strong bg-accent-soft/50" : "card hover:shadow-card-lg",
+                          "scroll-mt-28 rounded-3xl border p-5 transition-[box-shadow,translate]",
+                          isBreak ? "border-dashed border-border-strong bg-accent-soft/50" : "card hover:-translate-y-0.5 hover:shadow-card-lg",
                           live && "ring-2 ring-mint",
                         )}
                       >
@@ -313,7 +317,8 @@ export function ProgrammeView({
                               <a
                                 href={withBase(`/api/calendar?session=${encodeURIComponent(s.id)}`)}
                                 download
-                                className="grid h-9 w-9 place-items-center rounded-full text-subtle transition hover:bg-surface-2 hover:text-fg"
+                                data-ripple=""
+                                className="grid h-9 w-9 place-items-center rounded-full text-subtle transition hover:-translate-y-0.5 hover:bg-surface-2 hover:text-fg"
                                 aria-label={`Add “${s.title}” to your calendar`}
                                 title="Add to calendar"
                               >
@@ -325,6 +330,7 @@ export function ProgrammeView({
                                 aria-pressed={starred}
                                 aria-label={starred ? `Remove “${s.title}” from my agenda` : `Add “${s.title}” to my agenda`}
                                 title={starred ? "In my agenda" : "Add to my agenda"}
+                                data-burst=""
                                 className={cn("grid h-9 w-9 place-items-center rounded-full transition hover:bg-surface-2", starred ? "text-butter-ink" : "text-subtle hover:text-fg")}
                               >
                                 <Star size={18} aria-hidden fill={starred ? "currentColor" : "none"} />
@@ -339,7 +345,7 @@ export function ProgrammeView({
                             {moderator ? (
                               <p>
                                 <span className="font-semibold text-subtle">Moderator: </span>
-                                <Link className="font-semibold text-fg underline decoration-border-strong underline-offset-2 hover:decoration-brand" href={`/speakers?speaker=${encodeURIComponent(moderator.slug)}`}>
+                                <Link className="font-semibold text-fg underline decoration-border-strong underline-offset-2 hover:decoration-brand hover:underline-offset-4" href={`/speakers?speaker=${encodeURIComponent(moderator.slug)}`}>
                                   {moderator.name}
                                 </Link>
                               </p>
@@ -350,7 +356,7 @@ export function ProgrammeView({
                                 {people.map((p, i) => (
                                   <span key={p.id}>
                                     {i ? ", " : ""}
-                                    <Link className="font-semibold text-fg underline decoration-border-strong underline-offset-2 hover:decoration-brand" href={`/speakers?speaker=${encodeURIComponent(p.slug)}`}>
+                                    <Link className="font-semibold text-fg underline decoration-border-strong underline-offset-2 hover:decoration-brand hover:underline-offset-4" href={`/speakers?speaker=${encodeURIComponent(p.slug)}`}>
                                       {p.name}
                                     </Link>
                                     {p.affiliation ? <span className="text-subtle"> · {p.affiliation}</span> : null}

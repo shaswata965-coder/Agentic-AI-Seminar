@@ -14,8 +14,9 @@ export function Highlights({ s }: { s: SiteSettings }) {
           <li
             key={`${h.label}-${i}`}
             data-reveal
+            data-glow=""
             style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties}
-            className={`tone-${TONES[i % TONES.length]} card group flex items-center gap-3.5 p-4 transition-transform duration-300 hover:-translate-y-1 sm:p-5 ${i === s.highlights.length - 1 && s.highlights.length % 2 === 1 ? "col-span-2 sm:col-span-1" : ""}`}
+            className={`tone-${TONES[i % TONES.length]} card group flex items-center gap-3.5 p-4 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg sm:p-5 ${i === s.highlights.length - 1 && s.highlights.length % 2 === 1 ? "col-span-2 sm:col-span-1" : ""}`}
           >
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
               <CmsIcon name={h.icon} size={22} />

@@ -53,7 +53,7 @@ export function MediaLibraryPicker({ open, onClose, onPick, accept }: { open: bo
                   onPick(m);
                   onClose();
                 }}
-                className="group block w-full overflow-hidden rounded-2xl border border-border bg-surface-2 text-left transition hover:border-brand"
+                className="group block w-full overflow-hidden rounded-2xl border border-border bg-surface-2 text-left transition hover:-translate-y-0.5 hover:border-brand hover:shadow-card"
               >
                 <span className="grid aspect-square place-items-center bg-[repeating-conic-gradient(var(--surface-2)_0_25%,var(--surface)_0_50%)] bg-[length:16px_16px]">
                   {m.contentType.startsWith("image/") ? (
@@ -111,14 +111,14 @@ export function MediaPicker({ value, onChange, accept = "image/*", id, invalid }
         </div>
         <div className="flex min-w-0 flex-1 flex-col gap-2">
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => input.current?.click()} disabled={busy} className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-sm font-semibold text-brand-fg disabled:opacity-60">
+            <button type="button" onClick={() => input.current?.click()} disabled={busy} data-ripple="" className="inline-flex items-center gap-1.5 rounded-full bg-brand px-3.5 py-1.5 text-sm font-semibold text-brand-fg hover:-translate-y-0.5 hover:bg-brand-strong disabled:opacity-60">
               {busy ? <Loader size={15} className="animate-spin" aria-hidden /> : <ImagePlus size={15} aria-hidden />} {busy ? "Uploading…" : "Upload"}
             </button>
-            <button type="button" onClick={() => setLibraryOpen(true)} className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-semibold text-fg hover:border-brand">
+            <button type="button" onClick={() => setLibraryOpen(true)} data-ripple="" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm font-semibold text-fg hover:-translate-y-0.5 hover:border-brand">
               <Library size={15} aria-hidden /> Library
             </button>
             {value ? (
-              <button type="button" onClick={() => onChange("")} className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-blush-ink hover:bg-blush-soft">
+              <button type="button" onClick={() => onChange("")} data-ripple="" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold text-blush-ink hover:bg-blush-soft">
                 <Trash size={15} aria-hidden /> Remove
               </button>
             ) : null}

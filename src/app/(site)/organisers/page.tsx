@@ -53,9 +53,9 @@ export default async function OrganisersPage() {
         description={<p>The Agentic AI Workshop 2026 is organised by the Indian Institute of Technology Delhi and the Yardi School of Artificial Intelligence (ScAI), IIT Delhi.</p>}
         auraNode={
           <div className="flex items-end">
-            <Aura variant="organisers" size={120} overrides={{ eyeColor: AURA_EYES.lilac, effects: [] }} className="-mr-6" />
-            <Aura variant="organisers" size={180} interactive greet="We're the team behind the workshop!" className="relative z-10" />
-            <Aura variant="organisers" size={120} overrides={{ eyeColor: AURA_EYES.mint, expression: "wink", pose: "idle", effects: [] }} className="-ml-6" />
+            <Aura variant="organisers" size={120} overrides={{ eyeColor: AURA_EYES.lilac, effects: [] }} entrance="load" entranceFrom="left" entranceDelay={0.45} className="-mr-6" />
+            <Aura variant="organisers" size={180} interactive greet="We're the team behind the workshop!" entrance="load" entranceFrom="top" entranceDelay={0.2} className="relative z-10" />
+            <Aura variant="organisers" size={120} overrides={{ eyeColor: AURA_EYES.mint, expression: "wink", pose: "idle", effects: [] }} entrance="load" entranceDelay={0.65} className="-ml-6" />
           </div>
         }
       />

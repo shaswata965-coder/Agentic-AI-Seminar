@@ -31,7 +31,8 @@ function Group<T extends string>({ title, items, value, onChange }: { title: str
             type="button"
             aria-pressed={value === it}
             onClick={() => onChange(it)}
-            className={cn("rounded-full px-3 py-1.5 text-sm font-semibold transition", value === it ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}
+            data-ripple=""
+            className={cn("rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5", value === it ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}
           >
             {label(it)}
           </button>
@@ -76,8 +77,8 @@ export function AuraPlayground() {
             overrides={{ expression, pose, prop: prop === "none" ? undefined : prop, headwear: headwear === "none" ? undefined : headwear, emblem, effects, eyeColor: eye }}
           />
         </div>
-        <button type="button" onClick={surprise} className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 font-semibold text-brand-fg transition hover:-translate-y-0.5">
-          <Shuffle size={17} aria-hidden /> Surprise me
+        <button type="button" onClick={surprise} data-ripple="" className="btn-shine group mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 font-semibold text-brand-fg transition hover:-translate-y-0.5 hover:bg-brand-strong">
+          <Shuffle size={17} aria-hidden className="transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:rotate-180" /> Surprise me
         </button>
       </div>
       <div className="card grid min-w-0 gap-6 p-4 sm:p-6">
@@ -100,7 +101,7 @@ export function AuraPlayground() {
             {EFFECTS.map((fx) => {
               const on = effects.includes(fx);
               return (
-                <button key={fx} type="button" aria-pressed={on} onClick={() => setEffects((list) => (on ? list.filter((x) => x !== fx) : [...list, fx]))} className={cn("rounded-full px-3 py-1.5 text-sm font-semibold transition", on ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}>
+                <button key={fx} type="button" aria-pressed={on} onClick={() => setEffects((list) => (on ? list.filter((x) => x !== fx) : [...list, fx]))} data-ripple="" className={cn("rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5", on ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}>
                   {label(fx)}
                 </button>
               );
@@ -111,7 +112,7 @@ export function AuraPlayground() {
           <legend className="text-xs font-bold tracking-[0.12em] text-subtle uppercase">Eye colour</legend>
           <div className="mt-2 flex flex-wrap gap-2">
             {Object.entries(AURA_EYES).map(([name, c]) => (
-              <button key={name} type="button" aria-pressed={eye === c} aria-label={`${name} eyes`} onClick={() => setEye(c)} className={cn("h-9 w-9 rounded-full ring-2 ring-offset-2 ring-offset-surface transition", eye === c ? "ring-brand" : "ring-transparent")} style={{ background: c }} />
+              <button key={name} type="button" aria-pressed={eye === c} aria-label={`${name} eyes`} onClick={() => setEye(c)} className={cn("h-9 w-9 rounded-full ring-2 ring-offset-2 ring-offset-surface transition hover:scale-110", eye === c ? "scale-110 ring-brand" : "ring-transparent")} style={{ background: c }} />
             ))}
           </div>
         </fieldset>

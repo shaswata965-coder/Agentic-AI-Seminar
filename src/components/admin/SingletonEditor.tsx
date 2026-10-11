@@ -89,7 +89,7 @@ export function SingletonEditor({ kind }: { kind: "settings" | "hackathon" }) {
                     aria-current={tab === s.key ? "true" : undefined}
                     className={cn(
                       "flex w-full items-center justify-between gap-2 rounded-xl px-3 py-2 text-left text-sm font-semibold whitespace-nowrap transition",
-                      tab === s.key ? "bg-surface text-fg shadow-card ring-1 ring-border" : "text-muted hover:text-fg",
+                      tab === s.key ? "bg-surface text-fg shadow-card ring-1 ring-border" : "text-muted hover:translate-x-0.5 hover:bg-surface/60 hover:text-fg",
                     )}
                   >
                     {s.title}

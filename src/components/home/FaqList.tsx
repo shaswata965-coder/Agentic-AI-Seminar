@@ -44,8 +44,9 @@ export function FaqList({ faqs, showAura = true }: { faqs: Faq[]; showAura?: boo
                   type="button"
                   aria-pressed={cat === c}
                   onClick={() => setCat(c)}
+                  data-ripple=""
                   className={cn(
-                    "rounded-full px-3 py-1.5 text-sm font-semibold transition",
+                    "rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5",
                     cat === c ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
                   )}
                 >
@@ -66,7 +67,8 @@ export function FaqList({ faqs, showAura = true }: { faqs: Faq[]; showAura?: boo
         {shown.map((f) => (
           <li key={f.id}>
             <details
-              className="group rounded-2xl border border-border bg-surface transition-shadow open:shadow-card"
+              data-glow=""
+              className="group rounded-2xl border border-border bg-surface transition-[box-shadow,border-color] hover:border-border-strong open:shadow-card"
               onToggle={(e) => {
                 const isOpen = (e.currentTarget as HTMLDetailsElement).open;
                 setOpenId((cur) => (isOpen ? f.id : cur === f.id ? null : cur));

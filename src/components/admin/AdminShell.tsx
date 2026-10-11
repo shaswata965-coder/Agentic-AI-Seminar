@@ -139,11 +139,13 @@ function NavItems({ me, onNavigate, pathname }: NavProps & { pathname: string | 
                       onClick={onNavigate}
                       aria-current={active ? "page" : undefined}
                       className={cn(
-                        "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-colors",
-                        active ? "bg-brand text-brand-fg shadow-sm" : "text-muted hover:bg-surface-2 hover:text-fg",
+                        "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold transition-[color,background-color,translate,box-shadow] duration-200",
+                        active ? "bg-brand text-brand-fg shadow-sm" : "text-muted hover:translate-x-1 hover:bg-surface-2 hover:text-fg",
                       )}
                     >
-                      <Icon size={17} aria-hidden />
+                      <span className="btn-ico-l">
+                        <Icon size={17} aria-hidden />
+                      </span>
                       {label}
                     </Link>
                   </li>
@@ -166,8 +168,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
   }
 
   const brand = (
-    <Link href="/admin" className="flex items-center gap-2.5 px-3">
-      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--azure-soft),var(--lilac-soft))] ring-1 ring-border">
+    <Link href="/admin" className="group/brand flex items-center gap-2.5 px-3">
+      <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--azure-soft),var(--lilac-soft))] ring-1 ring-border transition-[rotate,scale] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/brand:scale-105 group-hover/brand:-rotate-6">
         <AuraHead size={30} />
       </span>
       <span className="leading-tight">
@@ -179,7 +181,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
   const footer = (
     <div className="grid gap-2 border-t border-border pt-4">
-      <a href={withBase("/")} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-fg">
+      <a href={withBase("/")} target="_blank" rel="noopener noreferrer" className="mi-link flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-muted hover:bg-surface-2 hover:text-fg">
         <ExternalLink size={16} aria-hidden /> View website
       </a>
       <div className="flex items-center gap-2 px-3">
@@ -188,8 +190,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
           <p className="text-xs text-subtle capitalize">{me?.role ?? ""}</p>
         </div>
         <ThemeToggle />
-        <button type="button" onClick={logout} className="grid h-10 w-10 place-items-center rounded-full border border-border text-muted hover:border-blush-ink hover:text-blush-ink" aria-label="Sign out" title="Sign out">
-          <LogOut size={17} aria-hidden />
+        <button type="button" onClick={logout} data-ripple="" className="group grid h-10 w-10 place-items-center rounded-full border border-border text-muted hover:border-blush-ink hover:text-blush-ink" aria-label="Sign out" title="Sign out">
+          <LogOut size={17} aria-hidden className="transition-transform duration-300 group-hover:translate-x-0.5" />
         </button>
       </div>
     </div>
@@ -208,7 +210,7 @@ export function AdminShell({ children }: { children: ReactNode }) {
 
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-[var(--header-bg)] px-4 backdrop-blur-xl lg:hidden">
           {brand}
-          <button type="button" onClick={() => setOpen(true)} className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface" aria-label="Open admin menu" aria-expanded={open}>
+          <button type="button" onClick={() => setOpen(true)} data-ripple="" className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface" aria-label="Open admin menu" aria-expanded={open}>
             <Menu size={20} aria-hidden />
           </button>
         </header>
@@ -218,8 +220,8 @@ export function AdminShell({ children }: { children: ReactNode }) {
             <div className="absolute inset-y-0 left-0 flex w-[min(20rem,88vw)] animate-fade-up flex-col gap-6 overflow-y-auto bg-surface p-4 shadow-card-lg">
               <div className="flex items-center justify-between">
                 {brand}
-                <button type="button" onClick={() => setOpen(false)} className="grid h-10 w-10 place-items-center rounded-full border border-border" aria-label="Close menu">
-                  <X size={18} aria-hidden />
+                <button type="button" onClick={() => setOpen(false)} data-ripple="" className="group grid h-10 w-10 place-items-center rounded-full border border-border" aria-label="Close menu">
+                  <X size={18} aria-hidden className="transition-transform duration-300 group-hover:rotate-90" />
                 </button>
               </div>
               <div className="flex-1">

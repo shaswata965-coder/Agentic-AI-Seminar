@@ -110,7 +110,7 @@ export function Hero({ s }: { s: SiteSettings }) {
         <div className="relative mx-auto flex w-full max-w-[460px] justify-center pt-6 lg:pt-0">
           <div aria-hidden className="absolute inset-[8%] -z-10 rounded-full bg-[conic-gradient(from_200deg,var(--azure-soft),var(--lilac-soft),var(--blush-soft),var(--mint-soft),var(--azure-soft))] blur-2xl" />
           <div aria-hidden className="absolute inset-[16%] -z-10 rounded-full border border-dashed border-border-strong opacity-60 animate-spin-slow" />
-          <Aura variant="hero" size={340} interactive greet className="max-w-[78vw]" />
+          <Aura variant="hero" size={340} interactive greet entrance="load" className="max-w-[78vw]" />
           {THEME_CHIPS.map(({ label, tone, Icon, pos, delay }) => (
             <span
               key={label}

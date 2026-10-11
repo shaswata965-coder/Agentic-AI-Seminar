@@ -48,12 +48,12 @@ export function PersonCard({
   const nameEl = !action ? (
     name
   ) : "href" in action ? (
-    <Link href={action.href} className={STRETCH}>
+    <Link href={action.href} className={STRETCH} data-stretch="">
       {name}
       {hint}
     </Link>
   ) : (
-    <button type="button" onClick={action.onClick} aria-haspopup={action.hasPopup} className={cn(STRETCH, "cursor-pointer")}>
+    <button type="button" onClick={action.onClick} aria-haspopup={action.hasPopup} className={cn(STRETCH, "cursor-pointer")} data-stretch="">
       {name}
       {hint}
     </button>
@@ -61,7 +61,7 @@ export function PersonCard({
   return (
     <div
       className={cn(
-        "group card relative flex h-full flex-col items-center overflow-hidden px-5 pt-7 pb-5 text-center transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg",
+        "group card relative flex h-full flex-col items-center overflow-hidden px-5 pt-7 pb-5 text-center transition-[translate,scale,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg",
         className,
       )}
     >
@@ -91,7 +91,7 @@ export function PersonCard({
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="relative z-[2] inline-flex items-center gap-1 text-sm font-semibold text-accent-ink hover:underline"
+            className="mi-link relative z-[2] inline-flex items-center gap-1 text-sm font-semibold text-accent-ink"
             aria-label={`${linkLabel}: ${name} (opens in a new tab)`}
           >
             {linkLabel} <ArrowUpRight size={15} aria-hidden />

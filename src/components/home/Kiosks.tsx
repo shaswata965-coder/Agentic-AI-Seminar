@@ -21,7 +21,7 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
               icon={<Store size={18} aria-hidden />}
             />
             {s.contactEmail ? (
-              <a className="text-sm font-semibold text-accent-ink hover:underline" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent("Exhibitor enquiry — Agentic AI Workshop 2026")}`}>
+              <a className="mi-link text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent("Exhibitor enquiry — Agentic AI Workshop 2026")}`}>
                 or e-mail {s.contactEmail}
               </a>
             ) : null}
@@ -31,9 +31,9 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
           {kiosks.length ? (
             <ul className="grid gap-4 sm:grid-cols-2">
               {kiosks.map((k, i) => (
-                <li key={k.id} data-reveal style={{ ["--reveal-delay" as string]: `${(i % 2) * 90}ms` }} className="card flex h-full flex-col p-5 transition-transform duration-300 hover:-translate-y-1">
+                <li key={k.id} data-reveal style={{ ["--reveal-delay" as string]: `${(i % 2) * 90}ms` }} data-glow="" className="card group flex h-full flex-col p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">
                   <div className="flex items-center gap-3">
-                    <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border border-border bg-white p-1.5">
+                    <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl border border-border bg-white p-1.5 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-105 group-hover:-rotate-3">
                       {k.logo ? <Img src={k.logo} alt={`${k.company} logo`} className="max-h-full max-w-full object-contain" /> : <Store size={22} className="text-peach-ink" aria-hidden />}
                     </div>
                     <div className="min-w-0">
@@ -43,8 +43,9 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
                   </div>
                   <p className="mt-3 text-sm text-muted">{k.description}</p>
                   {k.website ? (
-                    <a href={k.website} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-accent-ink hover:underline">
-                      Visit website <ArrowUpRight size={15} aria-hidden />
+                    <a href={k.website} target="_blank" rel="noopener noreferrer" className="group/visit mt-auto inline-flex items-center gap-1 self-start pt-4 text-sm font-semibold text-accent-ink">
+                      <span className="mi-underline">Visit website</span>
+                      <ArrowUpRight size={15} aria-hidden className="transition-transform duration-300 group-hover/visit:translate-x-0.5 group-hover/visit:-translate-y-0.5" />
                     </a>
                   ) : null}
                 </li>

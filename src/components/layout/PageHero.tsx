@@ -55,7 +55,7 @@ export function PageHero({
           {description ? <div className="mt-5 max-w-2xl text-lg text-muted">{description}</div> : null}
           {children ? <div className="mt-7 flex flex-wrap items-center gap-3">{children}</div> : null}
         </div>
-        <div className="mx-auto md:mx-0">{auraNode ?? (aura ? <Aura variant={aura} size={230} interactive greet={greet} bubbleSide="left" className="max-w-[60vw]" /> : null)}</div>
+        <div className="mx-auto md:mx-0">{auraNode ?? (aura ? <Aura variant={aura} size={230} interactive greet={greet} bubbleSide="left" entrance="load" className="max-w-[60vw]" /> : null)}</div>
       </div>
     </section>
   );

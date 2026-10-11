@@ -152,8 +152,8 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
                 </div>
                 {i > 0 ? (
                   <div className="mt-3 flex justify-end">
-                    <button type="button" onClick={() => setMembers((list) => list.filter((_, j) => j !== i))} className="inline-flex items-center gap-1.5 text-sm font-semibold text-blush-ink hover:underline">
-                      <Trash size={15} aria-hidden /> Remove member
+                    <button type="button" onClick={() => setMembers((list) => list.filter((_, j) => j !== i))} className="group mi-link inline-flex items-center gap-1.5 text-sm font-semibold text-blush-ink">
+                      <Trash size={15} aria-hidden className="origin-bottom group-hover:animate-[mi-wiggle_0.5s_ease-in-out]" /> Remove member
                     </button>
                   </div>
                 ) : null}

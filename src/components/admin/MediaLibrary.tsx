@@ -79,11 +79,12 @@ export function MediaLibrary() {
                 <button
                   type="button"
                   onClick={() => navigator.clipboard.writeText(absoluteUrl(m.url)).then(() => toast("Link copied", "success"))}
+                  data-ripple=""
                   className="inline-flex flex-1 items-center justify-center gap-1 rounded-lg border border-border py-1.5 text-xs font-semibold text-muted hover:text-fg"
                 >
                   <Copy size={13} aria-hidden /> Copy link
                 </button>
-                <button type="button" onClick={() => remove(m)} className="grid w-9 place-items-center rounded-lg border border-border text-subtle hover:border-blush-ink hover:text-blush-ink" aria-label={`Delete ${m.filename}`}>
+                <button type="button" onClick={() => remove(m)} data-ripple="" className="grid w-9 place-items-center rounded-lg border border-border text-subtle hover:border-blush-ink hover:text-blush-ink" aria-label={`Delete ${m.filename}`}>
                   <Trash size={14} />
                 </button>
               </div>

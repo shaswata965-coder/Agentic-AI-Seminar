@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
+import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { emptyValue } from "@/lib/content/normalize";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
@@ -49,6 +50,7 @@ export function ResourceManager({ resourceKey }: { resourceKey: string }) {
   const { data, error, loading, reload, setData } = useApi<Item[]>(`/content/${resourceKey}`);
   const [q, setQ] = useState("");
   const [show, setShow] = useState<"all" | "published" | "hidden">("all");
+  const { listRef: showListRef, pillRef: showPillRef } = useSlidingPill(show);
   const [editing, setEditing] = useState<Item | Record<string, unknown> | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -166,9 +168,10 @@ export function ResourceManager({ resourceKey }: { resourceKey: string }) {
           <Search size={17} aria-hidden className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-subtle" />
           <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={`Search ${def.label.toLowerCase()}…`} className="h-10 w-full rounded-full border border-border bg-surface pr-4 pl-10 text-sm focus:border-brand focus:outline-none" />
         </label>
-        <div className="inline-flex rounded-full border border-border bg-surface p-1" role="group" aria-label="Filter by visibility">
+        <div ref={showListRef} className="group/seg relative isolate inline-flex rounded-full border border-border bg-surface p-1" role="group" aria-label="Filter by visibility">
+          <SlidingPill pillRef={showPillRef} className="bg-brand shadow-sm" />
           {(["all", "published", "hidden"] as const).map((v) => (
-            <button key={v} type="button" aria-pressed={show === v} onClick={() => setShow(v)} className={cn("rounded-full px-3 py-1.5 text-sm font-semibold capitalize", show === v ? "bg-brand text-brand-fg" : "text-muted hover:text-fg")}>
+            <button key={v} type="button" aria-pressed={show === v} onClick={() => setShow(v)} data-ripple="" className={cn("rounded-full px-3 py-1.5 text-sm font-semibold capitalize", show === v ? "bg-brand text-brand-fg group-data-[pill=on]/seg:bg-transparent" : "text-muted hover:text-fg")}>
               {v}
             </button>
           ))}
@@ -223,21 +226,21 @@ export function ResourceManager({ resourceKey }: { resourceKey: string }) {
                     <div className="flex items-center justify-end gap-0.5">
                       {canReorder && !q && show === "all" ? (
                         <>
-                          <button type="button" onClick={() => move(it, -1)} disabled={idx === 0} className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-30" aria-label={`Move ${title(it)} up`}>
+                          <button type="button" onClick={() => move(it, -1)} disabled={idx === 0} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-30" aria-label={`Move ${title(it)} up`}>
                             <ArrowUp size={16} />
                           </button>
-                          <button type="button" onClick={() => move(it, 1)} disabled={idx === items.length - 1} className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-30" aria-label={`Move ${title(it)} down`}>
+                          <button type="button" onClick={() => move(it, 1)} disabled={idx === items.length - 1} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg disabled:opacity-30" aria-label={`Move ${title(it)} down`}>
                             <ArrowDown size={16} />
                           </button>
                         </>
                       ) : null}
-                      <button type="button" onClick={() => togglePublish(it)} className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg" aria-label={it.published ? `Hide ${title(it)}` : `Publish ${title(it)}`} title={it.published ? "Hide from website" : "Publish"}>
+                      <button type="button" onClick={() => togglePublish(it)} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg" aria-label={it.published ? `Hide ${title(it)}` : `Publish ${title(it)}`} title={it.published ? "Hide from website" : "Publish"}>
                         {it.published ? <EyeOff size={16} /> : <Check size={16} />}
                       </button>
-                      <button type="button" onClick={() => { setErrors({}); setEditing(it); }} className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg" aria-label={`Edit ${title(it)}`} title="Edit">
+                      <button type="button" onClick={() => { setErrors({}); setEditing(it); }} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg" aria-label={`Edit ${title(it)}`} title="Edit">
                         <Pencil size={16} />
                       </button>
-                      <button type="button" onClick={() => setConfirm(it)} className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-blush-soft hover:text-blush-ink" aria-label={`Delete ${title(it)}`} title="Delete">
+                      <button type="button" onClick={() => setConfirm(it)} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-blush-soft hover:text-blush-ink" aria-label={`Delete ${title(it)}`} title="Delete">
                         <Trash size={16} />
                       </button>
                     </div>

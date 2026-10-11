@@ -37,13 +37,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             <div
               key={t.id}
               className={cn(
-                "pointer-events-auto flex max-w-md animate-pop items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-medium text-fg shadow-card-lg",
+                "mi-toast pointer-events-auto flex max-w-md items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 text-sm font-medium text-fg shadow-card-lg",
                 t.kind === "success" && "tone-mint",
                 t.kind === "error" && "tone-blush",
                 t.kind === "info" && "tone-azure",
               )}
             >
-              <Icon size={18} className="shrink-0 text-accent-ink" />
+              <Icon size={18} className="shrink-0 animate-pop text-accent-ink [animation-delay:140ms]" />
               {t.message}
             </div>
           );

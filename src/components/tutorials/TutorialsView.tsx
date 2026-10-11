@@ -48,9 +48,10 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
               type="button"
               aria-pressed={theme === t}
               onClick={() => choose(t)}
+              data-ripple=""
               className={cn(
                 t === "all" ? "tone-mint" : `tone-${THEME_META[t].tone}`,
-                "rounded-full px-4 py-2 text-sm font-semibold transition",
+                "rounded-full px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5",
                 theme === t ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_55%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
               )}
             >
@@ -70,7 +71,7 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
               const level = LEVEL_META[t.level] ?? LEVEL_META.all;
               const th = THEME_META[t.theme] ?? THEME_META.general;
               return (
-                <li key={t.id} id={t.slug || t.id} className={`tone-${th.tone} card scroll-mt-28 p-6 sm:p-7`}>
+                <li key={t.id} id={t.slug || t.id} data-glow="" className={`tone-${th.tone} card scroll-mt-28 p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg sm:p-7`}>
                   <div className="flex flex-wrap gap-2">
                     <Badge tone={level.tone} size="xs" dot>
                       {level.label}
@@ -96,7 +97,7 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
                           <span key={k}>
                             {k ? ", " : ""}
                             {i.url ? (
-                              <a href={i.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-fg underline decoration-border-strong underline-offset-2 hover:decoration-brand">
+                              <a href={i.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-fg underline decoration-border-strong underline-offset-2 hover:decoration-brand hover:underline-offset-4">
                                 {i.name}
                               </a>
                             ) : (
@@ -131,8 +132,14 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
                         const Icon = materialIcon(m.url, m.label);
                         return (
                           <li key={k}>
-                            <a href={m.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-muted transition hover:border-brand hover:text-brand">
-                              <Icon size={15} aria-hidden /> {m.label} <ArrowUpRight size={13} aria-hidden />
+                            <a href={m.url} target="_blank" rel="noopener noreferrer" data-ripple="" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-brand">
+                              <span className="btn-ico-l">
+                                <Icon size={15} aria-hidden />
+                              </span>{" "}
+                              {m.label}{" "}
+                              <span className="btn-ico-r">
+                                <ArrowUpRight size={13} aria-hidden />
+                              </span>
                             </a>
                           </li>
                         );
@@ -164,12 +171,12 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
             {dShown.map((d) => {
               const th = THEME_META[d.theme] ?? THEME_META.general;
               return (
-                <li key={d.id} className={`tone-${th.tone} card flex flex-col overflow-hidden`}>
+                <li key={d.id} data-glow="" className={`tone-${th.tone} card group flex flex-col overflow-hidden transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
                   <div className="p-3 pb-0">
                     {d.videoUrl ? (
                       <VideoEmbed url={d.videoUrl} title={d.title} />
                     ) : d.image ? (
-                      <Img src={d.image} alt={d.title} className="aspect-video w-full rounded-2xl object-cover" />
+                      <Img src={d.image} alt={d.title} className="aspect-video w-full rounded-2xl object-cover transition-[scale] duration-500 group-hover:scale-[1.03]" />
                     ) : (
                       <div className="grid aspect-video place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--accent-soft),var(--surface-2))]">
                         <Aura variant="demos" size={110} lite />
@@ -186,8 +193,9 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
                     {d.team ? <p className="text-sm font-semibold text-subtle">{d.team}</p> : null}
                     <p className="mt-2 text-sm text-muted">{d.description}</p>
                     {d.link ? (
-                      <a href={d.link} target="_blank" rel="noopener noreferrer" className="mt-auto inline-flex items-center gap-1 pt-4 text-sm font-semibold text-accent-ink hover:underline">
-                        Project link <ArrowUpRight size={15} aria-hidden />
+                      <a href={d.link} target="_blank" rel="noopener noreferrer" className="group/visit mt-auto inline-flex items-center gap-1 self-start pt-4 text-sm font-semibold text-accent-ink">
+                        <span className="mi-underline">Project link</span>
+                        <ArrowUpRight size={15} aria-hidden className="transition-transform duration-300 group-hover/visit:translate-x-0.5 group-hover/visit:-translate-y-0.5" />
                       </a>
                     ) : null}
                   </div>

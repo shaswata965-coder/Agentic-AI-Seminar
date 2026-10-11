@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
+import { MicroInteractions } from "@/components/effects/MicroInteractions";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { getSettings } from "@/lib/content/queries";
 import { formatDateRange } from "@/lib/format";
@@ -64,9 +65,14 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
   const brandCss = brandStyle(s.brandColor);
   return (
     <html lang="en-IN" suppressHydrationWarning className={`${inter.variable} ${outfit.variable}`}>
-      <head>{brandCss ? <style id="brand-colour">{brandCss}</style> : null}</head>
+      <head>
+        {/* Lets CSS hide things that JS will animate in, so without JS nothing stays hidden. */}
+        <Script id="js-flag" strategy="beforeInteractive">{`document.documentElement.classList.add("js")`}</Script>
+        {brandCss ? <style id="brand-colour">{brandCss}</style> : null}
+      </head>
       <body className="min-h-dvh antialiased">
         <ThemeProvider>{children}</ThemeProvider>
+        <MicroInteractions />
         {gaId ? (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`} strategy="afterInteractive" />

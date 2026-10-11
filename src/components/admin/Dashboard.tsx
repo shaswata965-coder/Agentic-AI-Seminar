@@ -68,8 +68,8 @@ export function Dashboard() {
       <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {tiles.map(({ label, value, note, Icon, tone, href }) => (
           <li key={label}>
-            <Link href={href} className={`${tone} card group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-card-lg`}>
-              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-accent-soft text-accent-ink">
+            <Link href={href} data-glow="" className={`${tone} card group flex items-center gap-4 p-5 transition hover:-translate-y-0.5 hover:shadow-card-lg`}>
+              <span className="grid h-12 w-12 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6">
                 <Icon size={22} aria-hidden />
               </span>
               <span>
@@ -89,7 +89,7 @@ export function Dashboard() {
               <h2 id="recent-regs" className="font-display text-xl font-bold text-fg">
                 Latest registrations
               </h2>
-              <a href={withBase("/api/admin/export/workshop")} className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand hover:underline">
+              <a href={withBase("/api/admin/export/workshop")} className="mi-link inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
                 <Download size={15} aria-hidden /> CSV
               </a>
             </div>
@@ -157,8 +157,11 @@ export function Dashboard() {
             <ul className="mt-4 grid gap-2">
               {quick.map(({ href, label, Icon }) => (
                 <li key={href}>
-                  <Link href={href} className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm font-semibold text-fg hover:border-brand hover:text-brand">
-                    <Icon size={17} aria-hidden /> {label}
+                  <Link href={href} data-ripple="" className="flex items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-sm font-semibold text-fg hover:translate-x-0.5 hover:border-brand hover:text-brand">
+                    <span className="btn-ico-l">
+                      <Icon size={17} aria-hidden />
+                    </span>{" "}
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -233,9 +236,10 @@ function RefreshSite() {
         type="button"
         onClick={refresh}
         disabled={busy}
-        className="flex w-full items-center gap-3 rounded-xl border border-dashed border-border-strong px-3 py-2.5 text-sm font-semibold text-fg hover:border-brand hover:text-brand disabled:opacity-60"
+        data-ripple=""
+        className="group flex w-full items-center gap-3 rounded-xl border border-dashed border-border-strong px-3 py-2.5 text-sm font-semibold text-fg hover:border-brand hover:text-brand disabled:opacity-60"
       >
-        <RefreshCw size={17} aria-hidden className={busy ? "animate-spin" : undefined} /> {busy ? "Refreshing…" : "Refresh website"}
+        <RefreshCw size={17} aria-hidden className={busy ? "animate-spin" : "transition-transform duration-500 group-hover:rotate-180"} /> {busy ? "Refreshing…" : "Refresh website"}
       </button>
       <p className="mt-2 text-xs text-subtle">Only needed after a new deployment or changes made outside this panel — saving here updates the site automatically.</p>
     </div>

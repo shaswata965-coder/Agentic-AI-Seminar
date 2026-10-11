@@ -31,18 +31,18 @@ export function HackathonTimeline({ items }: { items: HackathonInfo["timeline"] 
           const here = i === current;
           const label = m.dateLabel || (m.date ? formatDate(`${m.date}T12:00:00+05:30`, { day: "numeric", month: "short", year: "numeric" }) : "TBA");
           return (
-            <li key={`${m.label}-${i}`} className="relative flex gap-4 lg:flex-col lg:items-center lg:gap-3 lg:text-center">
+            <li key={`${m.label}-${i}`} className="group relative flex gap-4 lg:flex-col lg:items-center lg:gap-3 lg:text-center">
               {i < items.length - 1 ? <span aria-hidden className="absolute top-14 bottom-[-1rem] left-7 w-0.5 bg-border lg:hidden" /> : null}
               <span
                 className={cn(
-                  "relative z-10 grid h-14 w-14 shrink-0 place-items-center rounded-full border-4 border-bg font-display text-lg font-bold shadow-card transition-colors",
+                  "relative z-10 grid h-14 w-14 shrink-0 place-items-center rounded-full border-4 border-bg font-display text-lg font-bold shadow-card transition-[background-color,color,scale] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110",
                   here ? "bg-[var(--aqua)] text-[#0f172a]" : done ? "bg-[var(--mint)] text-[#0f172a]" : "bg-surface text-subtle ring-1 ring-border",
                 )}
               >
                 {here ? <AuraHead size={34} /> : done ? <Check size={22} aria-hidden /> : i + 1}
                 {here ? <span className="absolute inset-0 animate-ping-soft rounded-full bg-[var(--aqua)] opacity-40" aria-hidden /> : null}
               </span>
-              <div className="card min-w-0 flex-1 p-4 lg:w-full">
+              <div data-glow="" className="card min-w-0 flex-1 p-4 transition-[translate,box-shadow] duration-300 group-hover:-translate-y-1 group-hover:shadow-card-lg lg:w-full">
                 <p className={cn("text-xs font-bold tracking-[0.12em] uppercase", label === "TBA" ? "text-subtle" : "text-aqua-ink")}>{label}</p>
                 <p className="mt-1 font-display text-[15.5px] leading-snug font-semibold text-fg">{m.label}</p>
                 {m.description ? <p className="mt-1 text-sm text-muted">{m.description}</p> : null}

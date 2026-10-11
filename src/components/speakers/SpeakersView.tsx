@@ -10,6 +10,7 @@ import { GitHubIcon, LinkedInIcon, XIcon } from "@/components/ui/BrandIcons";
 import { Modal } from "@/components/ui/Modal";
 import { PersonCard } from "@/components/ui/PersonCard";
 import { RichText } from "@/components/ui/RichText";
+import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { cn } from "@/lib/cn";
 import { replaceQuery, useUrlParam } from "@/lib/client-hooks";
 import { SPEAKER_CATEGORY_META, THEME_META } from "@/lib/content/constants";
@@ -44,9 +45,13 @@ function Links({ sp }: { sp: Speaker }) {
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-muted transition hover:border-brand hover:text-brand"
+            data-ripple=""
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-brand"
           >
-            <Icon size={15} aria-hidden /> {label}
+            <span className="btn-ico-l">
+              <Icon size={15} aria-hidden />
+            </span>{" "}
+            {label}
           </a>
         </li>
       ))}
@@ -56,6 +61,7 @@ function Links({ sp }: { sp: Speaker }) {
 
 export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speaker[]; sessions: SpeakerSession[]; showMore: boolean }) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
+  const { listRef, pillRef } = useSlidingPill(filter, '[aria-selected="true"]');
   const [q, setQ] = useState("");
   const urlSlug = useUrlParam("speaker");
   const [slugChoice, setOpenSlug] = useState<string | null | undefined>(undefined);
@@ -104,7 +110,8 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <div role="tablist" aria-label="Filter speakers" className="inline-flex flex-wrap gap-1 rounded-full border border-border bg-surface p-1 shadow-card">
+        <div ref={listRef} role="tablist" aria-label="Filter speakers" className="group/seg relative isolate inline-flex flex-wrap gap-1 rounded-full border border-border bg-surface p-1 shadow-card">
+          <SlidingPill pillRef={pillRef} className="bg-accent-soft ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
           {FILTERS.map((f) => (
             <button
               key={f.id}
@@ -112,9 +119,12 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
               type="button"
               aria-selected={filter === f.id}
               onClick={() => setFilter(f.id)}
+              data-ripple=""
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-semibold transition",
-                filter === f.id ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)]" : "text-muted hover:text-fg",
+                filter === f.id
+                  ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] group-data-[pill=on]/seg:bg-transparent group-data-[pill=on]/seg:ring-0"
+                  : "text-muted hover:bg-surface-2 hover:text-fg",
               )}
             >
               {f.label}
@@ -183,7 +193,7 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
               const theme = THEME_META[p.theme] ?? THEME_META.general;
               const moderator = p.moderator ? byId[p.moderator] : undefined;
               return (
-                <li key={p.id} className={`tone-${theme.tone} card p-6`}>
+                <li key={p.id} data-glow="" className={`tone-${theme.tone} card p-6`}>
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone="peach" size="xs" dot>
                       Panel
@@ -207,8 +217,8 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
                         <span className="inline-flex items-center gap-1 font-semibold text-subtle">
                           <Mic2 size={15} aria-hidden /> Moderator
                         </span>
-                        <button type="button" onClick={() => open(moderator.slug)} className="inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pr-3 pl-1 font-semibold text-fg hover:bg-accent-soft">
-                          <Avatar name={moderator.name} src={moderator.photo} size={26} />
+                        <button type="button" onClick={() => open(moderator.slug)} data-ripple="" className="group/chip inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pr-3 pl-1 font-semibold text-fg hover:-translate-y-0.5 hover:bg-accent-soft">
+                          <Avatar name={moderator.name} src={moderator.photo} size={26} className="transition-[scale,rotate] duration-300 group-hover/chip:scale-110 group-hover/chip:-rotate-6" />
                           {moderator.name}
                         </button>
                       </p>
@@ -222,8 +232,8 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
                           .map((id) => byId[id])
                           .filter(Boolean)
                           .map((sp) => (
-                            <button key={sp.id} type="button" onClick={() => open(sp.slug)} className="inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pr-3 pl-1 font-semibold text-fg hover:bg-accent-soft">
-                              <Avatar name={sp.name} src={sp.photo} size={26} />
+                            <button key={sp.id} type="button" onClick={() => open(sp.slug)} data-ripple="" className="group/chip inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pr-3 pl-1 font-semibold text-fg hover:-translate-y-0.5 hover:bg-accent-soft">
+                              <Avatar name={sp.name} src={sp.photo} size={26} className="transition-[scale,rotate] duration-300 group-hover/chip:scale-110 group-hover/chip:-rotate-6" />
                               {sp.name}
                             </button>
                           ))
@@ -292,14 +302,16 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
                   <ul className="mt-2 grid gap-2">
                     {appearances.map((a) => (
                       <li key={a.id}>
-                        <Link href={`/programme?day=${a.day}#session-${a.id}`} className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3 hover:border-brand">
+                        <Link href={`/programme?day=${a.day}#session-${a.id}`} className="flex items-center justify-between gap-3 rounded-2xl border border-border p-3 hover:-translate-y-0.5 hover:border-brand hover:shadow-card">
                           <span>
                             <span className="block font-semibold text-fg">{a.title}</span>
                             <span className="text-sm text-muted">
                               {a.dayLabel} · {timeRange(a.start, a.end)} · {a.room || "Room TBA"}
                             </span>
                           </span>
-                          <ArrowRight size={17} aria-hidden className="text-subtle" />
+                          <span className="btn-ico-r text-subtle">
+                            <ArrowRight size={17} aria-hidden />
+                          </span>
                         </Link>
                       </li>
                     ))}
@@ -309,11 +321,17 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
               {list.length > 1 ? (
                 <div className="flex items-center justify-between border-t border-border pt-5">
                   <button type="button" onClick={() => go(-1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-fg">
-                    <ArrowLeft size={16} aria-hidden /> Previous
+                    <span className="btn-ico-back">
+                      <ArrowLeft size={16} aria-hidden />
+                    </span>{" "}
+                    Previous
                   </button>
                   <span className="text-xs text-subtle">Use ← → keys</span>
                   <button type="button" onClick={() => go(1)} className="inline-flex items-center gap-1.5 text-sm font-semibold text-muted hover:text-fg">
-                    Next <ArrowRight size={16} aria-hidden />
+                    Next{" "}
+                    <span className="btn-ico-r">
+                      <ArrowRight size={16} aria-hidden />
+                    </span>
                   </button>
                 </div>
               ) : null}

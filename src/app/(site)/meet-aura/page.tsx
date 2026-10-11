@@ -46,8 +46,8 @@ export default function MeetAuraPage() {
         <SectionHeading id="looks-title" eyebrow="Around the site" title={`${variants.length} looks, one guide`} description="Every page and section has its own version of Aura." />
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {variants.map((v) => (
-            <li key={v} className="card flex flex-col items-center p-4 text-center">
-              <Aura variant={v} size={130} lite label={AURA_PRESETS[v].label} />
+            <li key={v} data-glow="" className="card flex flex-col items-center p-4 text-center transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">
+              <Aura variant={v} size={130} lite label={AURA_PRESETS[v].label} entrance="zip" />
               <p className="mt-2 text-sm font-semibold text-fg">{WHERE[v]}</p>
             </li>
           ))}

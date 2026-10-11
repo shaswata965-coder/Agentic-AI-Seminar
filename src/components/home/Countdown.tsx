@@ -74,7 +74,7 @@ export function Countdown({ target, end, className }: { target: string; end: str
         const text = v === null ? "--" : String(v).padStart(2, "0");
         return (
           <div key={key} className={cn(tone, "relative overflow-hidden rounded-2xl bg-accent-soft px-2 py-3 text-center ring-1 ring-inset ring-[color-mix(in_oklab,var(--accent)_35%,transparent)] sm:py-4")}>
-            <span key={text} className="block animate-pop font-display text-3xl font-bold text-fg tabular sm:text-[2.6rem] sm:leading-none">
+            <span key={text} className="mi-tick block font-display text-3xl font-bold text-fg tabular sm:text-[2.6rem] sm:leading-none">
               {text}
             </span>
             <span className="mt-1.5 block text-[11px] font-bold tracking-[0.14em] text-accent-ink uppercase sm:text-xs">{label}</span>

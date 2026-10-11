@@ -6,15 +6,17 @@ import { withBase } from "@/lib/paths";
 type Variant = "primary" | "secondary" | "soft" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
 
+// Micro-interactions (see app/micro.css): lift on hover, dip on press, ink
+// ripple (data-ripple), sheen on primary buttons and nudging icons.
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-[transform,background-color,box-shadow,color,border-color] duration-200 ease-out active:scale-[0.97] disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-[translate,scale,background-color,box-shadow,color,border-color,opacity] duration-200 ease-out active:scale-[0.96] disabled:pointer-events-none disabled:opacity-60";
 
 const variants: Record<Variant, string> = {
   primary:
-    "bg-brand text-brand-fg shadow-[0_10px_28px_-12px_color-mix(in_oklab,var(--brand)_80%,transparent)] hover:-translate-y-0.5 hover:bg-brand-strong",
+    "btn-shine bg-brand text-brand-fg shadow-[0_10px_28px_-12px_color-mix(in_oklab,var(--brand)_80%,transparent)] hover:-translate-y-0.5 hover:bg-brand-strong hover:shadow-[0_16px_34px_-12px_color-mix(in_oklab,var(--brand)_85%,transparent)]",
   secondary: "bg-fg text-bg hover:-translate-y-0.5 hover:opacity-90",
   soft: "bg-accent-soft text-accent-ink ring-1 ring-inset ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--accent)_28%,var(--accent-soft))]",
-  outline: "border border-border-strong bg-surface text-fg hover:-translate-y-0.5 hover:border-brand hover:text-brand",
+  outline: "border border-border-strong bg-surface text-fg hover:-translate-y-0.5 hover:border-brand hover:text-brand hover:shadow-card",
   ghost: "text-fg hover:bg-surface-2",
 };
 
@@ -37,6 +39,16 @@ export function buttonClasses(variant: Variant = "primary", size: Size = "md", c
   return cn(base, variants[variant], sizes[size], className);
 }
 
+function ButtonContent({ icon, iconRight, children }: Pick<CommonProps, "icon" | "iconRight" | "children">) {
+  return (
+    <>
+      {icon ? <span className="btn-ico-l">{icon}</span> : null}
+      {children}
+      {iconRight ? <span className="btn-ico-r">{iconRight}</span> : null}
+    </>
+  );
+}
+
 type LinkButtonProps = CommonProps &
   Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "className" | "children"> & { href: string; external?: boolean };
 
@@ -49,20 +61,21 @@ export function ButtonLink({ href, external, variant, size, icon, iconRight, cla
       <a
         href={isExternal ? href : withBase(href)}
         className={cls}
+        data-ripple=""
         {...(isExternal && !href.startsWith("mailto:") && !href.startsWith("tel:") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
         {...rest}
       >
-        {icon}
-        {children}
-        {iconRight}
+        <ButtonContent icon={icon} iconRight={iconRight}>
+          {children}
+        </ButtonContent>
       </a>
     );
   }
   return (
-    <Link href={href} className={cls} {...rest}>
-      {icon}
-      {children}
-      {iconRight}
+    <Link href={href} className={cls} data-ripple="" {...rest}>
+      <ButtonContent icon={icon} iconRight={iconRight}>
+        {children}
+      </ButtonContent>
     </Link>
   );
 }
@@ -71,10 +84,10 @@ type ButtonProps = CommonProps & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "
 
 export function Button({ variant, size, icon, iconRight, className, children, type = "button", ...rest }: ButtonProps) {
   return (
-    <button type={type} className={buttonClasses(variant, size, className)} {...rest}>
-      {icon}
-      {children}
-      {iconRight}
+    <button type={type} className={buttonClasses(variant, size, className)} data-ripple="" {...rest}>
+      <ButtonContent icon={icon} iconRight={iconRight}>
+        {children}
+      </ButtonContent>
     </button>
   );
 }

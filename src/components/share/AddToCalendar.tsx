@@ -1,7 +1,7 @@
 "use client";
 
 import { CalendarPlus, ChevronDown, Download } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { buttonClasses } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import type { CalendarLinks } from "@/lib/event";
@@ -38,7 +38,7 @@ export function AddToCalendar({
     };
   }, [open]);
 
-  const item = "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-fg transition-colors hover:bg-surface-2";
+  const item = "group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-fg transition-[background-color,translate] hover:translate-x-0.5 hover:bg-surface-2";
 
   return (
     <div ref={ref} className={cn("relative inline-block", className)}>
@@ -48,28 +48,31 @@ export function AddToCalendar({
         aria-haspopup="true"
         onClick={() => setOpen((v) => !v)}
         className={buttonClasses(variant, size)}
+        data-ripple=""
       >
-        <CalendarPlus size={18} aria-hidden />
+        <span className="btn-ico-l">
+          <CalendarPlus size={18} aria-hidden />
+        </span>
         {label}
-        <ChevronDown size={16} aria-hidden className={cn("transition-transform", open && "rotate-180")} />
+        <ChevronDown size={16} aria-hidden className={cn("transition-transform duration-300", open && "rotate-180")} />
       </button>
       {open ? (
         <div
           className={cn(
-            "absolute top-full z-30 mt-2 w-60 animate-pop rounded-2xl border border-border bg-surface p-1.5 shadow-card-lg",
-            align === "right" ? "right-0" : "left-0",
+            "mi-stagger absolute top-full z-30 mt-2 w-60 animate-pop rounded-2xl border border-border bg-surface p-1.5 shadow-card-lg",
+            align === "right" ? "right-0 origin-top-right" : "left-0 origin-top-left",
           )}
         >
-          <a className={item} href={links.google} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-azure-soft text-xs font-bold text-azure-ink">G</span>
+          <a className={item} style={{ "--i": 0 } as CSSProperties} href={links.google} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+            <span className="grid h-7 w-7 place-items-center rounded-lg transition-[scale,rotate] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6 bg-azure-soft text-xs font-bold text-azure-ink">G</span>
             Google Calendar
           </a>
-          <a className={item} href={links.outlook} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-lilac-soft text-xs font-bold text-lilac-ink">O</span>
+          <a className={item} style={{ "--i": 1 } as CSSProperties} href={links.outlook} target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
+            <span className="grid h-7 w-7 place-items-center rounded-lg transition-[scale,rotate] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6 bg-lilac-soft text-xs font-bold text-lilac-ink">O</span>
             Outlook.com
           </a>
-          <a className={item} href={withBase(links.ics)} download onClick={() => setOpen(false)}>
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-mint-soft text-mint-ink">
+          <a className={item} style={{ "--i": 2 } as CSSProperties} href={withBase(links.ics)} download onClick={() => setOpen(false)}>
+            <span className="grid h-7 w-7 place-items-center rounded-lg transition-[scale,rotate] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6 bg-mint-soft text-mint-ink">
               <Download size={14} aria-hidden />
             </span>
             Apple / other (.ics)

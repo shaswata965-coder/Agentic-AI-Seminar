@@ -2,6 +2,7 @@
 
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
+import { SlidingPill, useSlidingPill } from "./SlidingPill";
 
 export interface TabItem {
   id: string;
@@ -28,6 +29,7 @@ export function Tabs({
   const uid = useId();
   const [active, setActive] = useState(initial ?? items[0]?.id);
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
+  const { listRef, pillRef } = useSlidingPill(active, '[aria-selected="true"]');
 
   const select = (id: string, focus = false) => {
     setActive(id);
@@ -50,10 +52,12 @@ export function Tabs({
   return (
     <div className={className}>
       <div
+        ref={listRef}
         role="tablist"
         aria-label={ariaLabel}
-        className={cn("inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1 shadow-card", listClassName)}
+        className={cn("group/seg relative isolate inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1 shadow-card", listClassName)}
       >
+        <SlidingPill pillRef={pillRef} className="bg-accent-soft shadow-sm ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
         {items.map((t, i) => {
           const selected = t.id === active;
           return (
@@ -70,9 +74,12 @@ export function Tabs({
               tabIndex={selected ? 0 : -1}
               onClick={() => select(t.id)}
               onKeyDown={(e) => onKey(e, i)}
+              data-ripple=""
               className={cn(
-                "relative rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-colors duration-200",
-                selected ? "bg-accent-soft text-accent-ink shadow-sm ring-1 ring-inset ring-[color-mix(in_oklab,var(--accent)_45%,transparent)]" : "text-muted hover:text-fg",
+                "relative rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-[color,background-color,scale] duration-200",
+                selected
+                  ? "bg-accent-soft text-accent-ink shadow-sm ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset group-data-[pill=on]/seg:bg-transparent group-data-[pill=on]/seg:shadow-none group-data-[pill=on]/seg:ring-0"
+                  : "text-muted hover:bg-surface-2 hover:text-fg",
               )}
             >
               {t.label}

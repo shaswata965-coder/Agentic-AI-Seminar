@@ -13,7 +13,7 @@ function Item({ a }: { a: Announcement }) {
   const t = TONE[a.tone] ?? TONE.info;
   const external = /^https?:/.test(a.linkUrl);
   return (
-    <article className="relative rounded-2xl border border-border bg-surface p-5 transition-shadow hover:shadow-card">
+    <article data-glow="" className="relative rounded-2xl border border-border bg-surface p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-card">
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <Badge tone={t.tone} size="xs" dot>
           {t.label}
@@ -33,11 +33,11 @@ function Item({ a }: { a: Announcement }) {
       {a.body ? <RichText text={a.body} className="mt-2 text-[15px] text-muted" /> : null}
       {a.linkUrl ? (
         external ? (
-          <a href={a.linkUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline">
+          <a href={a.linkUrl} target="_blank" rel="noopener noreferrer" className="mi-link mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand">
             {a.linkLabel || "Read more"} <ArrowUpRight size={15} aria-hidden />
           </a>
         ) : (
-          <Link href={a.linkUrl} className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand hover:underline">
+          <Link href={a.linkUrl} className="mi-link mt-3 inline-flex items-center gap-1 text-sm font-semibold text-brand">
             {a.linkLabel || "Read more"} <ArrowUpRight size={15} aria-hidden />
           </Link>
         )

@@ -1,0 +1,181 @@
+/* -------------------------------------------------------------------------
+   Micro-interactions: small, quick feedback on everything you can press,
+   hover or focus. Transforms and opacity only; the global reduced-motion rule
+   in globals.css switches them off. Ripple, pop and pointer glow are driven
+   by components/effects/MicroInteractions.tsx.
+   Everything sits in the components layer, so Tailwind utilities still win.
+   ------------------------------------------------------------------------- */
+
+@layer components {
+  /* Smooth state changes on every control */
+  :where(a, button, summary, label, input, select, textarea, [role="button"], [role="tab"]) {
+    transition-property: color, background-color, border-color, outline-color, outline-offset, text-decoration-color, text-underline-offset, box-shadow, opacity, scale, translate, rotate;
+    transition-duration: 0.2s;
+    transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  /* The focus ring snaps in from slightly further out */
+  :where(a, button, summary, input, select, textarea, [tabindex], [role="button"], [role="tab"]) { outline-offset: 6px; }
+  :focus-visible { outline-offset: 2px; }
+
+  /* Press: controls dip while held; link cards press in a touch */
+  :where(button, [role="button"], [role="tab"], a[data-ripple]):not(:disabled, [data-stretch]):active { scale: 0.96; }
+  :where(summary):active { scale: 0.99; }
+  .card:has([data-stretch]:active) { scale: 0.985; }
+
+  /* Ink ripple (element added by MicroInteractions) */
+  [data-ripple] { position: relative; overflow: hidden; isolation: isolate; }
+  .mi-ripple {
+    position: absolute;
+    z-index: -1;
+    border-radius: 9999px;
+    background: currentColor;
+    opacity: 0;
+    scale: 0;
+    pointer-events: none;
+    animation: mi-ripple 0.65s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }
+
+  /* Icons in ripple controls: icon-only buttons grow a little, downloads dip */
+  [data-ripple] > svg { transition: scale 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), rotate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), translate 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  [data-ripple]:not(:disabled):hover > svg:only-child { scale: 1.12; }
+  [data-ripple]:hover > .lucide-download { translate: 0 2px; }
+
+  /* Pop on the toggle that was just used (class added by MicroInteractions) */
+  .mi-pop:not(label, summary) { animation: mi-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  label.mi-pop :is(input[type="checkbox"], input[type="radio"]):not(.sr-only),
+  label.mi-pop .sr-only + span,
+  summary.mi-pop svg { animation: mi-pop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  /* Agenda star: spin + burst ring when added */
+  [data-burst] { position: relative; }
+  [data-burst] svg { transition: scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  [data-burst]:hover svg { scale: 1.15; }
+  [data-burst].mi-pop[aria-pressed="true"] svg { animation: mi-star 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  [data-burst].mi-pop[aria-pressed="true"]::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    border: 2px solid currentColor;
+    pointer-events: none;
+    animation: mi-burst 0.55s ease-out forwards;
+  }
+
+  /* Light that follows the mouse across cards */
+  @media (hover: hover) and (pointer: fine) {
+    [data-glow] { position: relative; isolation: isolate; }
+    [data-glow]::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      border-radius: inherit;
+      background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 0%), color-mix(in oklab, var(--accent) 24%, transparent), transparent 70%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    [data-glow]:hover::before { opacity: 1; }
+  }
+
+  /* Text links: underline draws in from the left */
+  .mi-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 1.5px;
+    transition: background-size 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.2s;
+  }
+  .mi-underline:hover,
+  .mi-underline:focus-visible { background-size: 100% 1.5px; }
+
+  /* Inline action links: the underline slides up into place, a trailing arrow nudges */
+  .mi-link {
+    text-decoration-line: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 7px;
+  }
+  .mi-link:hover,
+  .mi-link:focus-visible { text-decoration-color: currentColor; text-underline-offset: 3px; }
+  .mi-link svg { transition: translate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  .mi-link:is(:hover, :focus-visible) :is(.lucide-arrow-up-right, .lucide-external-link) { translate: 2px -2px; }
+  .mi-link:is(:hover, :focus-visible) .lucide-arrow-right { translate: 3px 0; }
+  .mi-link:is(:hover, :focus-visible) .lucide-download { translate: 0 2px; }
+
+  /* Button icons: arrows nudge forward, leading icons give a little wiggle */
+  .btn-ico-r,
+  .btn-ico-back,
+  .btn-ico-l { display: inline-flex; transition: translate 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), rotate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), scale 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  :hover > .btn-ico-r,
+  :focus-visible > .btn-ico-r { translate: 3px 0; }
+  :hover > .btn-ico-back,
+  :focus-visible > .btn-ico-back { translate: -3px 0; }
+  :hover > .btn-ico-l,
+  :focus-visible > .btn-ico-l { rotate: -8deg; scale: 1.12; }
+
+  /* A sheen sweeps across primary buttons on hover */
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -60%;
+    z-index: -1;
+    width: 45%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.32), transparent);
+    pointer-events: none;
+    transition: translate 0.75s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .btn-shine:hover::after { translate: 380% 0; }
+  .btn-shine:not(:hover)::after { transition: none; }
+
+  /* Fields that fail validation give a short shake */
+  [aria-invalid="true"] { animation: mi-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+  /* Countdown digits roll in when they change (keyed span) */
+  .mi-tick { display: inline-block; animation: mi-tick 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
+
+  /* Menus: items cascade in (set --i on each item) */
+  .mi-stagger > * { animation: mi-rise 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 32ms); }
+
+  /* Toasts spring in and fade out before they are removed (4.2 s) */
+  .mi-toast { animation: mi-toast-in 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.25) both, mi-toast-out 0.35s ease-in 3.8s both; }
+
+  /* Small Aura heads blink now and then, and when their link is hovered */
+  .aura-head-eye { transform-box: fill-box; transform-origin: center; animation: mi-blink 7s infinite; }
+  .aura-head-eye + .aura-head-eye { animation-delay: 0.04s; }
+  :hover > * > .aura-head-eye,
+  :hover > * > * > .aura-head-eye,
+  :hover > * > * > * > .aura-head-eye { animation: mi-blink-now 0.5s 2; }
+}
+
+/* Accordions open and close smoothly where the browser supports it */
+@supports selector(::details-content) and (interpolate-size: allow-keywords) {
+  :root { interpolate-size: allow-keywords; }
+  details::details-content {
+    block-size: 0;
+    overflow-y: clip;
+    transition: block-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), content-visibility 0.35s allow-discrete;
+  }
+  details[open]::details-content { block-size: auto; }
+}
+
+/* Dialog backdrops fade in */
+dialog[open]::backdrop { animation: mi-fade 0.25s ease-out; }
+
+@keyframes mi-ripple { 0% { scale: 0; opacity: 0.26; } 100% { scale: 1; opacity: 0; } }
+@keyframes mi-pop { 0% { scale: 1; } 35% { scale: 0.9; } 70% { scale: 1.08; } 100% { scale: 1; } }
+@keyframes mi-star { 0% { rotate: 0deg; scale: 0.6; } 60% { rotate: 160deg; scale: 1.35; } 100% { rotate: 144deg; scale: 1; } }
+@keyframes mi-burst { 0% { opacity: 0.9; scale: 0.6; } 100% { opacity: 0; scale: 1.9; } }
+@keyframes mi-shake { 0%, 100% { translate: 0 0; } 20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -3px 0; } 80% { translate: 2px 0; } }
+@keyframes mi-tick { from { opacity: 0; translate: 0 -45%; } to { opacity: 1; translate: 0 0; } }
+@keyframes mi-rise { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes mi-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes mi-toast-in { from { opacity: 0; translate: 0 18px; scale: 0.92; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes mi-toast-out { to { opacity: 0; translate: 0 10px; scale: 0.96; } }
+@keyframes mi-wiggle { 0%, 100% { rotate: 0deg; } 25% { rotate: -12deg; } 50% { rotate: 9deg; } 75% { rotate: -5deg; } }
+@keyframes mi-hop { 0%, 100% { translate: 0 0; } 50% { translate: 0 -3px; } }
+@keyframes mi-blink { 0%, 94%, 100% { transform: scaleY(1); } 96.5% { transform: scaleY(0.12); } }
+@keyframes mi-blink-now { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.12); } }

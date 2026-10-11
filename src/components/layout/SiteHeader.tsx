@@ -3,7 +3,7 @@
 import { ChevronDown, Menu, Ticket, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
@@ -31,6 +31,7 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
   const exploreRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const sections = [...SECTION_NAV, ...extraNav];
+  const pages = [{ href: "/", label: "Home" }, ...PRIMARY_NAV, { href: "/register", label: "Registration" }];
 
   // Glass background + reading progress bar.
   useEffect(() => {
@@ -104,12 +105,18 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "relative rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors",
+                  "group relative rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors",
                   active ? "text-brand" : "text-muted hover:text-fg",
                 )}
               >
                 {item.label}
-                {active ? <span aria-hidden className="absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full bg-brand" /> : null}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "absolute inset-x-3 -bottom-0.5 h-0.5 rounded-full transition-[scale,background-color] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)]",
+                    active ? "bg-brand" : "scale-x-0 bg-border-strong group-hover:scale-x-100 group-focus-visible:scale-x-100",
+                  )}
+                />
               </Link>
             );
           })}
@@ -119,7 +126,8 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
               aria-expanded={exploreOpen}
               aria-controls="explore-menu"
               onClick={() => setExploreOpen((v) => !v)}
-              className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-[14.5px] font-semibold text-muted transition-colors hover:text-fg"
+              data-ripple=""
+              className={cn("inline-flex items-center gap-1 rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors hover:bg-surface-2 hover:text-fg", exploreOpen ? "bg-surface-2 text-fg" : "text-muted")}
             >
               Explore
               <ChevronDown size={16} aria-hidden className={cn("transition-transform duration-300", exploreOpen && "rotate-180")} />
@@ -127,21 +135,22 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
             {exploreOpen ? (
               <div
                 id="explore-menu"
-                className="absolute top-full right-0 mt-3 w-[34rem] animate-pop rounded-3xl border border-border bg-surface p-3 shadow-card-lg"
+                className="absolute top-full right-0 mt-3 w-[34rem] origin-top-right animate-pop rounded-3xl border border-border bg-surface p-3 shadow-card-lg"
               >
-                <div className="grid grid-cols-2 gap-1">
+                <div className="mi-stagger grid grid-cols-2 gap-1">
                   {sections.map((item, i) => (
                     <Link
                       key={item.href}
                       href={item.href}
                       onClick={() => setExploreOpen(false)}
+                      style={{ "--i": i } as CSSProperties}
                       className={cn(
                         "group rounded-2xl p-3 transition-colors hover:bg-accent-soft",
                         ["tone-mint", "tone-lilac", "tone-peach", "tone-aqua", "tone-butter", "tone-blush"][i % 6],
                       )}
                     >
-                      <span className="flex items-center gap-2 font-display text-[15px] font-semibold text-fg group-hover:text-accent-ink">
-                        <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                      <span className="flex items-center gap-2 font-display text-[15px] font-semibold text-fg transition-[translate,color] duration-200 group-hover:translate-x-0.5 group-hover:text-accent-ink">
+                        <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--accent)] transition-[scale] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-150" />
                         {item.label}
                       </span>
                       {item.description ? <span className="mt-1 block text-[13px] leading-snug text-muted">{item.description}</span> : null}
@@ -160,6 +169,7 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
           </ButtonLink>
           <button
             type="button"
+            data-ripple=""
             className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg lg:hidden"
             aria-label="Open menu"
             aria-expanded={menuOpen}
@@ -192,19 +202,20 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface"
+                  data-ripple=""
+                  className="group grid h-10 w-10 place-items-center rounded-full border border-border bg-surface"
                   aria-label="Close menu"
                 >
-                  <X size={20} aria-hidden />
+                  <X size={20} aria-hidden className="transition-transform duration-300 group-hover:rotate-90" />
                 </button>
               </div>
             </div>
             <nav aria-label="Mobile" className="container-site grid gap-8 pt-4 pb-6">
               <div>
                 <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">Pages</p>
-                <ul className="grid gap-1">
-                  {[{ href: "/", label: "Home" }, ...PRIMARY_NAV, { href: "/register", label: "Registration" }].map((item) => (
-                    <li key={item.href}>
+                <ul className="mi-stagger grid gap-1">
+                  {pages.map((item, i) => (
+                    <li key={item.href} style={{ "--i": i } as CSSProperties}>
                       <Link
                         href={item.href}
                         onClick={() => setMenuOpen(false)}
@@ -222,12 +233,13 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
               </div>
               <div>
                 <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">On the home page</p>
-                <ul className="grid grid-cols-2 gap-2">
+                <ul className="mi-stagger grid grid-cols-2 gap-2">
                   {sections.map((item, i) => (
-                    <li key={item.href}>
+                    <li key={item.href} style={{ "--i": pages.length + i } as CSSProperties}>
                       <Link
                         href={item.href}
                         onClick={() => setMenuOpen(false)}
+                        data-ripple=""
                         className={cn(
                           "block rounded-2xl bg-accent-soft px-3 py-3 text-[15px] font-semibold text-accent-ink",
                           ["tone-mint", "tone-lilac", "tone-peach", "tone-aqua", "tone-butter", "tone-blush"][i % 6],

@@ -1,12 +1,28 @@
 "use client";
 
 import "./aura.css";
-import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useId, useRef, useState, type AnimationEvent, type CSSProperties } from "react";
 import { cn } from "@/lib/cn";
 import { AuraArt, AURA_H, AURA_W } from "./AuraArt";
+import { flyInOnView } from "./entrance";
 import { AURA_PRESETS } from "./presets";
 import { onIdleChange, trackLook } from "./look";
 import type { AuraLook, AuraVariant, Effect, Expression, Pose } from "./types";
+
+/**
+ * How Aura arrives: "load" flies in as the page opens (page heroes), "fly",
+ * "zip" and "drift" play when it first scrolls into view. "auto" picks by size.
+ */
+export type AuraEntrance = "auto" | "load" | "fly" | "zip" | "drift" | "none";
+
+function entranceKind(entrance: AuraEntrance, size: number, variant: AuraVariant): Exclude<AuraEntrance, "auto"> {
+  if (entrance !== "auto") return entrance;
+  if (size < 56) return "none";
+  if (variant === "sleep" || variant === "loading") return "drift";
+  return size >= 96 ? "fly" : "zip";
+}
+
+const FLY_ANIMATIONS = new Set(["aura-fly-in", "aura-zip-in", "aura-drift-in"]);
 
 export interface AuraProps {
   /** Which representation of Aura to show (see presets.ts). */
@@ -33,6 +49,11 @@ export interface AuraProps {
   /** Fine-tune the preset (expression, prop, effects…). */
   overrides?: Partial<AuraLook>;
   onActivate?: () => void;
+  /** Entrance animation (default "auto"). */
+  entrance?: AuraEntrance;
+  /** For `entrance="load"`: where Aura flies in from (default right) and when. */
+  entranceFrom?: "left" | "right" | "top";
+  entranceDelay?: number;
   className?: string;
 }
 
@@ -50,6 +71,9 @@ export function Aura({
   sleepWhenIdle,
   overrides,
   onActivate,
+  entrance = "auto",
+  entranceFrom,
+  entranceDelay,
   className,
 }: AuraProps) {
   const preset = AURA_PRESETS[variant];
@@ -82,6 +106,7 @@ export function Aura({
   };
 
   const waves = base.pose === "wave" || base.pose === "cheer";
+  const arrival = entranceKind(entrance, size, variant);
 
   useEffect(() => {
     const pending = timers.current;
@@ -101,14 +126,23 @@ export function Aura({
     const text = typeof greet === "string" ? greet : lines[0];
     if (!text) return;
     tipIndex.current = typeof greet === "string" ? 0 : 1;
-    const show = setTimeout(() => setBubble(text), 900);
-    const hide = setTimeout(() => setBubble(null), 6400);
+    // Say hello once Aura has landed.
+    const delay = arrival === "load" ? 1900 : 900;
+    const show = setTimeout(() => setBubble(text), delay);
+    const hide = setTimeout(() => setBubble(null), delay + 5500);
     return () => {
       clearTimeout(show);
       clearTimeout(hide);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [greet]);
+
+  // Fly in when first scrolled into view.
+  const scrollEntrance = arrival === "fly" || arrival === "zip" || arrival === "drift";
+  useEffect(() => {
+    if (!scrollEntrance || !ref.current) return;
+    return flyInOnView(ref.current);
+  }, [scrollEntrance]);
 
   // Eyes follow the pointer.
   const shouldTrack = track ?? interactive;
@@ -153,9 +187,18 @@ export function Aura({
     ? [...(base.effects ?? []).filter((e) => e !== "confetti"), "zzz"]
     : (base.effects ?? []);
 
+  const loadFrom =
+    arrival !== "load"
+      ? null
+      : {
+          ...(entranceFrom === "left" ? { "--fly-x": "calc(-1 * min(46vw, 560px))", "--fly-dir": -1 } : null),
+          ...(entranceFrom === "top" ? { "--fly-x": "0px", "--fly-y": "-60vh", "--fly-dir": 0 } : null),
+          ...(entranceDelay !== undefined ? { "--fly-delay": `${entranceDelay}s` } : null),
+        };
   const style = {
     width: size,
     ...(look ? { "--lx": look.x, "--ly": look.y } : null),
+    ...loadFrom,
   } as CSSProperties;
 
   const art = (
@@ -197,6 +240,17 @@ export function Aura({
     </span>
   );
 
+  const flyProps =
+    arrival === "none"
+      ? {}
+      : {
+          "data-fly": arrival === "load" ? "load" : "pending",
+          "data-fly-kind": scrollEntrance && arrival !== "fly" ? arrival : undefined,
+          onAnimationEnd: (e: AnimationEvent<HTMLElement>) => {
+            if (e.target === e.currentTarget && FLY_ANIMATIONS.has(e.animationName)) e.currentTarget.dataset.fly = "done";
+          },
+        };
+
   const classes = cn(
     "aura-wrap relative inline-block shrink-0 select-none align-middle",
     reaction && `aura--${reaction}`,
@@ -214,6 +268,7 @@ export function Aura({
         }}
         className={classes}
         style={style}
+        {...flyProps}
       >
         <button
           type="button"
@@ -236,6 +291,7 @@ export function Aura({
       }}
       className={classes}
       style={style}
+      {...flyProps}
       role={label ? "img" : undefined}
       aria-label={label}
       aria-hidden={label ? undefined : true}

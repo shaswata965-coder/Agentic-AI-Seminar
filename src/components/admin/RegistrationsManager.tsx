@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
+import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { useToast } from "@/components/ui/Toast";
 import { useUrlParam } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
@@ -64,6 +65,7 @@ export function RegistrationsManager() {
   const urlType = useUrlParam("type");
   const [typeChoice, setType] = useState<"workshop" | "hackathon" | null>(null);
   const type = typeChoice ?? (urlType === "hackathon" ? "hackathon" : "workshop");
+  const { listRef, pillRef } = useSlidingPill(type);
   const { data, loading, reload, setData } = useApi<(Workshop | Team)[]>(`/registrations?type=${type}`);
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
@@ -106,13 +108,14 @@ export function RegistrationsManager() {
         title="Registrations"
         description="Everyone who registered through the website. Update statuses, add notes and download spreadsheets."
         actions={
-          <a href={withBase(`/api/admin/export/${type}`)} className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-4 text-sm font-semibold text-brand-fg">
+          <a href={withBase(`/api/admin/export/${type}`)} data-ripple="" className="btn-shine inline-flex h-11 items-center gap-2 rounded-full bg-brand px-4 text-sm font-semibold text-brand-fg hover:-translate-y-0.5 hover:bg-brand-strong">
             <Download size={16} aria-hidden /> Download CSV
           </a>
         }
       />
       <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div className="inline-flex rounded-full border border-border bg-surface p-1 shadow-card" role="tablist" aria-label="Registration type">
+        <div ref={listRef} className="group/seg relative isolate inline-flex rounded-full border border-border bg-surface p-1 shadow-card" role="tablist" aria-label="Registration type">
+          <SlidingPill pillRef={pillRef} className="bg-brand shadow-sm" />
           {(["workshop", "hackathon"] as const).map((t) => (
             <button
               key={t}
@@ -123,7 +126,8 @@ export function RegistrationsManager() {
                 setType(t);
                 setStatus("all");
               }}
-              className={cn("rounded-full px-4 py-2 text-sm font-semibold", type === t ? "bg-brand text-brand-fg" : "text-muted hover:text-fg")}
+              data-ripple=""
+              className={cn("rounded-full px-4 py-2 text-sm font-semibold", type === t ? "bg-brand text-brand-fg group-data-[pill=on]/seg:bg-transparent" : "text-muted hover:text-fg")}
             >
               {t === "workshop" ? "Workshop" : "Hackathon teams"}
             </button>

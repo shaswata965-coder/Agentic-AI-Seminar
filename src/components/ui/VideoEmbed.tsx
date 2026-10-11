@@ -56,8 +56,9 @@ export function VideoEmbed({ url, title }: { url: string; title: string }) {
       {v.kind === "youtube" ? (
         <img src={`https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
       ) : null}
-      <span className="relative grid h-16 w-16 place-items-center rounded-full bg-white/95 text-[#0f172a] shadow-card-lg transition-transform group-hover:scale-110">
-        <Play size={26} aria-hidden fill="currentColor" className="ml-1" />
+      <span className="relative grid h-16 w-16 place-items-center rounded-full bg-white/95 text-[#0f172a] shadow-card-lg transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110">
+        <span aria-hidden className="absolute inset-0 rounded-full bg-white/70 opacity-0 group-hover:animate-ping-soft group-hover:opacity-100" />
+        <Play size={26} aria-hidden fill="currentColor" className="relative ml-1" />
       </span>
     </button>
   );

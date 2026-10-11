@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./micro.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -200,6 +201,8 @@
     color: var(--fg);
     font-family: var(--font-sans);
     text-rendering: optimizeLegibility;
+    /* Aura flies in from beyond the screen edges: never show a sideways scrollbar for it. */
+    overflow-x: clip;
   }
   h1, h2, h3, h4 {
     font-family: var(--font-display);
@@ -368,7 +371,8 @@
 .rich ol { list-style: decimal; padding-left: 1.25em; }
 .rich li + li { margin-top: 0.35em; }
 .rich li::marker { color: var(--accent-ink); }
-.rich a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.rich a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; transition: text-underline-offset 0.2s ease, text-decoration-thickness 0.2s ease; }
+.rich a:hover { text-underline-offset: 5px; text-decoration-thickness: 2px; }
 .rich strong { color: var(--fg); font-weight: 650; }
 .rich code { font-size: 0.9em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 0.35em; }
 

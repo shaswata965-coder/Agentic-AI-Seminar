@@ -15,11 +15,11 @@ const TIER_TONES = ["butter", "lilac", "peach", "azure", "mint", "blush"] as con
 
 function Logo({ sp, size }: { sp: Sponsor; size: keyof typeof SIZE }) {
   const inner = sp.logo ? (
-    <Img src={sp.logo} alt={sp.name} className="max-h-[70%] max-w-[80%] object-contain" />
+    <Img src={sp.logo} alt={sp.name} className="max-h-[70%] max-w-[80%] object-contain transition-[scale] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-105" />
   ) : (
     <span className="px-3 py-3 text-center font-display text-lg leading-snug font-bold break-words text-fg">{sp.name}</span>
   );
-  const cls = cn("grid w-full place-items-center rounded-2xl border border-border bg-white transition hover:-translate-y-0.5 hover:shadow-card dark:bg-surface", sp.logo ? SIZE[size] : TEXT_SIZE[size]);
+  const cls = cn("group grid w-full place-items-center rounded-2xl border border-border bg-white transition hover:-translate-y-1 hover:shadow-card-lg dark:bg-surface", sp.logo ? SIZE[size] : TEXT_SIZE[size]);
   return sp.website ? (
     <a href={sp.website} target="_blank" rel="noopener noreferrer" className={cls} title={sp.name}>
       {inner}
@@ -80,8 +80,8 @@ export function Partners({ s, sponsors }: { s: SiteSettings; sponsors: Sponsor[]
         <h3 className="font-display text-2xl font-bold text-fg">Sponsorship opportunities</h3>
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {s.sponsorTiers.map((t, i) => (
-            <li key={`${t.name}-${i}`} className={`tone-${TIER_TONES[i % TIER_TONES.length]} card flex flex-col p-6`} data-reveal style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}>
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink">
+            <li key={`${t.name}-${i}`} className={`tone-${TIER_TONES[i % TIER_TONES.length]} card group flex flex-col p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`} data-reveal data-glow="" style={{ ["--reveal-delay" as string]: `${i * 80}ms` }}>
+              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:rotate-6">
                 <Handshake size={21} aria-hidden />
               </span>
               <p className="mt-4 font-display text-xl font-bold text-fg">{t.name}</p>
@@ -105,7 +105,7 @@ export function Partners({ s, sponsors }: { s: SiteSettings; sponsors: Sponsor[]
             </ButtonLink>
           ) : null}
           {s.contactEmail ? (
-            <a className="text-sm font-semibold text-accent-ink hover:underline" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent("Sponsorship enquiry — Agentic AI Workshop 2026")}`}>
+            <a className="mi-underline text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent("Sponsorship enquiry — Agentic AI Workshop 2026")}`}>
               Sponsor enquiries: {s.contactEmail}
             </a>
           ) : null}
