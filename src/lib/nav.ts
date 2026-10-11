@@ -4,14 +4,18 @@ export interface NavItem {
   description?: string;
 }
 
-/** Dedicated pages (brief §2). */
+/** Dedicated pages shown as links in the navigation bar (after Home). */
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/programme", label: "Programme" },
   { href: "/speakers", label: "Speakers" },
   { href: "/tutorials", label: "Tutorials & Demos" },
   { href: "/hackathon", label: "Hackathon" },
-  { href: "/organisers", label: "Organisers" },
 ];
+
+export const HOME_NAV: NavItem = { href: "/", label: "Home" };
+
+/** Dedicated pages listed under Explore, with the home page sections. */
+export const EXPLORE_PAGES: NavItem[] = [{ href: "/organisers", label: "Organisers", description: "Faculty, student organisers and volunteers" }];
 
 /** Sections of the single-scroll home page. */
 export const SECTION_NAV: NavItem[] = [

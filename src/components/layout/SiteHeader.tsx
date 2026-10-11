@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { PRIMARY_NAV, SECTION_NAV, type NavItem } from "@/lib/nav";
+import { EXPLORE_PAGES, HOME_NAV, PRIMARY_NAV, SECTION_NAV, type NavItem } from "@/lib/nav";
 import { BrandMark } from "./BrandMark";
 import { InstituteLogo } from "./InstituteLogo";
 import { ThemeToggle } from "./ThemeToggle";
@@ -34,8 +34,9 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
   const [menuOpen, setMenuOpen] = useState(false);
   const exploreRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const sections = [...SECTION_NAV, ...extraNav];
-  const pages = [{ href: "/", label: "Home" }, ...PRIMARY_NAV, { href: "/register", label: "Registration" }];
+  const sections = [...SECTION_NAV, ...EXPLORE_PAGES, ...extraNav];
+  const pages = [HOME_NAV, ...PRIMARY_NAV, { href: "/register", label: "Registration" }];
+  const exploreActive = sections.some((item) => isActive(pathname, item.href));
   const barCls = "flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:h-[72px] xl:px-8";
   const iitdLogo = <InstituteLogo kind="iitd" upload={logos.iitd} className="h-9 lg:h-11" />;
   // The full ScAI wordmark where the header has room, otherwise just its "ScAI" letters.
@@ -111,7 +112,7 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden items-center gap-0.5 xl:flex">
-          {PRIMARY_NAV.map((item) => {
+          {[HOME_NAV, ...PRIMARY_NAV].map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <Link
@@ -141,7 +142,7 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
               aria-controls="explore-menu"
               onClick={() => setExploreOpen((v) => !v)}
               data-ripple=""
-              className={cn("inline-flex items-center gap-1 rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors hover:bg-surface-2 hover:text-fg", exploreOpen ? "bg-surface-2 text-fg" : "text-muted")}
+              className={cn("inline-flex items-center gap-1 rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors hover:bg-surface-2 hover:text-fg", exploreOpen ? "bg-surface-2 text-fg" : exploreActive ? "text-brand" : "text-muted")}
             >
               Explore
               <ChevronDown size={16} aria-hidden className={cn("transition-transform duration-300", exploreOpen && "rotate-180")} />
@@ -250,7 +251,7 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
                 </ul>
               </div>
               <div>
-                <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">On the home page</p>
+                <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">Explore</p>
                 <ul className="mi-stagger grid grid-cols-2 gap-2">
                   {sections.map((item, i) => (
                     <li key={item.href} style={{ "--i": pages.length + i } as CSSProperties}>

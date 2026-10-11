@@ -7,7 +7,7 @@ import { InstagramIcon, LinkedInIcon, XIcon, YouTubeIcon } from "@/components/ui
 import type { SiteSettings } from "@/lib/content/types";
 import { brandName, eventCalendarLinks, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
-import { PRIMARY_NAV, SECTION_NAV, postEventNav } from "@/lib/nav";
+import { EXPLORE_PAGES, PRIMARY_NAV, SECTION_NAV, postEventNav } from "@/lib/nav";
 import { absoluteUrl } from "@/lib/paths";
 import { BrandMark } from "./BrandMark";
 
@@ -110,7 +110,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
         <nav aria-label="Explore">
           <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">Explore</h2>
           <ul className="mt-4 space-y-2.5">
-            {[...SECTION_NAV, ...postEventNav(s), { href: "/meet-aura", label: "Meet Aura" }].map((i) => (
+            {[...SECTION_NAV, ...EXPLORE_PAGES, ...postEventNav(s), { href: "/meet-aura", label: "Meet Aura" }].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}

@@ -248,6 +248,33 @@
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
 }
 
+/* Home hero text column: as tall as it was when it also held the logo box, the
+   Register / Hackathon / Programme buttons and the share row (measured per width). */
+@utility hero-copy {
+  min-height: 818px;
+  @media (width >= 460px) {
+    min-height: 726px;
+  }
+  @media (width >= 580px) {
+    min-height: 527px;
+  }
+  @media (width >= 640px) {
+    min-height: 607px;
+  }
+  @media (width >= 700px) {
+    min-height: 543px;
+  }
+  @media (width >= 768px) {
+    min-height: 482px;
+  }
+  @media (width >= 1024px) {
+    min-height: 628px;
+  }
+  @media (width >= 1200px) {
+    min-height: 564px;
+  }
+}
+
 @utility bg-dots {
   background-image: radial-gradient(color-mix(in oklab, var(--fg) 9%, transparent) 1px, transparent 1px);
   background-size: 22px 22px;

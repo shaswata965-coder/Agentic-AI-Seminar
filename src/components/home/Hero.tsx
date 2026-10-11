@@ -79,27 +79,30 @@ export function Hero({ s }: { s: SiteSettings }) {
       <NetworkCanvas className="absolute inset-0 -z-10" avoid="[data-graph-avoid]" />
 
       <div className="container-site grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-6 lg:pt-14 lg:pb-14">
-        <div>
-          <h1 id="hero-title" data-graph-avoid="text" className="font-display text-[2.6rem] leading-[1.02] font-extrabold tracking-tight text-fg sm:text-6xl lg:text-[4.4rem]">
-            {lead.length ? (
-              <>
-                <span className="text-gradient animate-gradient">{lead.join(" ")}</span> {last}
-              </>
-            ) : (
-              <span className="text-gradient animate-gradient">{last}</span>
-            )}
-            {year ? (
-              <>
-                {" "}
-                <span className="text-muted">{year}</span>
-              </>
-            ) : null}
-          </h1>
-          <p data-graph-avoid="text" className="mt-5 max-w-xl text-lg text-muted sm:text-xl">
-            {s.tagline}
-          </p>
+        {/* hero-copy keeps the hero as tall as it used to be; the space is shared evenly around the text. */}
+        <div className="hero-copy flex flex-col justify-evenly gap-8">
+          <div>
+            <h1 id="hero-title" data-graph-avoid="text" className="font-display text-[2.6rem] leading-[1.02] font-extrabold tracking-tight text-fg sm:text-6xl lg:text-[4.4rem]">
+              {lead.length ? (
+                <>
+                  <span className="text-gradient animate-gradient">{lead.join(" ")}</span> {last}
+                </>
+              ) : (
+                <span className="text-gradient animate-gradient">{last}</span>
+              )}
+              {year ? (
+                <>
+                  {" "}
+                  <span className="text-muted">{year}</span>
+                </>
+              ) : null}
+            </h1>
+            <p data-graph-avoid="text" className="mt-5 max-w-xl text-lg text-muted sm:text-xl">
+              {s.tagline}
+            </p>
+          </div>
 
-          <dl className="mt-8 flex flex-wrap gap-x-10 gap-y-5">
+          <dl className="flex flex-wrap gap-x-10 gap-y-5">
             <Fact label="When" icon={<CalendarDays size={14} aria-hidden />} tone="tone-azure">
               <time dateTime={s.startDate}>{formatDateRange(s.startDate, s.endDate)}</time>
             </Fact>
@@ -124,9 +127,7 @@ export function Hero({ s }: { s: SiteSettings }) {
               <Aura variant="countdown" size={72} lite />
               <div>
                 <p className="font-display text-lg font-semibold text-fg">Countdown</p>
-                <p className="text-sm text-muted">
-                  to {formatDate(s.startDate, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} IST
-                </p>
+                <p className="text-sm text-muted">to {formatDate(s.startDate, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} IST</p>
               </div>
             </div>
             <Countdown target={s.startDate} end={s.endDate} className="flex-1" />
