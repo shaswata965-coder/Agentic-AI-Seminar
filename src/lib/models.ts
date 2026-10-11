@@ -1,0 +1,245 @@
+import mongoose, { Schema, type Model, type SchemaDefinition } from "mongoose";
+import type { FieldDef } from "@/lib/schema/fields";
+import { COLLECTION_MAP, COLLECTIONS } from "@/lib/schema/resources";
+
+/* ---------------------------------------------------------------------------
+   Content collections — schemas are generated from the admin field
+   definitions so the CMS form, validation and storage never drift apart.
+   ------------------------------------------------------------------------- */
+
+function schemaFromFields(fields: FieldDef[]): SchemaDefinition {
+  const def: SchemaDefinition = {};
+  for (const f of fields) {
+    switch (f.type) {
+      case "number":
+        def[f.name] = { type: Number, default: null };
+        break;
+      case "boolean":
+        def[f.name] = { type: Boolean, default: false };
+        break;
+      case "multiselect":
+      case "stringList":
+        def[f.name] = { type: [String], default: [] };
+        break;
+      case "objectList":
+        def[f.name] = { type: [Schema.Types.Mixed], default: [] };
+        break;
+      case "group":
+        def[f.name] = { type: Schema.Types.Mixed, default: {} };
+        break;
+      case "ref":
+        def[f.name] = { type: Schema.Types.ObjectId, ref: COLLECTION_MAP[f.resource]?.model, default: null };
+        break;
+      case "refList":
+        def[f.name] = { type: [{ type: Schema.Types.ObjectId, ref: COLLECTION_MAP[f.resource]?.model }], default: [] };
+        break;
+      default:
+        def[f.name] = { type: String, default: "", trim: true };
+    }
+  }
+  return def;
+}
+
+const collectionModels: Record<string, Model<Record<string, unknown>>> = {};
+for (const c of COLLECTIONS) {
+  const schema = new Schema(schemaFromFields(c.fields), { timestamps: true, minimize: false });
+  if (c.slugFrom) schema.index({ slug: 1 });
+  schema.index({ published: 1, order: 1 });
+  collectionModels[c.key] =
+    (mongoose.models[c.model] as Model<Record<string, unknown>>) ?? mongoose.model<Record<string, unknown>>(c.model, schema);
+}
+
+export function getCollectionModel(key: string): Model<Record<string, unknown>> {
+  const m = collectionModels[key];
+  if (!m) throw new Error(`Unknown collection: ${key}`);
+  return m;
+}
+
+/* ------------------------------------------------------------ Singletons -- */
+
+export interface SingletonDoc {
+  key: string;
+  data: Record<string, unknown>;
+  updatedAt?: Date;
+}
+const singletonSchema = new Schema<SingletonDoc>(
+  {
+    key: { type: String, required: true, unique: true },
+    data: { type: Schema.Types.Mixed, default: {} },
+  },
+  { timestamps: true, minimize: false },
+);
+export const Singleton = (mongoose.models.Singleton as Model<SingletonDoc>) ?? mongoose.model<SingletonDoc>("Singleton", singletonSchema);
+
+/* --------------------------------------------------------- Registrations -- */
+
+export interface RegistrationDoc {
+  regId: string;
+  name: string;
+  email: string;
+  phone: string;
+  organisation: string;
+  designation: string;
+  category: string;
+  city: string;
+  country: string;
+  interests: string[];
+  tutorials: boolean;
+  hackathonInterest: boolean;
+  dietary: string;
+  accessibility: string;
+  heardFrom: string;
+  message: string;
+  consent: boolean;
+  status: "registered" | "confirmed" | "waitlisted" | "cancelled";
+  emailSent: boolean;
+  notes: string;
+  createdAt?: Date;
+}
+const registrationSchema = new Schema<RegistrationDoc>(
+  {
+    regId: { type: String, required: true, unique: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, lowercase: true, trim: true, unique: true },
+    phone: { type: String, default: "" },
+    organisation: { type: String, default: "" },
+    designation: { type: String, default: "" },
+    category: { type: String, default: "other" },
+    city: { type: String, default: "" },
+    country: { type: String, default: "India" },
+    interests: { type: [String], default: [] },
+    tutorials: { type: Boolean, default: false },
+    hackathonInterest: { type: Boolean, default: false },
+    dietary: { type: String, default: "" },
+    accessibility: { type: String, default: "" },
+    heardFrom: { type: String, default: "" },
+    message: { type: String, default: "" },
+    consent: { type: Boolean, default: false },
+    status: { type: String, enum: ["registered", "confirmed", "waitlisted", "cancelled"], default: "registered" },
+    emailSent: { type: Boolean, default: false },
+    notes: { type: String, default: "" },
+  },
+  { timestamps: true },
+);
+export const Registration =
+  (mongoose.models.Registration as Model<RegistrationDoc>) ?? mongoose.model<RegistrationDoc>("Registration", registrationSchema);
+
+export interface TeamMember {
+  name: string;
+  email: string;
+  phone: string;
+  organisation: string;
+  role: string;
+}
+export interface HackathonRegistrationDoc {
+  regId: string;
+  teamName: string;
+  teamKey: string;
+  track: string;
+  members: TeamMember[];
+  leaderEmail: string;
+  ideaTitle: string;
+  ideaSummary: string;
+  githubUrl: string;
+  consent: boolean;
+  status: "registered" | "shortlisted" | "not-shortlisted" | "withdrawn";
+  emailSent: boolean;
+  notes: string;
+  createdAt?: Date;
+}
+const hackathonRegistrationSchema = new Schema<HackathonRegistrationDoc>(
+  {
+    regId: { type: String, required: true, unique: true },
+    teamName: { type: String, required: true, trim: true },
+    teamKey: { type: String, required: true, unique: true },
+    track: { type: String, default: "" },
+    members: {
+      type: [
+        new Schema<TeamMember>(
+          {
+            name: { type: String, required: true },
+            email: { type: String, required: true, lowercase: true },
+            phone: { type: String, default: "" },
+            organisation: { type: String, default: "" },
+            role: { type: String, default: "" },
+          },
+          { _id: false },
+        ),
+      ],
+      default: [],
+    },
+    leaderEmail: { type: String, required: true, lowercase: true, index: true },
+    ideaTitle: { type: String, default: "" },
+    ideaSummary: { type: String, default: "" },
+    githubUrl: { type: String, default: "" },
+    consent: { type: Boolean, default: false },
+    status: { type: String, enum: ["registered", "shortlisted", "not-shortlisted", "withdrawn"], default: "registered" },
+    emailSent: { type: Boolean, default: false },
+    notes: { type: String, default: "" },
+  },
+  { timestamps: true },
+);
+export const HackathonRegistration =
+  (mongoose.models.HackathonRegistration as Model<HackathonRegistrationDoc>) ??
+  mongoose.model<HackathonRegistrationDoc>("HackathonRegistration", hackathonRegistrationSchema);
+
+/* ------------------------------------------------------------- Enquiries -- */
+
+export interface EnquiryDoc {
+  type: "contact" | "exhibitor" | "sponsor";
+  name: string;
+  email: string;
+  organisation: string;
+  phone: string;
+  subject: string;
+  message: string;
+  status: "new" | "in-progress" | "closed";
+  notes: string;
+  createdAt?: Date;
+}
+const enquirySchema = new Schema<EnquiryDoc>(
+  {
+    type: { type: String, enum: ["contact", "exhibitor", "sponsor"], default: "contact", index: true },
+    name: { type: String, required: true, trim: true },
+    email: { type: String, required: true, lowercase: true, trim: true },
+    organisation: { type: String, default: "" },
+    phone: { type: String, default: "" },
+    subject: { type: String, default: "" },
+    message: { type: String, required: true },
+    status: { type: String, enum: ["new", "in-progress", "closed"], default: "new" },
+    notes: { type: String, default: "" },
+  },
+  { timestamps: true },
+);
+export const Enquiry = (mongoose.models.Enquiry as Model<EnquiryDoc>) ?? mongoose.model<EnquiryDoc>("Enquiry", enquirySchema);
+
+/* ----------------------------------------------------------------- Users -- */
+
+export interface UserDoc {
+  email: string;
+  name: string;
+  passwordHash: string;
+  role: "admin" | "editor";
+  active: boolean;
+  lastLoginAt: Date | null;
+}
+const userSchema = new Schema<UserDoc>(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    name: { type: String, default: "" },
+    passwordHash: { type: String, required: true },
+    role: { type: String, enum: ["admin", "editor"], default: "editor" },
+    active: { type: Boolean, default: true },
+    lastLoginAt: { type: Date, default: null },
+  },
+  { timestamps: true },
+);
+export const User = (mongoose.models.User as Model<UserDoc>) ?? mongoose.model<UserDoc>("User", userSchema);
+
+/* ----------------------------------------------------------------- Media -- */
+
+export function mediaBucket() {
+  const db = mongoose.connection.db;
+  if (!db) throw new Error("Database not connected");
+  return new mongoose.mongo.GridFSBucket(db, { bucketName: "media" });
+}

@@ -1,0 +1,162 @@
+/* Aura mascot animations. Pure CSS transforms/opacity so they stay on the
+   compositor; trimmed on small screens and disabled for reduced motion. */
+
+.aura-svg { overflow: visible; display: block; }
+
+.aura-svg .aura-float,
+.aura-svg .aura-react,
+.aura-svg .aura-head,
+.aura-svg .aura-head-bob,
+.aura-svg .aura-arm,
+.aura-svg .aura-eye,
+.aura-svg .aura-shadow,
+.aura-svg .aura-twinkle,
+.aura-svg .aura-rise,
+.aura-svg .aura-confetti,
+.aura-svg .aura-orbit-spin,
+.aura-svg .aura-orbit-node,
+.aura-svg .aura-bubble,
+.aura-svg .aura-flame,
+.aura-svg .aura-tick,
+.aura-svg .aura-flash,
+.aura-svg .aura-pulse ellipse,
+.aura-svg .aura-bob-small,
+.aura-svg .aura-glow-pulse,
+.aura-svg .aura-thrust,
+.aura-svg .aura-chest-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Hover & float */
+.aura-svg .aura-float { animation: aura-float 4.2s ease-in-out infinite; animation-delay: var(--aura-phase, 0s); }
+.aura-svg .aura-shadow { animation: aura-shadow 4.2s ease-in-out infinite; animation-delay: var(--aura-phase, 0s); }
+.aura-svg .aura-head-bob { animation: aura-head-bob 4.2s ease-in-out infinite; animation-delay: calc(var(--aura-phase, 0s) - 0.6s); }
+.aura-svg .aura-thrust { animation: aura-flicker 1.6s ease-in-out infinite; }
+
+/* Look-at (CSS vars --lx/--ly are set by JS, range -1..1) */
+.aura-svg .aura-head {
+  transform-origin: 50% 85%;
+  transform: rotate(calc(var(--lx, 0) * 7deg));
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.aura-svg .aura-eyes {
+  transform: translate(calc(var(--lx, 0) * 7px), calc(var(--ly, 0) * 5px));
+  transition: transform 0.25s ease-out;
+}
+
+/* Eyes */
+.aura-svg .aura-blink { animation: aura-blink 5.5s infinite; animation-delay: var(--aura-phase, 0s); }
+.aura-svg .aura-eye-glow { animation: aura-glow 3.4s ease-in-out infinite; }
+.dark .aura-svg .aura-eye-glow { opacity: 1; }
+.aura-svg .aura-chest-glow { animation: aura-glow 2.6s ease-in-out infinite; }
+.aura-svg .aura-scan { animation: aura-scan 1.6s ease-in-out infinite alternate; }
+
+/* Arms */
+.aura-svg .aura-arm {
+  transform-origin: 50% 10%;
+  transform: rotate(var(--rot, 0deg));
+  transition: transform 0.5s cubic-bezier(0.34, 1.4, 0.5, 1);
+}
+.aura-svg .aura-arm-sway { animation: aura-sway 4.2s ease-in-out infinite; animation-delay: var(--aura-phase, 0s); }
+.aura-svg .aura-arm-wave { animation: aura-wave 0.9s ease-in-out infinite; }
+.aura-svg .aura-arm-tap { animation: aura-tap 0.42s ease-in-out infinite alternate; }
+.aura-svg .aura-arm-tap-alt { animation-delay: -0.21s; }
+
+/* Reactions (toggled on the wrapper) */
+.aura--twirl .aura-svg .aura-react { animation: aura-twirl 0.9s cubic-bezier(0.3, 0.7, 0.3, 1); transform-origin: 50% 60%; }
+.aura--hop .aura-svg .aura-react { animation: aura-hop 0.75s cubic-bezier(0.3, 0.7, 0.3, 1); transform-origin: 50% 100%; }
+
+/* Props & effects */
+.aura-svg .aura-bubble { animation: aura-bubble 2.2s ease-in infinite; }
+.aura-svg .aura-bubble-2 { animation-delay: -0.8s; }
+.aura-svg .aura-bubble-3 { animation-delay: -1.5s; }
+.aura-svg .aura-flame { transform-origin: 50% 0%; animation: aura-flame 0.35s ease-in-out infinite alternate; }
+.aura-svg .aura-cursor { animation: aura-cursor 1s steps(1) infinite; }
+.aura-svg .aura-tick { transform-origin: 50% 100%; animation: aura-tick 6s steps(12) infinite; }
+.aura-svg .aura-waves { animation: aura-fade 1.2s ease-in-out infinite; }
+.aura-svg .aura-wave-2 { animation: aura-fade 1.2s ease-in-out infinite; animation-delay: -0.4s; }
+.aura-svg .aura-bob-small { animation: aura-bob 2.4s ease-in-out infinite; }
+.aura-svg .aura-orbit-spin { animation: aura-spin 10s linear infinite; }
+.aura-svg .aura-orbit-node { animation: aura-spin 10s linear infinite reverse; }
+.aura-svg .aura-twinkle { animation: aura-twinkle 2.4s ease-in-out infinite; }
+.aura-svg .aura-rise { animation: aura-rise 3.2s ease-in-out infinite; }
+.aura-svg .aura-confetti { animation: aura-confetti 2.6s ease-in-out infinite; }
+.aura-svg .aura-glow-pulse { animation: aura-glow 2s ease-in-out infinite; }
+.aura-svg .aura-rays { animation: aura-fade 2s ease-in-out infinite; }
+.aura-svg .aura-flash { animation: aura-flash 2.8s ease-out infinite; }
+.aura-svg .aura-pulse ellipse { animation: aura-ring 2.4s ease-out infinite; }
+.aura-svg .aura-pulse .aura-pulse-2 { animation-delay: -1.2s; }
+.aura-svg .aura-delay-1 { animation-delay: -0.8s; }
+.aura-svg .aura-delay-2 { animation-delay: -1.6s; }
+.aura-svg .aura-delay-3 { animation-delay: -2.2s; }
+
+/* Speech bubble */
+.aura-bubble-say {
+  animation: aura-say 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.25) both;
+  transform-origin: var(--bubble-origin, 20% 100%);
+}
+
+@keyframes aura-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes aura-shadow { 0%, 100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.82); opacity: 0.6; } }
+@keyframes aura-head-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3.5px); } }
+@keyframes aura-flicker { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 0.55; transform: scale(0.86); } }
+@keyframes aura-blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+@keyframes aura-glow { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
+@keyframes aura-scan { from { transform: translateY(0); } to { transform: translateY(60px); } }
+@keyframes aura-sway { 0%, 100% { transform: rotate(calc(var(--rot) - 3deg)); } 50% { transform: rotate(calc(var(--rot) + 3deg)); } }
+@keyframes aura-wave { 0%, 100% { transform: rotate(calc(var(--rot) - 14deg)); } 50% { transform: rotate(calc(var(--rot) + 16deg)); } }
+@keyframes aura-tap { from { transform: rotate(calc(var(--rot) - 3deg)); } to { transform: rotate(calc(var(--rot) + 4deg)); } }
+@keyframes aura-twirl {
+  0% { transform: scaleX(1) translateY(0); }
+  20% { transform: scaleX(0.12) translateY(-12px); }
+  40% { transform: scaleX(-1) translateY(-18px); }
+  60% { transform: scaleX(-0.12) translateY(-12px); }
+  80% { transform: scaleX(1) translateY(-4px); }
+  100% { transform: scaleX(1) translateY(0); }
+}
+@keyframes aura-hop {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  25% { transform: translateY(0) scale(1.06, 0.92); }
+  55% { transform: translateY(-26px) scale(0.96, 1.05); }
+  80% { transform: translateY(0) scale(1.04, 0.96); }
+}
+@keyframes aura-bubble { 0% { transform: translateY(0); opacity: 0; } 20% { opacity: 1; } 100% { transform: translateY(-22px); opacity: 0; } }
+@keyframes aura-flame { from { transform: scaleY(0.75); opacity: 0.85; } to { transform: scaleY(1.2); opacity: 1; } }
+@keyframes aura-cursor { 0%, 50% { opacity: 1; } 51%, 100% { opacity: 0; } }
+@keyframes aura-tick { to { transform: rotate(360deg); } }
+@keyframes aura-fade { 0%, 100% { opacity: 0.25; } 50% { opacity: 1; } }
+@keyframes aura-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+@keyframes aura-spin { to { transform: rotate(360deg); } }
+@keyframes aura-twinkle { 0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.4; } 50% { transform: scale(1.1) rotate(20deg); opacity: 1; } }
+@keyframes aura-rise { 0% { transform: translateY(6px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-16px); opacity: 0; } }
+@keyframes aura-confetti { 0%, 100% { transform: translateY(-4px) rotate(0deg); } 50% { transform: translateY(8px) rotate(140deg); } }
+@keyframes aura-flash { 0%, 70%, 100% { opacity: 0; transform: scale(0.4); } 76% { opacity: 1; transform: scale(1.2); } 86% { opacity: 0; transform: scale(1.4); } }
+@keyframes aura-ring { 0% { transform: scale(0.6); opacity: 0.8; } 100% { transform: scale(1.6); opacity: 0; } }
+@keyframes aura-say { from { opacity: 0; transform: scale(0.6) translateY(6px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+/* Small instances & touch devices: keep the gentle hover + blink, drop the extras */
+.aura--lite .aura-svg .aura-orbit-spin,
+.aura--lite .aura-svg .aura-orbit-node,
+.aura--lite .aura-svg .aura-twinkle,
+.aura--lite .aura-svg .aura-rise,
+.aura--lite .aura-svg .aura-confetti,
+.aura--lite .aura-svg .aura-arm-sway,
+.aura--lite .aura-svg .aura-head-bob { animation: none; }
+
+@media (max-width: 767px), (pointer: coarse) {
+  .aura-svg .aura-orbit-spin,
+  .aura-svg .aura-orbit-node,
+  .aura-svg .aura-rise,
+  .aura-svg .aura-confetti,
+  .aura-svg .aura-arm-sway,
+  .aura-svg .aura-head-bob,
+  .aura-svg .aura-eye-glow,
+  .aura-svg .aura-chest-glow,
+  .aura-svg .aura-thrust { animation: none; }
+  .aura-svg .aura-float, .aura-svg .aura-shadow { animation-duration: 6s; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aura-svg *, .aura-bubble-say { animation: none !important; transition: none !important; }
+}

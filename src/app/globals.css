@@ -1,0 +1,382 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* -------------------------------------------------------------------------
+   Design tokens
+   Light mode uses airy, pastel tints; dark mode uses a deep navy canvas with
+   luminous pastel accents. Every section picks a "tone" (azure, lilac, mint,
+   peach, blush, butter, aqua) so the palette stays varied but always light.
+   ------------------------------------------------------------------------- */
+:root {
+  color-scheme: light;
+
+  --bg: #f6f8fc;
+  --bg-soft: #eef2f9;
+  --surface: #ffffff;
+  --surface-2: #f3f6fb;
+  --surface-3: #e8edf6;
+  --border: #e1e7f1;
+  --border-strong: #c7d1e2;
+  --fg: #0f172a;
+  --muted: #475569;
+  --subtle: #64748b;
+
+  /* Brand (IIT Delhi / ScAI colours can be set from Admin → Settings → Branding) */
+  --brand: #3b5bdb;
+  --brand-strong: #2a44b8;
+  --brand-fg: #ffffff;
+  --brand-soft: #eef1ff;
+  --ring: #3b5bdb;
+
+  --azure: #8cc8ff;
+  --azure-soft: #eaf5ff;
+  --azure-ink: #0b5cad;
+  --lilac: #c3b1ff;
+  --lilac-soft: #f2eeff;
+  --lilac-ink: #5b3cc4;
+  --mint: #8fe0c0;
+  --mint-soft: #e7f8f1;
+  --mint-ink: #0d7352;
+  --peach: #ffbf99;
+  --peach-soft: #fff1e8;
+  --peach-ink: #b0501a;
+  --blush: #ffa9c1;
+  --blush-soft: #ffeef3;
+  --blush-ink: #b42f58;
+  --butter: #ffdc73;
+  --butter-soft: #fff8dc;
+  --butter-ink: #8a5f00;
+  --aqua: #67e3f9;
+  --aqua-soft: #e4fbff;
+  --aqua-ink: #0b7285;
+
+  --accent: var(--azure);
+  --accent-soft: var(--azure-soft);
+  --accent-ink: var(--azure-ink);
+
+  --card-shadow: 0 1px 2px rgb(15 23 42 / 0.04), 0 10px 30px -14px rgb(30 41 59 / 0.16);
+  --card-shadow-lg: 0 2px 4px rgb(15 23 42 / 0.04), 0 24px 48px -20px rgb(30 41 59 / 0.28);
+  --header-bg: rgb(246 248 252 / 0.78);
+
+  /* Aura mascot */
+  --aura-body-1: #ffffff;
+  --aura-body-2: #f1f5fb;
+  --aura-body-3: #d3ddec;
+  --aura-visor-1: #1d2946;
+  --aura-visor-2: #060a14;
+  --aura-eye: #5fe3ff;
+  --aura-shadow: rgb(30 41 59 / 0.18);
+  --aura-line: #93a4be;
+  --aura-edge: #c9d4e5;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg: #0a0f1e;
+  --bg-soft: #0e1527;
+  --surface: #111a2e;
+  --surface-2: #162038;
+  --surface-3: #1c2744;
+  --border: #243150;
+  --border-strong: #33446b;
+  --fg: #e8edf7;
+  --muted: #aab5cc;
+  --subtle: #8592ad;
+
+  --brand: #8fa8ff;
+  --brand-strong: #b3c3ff;
+  --brand-fg: #0a0f1e;
+  --brand-soft: #1a2244;
+  --ring: #a5b8ff;
+
+  --azure: #7cbcff;
+  --azure-soft: #12223b;
+  --azure-ink: #a8d4ff;
+  --lilac: #b7a3ff;
+  --lilac-soft: #1c1a3a;
+  --lilac-ink: #cdbfff;
+  --mint: #7fdcb8;
+  --mint-soft: #10282a;
+  --mint-ink: #9eecd0;
+  --peach: #ffb48a;
+  --peach-soft: #2a1d20;
+  --peach-ink: #ffc9a8;
+  --blush: #ff9cb9;
+  --blush-soft: #2a1828;
+  --blush-ink: #ffb8cc;
+  --butter: #ffd666;
+  --butter-soft: #29251a;
+  --butter-ink: #ffe7a0;
+  --aqua: #5fe3ff;
+  --aqua-soft: #0d2833;
+  --aqua-ink: #8ff0ff;
+
+  --card-shadow: 0 1px 2px rgb(0 0 0 / 0.35), 0 12px 32px -16px rgb(0 0 0 / 0.65);
+  --card-shadow-lg: 0 2px 6px rgb(0 0 0 / 0.4), 0 28px 56px -24px rgb(0 0 0 / 0.75);
+  --header-bg: rgb(10 15 30 / 0.72);
+
+  --aura-body-1: #f7f9fd;
+  --aura-body-2: #e3e9f4;
+  --aura-body-3: #b9c5da;
+  --aura-visor-1: #18223b;
+  --aura-visor-2: #03060d;
+  --aura-shadow: rgb(0 0 0 / 0.5);
+  --aura-line: #6d7d99;
+  --aura-edge: rgb(255 255 255 / 0);
+}
+
+/* Section tones */
+.tone-azure { --accent: var(--azure); --accent-soft: var(--azure-soft); --accent-ink: var(--azure-ink); }
+.tone-lilac { --accent: var(--lilac); --accent-soft: var(--lilac-soft); --accent-ink: var(--lilac-ink); }
+.tone-mint { --accent: var(--mint); --accent-soft: var(--mint-soft); --accent-ink: var(--mint-ink); }
+.tone-peach { --accent: var(--peach); --accent-soft: var(--peach-soft); --accent-ink: var(--peach-ink); }
+.tone-blush { --accent: var(--blush); --accent-soft: var(--blush-soft); --accent-ink: var(--blush-ink); }
+.tone-butter { --accent: var(--butter); --accent-soft: var(--butter-soft); --accent-ink: var(--butter-ink); }
+.tone-aqua { --accent: var(--aqua); --accent-soft: var(--aqua-soft); --accent-ink: var(--aqua-ink); }
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-soft: var(--bg-soft);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-subtle: var(--subtle);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-ring: var(--ring);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-azure: var(--azure);
+  --color-azure-soft: var(--azure-soft);
+  --color-azure-ink: var(--azure-ink);
+  --color-lilac: var(--lilac);
+  --color-lilac-soft: var(--lilac-soft);
+  --color-lilac-ink: var(--lilac-ink);
+  --color-mint: var(--mint);
+  --color-mint-soft: var(--mint-soft);
+  --color-mint-ink: var(--mint-ink);
+  --color-peach: var(--peach);
+  --color-peach-soft: var(--peach-soft);
+  --color-peach-ink: var(--peach-ink);
+  --color-blush: var(--blush);
+  --color-blush-soft: var(--blush-soft);
+  --color-blush-ink: var(--blush-ink);
+  --color-butter: var(--butter);
+  --color-butter-soft: var(--butter-soft);
+  --color-butter-ink: var(--butter-ink);
+  --color-aqua: var(--aqua);
+  --color-aqua-soft: var(--aqua-soft);
+  --color-aqua-ink: var(--aqua-ink);
+
+  --shadow-card: var(--card-shadow);
+  --shadow-card-lg: var(--card-shadow-lg);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-outfit), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* -------------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-padding-top: 96px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html { scroll-behavior: smooth; }
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  p { text-wrap: pretty; }
+  ::selection { background: color-mix(in oklab, var(--brand) 28%, transparent); }
+  :focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  [hidden] { display: none !important; }
+  summary { cursor: pointer; }
+  summary::-webkit-details-marker { display: none; }
+}
+
+/* -------------------------------------------------------------------------
+   Utilities
+   ------------------------------------------------------------------------- */
+@utility container-site {
+  width: 100%;
+  max-width: 76rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @media (width >= 40rem) { padding-inline: 1.5rem; }
+  @media (width >= 64rem) { padding-inline: 2rem; }
+}
+
+@utility text-gradient {
+  background-image: linear-gradient(100deg, var(--brand) 0%, var(--lilac-ink) 45%, var(--blush-ink) 75%, var(--peach-ink) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--surface) 72%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+}
+
+@utility bg-dots {
+  background-image: radial-gradient(color-mix(in oklab, var(--fg) 9%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+@utility card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  box-shadow: var(--card-shadow);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Gradient wash used behind section headers & heroes */
+.wash {
+  background:
+    radial-gradient(60% 80% at 10% 0%, color-mix(in oklab, var(--accent) 34%, transparent), transparent 70%),
+    radial-gradient(50% 70% at 90% 10%, color-mix(in oklab, var(--lilac) 26%, transparent), transparent 70%),
+    radial-gradient(40% 60% at 70% 100%, color-mix(in oklab, var(--mint) 22%, transparent), transparent 70%);
+}
+.dark .wash {
+  background:
+    radial-gradient(60% 80% at 10% 0%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(50% 70% at 90% 10%, color-mix(in oklab, var(--lilac) 13%, transparent), transparent 70%),
+    radial-gradient(40% 60% at 70% 100%, color-mix(in oklab, var(--mint) 10%, transparent), transparent 70%);
+}
+
+/* -------------------------------------------------------------------------
+   Motion
+   ------------------------------------------------------------------------- */
+@keyframes gradient-pan { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+@keyframes float-y { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes pop-in { 0% { opacity: 0; transform: scale(0.85) translateY(6px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+@keyframes fade-up { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@keyframes ping-soft { 0% { transform: scale(1); opacity: 0.7; } 80%, 100% { transform: scale(2.2); opacity: 0; } }
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+@keyframes confetti-fall {
+  0% { transform: translate3d(0, -10vh, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate3d(var(--dx, 0), 105vh, 0) rotate(var(--rot, 540deg)); opacity: 0.9; }
+}
+@keyframes plane-fly {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  100% { transform: translate(260px, -180px) rotate(-18deg); opacity: 0; }
+}
+
+.animate-gradient { animation: gradient-pan 10s ease-in-out infinite; }
+.animate-float { animation: float-y 6s ease-in-out infinite; }
+.animate-pop { animation: pop-in 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+.animate-fade-up { animation: fade-up 0.5s ease-out both; }
+.animate-ping-soft { animation: ping-soft 2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+.animate-spin-slow { animation: spin-slow 18s linear infinite; }
+
+.shimmer-text {
+  background: linear-gradient(90deg, var(--subtle) 0%, var(--fg) 50%, var(--subtle) 100%);
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer 3.2s linear infinite;
+}
+
+.marquee-track { animation: marquee 40s linear infinite; }
+.marquee:hover .marquee-track,
+.marquee:focus-within .marquee-track { animation-play-state: paused; }
+
+/* Scroll reveal: CSS scroll-driven animation (no JS). Browsers without
+   support simply show the content. */
+@keyframes reveal-in {
+  from { opacity: 0; transform: translateY(26px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    [data-reveal] {
+      animation: reveal-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 40%;
+    }
+  }
+}
+
+/* View-transition theme switch (circular reveal from the toggle button) */
+::view-transition-old(root),
+::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+
+/* Lighter motion on small/touch screens and full stop for reduced motion */
+@media (max-width: 767px), (pointer: coarse) {
+  .animate-float, .animate-spin-slow { animation-duration: 12s; }
+  .motion-desktop-only { animation: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Print (programme / schedule)
+   ------------------------------------------------------------------------- */
+@media print {
+  .no-print, header[data-site-header], footer[data-site-footer], [data-aura-assistant] { display: none !important; }
+  body { background: #fff; color: #000; }
+  .card { box-shadow: none; border-color: #ccc; }
+}
+
+/* -------------------------------------------------------------------------
+   Rich text (CMS content)
+   ------------------------------------------------------------------------- */
+.rich > * + * { margin-top: 0.85em; }
+.rich ul { list-style: disc; padding-left: 1.25em; }
+.rich ol { list-style: decimal; padding-left: 1.25em; }
+.rich li + li { margin-top: 0.35em; }
+.rich li::marker { color: var(--accent-ink); }
+.rich a { color: var(--brand); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1.5px; }
+.rich strong { color: var(--fg); font-weight: 650; }
+.rich code { font-size: 0.9em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 0.35em; }
+
+html:has(dialog[open]) { overflow: hidden; }
+dialog::backdrop { background: rgb(10 15 30 / 0.45); }
+
+/* Bars that grow as they scroll into view (judging criteria) */
+@keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.grow-bar { transform-origin: left; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .grow-bar { animation: grow-x linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
+  }
+}
