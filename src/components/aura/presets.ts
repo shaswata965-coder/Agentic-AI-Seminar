@@ -347,3 +347,9 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     tips: ["Oops — something glitched. Try again?"],
   },
 };
+
+/** The visual part of a preset (without its label and tips). */
+export function auraLook(variant: AuraVariant): import("./types").AuraLook {
+  const { expression, pose, prop, headwear, wear, emblem, effects, eyeColor } = AURA_PRESETS[variant];
+  return { expression, pose, prop, headwear, wear, emblem, effects, eyeColor };
+}
