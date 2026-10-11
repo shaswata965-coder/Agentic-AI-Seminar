@@ -42,14 +42,15 @@ export function useSlidingPill<T extends HTMLElement = HTMLDivElement>(selection
   return { listRef, pillRef };
 }
 
-/** The moving pill. Place it as the first child of the (relative, isolated) list. */
+/** The moving pill. Place it as the first child of the (relative, isolated) list.
+ * Eases out without overshoot so long jumps never fling it past the track. */
 export function SlidingPill({ pillRef, className }: { pillRef: Ref<HTMLSpanElement>; className?: string }) {
   return (
     <span
       ref={pillRef}
       aria-hidden
       className={cn(
-        "pointer-events-none absolute top-0 left-0 -z-10 rounded-full opacity-0 group-data-[pill=on]/seg:opacity-100 group-data-[pill=on]/seg:transition-[transform,width,height,opacity] group-data-[pill=on]/seg:duration-300 group-data-[pill=on]/seg:ease-[cubic-bezier(0.34,1.4,0.64,1)]",
+        "pointer-events-none absolute top-0 left-0 -z-10 rounded-full opacity-0 group-data-[pill=on]/seg:opacity-100 group-data-[pill=on]/seg:transition-[transform,width,height,opacity] group-data-[pill=on]/seg:duration-[350ms] group-data-[pill=on]/seg:ease-[cubic-bezier(0.22,1,0.36,1)]",
         className,
       )}
     />
