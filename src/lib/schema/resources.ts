@@ -636,7 +636,7 @@ export const SETTINGS_DEF: SingletonDef = {
       fields: [
         email("contactEmail", "Official e-mail", { width: "half" }),
         text("contactPhone", "Phone (optional)", { width: "half" }),
-        email("notifyEmail", "Send form notifications to", { width: "half", help: "New registrations and enquiries are e-mailed here (needs SMTP)." }),
+        email("notifyEmail", "Send form notifications to", { width: "half", help: "New hackathon teams and enquiries are e-mailed here (needs SMTP). Workshop registrations are listed under Registrations." }),
         url("website", "Website", { width: "half" }),
         url("linkedin", "LinkedIn", { width: "half" }),
         url("x", "X / Twitter", { width: "half" }),

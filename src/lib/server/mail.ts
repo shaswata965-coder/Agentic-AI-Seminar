@@ -3,6 +3,7 @@ import nodemailer, { type Transporter } from "nodemailer";
 
 export interface MailInput {
   to: string;
+  cc?: string[];
   subject: string;
   html: string;
   text: string;
@@ -40,6 +41,7 @@ export async function sendMail(input: MailInput): Promise<boolean> {
     await t.sendMail({
       from: process.env.MAIL_FROM || process.env.SMTP_USER,
       to: input.to,
+      cc: input.cc?.length ? input.cc : undefined,
       subject: input.subject,
       html: input.html,
       text: input.text,

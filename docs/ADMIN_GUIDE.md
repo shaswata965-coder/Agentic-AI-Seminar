@@ -124,7 +124,7 @@ Mentors and judges are added under **Organisers & volunteers** (section 7).
 
 ## 10. Contact, social links, branding and SEO
 
-- **Contact & social:** official e-mail, phone (optional), LinkedIn, X, Instagram, YouTube, and the address that receives notifications of new registrations and enquiries.
+- **Contact & social:** official e-mail, phone (optional), LinkedIn, X, Instagram, YouTube, and the address that is e-mailed about new hackathon teams and enquiries (workshop registrations are listed under **Registrations**).
 - **Branding:** upload the official **IIT Delhi** and **ScAI** logos (PNG or SVG with a transparent background is best), an event logo, and the **brand colour** (e.g. `#3b5bdb`). The colour updates buttons and highlights across the site. You can also upload a custom social-media preview image (1200 × 630 px).
 - **SEO & analytics:** the Google Analytics ID (`G-…`) and search keywords.
 - **Features & post-event:** a site-wide banner (e.g. "Registration closes on 30 November"), the *Ask Aura* helper, the *More speakers* card, and the post-event switches.

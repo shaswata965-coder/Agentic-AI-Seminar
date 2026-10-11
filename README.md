@@ -93,7 +93,7 @@ All settings are environment variables; [`.env.example`](.env.example) documents
 | `COOKIE_SECURE` | | `false` only to test a production build over plain HTTP. Not needed on localhost |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` | | Outgoing mail for confirmations and organiser notifications. Without them, forms still work but no e-mail is sent |
 | `MAIL_FROM` | | Sender, e.g. `"Agentic AI Workshop 2026 <no-reply@iitd.ac.in>"` |
-| `NOTIFY_EMAIL` | | Where organiser notifications go (overridable in Admin → Site settings → Contact) |
+| `NOTIFY_EMAIL` | | Where organiser notifications go: new hackathon teams and enquiries (overridable in Admin → Site settings → Contact) |
 | `NEXT_PUBLIC_GA_ID` | | Google Analytics 4 ID `G-…` (or set it in Admin → Site settings → SEO) |
 | `MAX_UPLOAD_MB` | | Max size per upload (default 8) |
 

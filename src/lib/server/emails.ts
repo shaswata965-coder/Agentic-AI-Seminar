@@ -96,7 +96,10 @@ ${t.members.map((m) => `- ${m.name} <${m.email}>`).join("\n")}
 Details: ${absoluteUrl("/hackathon")}
 
 — The organising team`;
-  return { to: t.leaderEmail, subject: `Team registered: ${t.teamName} (${t.regId})`, html: layout(s, "Your team is registered", body), text, replyTo: s.contactEmail || undefined };
+  // Every member gets a copy, so the whole team has the team ID.
+  const lead = t.leaderEmail.toLowerCase();
+  const cc = [...new Set(t.members.map((m) => m.email.trim().toLowerCase()).filter((e) => e && e !== lead))];
+  return { to: t.leaderEmail, cc, subject: `Team registered: ${t.teamName} (${t.regId})`, html: layout(s, "Your team is registered", body), text, replyTo: s.contactEmail || undefined };
 }
 
 const ENQUIRY_LABEL = { contact: "message", exhibitor: "exhibitor enquiry", sponsor: "sponsorship enquiry" } as const;
