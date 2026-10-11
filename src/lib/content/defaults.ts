@@ -11,7 +11,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   shortName: "AAIW 2026",
   tagline: "Where autonomous AI agents meet healthcare, science and entrepreneurship.",
   description:
-    "A two-day workshop at IIT Delhi on agentic AI — invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a hackathon. 15–16 December 2026.",
+    "A two-day workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a hackathon. 15–16 December 2026.",
   organisedBy: "Indian Institute of Technology Delhi and Yardi School of Artificial Intelligence (ScAI), IIT Delhi",
   startDate: "2026-12-15T09:00:00+05:30",
   endDate: "2026-12-16T18:00:00+05:30",
@@ -46,7 +46,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   featuredSpeakers: 8,
 
   motivation:
-    "AI systems are moving from answering questions to **taking actions** — planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
+    "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
   agenticAI:
     "Agentic AI refers to systems that pursue goals with a degree of autonomy. Instead of producing a single response, an agent **perceives** its environment, **reasons** about what to do, **plans** a sequence of steps, **acts** using tools, APIs or other agents, and **reflects** on the outcome to improve. Large language models often act as the reasoning engine, combined with memory, tool use and human oversight.",
   audience: [
@@ -62,20 +62,20 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { title: "Tutorials", icon: "graduation", description: "Hands-on sessions on building and evaluating agents." },
     { title: "Live demos", icon: "monitor", description: "Agents in action, from research labs and companies." },
     { title: "Industry kiosks", icon: "store", description: "Meet companies showcasing agentic technology." },
-    { title: "Hackathon", icon: "trophy", description: "Build agents for health, science and startups — finals at the workshop." },
+    { title: "Hackathon", icon: "trophy", description: "Build agents for health, science and startups, with the finals at the workshop." },
   ],
   themes: [
     {
       key: "healthcare",
       title: "Agentic AI in Healthcare",
       description:
-        "Agents that support clinicians and patients — triaging, summarising records, coordinating care and accelerating diagnostics — built to be safe, fair and accountable.",
+        "Agents that support clinicians and patients by triaging, summarising records, coordinating care and accelerating diagnostics, built to be safe, fair and accountable.",
     },
     {
       key: "science",
       title: "Agentic AI for Scientific Discovery",
       description:
-        "AI scientists that read the literature, generate hypotheses, design and run experiments and analyse results — closing the loop from idea to insight.",
+        "AI scientists that read the literature, generate hypotheses, design and run experiments and analyse results, closing the loop from idea to insight.",
     },
     {
       key: "entrepreneurship",
@@ -97,7 +97,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
       mode: "air",
       title: "From the airport",
       details:
-        "Indira Gandhi International Airport (DEL) is roughly 15 km from campus — about 30–60 minutes by taxi depending on traffic. Prepaid taxis and app-based cabs are available at every terminal. The Magenta Line metro (from Terminal 1) and the Airport Express Line (from Terminal 3) connect to the city network.",
+        "Indira Gandhi International Airport (DEL) is roughly 15 km from campus, about 30–60 minutes by taxi depending on traffic. Prepaid taxis and app-based cabs are available at every terminal. The Magenta Line metro (from Terminal 1) and the Airport Express Line (from Terminal 3) connect to the city network.",
     },
     {
       mode: "rail",
@@ -121,13 +121,13 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   campusEntry:
     "IIT Delhi is a secured campus. Please carry a valid government-issued photo ID and your registration ID (sent to you by e-mail). The exact hall, entry gate and any visitor-pass details will be shared here and by e-mail before the workshop.",
   accommodation: [
-    { name: "IIT Delhi guest house", kind: "campus", distance: "On campus", url: "", note: "Limited rooms may be available for speakers and outstation participants on request — contact the organisers." },
+    { name: "IIT Delhi guest house", kind: "campus", distance: "On campus", url: "", note: "Limited rooms may be available for speakers and outstation participants on request. Contact the organisers." },
     { name: "Hauz Khas, Green Park & Safdarjung Enclave", kind: "area", distance: "2–5 km", url: "", note: "Many hotels and guest houses within a short cab or metro ride." },
     { name: "Saket & Malviya Nagar", kind: "area", distance: "3–6 km", url: "", note: "Mid-range hotels, restaurants and malls on the Yellow Line metro." },
-    { name: "Aerocity", kind: "area", distance: "~15 km", url: "", note: "Business hotels next to the airport — convenient for short visits." },
+    { name: "Aerocity", kind: "area", distance: "~15 km", url: "", note: "Business hotels next to the airport, convenient for short visits." },
   ],
   localInfo: [
-    "December in Delhi is cool, with chilly mornings and evenings — pack a light jacket.",
+    "December in Delhi is cool, with chilly mornings and evenings. Pack a light jacket.",
     "Air quality can be poor in winter; carry a mask if you are sensitive to pollution.",
     "App-based cabs and the Delhi Metro are the easiest ways to get around.",
     "Hauz Khas Village, Deer Park and the Qutub Minar are a short ride from campus.",
@@ -193,14 +193,14 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 
 export const DEFAULT_HACKATHON: HackathonInfo = {
   title: "Agentic AI Hackathon 2026",
-  tagline: "Build agents that matter — for health, science and startups.",
+  tagline: "Build agents that matter for health, science and startups.",
   overview:
     "Teams design and build agentic AI systems that tackle real problems aligned with the workshop's three themes. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
   mode: "To be announced (on-site / hybrid)",
   teamSize: "To be announced",
   prizePool: "TBA",
   eligibility: [
-    "Open to students, researchers and early-career professionals — final eligibility rules will be announced.",
+    "Open to students, researchers and early-career professionals. Final eligibility rules will be announced.",
     "Teams may include members from different institutions.",
     "Each participant can be part of only one team.",
   ],
@@ -209,7 +209,7 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
     {
       theme: "healthcare",
       title: "Agents for Healthcare",
-      description: "Build agents that help patients, clinicians or health systems — safely and responsibly.",
+      description: "Build agents that help patients, clinicians or health systems, safely and responsibly.",
       problems: [
         "A triage assistant that gathers symptoms and routes patients to the right care",
         "An agent that summarises patient records for busy clinicians",
@@ -269,7 +269,7 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
   ],
   resources: [
     { kind: "api", title: "Model & API access", description: "Details of API credits and model access will be shared with registered teams.", url: "" },
-    { kind: "dataset", title: "Datasets", description: "Curated datasets for each track — to be announced.", url: "" },
+    { kind: "dataset", title: "Datasets", description: "Curated datasets for each track, to be announced.", url: "" },
     { kind: "compute", title: "Compute credits", description: "Cloud / GPU credits, if available, will be announced.", url: "" },
   ],
   resultsNote: "Congratulations to all the teams who took part!",
@@ -300,7 +300,7 @@ export const DEFAULT_PEOPLE: NewDoc<Person>[] = [
 
 export const DEFAULT_FAQS: NewDoc<Faq>[] = [
   { category: "general", question: "Who can attend the workshop?", answer: "The workshop is open to researchers, faculty, students, industry practitioners, startups and investors interested in agentic AI. Registration is required." },
-  { category: "registration", question: "Is there a registration fee?", answer: "Fee details (if any) will be announced on the Registration page. Register early — seats may be limited." },
+  { category: "registration", question: "Is there a registration fee?", answer: "Fee details (if any) will be announced on the Registration page. Register early: seats may be limited." },
   { category: "registration", question: "Do I need to register separately for the hackathon?", answer: "Yes. Workshop registration and hackathon registration are separate. Hackathon registration is done per team on the Hackathon page." },
   { category: "programme", question: "When will the detailed programme be available?", answer: "The schedule is published on the Programme page as sessions are confirmed. You can download it as a PDF and add sessions to your calendar." },
   { category: "programme", question: "What should I bring to the tutorials?", answer: "Most tutorials need a laptop. Check each tutorial's prerequisites (software, accounts) on the Tutorials & Demos page." },

@@ -50,7 +50,7 @@ export function Announcements({ items }: { items: Announcement[] }) {
   const shown = items.slice(0, 4);
   const older = items.slice(4);
   return (
-    <section id="news" aria-labelledby="news-title" className="tone-peach scroll-mt-24 py-12 sm:py-16">
+    <section id="news" aria-labelledby="news-title" data-tags="stamp" className="tone-peach scroll-mt-24 py-12 sm:py-16">
       <div className="container-site">
         <div className="card relative overflow-hidden p-6 sm:p-10">
           <div aria-hidden className="wash pointer-events-none absolute inset-0 opacity-70" />
@@ -77,7 +77,7 @@ export function Announcements({ items }: { items: Announcement[] }) {
                     <Megaphone size={26} />
                   </span>
                   <p className="mt-3 font-display text-lg font-semibold text-fg">No announcements yet</p>
-                  <p className="mt-1 max-w-sm text-muted">Check back soon — registration and speaker news will be posted here.</p>
+                  <p className="mt-1 max-w-sm text-muted">Check back soon: registration and speaker news will be posted here.</p>
                 </div>
               )}
               {older.length ? (

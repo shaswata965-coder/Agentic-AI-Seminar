@@ -14,7 +14,7 @@ import { registrationSchema } from "@/lib/server/validation";
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return error(403, "Cross-site requests are not allowed.");
   const limit = rateLimit(`register:${clientIp(req)}`, 8, 15 * 60_000);
-  if (!limit.ok) return error(429, "Too many attempts — please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
+  if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
 
   const body = await readJson(req);
   if (!body || typeof body !== "object") return error(400, "Invalid request.");
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
   const s = await getSettings();
   if (s.workshopUrl) return error(409, "Registration is handled through the official external form.");
   if (s.workshopStatus !== "open") return error(403, s.workshopStatus === "closed" ? "Registration is closed." : "Registration has not opened yet.");
-  if (deadlinePassed(s.workshopDeadline)) return error(403, "Registration is closed — the deadline has passed.");
+  if (deadlinePassed(s.workshopDeadline)) return error(403, "Registration is closed: the deadline has passed.");
 
   const parsed = registrationSchema.safeParse(body);
   if (!parsed.success) return error(422, "Please check the highlighted fields.", { fieldErrors: zodFieldErrors(parsed.error) });

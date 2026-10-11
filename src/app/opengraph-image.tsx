@@ -8,11 +8,11 @@ import { formatDateRange } from "@/lib/format";
 import { svgDataUri, toSvgString } from "@/lib/svg-string";
 
 // A static string, so it describes the card rather than naming the event (the name is edited in the admin).
-export const alt = "Event title, dates and tagline beside Aura, the robot guide — IIT Delhi & Yardi School of Artificial Intelligence";
+export const alt = "Event title, dates and tagline beside Aura, the robot guide, with the IIT Delhi and Yardi ScAI names";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-// Outfit (SIL Open Font License) — bundled so images render without network access.
+// Outfit (SIL Open Font License), bundled so images render without network access.
 const fonts = Promise.all([
   readFile(join(process.cwd(), "assets/fonts/outfit-latin-500-normal.woff")),
   readFile(join(process.cwd(), "assets/fonts/outfit-latin-800-normal.woff")),
@@ -37,8 +37,8 @@ export default async function OpenGraphImage() {
       >
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: 700 }}>
           <div style={{ display: "flex", gap: 12 }}>
-            <div style={{ display: "flex", padding: "10px 18px", borderRadius: 18, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>IIT Delhi</div>
-            <div style={{ display: "flex", padding: "10px 18px", borderRadius: 18, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>Yardi ScAI</div>
+            <div style={{ display: "flex", padding: "10px 18px", borderRadius: 8, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>IIT Delhi</div>
+            <div style={{ display: "flex", padding: "10px 18px", borderRadius: 8, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>Yardi ScAI</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", fontSize: 30, fontWeight: 700, color: "#5b3cc4", letterSpacing: 2 }}>
@@ -49,7 +49,7 @@ export default async function OpenGraphImage() {
           </div>
           <div style={{ display: "flex", gap: 14, fontSize: 24, color: "#334155" }}>
             {["Talks", "Panels", "Tutorials", "Demos", "Kiosks", "Hackathon"].map((t) => (
-              <div key={t} style={{ display: "flex", padding: "8px 16px", borderRadius: 999, background: "rgba(255,255,255,0.7)" }}>
+              <div key={t} style={{ display: "flex", padding: "8px 16px 8px 14px", borderRadius: "0 8px 8px 0", borderLeft: "4px solid #8b6cf0", background: "rgba(255,255,255,0.7)" }}>
                 {t}
               </div>
             ))}

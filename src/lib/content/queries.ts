@@ -4,7 +4,7 @@ import { getCollectionModel, Singleton } from "@/lib/models";
 import { COLLECTION_MAP } from "@/lib/schema/resources";
 import { ensureDefaultContent } from "./bootstrap";
 import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS } from "./defaults";
-import { fillDefaults, mergeDefaults, toPlain } from "./normalize";
+import { fillDefaults, mergeDefaults, stripEmDashes, toPlain } from "./normalize";
 import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from "./types";
 
 /*
@@ -12,6 +12,7 @@ import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from
  * `use cache` and tagged; saving in the admin expires the tag immediately.
  * If the database is not configured or unreachable, defaults are returned
  * with a short cache life so real content replaces them as soon as possible.
+ * Stored text is passed through `stripEmDashes`: the site shows no em dashes.
  */
 
 /** Added to every cached query, so "Refresh website" can expire everything at once. */
@@ -40,7 +41,7 @@ export async function getSettings(): Promise<SiteSettings> {
     return DEFAULT_SETTINGS;
   }
   cacheLife("cms");
-  return mergeDefaults(DEFAULT_SETTINGS, toPlain<{ data?: unknown }>(res.data ?? {}).data);
+  return stripEmDashes(mergeDefaults(DEFAULT_SETTINGS, toPlain<{ data?: unknown }>(res.data ?? {}).data));
 }
 
 export async function getHackathon(): Promise<HackathonInfo> {
@@ -52,7 +53,7 @@ export async function getHackathon(): Promise<HackathonInfo> {
     return DEFAULT_HACKATHON;
   }
   cacheLife("cms");
-  return mergeDefaults(DEFAULT_HACKATHON, toPlain<{ data?: unknown }>(res.data ?? {}).data);
+  return stripEmDashes(mergeDefaults(DEFAULT_HACKATHON, toPlain<{ data?: unknown }>(res.data ?? {}).data));
 }
 
 const FALLBACKS: Partial<Record<CollectionKey, object[]>> = {
@@ -73,7 +74,7 @@ async function listPublished(key: CollectionKey): Promise<object[]> {
     return (FALLBACKS[key] ?? []).map((d) => fillDefaults<object>(def.fields, d as Record<string, unknown>));
   }
   cacheLife("cms");
-  return res.data;
+  return stripEmDashes(res.data);
 }
 
 async function list<K extends CollectionKey>(key: K): Promise<CollectionTypes[K][]> {

@@ -30,7 +30,7 @@ export function workshopIcs(s: SiteSettings) {
   return buildIcs(
     eventDays(s).map((d) => ({
       uid: `aaiw-day-${d.day}@${new URL(absoluteUrl("/")).hostname}`,
-      title: `${s.eventName} — Day ${d.day}`,
+      title: `${s.eventName}, Day ${d.day}`,
       start: d.start,
       end: d.end,
       description: `${s.tagline}\n${absoluteUrl("/programme")}`,
@@ -51,7 +51,7 @@ ${box(`<p style="margin:0;font-size:13px;color:#64748b">Your registration ID</p>
 ${s.confirmationNote ? `<p>${esc(s.confirmationNote)}</p>` : ""}
 <p>We've attached a calendar file so you can add the workshop to your calendar.</p>
 <p>${button(absoluteUrl("/programme"), "View the programme")}</p>
-<p style="margin-top:24px">See you at IIT Delhi!<br/>— The organising team</p>`;
+<p style="margin-top:24px">See you at IIT Delhi!<br/>The organising team</p>`;
   const text = `Hi ${r.name},
 
 Thank you for registering for the ${s.eventName}.
@@ -64,7 +64,7 @@ Please carry a valid photo ID and this registration ID for campus entry.
 ${s.confirmationNote ? `\n${s.confirmationNote}\n` : ""}
 Programme: ${absoluteUrl("/programme")}
 
-— The organising team`;
+The organising team`;
   return {
     to: r.email,
     subject: `You're registered: ${s.eventName} (${r.regId})`,
@@ -84,7 +84,7 @@ ${box(`<p style="margin:0;font-size:13px;color:#64748b">Team registration ID</p>
 <p><strong>Team members</strong></p><ul>${list}</ul>
 <p>Keep an eye on the hackathon page for the idea-submission date, rules and resources.</p>
 <p>${button(absoluteUrl("/hackathon"), "Hackathon details")}</p>
-<p style="margin-top:24px">Happy building!<br/>— The organising team</p>`;
+<p style="margin-top:24px">Happy building!<br/>The organising team</p>`;
   const text = `Hi ${t.leaderName},
 
 Your team "${t.teamName}" is registered for the ${h.title}.
@@ -95,7 +95,7 @@ ${t.members.map((m) => `- ${m.name} <${m.email}>`).join("\n")}
 
 Details: ${absoluteUrl("/hackathon")}
 
-— The organising team`;
+The organising team`;
   // Every member gets a copy, so the whole team has the team ID.
   const lead = t.leaderEmail.toLowerCase();
   const cc = [...new Set(t.members.map((m) => m.email.trim().toLowerCase()).filter((e) => e && e !== lead))];
@@ -106,12 +106,12 @@ const ENQUIRY_LABEL = { contact: "message", exhibitor: "exhibitor enquiry", spon
 
 export function enquiryAckEmail(s: SiteSettings, e: { name: string; email: string; type: keyof typeof ENQUIRY_LABEL; message: string }): MailInput {
   const label = ENQUIRY_LABEL[e.type];
-  const body = `<p>Hi ${esc(e.name)},</p><p>Thanks for your ${label}. The organising team has received it and will get back to you soon.</p>${box(`<p style="margin:0;white-space:pre-wrap">${esc(e.message)}</p>`)}<p>— The organising team</p>`;
+  const body = `<p>Hi ${esc(e.name)},</p><p>Thanks for your ${label}. The organising team has received it and will get back to you soon.</p>${box(`<p style="margin:0;white-space:pre-wrap">${esc(e.message)}</p>`)}<p>The organising team</p>`;
   return {
     to: e.email,
-    subject: `We received your ${label} — ${s.eventName}`,
+    subject: `We received your ${label} · ${s.eventName}`,
     html: layout(s, "Thanks for getting in touch", body),
-    text: `Hi ${e.name},\n\nThanks for your ${label}. The organising team will get back to you soon.\n\nYour message:\n${e.message}\n\n— The organising team`,
+    text: `Hi ${e.name},\n\nThanks for your ${label}. The organising team will get back to you soon.\n\nYour message:\n${e.message}\n\nThe organising team`,
     replyTo: s.contactEmail || undefined,
   };
 }

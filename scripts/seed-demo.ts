@@ -20,9 +20,9 @@ import { objectSchema } from "@/lib/schema/field-validation";
 import { COLLECTION_MAP } from "@/lib/schema/resources";
 import { cliArgs, connect, RESTART_HINT, run } from "./lib/cli";
 
-const NOTE = "Sample content to preview the layout — edit or delete it in the admin panel, or run `npm run seed:demo -- --remove`.";
+const NOTE = "Sample content to preview the layout. Edit or delete it in the admin panel, or run `npm run seed:demo -- --remove`.";
 // For plain-text fields (no formatting).
-const NOTE_PLAIN = "Sample content to preview the layout — edit or delete it in the admin panel.";
+const NOTE_PLAIN = "Sample content to preview the layout. Edit or delete it in the admin panel.";
 
 /* ---------------------------------------------------------------- Data -- */
 
@@ -52,7 +52,7 @@ const SPEAKERS: Record<SpeakerKey, Record<string, unknown>> = {
     featured: true,
     bio: `**Sample profile.** Alan builds self-driving laboratories in which agents plan experiments, operate instruments and learn from every result.\n\n${NOTE}`,
     talkTitle: "The autonomous lab: agents that design, run and learn from experiments",
-    talkAbstract: "A sample abstract about closing the loop between hypothesis generation, robotic experimentation and analysis — and what changes when agents run the lab overnight.",
+    talkAbstract: "A sample abstract about closing the loop between hypothesis generation, robotic experimentation and analysis, and what changes when agents run the lab overnight.",
     website: "https://example.com",
   },
   grace: {
@@ -77,7 +77,7 @@ const SPEAKERS: Record<SpeakerKey, Record<string, unknown>> = {
     featured: true,
     bio: `**Sample profile.** Rohan co-founded a start-up that turns agent prototypes into products used by thousands of small businesses.\n\n${NOTE}`,
     talkTitle: "From demo to product: shipping agentic AI to real customers",
-    talkAbstract: "A sample abstract on pricing, reliability, evaluation and support when your product is an AI agent — lessons from building a start-up.",
+    talkAbstract: "A sample abstract on pricing, reliability, evaluation and support when your product is an AI agent: lessons from building a start-up.",
     website: "https://example.com",
   },
   kavya: {
@@ -128,7 +128,7 @@ const SESSIONS: SessionSeed[] = [
     end: "13:00",
     type: "panel",
     theme: "healthcare",
-    title: "Panel: agentic AI in healthcare — promise and pitfalls",
+    title: "Panel: agentic AI in healthcare, promise and pitfalls",
     moderator: "meera",
     panelists: ["kavya", "ishaan"],
     room: "Main hall",
@@ -206,7 +206,7 @@ const TUTORIALS = [
 
 const DEMOS = [
   { title: "Clinical notes summariser", team: "Sample Health Lab", theme: "healthcare", description: `An agent that reads discharge notes, flags missing information and drafts a patient-friendly summary for a clinician to approve.\n\n${NOTE_PLAIN}` },
-  { title: "Self-driving lab assistant", team: "Example University — Materials Lab", theme: "science", description: `An agent that proposes the next experiment, schedules the instruments and updates its model after every measurement.\n\n${NOTE_PLAIN}` },
+  { title: "Self-driving lab assistant", team: "Example University, Materials Lab", theme: "science", description: `An agent that proposes the next experiment, schedules the instruments and updates its model after every measurement.\n\n${NOTE_PLAIN}` },
   { title: "Founder's research co-pilot", team: "DemoStack (sample start-up)", theme: "entrepreneurship", description: `An agent that researches a market, compares competitors and drafts an investor memo with sources.\n\n${NOTE_PLAIN}` },
 ];
 
@@ -217,9 +217,9 @@ const KIOSKS = [
 ];
 
 const SPONSORS = [
-  { name: "Example Corp", tier: "platinum", website: "https://example.com", blurb: "Sample sponsor — replace with a real partner." },
-  { name: "Placeholder Cloud", tier: "gold", website: "https://example.com", blurb: "Sample sponsor — replace with a real partner." },
-  { name: "Sample Foundation", tier: "partner", website: "https://example.com", blurb: "Sample partner — replace with a real partner." },
+  { name: "Example Corp", tier: "platinum", website: "https://example.com", blurb: "Sample sponsor. Replace with a real partner." },
+  { name: "Placeholder Cloud", tier: "gold", website: "https://example.com", blurb: "Sample sponsor. Replace with a real partner." },
+  { name: "Sample Foundation", tier: "partner", website: "https://example.com", blurb: "Sample partner. Replace with a real partner." },
   { name: "Demo Developers Community", tier: "community", website: "https://example.com", blurb: "Sample community partner." },
 ];
 
@@ -234,7 +234,7 @@ const PEOPLE = [
 
 const ANNOUNCEMENTS = [
   { title: "Sample announcement: first speakers revealed", body: "This is sample content added by the demo seed to preview the announcements box.", tone: "info", linkUrl: "/speakers", linkLabel: "Meet the speakers", pinned: true },
-  { title: "Sample announcement: hackathon tracks published", body: "Teams can explore the three tracks — healthcare, scientific discovery and entrepreneurship.", tone: "success", linkUrl: "/hackathon", linkLabel: "Hackathon details" },
+  { title: "Sample announcement: hackathon tracks published", body: "Teams can explore the three tracks: healthcare, scientific discovery and entrepreneurship.", tone: "success", linkUrl: "/hackathon", linkLabel: "Hackathon details" },
 ];
 
 /* ------------------------------------------------------------- Helpers -- */
@@ -327,7 +327,7 @@ run(async () => {
 
   if (args.remove) {
     if (existing) await remove(existing);
-    else console.log("No sample content is loaded — nothing to remove.");
+    else console.log("No sample content is loaded, nothing to remove.");
   } else if (existing && !args.reset) {
     console.log(`Sample content is already loaded (${existing.items.length} items). Use --reset to replace it or --remove to delete it.`);
     return;

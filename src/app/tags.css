@@ -1,0 +1,120 @@
+/* -------------------------------------------------------------------------
+   Text tags (eyebrows, badges, small labels). There are no pill shapes:
+   a section chooses a tag style with data-tags="…" (see components/ui/Tag.tsx)
+   and every .tag inside it follows. Styles are set through custom properties
+   so the nearest section wins, while each tag keeps its own colour tone
+   (--accent, --accent-soft and --accent-ink are read on the tag itself).
+   ------------------------------------------------------------------------- */
+
+@layer components {
+  .tag {
+    /* Rules, bars and dashed edges: stronger than the pastel accent so they read on any background. */
+    --tag-edge: color-mix(in oklab, var(--accent) 55%, var(--accent-ink));
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    max-width: 100%;
+    padding: var(--tag-pad, 0.25em 0.6em);
+    font-family: var(--tag-font, inherit);
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+    color: var(--accent-ink);
+    background: var(--tag-bg, var(--accent-soft));
+    border: var(--tag-border-width, 0px) var(--tag-border-style, solid) var(--tag-edge);
+    border-radius: var(--tag-radius, 0.3rem);
+    box-shadow: var(--tag-bar, 0 0 0 0) var(--tag-edge);
+    clip-path: var(--tag-clip, none);
+  }
+  .tag::before {
+    content: var(--tag-before, none);
+    color: var(--accent);
+    font-weight: 800;
+  }
+  .tag::after {
+    content: var(--tag-after, none);
+    color: var(--accent);
+    font-weight: 800;
+  }
+  /* Section eyebrows and other headline tags. */
+  .tag-eyebrow {
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  /* Larger tags, e.g. the dates and venue in the home hero. */
+  .tag-lg {
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  /* Grey tag that ignores the section colour. */
+  .tag-neutral {
+    --accent: var(--border-strong);
+    --accent-soft: var(--surface-2);
+    --accent-ink: var(--muted);
+  }
+
+  /* Every style sets every property, so an inner section never inherits an outer one's shape. */
+  [data-tags] {
+    --tag-pad: initial;
+    --tag-font: initial;
+    --tag-bg: initial;
+    --tag-border-width: initial;
+    --tag-border-style: initial;
+    --tag-radius: initial;
+    --tag-bar: initial;
+    --tag-clip: initial;
+    --tag-before: initial;
+    --tag-after: initial;
+  }
+  /* [ PROGRAMME ]: schedules, times, recordings. */
+  [data-tags="bracket"] {
+    --tag-pad: 0;
+    --tag-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --tag-bg: transparent;
+    --tag-before: "[";
+    --tag-after: "]";
+  }
+  /* Text over an accent rule: reading-heavy sections. */
+  [data-tags="underline"] {
+    --tag-pad: 0 0 0.3em;
+    --tag-bg: transparent;
+    --tag-radius: 0;
+    --tag-bar: inset 0 -2px 0 0;
+  }
+  /* Flag with a notched tail: people. */
+  [data-tags="ribbon"] {
+    --tag-pad: 0.25em 1.15em 0.25em 0.6em;
+    --tag-radius: 0;
+    --tag-clip: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%);
+  }
+  /* // code comment: hackathon and hands-on sessions. */
+  [data-tags="slash"] {
+    --tag-pad: 0;
+    --tag-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --tag-bg: transparent;
+    --tag-before: "//";
+  }
+  /* Tinted label with an accent edge: notices and practical details. */
+  [data-tags="tab"] {
+    --tag-pad: 0.25em 0.65em 0.25em 0.75em;
+    --tag-radius: 0 0.3rem 0.3rem 0;
+    --tag-bar: inset 3px 0 0 0;
+  }
+  /* Dashed ticket stamp: registration and exhibitors. */
+  [data-tags="stamp"] {
+    --tag-bg: transparent;
+    --tag-border-width: 1.5px;
+    --tag-border-style: dashed;
+    --tag-radius: 0.2rem;
+  }
+  /* Label with two cut corners: themes and galleries. */
+  [data-tags="corner"] {
+    --tag-pad: 0.3em 0.95em;
+    --tag-radius: 0;
+    --tag-clip: polygon(0.75em 0, 100% 0, 100% calc(100% - 0.75em), calc(100% - 0.75em) 100%, 0 100%, 0 0.75em);
+  }
+  /* Plain square-cornered label (also the default outside any section). */
+  [data-tags="label"] {
+    --tag-radius: 0.3rem;
+  }
+}

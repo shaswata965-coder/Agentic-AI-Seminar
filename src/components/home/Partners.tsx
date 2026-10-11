@@ -34,7 +34,7 @@ function Logo({ sp, size }: { sp: Sponsor; size: keyof typeof SIZE }) {
 export function Partners({ s, sponsors }: { s: SiteSettings; sponsors: Sponsor[] }) {
   const tiers = SPONSOR_TIERS.map((t) => ({ tier: t, list: sponsors.filter((sp) => sp.tier === t) })).filter((g) => g.list.length);
   return (
-    <Section id="partners" tone="butter" labelledBy="partners-title">
+    <Section id="partners" tone="butter" labelledBy="partners-title" tags="ribbon">
       <SectionHeading
         id="partners-title"
         eyebrow="Partners & sponsors"
@@ -105,7 +105,7 @@ export function Partners({ s, sponsors }: { s: SiteSettings; sponsors: Sponsor[]
             </ButtonLink>
           ) : null}
           {s.contactEmail ? (
-            <a className="mi-underline text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Sponsorship enquiry — ${s.eventName}`)}`}>
+            <a className="mi-underline text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Sponsorship enquiry · ${s.eventName}`)}`}>
               Sponsor enquiries: {s.contactEmail}
             </a>
           ) : null}

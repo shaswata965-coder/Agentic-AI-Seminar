@@ -7,7 +7,7 @@ import { FaqList } from "./FaqList";
 
 export function FaqContact({ s, faqs }: { s: SiteSettings; faqs: Faq[] }) {
   return (
-    <Section id="faq" tone="lilac" labelledBy="faq-title" wash>
+    <Section id="faq" tone="lilac" labelledBy="faq-title" wash tags="underline">
       <div className="grid gap-12 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <SectionHeading id="faq-title" eyebrow="FAQ" title="Questions, answered" description="Can't find what you're looking for? Send us a message." className="mb-8 sm:mb-8" />
@@ -24,7 +24,7 @@ export function FaqContact({ s, faqs }: { s: SiteSettings; faqs: Faq[] }) {
                     {s.contactEmail}
                   </a>
                 ) : (
-                  <span className="text-muted">Official e-mail address coming soon — use the form below.</span>
+                  <span className="text-muted">Official e-mail address coming soon. Use the form below.</span>
                 )}
               </li>
               {s.contactPhone ? (

@@ -1,10 +1,15 @@
 import type { CSSProperties } from "react";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { AddToCalendar } from "@/components/share/AddToCalendar";
+import { ShareButtons } from "@/components/share/ShareButtons";
 import { CmsIcon } from "@/components/ui/Icon";
 import { RichText } from "@/components/ui/RichText";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import type { SiteSettings } from "@/lib/content/types";
+import { eventCalendarLinks } from "@/lib/event";
+import { formatDateRange } from "@/lib/format";
+import { absoluteUrl } from "@/lib/paths";
 import { AgentLoop } from "./AgentLoop";
 
 const TONES = ["azure", "lilac", "mint", "peach", "butter", "blush"] as const;
@@ -21,7 +26,7 @@ function activityHref(title: string) {
 
 export function About({ s }: { s: SiteSettings }) {
   return (
-    <Section id="about" tone="mint" wash labelledBy="about-title">
+    <Section id="about" tone="mint" wash labelledBy="about-title" tags="underline">
       <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
         <div>
           <SectionHeading id="about-title" eyebrow="About the workshop" title="Why agentic AI, and why now?" className="mb-6 sm:mb-8" />
@@ -34,6 +39,10 @@ export function About({ s }: { s: SiteSettings }) {
               What is agentic AI?
             </h3>
             <RichText text={s.agenticAI} className="mt-3 text-[15.5px] leading-relaxed text-muted" />
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <AddToCalendar links={eventCalendarLinks(s)} variant="outline" size="sm" />
+            <ShareButtons url={absoluteUrl("/")} text={`${s.eventName} at IIT Delhi, ${formatDateRange(s.startDate, s.endDate)}`} />
           </div>
         </div>
         <div data-reveal>

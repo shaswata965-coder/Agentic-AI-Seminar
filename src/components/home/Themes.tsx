@@ -8,7 +8,7 @@ import type { SiteSettings } from "@/lib/content/types";
 
 export function Themes({ s }: { s: SiteSettings }) {
   return (
-    <Section id="themes" tone="lilac" labelledBy="themes-title" band>
+    <Section id="themes" tone="lilac" labelledBy="themes-title" band tags="corner">
       <SectionHeading
         id="themes-title"
         eyebrow="Themes"
@@ -25,7 +25,7 @@ export function Themes({ s }: { s: SiteSettings }) {
                 <article className={`tone-${meta.tone} card relative flex h-full flex-col overflow-hidden p-6 sm:p-7`}>
                   <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_var(--mx,70%)_var(--my,0%),color-mix(in_oklab,var(--accent)_30%,transparent),transparent_70%)]" />
                   <div className="relative flex items-start justify-between gap-4">
-                    <span className="rounded-full bg-accent-soft px-3 py-1 text-xs font-bold tracking-[0.12em] text-accent-ink uppercase">Theme {i + 1}</span>
+                    <span className="tag tag-eyebrow">Theme {i + 1}</span>
                     <span aria-hidden className="font-display text-6xl leading-none font-black text-[color-mix(in_oklab,var(--accent)_45%,transparent)]">
                       0{i + 1}
                     </span>

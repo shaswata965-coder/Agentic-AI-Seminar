@@ -1,11 +1,14 @@
 import { CalendarDays, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { Aura } from "@/components/aura/Aura";
+import { AddToCalendar } from "@/components/share/AddToCalendar";
+import { ShareButtons } from "@/components/share/ShareButtons";
 import { InstagramIcon, LinkedInIcon, XIcon, YouTubeIcon } from "@/components/ui/BrandIcons";
 import type { SiteSettings } from "@/lib/content/types";
-import { brandName, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
+import { brandName, eventCalendarLinks, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { PRIMARY_NAV, SECTION_NAV, postEventNav } from "@/lib/nav";
+import { absoluteUrl } from "@/lib/paths";
 import { BrandMark } from "./BrandMark";
 
 export function SocialLinks({ s, className }: { s: SiteSettings; className?: string }) {
@@ -81,6 +84,10 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
               </li>
             ) : null}
           </ul>
+          <div className="mt-5 grid justify-items-start gap-3">
+            <AddToCalendar links={eventCalendarLinks(s)} variant="outline" size="sm" />
+            <ShareButtons url={absoluteUrl("/")} text={`${s.eventName} at IIT Delhi, ${formatDateRange(s.startDate, s.endDate)}`} />
+          </div>
           <SocialLinks s={s} className="mt-5 flex gap-2" />
         </div>
         <nav aria-label="Pages">

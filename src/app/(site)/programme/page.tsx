@@ -6,6 +6,7 @@ import { ProgrammeView, type MiniSpeaker, type ProgrammeSession } from "@/compon
 import { AddToCalendar } from "@/components/share/AddToCalendar";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { TagScope } from "@/components/ui/Tag";
 import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import { eventCalendarLinks, eventDays } from "@/lib/event";
 import { eventDayDate, eventDayLabel, formatDateRange } from "@/lib/format";
@@ -15,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   return {
     title: "Programme",
-    description: `Day-wise schedule of the ${s.eventName}: keynotes, talks, panels, tutorials, demos and the hackathon — ${formatDateRange(s.startDate, s.endDate)}.`,
+    description: `Day-wise schedule of the ${s.eventName}: keynotes, talks, panels, tutorials, demos and the hackathon, ${formatDateRange(s.startDate, s.endDate)}.`,
     alternates: { canonical: absoluteUrl("/programme") },
   };
 }
@@ -32,7 +33,7 @@ export default async function ProgrammePage() {
   const pdfHref = s.schedulePdf || "/api/programme/pdf";
 
   return (
-    <>
+    <TagScope style="bracket">
       <PageHero
         tone="azure"
         crumb="Programme"
@@ -63,7 +64,7 @@ export default async function ProgrammePage() {
               <div className="mb-6 flex flex-wrap items-center gap-3">
                 {s.programmeStatus === "draft" ? (
                   <Badge tone="butter" dot>
-                    Draft — subject to change
+                    Draft: subject to change
                   </Badge>
                 ) : (
                   <Badge tone="mint" dot>
@@ -80,6 +81,6 @@ export default async function ProgrammePage() {
           )}
         </div>
       </section>
-    </>
+    </TagScope>
   );
 }

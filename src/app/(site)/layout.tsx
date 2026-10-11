@@ -22,7 +22,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         Skip to content
       </a>
       {s.bannerText ? <SiteBanner text={s.bannerText} link={s.bannerLink} /> : null}
-      <SiteHeader brand={brandName(s)} registerHref={registrationHref(s)} extraNav={postEventNav(s)} />
+      <SiteHeader brand={brandName(s)} logos={{ iitd: s.logoIITD, scai: s.logoScAI }} registerHref={registrationHref(s)} extraNav={postEventNav(s)} />
       <main id="main" tabIndex={-1} className="outline-none">
         {children}
       </main>

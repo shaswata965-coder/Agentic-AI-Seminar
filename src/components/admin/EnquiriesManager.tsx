@@ -97,7 +97,7 @@ export function EnquiriesManager() {
                 <p className="mt-2 text-sm whitespace-pre-wrap text-muted">{e.message}</p>
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
-                <a href={`mailto:${e.email}?subject=${encodeURIComponent(`Re: ${e.subject || "your enquiry"} — ${eventName}`)}`} onClick={() => e.status === "new" && setStatus(e, "in-progress")} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3 text-sm font-semibold hover:border-brand hover:text-brand">
+                <a href={`mailto:${e.email}?subject=${encodeURIComponent(`Re: ${e.subject || "your enquiry"} · ${eventName}`)}`} onClick={() => e.status === "new" && setStatus(e, "in-progress")} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3 text-sm font-semibold hover:border-brand hover:text-brand">
                   <Mail size={15} aria-hidden /> Reply
                 </a>
                 <select value={e.status} onChange={(ev) => setStatus(e, ev.target.value as Enquiry["status"])} className="h-9 rounded-full border border-border bg-surface px-3 text-sm font-semibold" aria-label="Status">

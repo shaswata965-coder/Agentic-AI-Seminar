@@ -32,15 +32,15 @@ function Cell({ col, item, fields }: { col: Column; item: Item; fields: FieldDef
   const v = item[col.key];
   switch (col.kind) {
     case "image":
-      return v ? <img src={withBase(String(v))} alt="" className="h-10 w-10 rounded-xl object-cover ring-1 ring-border" /> : <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-xs text-subtle">—</span>;
+      return v ? <img src={withBase(String(v))} alt="" className="h-10 w-10 rounded-xl object-cover ring-1 ring-border" /> : <span className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-xs text-subtle">-</span>;
     case "boolean":
-      return v ? <Check size={18} className="text-mint-ink" aria-label="Yes" /> : <span className="text-subtle" aria-label="No">—</span>;
+      return v ? <Check size={18} className="text-mint-ink" aria-label="Yes" /> : <span className="text-subtle" aria-label="No">-</span>;
     case "date":
-      return <span className="whitespace-nowrap text-muted">{v ? formatDateTime(String(v)) : "—"}</span>;
+      return <span className="whitespace-nowrap text-muted">{v ? formatDateTime(String(v)) : "-"}</span>;
     case "option":
-      return v ? <Badge tone="neutral" size="xs" className="whitespace-nowrap">{optionLabel(fields, col.key, v)}</Badge> : <span className="text-subtle">—</span>;
+      return v ? <Badge tone="neutral" size="xs" className="whitespace-nowrap">{optionLabel(fields, col.key, v)}</Badge> : <span className="text-subtle">-</span>;
     default:
-      return <span className="line-clamp-2 font-medium text-fg">{String(v ?? "") || "—"}</span>;
+      return <span className="line-clamp-2 font-medium text-fg">{String(v ?? "") || "-"}</span>;
   }
 }
 
@@ -83,7 +83,7 @@ export function ResourceManager({ resourceKey }: { resourceKey: string }) {
     try {
       if ("id" in editing && editing.id) await api(`/content/${resourceKey}/${editing.id}`, { method: "PUT", json: body });
       else await api(`/content/${resourceKey}`, { method: "POST", json: body });
-      toast(`${def.singular} saved — the website is updated.`, "success");
+      toast(`${def.singular} saved. The website is updated.`, "success");
       invalidateOptions(resourceKey);
       setEditing(null);
       reload();

@@ -37,7 +37,7 @@ export async function requireAdmin(req: NextRequest, opts: { role?: "admin" } = 
   } catch {
     return error(503, "The database is unavailable. Please try again shortly.");
   }
-  if (!user) return error(401, "Your session has expired — please sign in again.");
+  if (!user) return error(401, "Your session has expired. Please sign in again.");
   if (opts.role === "admin" && user.role !== "admin") return error(403, "Only administrators can do this.");
   return user;
 }

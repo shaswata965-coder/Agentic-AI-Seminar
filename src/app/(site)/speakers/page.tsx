@@ -3,6 +3,7 @@ import { Aura } from "@/components/aura/Aura";
 import { PageHero } from "@/components/layout/PageHero";
 import { SpeakersView, type SpeakerSession } from "@/components/speakers/SpeakersView";
 import { ButtonLink } from "@/components/ui/Button";
+import { TagScope } from "@/components/ui/Tag";
 import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import { eventDayLabel } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
@@ -34,7 +35,7 @@ export default async function SpeakersPage() {
     dayLabel: eventDayLabel(s.startDate, x.day),
   }));
   return (
-    <>
+    <TagScope style="ribbon">
       <PageHero
         tone="lilac"
         crumb="Speakers"
@@ -69,6 +70,6 @@ export default async function SpeakersPage() {
           )}
         </div>
       </section>
-    </>
+    </TagScope>
   );
 }

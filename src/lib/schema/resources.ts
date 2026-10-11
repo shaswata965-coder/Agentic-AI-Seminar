@@ -43,8 +43,8 @@ import {
 
 export const themeOptions = opts(THEME_KEYS, (k) => THEME_META[k].short);
 const dayOptions = [
-  { value: "1", label: "Day 1 — Tue 15 Dec" },
-  { value: "2", label: "Day 2 — Wed 16 Dec" },
+  { value: "1", label: "Day 1 · Tue 15 Dec" },
+  { value: "2", label: "Day 2 · Wed 16 Dec" },
 ];
 const published = bool("published", "Published (visible on the website)");
 const order = num("order", "Display order", { help: "Lower numbers appear first.", width: "third" });
@@ -576,8 +576,8 @@ export const SETTINGS_DEF: SingletonDef = {
       title: "Programme",
       fields: [
         select("programmeStatus", "Programme status", [
-          { value: "tba", label: "To be announced — show placeholder" },
-          { value: "draft", label: "Draft — show sessions marked “subject to change”" },
+          { value: "tba", label: "To be announced (show placeholder)" },
+          { value: "draft", label: "Draft (show sessions marked “subject to change”)" },
           { value: "final", label: "Final" },
         ]),
         textarea("programmeNote", "Note above the schedule"),
@@ -647,10 +647,10 @@ export const SETTINGS_DEF: SingletonDef = {
     {
       key: "branding",
       title: "Branding",
-      description: "Upload the official IIT Delhi and ScAI logo files and set the brand colour once they are shared.",
+      description: "The IIT Delhi and ScAI logos are built in. Upload one here only to replace it.",
       fields: [
-        image("logoIITD", "IIT Delhi logo", { width: "half" }),
-        image("logoScAI", "ScAI logo", { width: "half" }),
+        image("logoIITD", "IIT Delhi logo", { width: "half", help: "Left corner of the navigation bar. Leave blank for the built-in emblem." }),
+        image("logoScAI", "ScAI logo", { width: "half", help: "Right corner of the navigation bar. Leave blank for the built-in logo." }),
         image("eventLogo", "Event logo", { width: "half" }),
         color("brandColor", "Brand colour", { width: "half", help: "Hex colour, e.g. #3b5bdb. Leave blank for the default." }),
         image("ogImage", "Social preview image (optional)", { help: "1200×630 px. Leave blank to use the generated preview." }),
@@ -693,7 +693,7 @@ export const HACKATHON_DEF: SingletonDef = {
         text("title", "Title", { required: true }),
         text("tagline", "Tagline"),
         richtext("overview", "Overview"),
-        text("mode", "Mode", { width: "half", placeholder: "On-site / hybrid — to be announced" }),
+        text("mode", "Mode", { width: "half", placeholder: "On-site / hybrid, to be announced" }),
         text("teamSize", "Team size", { width: "half" }),
         text("prizePool", "Prize pool", { width: "half", placeholder: "TBA" }),
         list("eligibility", "Eligibility", { itemLabel: "Rule" }),

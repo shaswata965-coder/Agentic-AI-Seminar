@@ -21,7 +21,7 @@ export function Venue({ s }: { s: SiteSettings }) {
   const open = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
   const dir = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}`;
   return (
-    <Section id="venue" tone="mint" labelledBy="venue-title" band>
+    <Section id="venue" tone="mint" labelledBy="venue-title" band tags="tab">
       <SectionHeading
         id="venue-title"
         eyebrow="Venue & travel"
@@ -94,7 +94,7 @@ export function Venue({ s }: { s: SiteSettings }) {
                   };
                 })}
               />
-              <p className="mt-4 text-xs text-subtle">Travel times are indicative — check live traffic and the DMRC journey planner.</p>
+              <p className="mt-4 text-xs text-subtle">Travel times are indicative. Check live traffic and the DMRC journey planner.</p>
             </div>
           ) : null}
         </div>

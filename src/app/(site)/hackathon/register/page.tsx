@@ -7,6 +7,7 @@ import { HackathonForm } from "@/components/forms/HackathonForm";
 import { PageHero } from "@/components/layout/PageHero";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { TagScope } from "@/components/ui/Tag";
 import { THEME_META } from "@/lib/content/constants";
 import { getHackathon, getSettings } from "@/lib/content/queries";
 import { absoluteUrl } from "@/lib/paths";
@@ -25,7 +26,7 @@ export default async function HackathonRegisterPage() {
     </Badge>
   );
   return (
-    <>
+    <TagScope style="slash">
       <PageHero tone="aqua" crumb="Hackathon registration" eyebrow="Hackathon" title="Register your team" aura="hackathon" description={<p>{h.registrationNote}</p>}>
         {s.hackathonStatus === "open" ? (
           <DeadlineGate deadline={s.hackathonDeadline} closed={closedBadge}>
@@ -66,7 +67,7 @@ export default async function HackathonRegisterPage() {
           )}
         </div>
       </section>
-    </>
+    </TagScope>
   );
 }
 

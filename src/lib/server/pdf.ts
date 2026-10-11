@@ -67,7 +67,7 @@ function wrap(font: PDFFont, size: number, text: string, width: number): string[
 
 async function build(s: SiteSettings, sessions: Session[], speakers: Speaker[], generated: Date): Promise<Uint8Array> {
   const doc = await PDFDocument.create();
-  doc.setTitle(`${s.eventName} — Programme`);
+  doc.setTitle(`${s.eventName} · Programme`);
   doc.setAuthor("IIT Delhi · Yardi School of Artificial Intelligence");
   doc.setSubject("Workshop programme");
   doc.setCreator(absoluteUrl("/"));
@@ -88,11 +88,11 @@ async function build(s: SiteSettings, sessions: Session[], speakers: Speaker[], 
       y = A4.h - 178;
       if (s.programmeStatus === "draft") {
         page.drawRectangle({ x: M, y: y - 6, width: A4.w - 2 * M, height: 22, color: TINT.butter });
-        page.drawText(safe(bold, "Draft schedule — sessions and timings may change. Check the website for the latest version."), { x: M + 8, y: y + 1, size: 9, font: bold, color: rgb(0.54, 0.37, 0) });
+        page.drawText(safe(bold, "Draft schedule: sessions and timings may change. Check the website for the latest version."), { x: M + 8, y: y + 1, size: 9, font: bold, color: rgb(0.54, 0.37, 0) });
         y -= 34;
       }
     } else {
-      page.drawText(safe(bold, `${s.eventName} — Programme (continued)`), { x: M, y: A4.h - M, size: 10, font: bold, color: SUBTLE });
+      page.drawText(safe(bold, `${s.eventName} · Programme (continued)`), { x: M, y: A4.h - M, size: 10, font: bold, color: SUBTLE });
       y = A4.h - M - 26;
     }
   };

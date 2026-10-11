@@ -3,7 +3,7 @@
 import { Clock } from "lucide-react";
 import { useNow } from "@/components/home/Countdown";
 
-/** "Closes in 12 days" — computed in the browser so the page can be cached. */
+/** "Closes in 12 days", computed in the browser so the page can be cached. */
 export function Deadline({ iso, label = "Registration closes" }: { iso: string; label?: string }) {
   const now = useNow();
   const t = Date.parse(iso);
@@ -25,7 +25,7 @@ export function Deadline({ iso, label = "Registration closes" }: { iso: string; 
       <span className="font-semibold text-fg">
         {label}: {date} IST
       </span>
-      {text ? <span className="rounded-full bg-butter-soft px-2 py-0.5 text-xs font-bold text-butter-ink">{text}</span> : null}
+      {text ? <span className="tag tone-butter">{text}</span> : null}
     </p>
   );
 }

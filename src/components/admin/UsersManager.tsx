@@ -34,7 +34,7 @@ export function UsersManager() {
     e.preventDefault();
     try {
       await api("/users", { method: "POST", json: form });
-      toast("User added — share their password with them securely.", "success");
+      toast("User added. Share their password with them securely.", "success");
       setAdding(false);
       setForm({ email: "", name: "", role: "editor", password: "" });
       reload();
@@ -132,7 +132,7 @@ export function UsersManager() {
           </h2>
           <TextField label="E-mail" type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} error={errors.email} />
           <TextField label="Name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
-          <SelectField label="Role" required value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} options={[{ value: "editor", label: "Editor — manage content" }, { value: "admin", label: "Administrator — everything" }]} />
+          <SelectField label="Role" required value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} options={[{ value: "editor", label: "Editor: manage content" }, { value: "admin", label: "Administrator: everything" }]} />
           <TextField label="Temporary password" type="text" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} error={errors.password} hint="At least 10 characters. Ask them to change it under “My account”." />
           <div className="flex justify-end gap-2">
             <Button variant="ghost" onClick={() => setAdding(false)}>

@@ -53,7 +53,7 @@ export function RefSelect({ resource, value, onChange, id, invalid }: { resource
   const options = useOptions(resource);
   return (
     <select id={id} value={value || ""} onChange={(e) => onChange(e.target.value)} aria-invalid={invalid || undefined} className={cn(inputClass, "h-11")}>
-      <option value="">{options === null ? "Loading…" : "— None —"}</option>
+      <option value="">{options === null ? "Loading…" : "None"}</option>
       {(options ?? []).map((o) => (
         <option key={o.value} value={o.value}>
           {o.label}
@@ -102,7 +102,7 @@ export function RefListSelect({ resource, value, onChange, id }: { resource: str
         className={cn(inputClass, "h-11")}
         disabled={options !== null && !available.length}
       >
-        <option value="">{options === null ? "Loading…" : available.length ? "+ Add…" : options.length ? "All added" : `No ${COLLECTION_MAP[resource]?.label.toLowerCase() ?? "items"} yet — create them first`}</option>
+        <option value="">{options === null ? "Loading…" : available.length ? "+ Add…" : options.length ? "All added" : `No ${COLLECTION_MAP[resource]?.label.toLowerCase() ?? "items"} yet. Create them first`}</option>
         {available.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}

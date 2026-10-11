@@ -21,7 +21,7 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
   const featured = speakers.filter((sp) => sp.featured);
   const list = (featured.length ? featured : speakers).slice(0, limit);
   return (
-    <Section tone="lilac" labelledBy="speakers-preview-title" wash>
+    <Section tone="lilac" labelledBy="speakers-preview-title" wash tags="ribbon">
       <SectionHeading
         id="speakers-preview-title"
         eyebrow="Speakers"

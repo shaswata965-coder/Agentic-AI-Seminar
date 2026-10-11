@@ -103,7 +103,7 @@ function FieldInput({ field: f, value, onChange, errors, path }: { field: FieldD
         <div>
           <Label htmlFor={id} field={f} />
           <select {...common} value={str} onChange={(e) => onChange(e.target.value)} className={cn(inputClass, "h-11")}>
-            {!f.required ? <option value="">— None —</option> : null}
+            {!f.required ? <option value="">None</option> : null}
             {f.options.map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}

@@ -26,7 +26,7 @@ export function authSecret(): Uint8Array | null {
   if (process.env.NODE_ENV === "production") return null;
   if (!warned) {
     warned = true;
-    console.warn("[auth] AUTH_SECRET is missing or shorter than 32 characters — using an insecure development secret.");
+    console.warn("[auth] AUTH_SECRET is missing or shorter than 32 characters; using an insecure development secret.");
   }
   return new TextEncoder().encode(DEV_SECRET);
 }

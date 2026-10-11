@@ -17,7 +17,7 @@ const teamKey = (name: string) => name.toLowerCase().normalize("NFKD").replace(/
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return error(403, "Cross-site requests are not allowed.");
   const limit = rateLimit(`hackathon:${clientIp(req)}`, 6, 15 * 60_000);
-  if (!limit.ok) return error(429, "Too many attempts — please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
+  if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
 
   const body = await readJson(req);
   if (!body || typeof body !== "object") return error(400, "Invalid request.");
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
   const [s, h] = await Promise.all([getSettings(), getHackathon()]);
   if (s.hackathonUrl) return error(409, `Hackathon registration happens on ${s.hackathonPlatform || "the external platform"}.`);
   if (s.hackathonStatus !== "open") return error(403, s.hackathonStatus === "closed" ? "Hackathon registration is closed." : "Hackathon registration has not opened yet.");
-  if (deadlinePassed(s.hackathonDeadline)) return error(403, "Hackathon registration is closed — the deadline has passed.");
+  if (deadlinePassed(s.hackathonDeadline)) return error(403, "Hackathon registration is closed: the deadline has passed.");
 
   const parsed = hackathonSchema.safeParse(body);
   if (!parsed.success) {
@@ -68,7 +68,7 @@ export async function POST(req: NextRequest) {
               ["Track", trackLabel],
               ["Lead", `${d.members[0].name} <${d.members[0].email}>`],
               ["Members", String(d.members.length)],
-              ["Idea", d.ideaTitle || "—"],
+              ["Idea", d.ideaTitle || "-"],
             ]),
           );
         }
@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         return error(500, "Something went wrong while saving your registration.");
       }
       if (/teamKey/.test(String((err as { message?: string }).message))) {
-        return error(409, "That team name is already taken — please choose another.", { fieldErrors: { teamName: "Team name taken" } });
+        return error(409, "That team name is already taken. Please choose another.", { fieldErrors: { teamName: "Team name taken" } });
       }
     }
   }

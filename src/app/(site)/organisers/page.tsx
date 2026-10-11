@@ -6,6 +6,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { ButtonLink } from "@/components/ui/Button";
 import { PersonCard } from "@/components/ui/PersonCard";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { TagScope } from "@/components/ui/Tag";
 import type { Tone } from "@/lib/content/constants";
 import { getPeople, getSettings } from "@/lib/content/queries";
 import type { Person } from "@/lib/content/types";
@@ -44,7 +45,7 @@ export default async function OrganisersPage() {
   const students = people.filter((p) => p.group === "student");
   const volunteers = people.filter((p) => p.group === "volunteer");
   return (
-    <>
+    <TagScope style="underline">
       <PageHero
         tone="blush"
         crumb="Organisers"
@@ -81,7 +82,7 @@ export default async function OrganisersPage() {
               <Aura variant="volunteers" size={180} interactive />
             </div>
             <div className="relative">
-              <p className="inline-flex items-center gap-2 rounded-full bg-accent-soft px-3 py-1 text-xs font-bold tracking-[0.12em] text-accent-ink uppercase">Coming soon</p>
+              <p className="tag tag-eyebrow">Coming soon</p>
               <h3 className="mt-3 font-display text-2xl font-bold text-fg sm:text-3xl">The volunteer list is on its way</h3>
               <p className="mt-2 max-w-lg text-muted">Names and photos of our volunteers will appear here soon. Want to help out at the workshop?</p>
               <div className="mt-5">
@@ -93,6 +94,6 @@ export default async function OrganisersPage() {
           </div>
         )}
       </Section>
-    </>
+    </TagScope>
   );
 }

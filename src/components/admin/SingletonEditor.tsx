@@ -52,7 +52,7 @@ export function SingletonEditor({ kind }: { kind: "settings" | "hackathon" }) {
       setDraft(null);
       setSavedAt(res.updatedAt);
       router.refresh(); // the admin sidebar and tab titles show the event name too
-      toast("Saved — the website now shows your changes.", "success");
+      toast("Saved. The website now shows your changes.", "success");
     } catch (e) {
       if (e instanceof ApiError) {
         setErrors(e.fieldErrors);
@@ -120,7 +120,7 @@ export function SingletonEditor({ kind }: { kind: "settings" | "hackathon" }) {
 
       <div className="fixed inset-x-0 bottom-0 z-20 border-t border-border bg-[var(--header-bg)] backdrop-blur-xl lg:left-[17rem]">
         <div className="flex items-center justify-between gap-3 px-4 py-3 sm:px-8">
-          <p className="text-sm text-muted">{dirty ? <span className="font-semibold text-butter-ink">You have unsaved changes</span> : updatedAt ? `Last saved ${formatDateTime(updatedAt)} IST` : "Defaults — not saved yet"}</p>
+          <p className="text-sm text-muted">{dirty ? <span className="font-semibold text-butter-ink">You have unsaved changes</span> : updatedAt ? `Last saved ${formatDateTime(updatedAt)} IST` : "Defaults, not saved yet"}</p>
           <div className="flex gap-2">
             {dirty ? (
               <Button variant="ghost" onClick={() => { setDraft(null); setErrors({}); }} disabled={saving}>

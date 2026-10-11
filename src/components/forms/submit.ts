@@ -19,7 +19,7 @@ export async function postJson<T = unknown>(path: string, body: unknown): Promis
     if (!res.ok) return { ok: false, message: json.error || json.message || "Something went wrong. Please try again.", fieldErrors: json.fieldErrors };
     return { ok: true, data: json.data, message: json.message };
   } catch {
-    return { ok: false, message: "Network error — please check your connection and try again." };
+    return { ok: false, message: "Network error. Please check your connection and try again." };
   }
 }
 

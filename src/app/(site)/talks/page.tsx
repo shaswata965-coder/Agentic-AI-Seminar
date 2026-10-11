@@ -5,6 +5,7 @@ import { Aura } from "@/components/aura/Aura";
 import { PageHero } from "@/components/layout/PageHero";
 import { ButtonLink } from "@/components/ui/Button";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
+import { TagScope } from "@/components/ui/Tag";
 import { getSettings, getTalks } from "@/lib/content/queries";
 import { eventDayLabel } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
@@ -15,7 +16,7 @@ export default async function TalksPage() {
   const [s, talks] = await Promise.all([getSettings(), getTalks()]);
   if (!s.showTalks) notFound();
   return (
-    <>
+    <TagScope style="bracket">
       <PageHero tone="lilac" crumb="Slides & recordings" eyebrow="Post-event" title="Talk slides & recordings" aura="recordings" description={<p>Catch up on the talks from the {s.eventName}.</p>} />
       <section className="tone-lilac py-12 sm:py-16">
         <div className="container-site">
@@ -52,6 +53,6 @@ export default async function TalksPage() {
           )}
         </div>
       </section>
-    </>
+    </TagScope>
   );
 }

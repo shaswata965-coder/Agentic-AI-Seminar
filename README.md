@@ -17,7 +17,7 @@ It's a fast, accessible, mobile-first site with light and dark modes, a light pa
 ## What's included
 
 **Public site**
-- **Home (single scroll, sticky navigation):** hero with title, tagline, dates, venue, IIT Delhi and ScAI logos, a live countdown to 15 December 2026 and the *Register*, *Join the Hackathon* and *View Programme* buttons; a highlight strip; an announcements box; About; the three theme cards; a programme preview; featured speakers; a hackathon teaser; industry kiosks; venue and travel with an embedded Google Map; partners and sponsors; FAQ and contact form.
+- **Home (single scroll, sticky navigation):** hero with title, tagline, dates, venue and a live countdown to 15 December 2026 (the IIT Delhi emblem and the ScAI logo sit at the corners of the navigation bar); a highlight strip; an announcements box; About; the three theme cards; a programme preview; featured speakers; a hackathon teaser; industry kiosks; venue and travel with an embedded Google Map; partners and sponsors; FAQ and contact form.
 - **Inner pages:** `/programme` (day tabs, filters by theme and type, search, *My agenda*, add sessions to a calendar, PDF download), `/speakers` (filters, pop-up profiles with talk title and abstract, shareable links, panel discussions), `/tutorials` (tutorials and demos), `/hackathon` (tracks, eligibility, team size, mode, rules and code of conduct, timeline, prizes, judging criteria, mentors, judges, resources, winners), `/hackathon/register`, `/register`, `/organisers` (faculty, students and volunteers) and `/meet-aura`.
 - **Post-event pages**, hidden until switched on in the admin: `/gallery` (photos), `/talks` (slides and recordings) and hackathon winners.
 - **Forms:** workshop registration, hackathon team registration (up to 6 members), and contact / *Exhibit with us* / sponsorship enquiries. They support deadlines and open/closed status, and send confirmation e-mails with a calendar invite.
@@ -158,7 +158,7 @@ server { listen 80; server_name agenticai.iitd.ac.in; return 301 https://$host$r
 
 1. Open `/api/health`. It should return `{"status":"ok","db":"connected"}`.
 2. Sign in at `/admin`, change the password (My account), and add the other organisers under **Users**.
-3. In **Site settings**, upload the official IIT Delhi and ScAI logos (Branding), set the contact e-mail and phone, check the registration status and deadlines, and add the Google Analytics ID.
+3. In **Site settings**, set the contact e-mail and phone, check the registration status and deadlines, and add the Google Analytics ID.
 4. Confirm `NEXT_PUBLIC_SITE_URL` is right. Social previews and e-mail links use it.
 5. Send a test registration to check that e-mail works.
 
@@ -201,6 +201,10 @@ docs/                  admin guide and requirements checklist
 
 **Motion:** Aura flies into place (Auras smaller than 56 px just appear). Page heroes use `entrance="load"` (pure CSS, on page load); other Auras fly in from the nearest edge when scrolled into view (`components/aura/entrance.ts`). Pass `entrance="zip" | "drift" | "none"` to change that. Micro-interactions live in `src/app/micro.css` with one delegated script (`components/effects/MicroInteractions.tsx`). Opt an element in with `data-ripple` (ink ripple on press), `data-glow` (cursor-following light on cards), `data-burst` (star spin and ring when pressed), or the `mi-link`, `mi-underline` and `mi-stagger` classes. Segmented controls use `useSlidingPill` (`components/ui/SlidingPill.tsx`). With *reduced motion* turned on, Auras simply appear in place; with JavaScript off, nothing is left hidden.
 
+**Text tags:** eyebrows, badges and small labels are never pill-shaped. Each section picks a tag style (`bracket`, `underline`, `ribbon`, `slash`, `tab`, `stamp`, `corner` or `label`) with `<Section tags="…">`, `data-tags="…"` or, for a whole page, `<TagScope style="…">`; every `.tag` inside follows (`src/app/tags.css`, `components/ui/Tag.tsx`).
+
+**No em dashes:** the site's own text avoids them, and stored content is shown with any em dash replaced (`stripEmDashes` in `src/lib/content/normalize.ts`), without changing the database.
+
 ---
 
 ## Accessibility, performance and security
@@ -221,4 +225,4 @@ docs/                  admin guide and requirements checklist
 
 ## Credits and licences
 
-Aura is an original character drawn in SVG for this site. Fonts: Inter and Outfit, bundled in `src/app/fonts` so builds need no internet access (SIL Open Font License; see `src/app/fonts/LICENSE.md`). Icons: Lucide (ISC). Replace the logo placeholders with the official IIT Delhi and ScAI logos under Admin → Site settings → Branding.
+Aura is an original character drawn in SVG for this site. Fonts: Inter and Outfit, bundled in `src/app/fonts` so builds need no internet access (SIL Open Font License; see `src/app/fonts/LICENSE.md`). Icons: Lucide (ISC). The IIT Delhi and ScAI logos are in `public/logos` (white on transparent, darkened automatically in light mode); Admin → Site settings → Branding can replace them.

@@ -35,7 +35,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Section | Requirement | Status |
 | --- | --- | --- |
-| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Logos show placeholders until the official files are uploaded (Admin → Branding) |
+| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register is in the navigation bar, and the hackathon and programme are in the menu. Add to calendar and share are in About and the footer |
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
 | Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the matching hackathon track |
@@ -99,7 +99,7 @@ Each pending item has a placeholder and an admin screen ready for it:
 
 | Item | Where to add it |
 | --- | --- |
-| Official logo, tagline, colour palette, IITD / ScAI logo files | Site settings → Branding / Event details |
+| Official logo, tagline, colour palette (IITD / ScAI logos are built in; replace them only if needed) | Site settings → Branding / Event details |
 | Speakers and panelists with photos, bios, talk titles | Speakers |
 | Detailed schedule, venue hall names | Programme; Site settings → Event details (hall) |
 | Tutorial, demo and kiosk details | Tutorials, Demos, Industry kiosks |

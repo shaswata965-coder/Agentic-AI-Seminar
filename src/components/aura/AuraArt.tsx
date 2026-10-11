@@ -3,7 +3,7 @@ import type { AuraLook, Effect, Emblem, Expression, Headwear, Pose, PropKind } f
 import { AURA_EYES } from "./presets";
 
 /*
- * Aura — an original, EVE-inspired agentic AI mascot: a glossy, egg-shaped
+ * Aura: an original, EVE-inspired agentic AI mascot: a glossy, egg-shaped
  * hovering robot with a floating head, a dark visor with glowing eyes and
  * fin-like arms. Pure SVG with no hooks so it can be rendered on the server,
  * in client components and inside OG images.

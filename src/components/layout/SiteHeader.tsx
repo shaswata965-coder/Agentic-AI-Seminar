@@ -9,11 +9,14 @@ import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { PRIMARY_NAV, SECTION_NAV, type NavItem } from "@/lib/nav";
 import { BrandMark } from "./BrandMark";
+import { InstituteLogo } from "./InstituteLogo";
 import { ThemeToggle } from "./ThemeToggle";
 
 export interface SiteHeaderProps {
   /** From `brandName()`. */
   brand: { title: string; year: string };
+  /** Logos uploaded under Admin → Branding; empty uses the bundled ones. */
+  logos: { iitd: string; scai: string };
   registerHref: string;
   extraNav: NavItem[];
 }
@@ -23,7 +26,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
+export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -33,6 +36,15 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const sections = [...SECTION_NAV, ...extraNav];
   const pages = [{ href: "/", label: "Home" }, ...PRIMARY_NAV, { href: "/register", label: "Registration" }];
+  const barCls = "flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:h-[72px] xl:px-8";
+  const iitdLogo = <InstituteLogo kind="iitd" upload={logos.iitd} className="h-9 lg:h-11" />;
+  // The full ScAI wordmark where the header has room, otherwise just its "ScAI" letters.
+  const scaiLogo = (
+    <>
+      <InstituteLogo kind="scai" upload={logos.scai} monogram className="h-6 2xl:hidden" />
+      <InstituteLogo kind="scai" upload={logos.scai} className="hidden h-6 2xl:flex" />
+    </>
+  );
 
   // Glass background + reading progress bar.
   useEffect(() => {
@@ -92,12 +104,13 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
         scrolled ? "border-b border-border bg-[var(--header-bg)] shadow-[0_8px_30px_-20px_rgb(15_23_42/0.35)] backdrop-blur-xl" : "border-b border-transparent",
       )}
     >
-      <div className="container-site flex h-16 items-center gap-3 lg:h-[72px]">
+      <div className={barCls}>
+        {iitdLogo}
         <Link href="/" className="rounded-2xl">
-          <BrandMark {...brand} srSuffix=", home page" />
+          <BrandMark {...brand} icon={false} srSuffix=", home page" />
         </Link>
 
-        <nav aria-label="Main" className="ml-auto hidden items-center gap-0.5 lg:flex">
+        <nav aria-label="Main" className="ml-auto hidden items-center gap-0.5 xl:flex">
           {PRIMARY_NAV.map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -106,7 +119,7 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group relative rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors",
+                  "group relative rounded-full px-3 py-2 text-[14.5px] font-semibold whitespace-nowrap transition-colors",
                   active ? "text-brand" : "text-muted hover:text-fg",
                 )}
               >
@@ -163,15 +176,16 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
           </div>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2 lg:ml-3">
-          <ThemeToggle />
-          <ButtonLink href={registerHref} size="sm" className="max-[359px]:hidden" icon={<Ticket size={16} aria-hidden />}>
-            Register
+        <div className="ml-auto flex items-center gap-2 xl:ml-3">
+          {/* On phones the theme switch lives in the menu, and Register shrinks to its icon. */}
+          <ThemeToggle className="max-sm:hidden" />
+          <ButtonLink href={registerHref} size="sm" className="max-sm:w-9 max-sm:px-0" icon={<Ticket size={16} aria-hidden />}>
+            <span className="max-sm:sr-only">Register</span>
           </ButtonLink>
           <button
             type="button"
             data-ripple=""
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg lg:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg xl:hidden"
             aria-label="Open menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
@@ -179,6 +193,7 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
             <Menu size={20} aria-hidden />
           </button>
         </div>
+        {scaiLogo}
       </div>
       <div
         aria-hidden
@@ -194,11 +209,12 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
       >
         {menuOpen ? (
           <div className="flex min-h-full flex-col">
-            <div className="container-site flex h-16 items-center justify-between">
+            <div className={barCls}>
+              {iitdLogo}
               <Link href="/" onClick={() => setMenuOpen(false)}>
-                <BrandMark {...brand} srSuffix=", home page" />
+                <BrandMark {...brand} icon={false} srSuffix=", home page" />
               </Link>
-              <div className="flex items-center gap-2">
+              <div className="ml-auto flex items-center gap-2">
                 <ThemeToggle />
                 <button
                   type="button"
@@ -210,6 +226,7 @@ export function SiteHeader({ brand, registerHref, extraNav }: SiteHeaderProps) {
                   <X size={20} aria-hidden className="transition-transform duration-300 group-hover:rotate-90" />
                 </button>
               </div>
+              {scaiLogo}
             </div>
             <nav aria-label="Mobile" className="container-site grid gap-8 pt-4 pb-6">
               <div>

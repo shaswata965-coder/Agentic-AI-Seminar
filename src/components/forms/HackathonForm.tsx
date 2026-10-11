@@ -104,7 +104,7 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
           <p className="mt-3 text-muted">Your team registration ID is</p>
           <p className="mt-2 rounded-2xl bg-surface-2 px-5 py-3 font-display text-2xl font-bold tracking-wider text-brand tabular">{done.regId}</p>
           <p className="mt-4 max-w-md text-sm text-muted">
-            {done.emailSent ? "We've e-mailed a confirmation to the team lead." : "Please note this ID — the organisers will contact your team lead."} Watch the Hackathon page for the idea-submission date.
+            {done.emailSent ? "We've e-mailed a confirmation to the team lead." : "Please note this ID. The organisers will contact your team lead."} Watch the Hackathon page for the idea-submission date.
           </p>
           <div className="mt-6">
             <ButtonLink href="/hackathon" variant="outline">
@@ -132,7 +132,7 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
         {step === 0 ? (
           <div className="grid animate-fade-up gap-5 sm:grid-cols-2">
             <TextField label="Team name" required value={team.teamName} onChange={(e) => setTeam({ ...team, teamName: e.target.value })} error={errors.teamName} maxLength={60} />
-            <SelectField label="Track" required placeholder="Choose a track" value={team.track} onChange={(e) => setTeam({ ...team, track: e.target.value })} error={errors.track} options={[...tracks, { value: "undecided", label: "Undecided — we'll pick later" }]} />
+            <SelectField label="Track" required placeholder="Choose a track" value={team.track} onChange={(e) => setTeam({ ...team, track: e.target.value })} error={errors.track} options={[...tracks, { value: "undecided", label: "Undecided, we'll pick later" }]} />
           </div>
         ) : null}
 

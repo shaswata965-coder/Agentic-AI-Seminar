@@ -17,7 +17,7 @@ export function ScheduleTba({ s, compact = false }: { s: SiteSettings; compact?:
       <div aria-hidden className="wash pointer-events-none absolute inset-0" />
       <div className="relative grid items-center gap-8 md:grid-cols-[auto_1fr]">
         <div className="mx-auto">
-          <Aura variant="programme" size={compact ? 170 : 210} interactive tips={["The schedule is being finalised — check back soon!", "Add the dates to your calendar meanwhile."]} />
+          <Aura variant="programme" size={compact ? 170 : 210} interactive tips={["The schedule is being finalised. Check back soon!", "Add the dates to your calendar meanwhile."]} />
         </div>
         <div>
           <Badge tone="butter" dot>
@@ -66,13 +66,13 @@ export function ProgrammePreview({ s, sessions, speakers }: { s: SiteSettings; s
   const days = eventDays(s);
   const tba = s.programmeStatus === "tba" || sessions.length === 0;
   return (
-    <Section tone="azure" labelledBy="programme-preview-title">
+    <Section tone="azure" labelledBy="programme-preview-title" tags="bracket">
       <SectionHeading
         id="programme-preview-title"
         eyebrow="Programme"
         title="Two days of ideas, hands‑on learning and building"
         description={
-          s.programmeStatus === "draft" ? "Draft schedule — sessions and timings may still change." : "A day-wise view of keynotes, talks, panels, tutorials, demos and the hackathon."
+          s.programmeStatus === "draft" ? "Draft schedule: sessions and timings may still change." : "A day-wise view of keynotes, talks, panels, tutorials, demos and the hackathon."
         }
         aside={
           !tba ? (

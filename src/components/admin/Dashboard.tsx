@@ -128,7 +128,7 @@ export function Dashboard() {
                   <li key={e.id} className="flex items-center justify-between gap-3 py-3 text-sm">
                     <span className="min-w-0">
                       <span className="block truncate font-semibold text-fg">{e.name}</span>
-                      <span className="block truncate text-muted">{e.organisation || "—"}</span>
+                      <span className="block truncate text-muted">{e.organisation || "-"}</span>
                     </span>
                     <span className="flex shrink-0 items-center gap-2">
                       <Badge tone={e.type === "sponsor" ? "butter" : e.type === "exhibitor" ? "peach" : "azure"} size="xs">
@@ -224,7 +224,7 @@ function RefreshSite() {
     setBusy(true);
     try {
       await api("/revalidate", { method: "POST" });
-      toast("Website refreshed — visitors now see the latest content.", "success");
+      toast("Website refreshed. Visitors now see the latest content.", "success");
     } catch (err) {
       toast((err as Error).message || "Could not refresh the website", "error");
     } finally {
@@ -242,7 +242,7 @@ function RefreshSite() {
       >
         <RefreshCw size={17} aria-hidden className={busy ? "animate-spin" : "transition-transform duration-500 group-hover:rotate-180"} /> {busy ? "Refreshing…" : "Refresh website"}
       </button>
-      <p className="mt-2 text-xs text-subtle">Only needed after a new deployment or changes made outside this panel — saving here updates the site automatically.</p>
+      <p className="mt-2 text-xs text-subtle">Only needed after a new deployment or changes made outside this panel. Saving here updates the site automatically.</p>
     </div>
   );
 }

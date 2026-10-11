@@ -4,7 +4,7 @@ import { cn } from "@/lib/cn";
 /*
  * Minimal, safe Markdown subset for CMS text: paragraphs, line breaks,
  * "- " bullet and "1. " numbered lists, **bold**, *italic*, `code` and
- * [links](https://…). Rendered as React elements — never as raw HTML.
+ * [links](https://…). Rendered as React elements, never as raw HTML.
  */
 
 const INLINE = /(\*\*[^*]+\*\*|\*[^*\s][^*]*\*|`[^`]+`|\[[^\]]+\]\([^)\s]+\))/g;

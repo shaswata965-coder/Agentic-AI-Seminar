@@ -212,7 +212,7 @@ export function RegistrationsManager() {
                     ["Category", ATTENDEE_CATEGORY_META[open.category as keyof typeof ATTENDEE_CATEGORY_META] ?? open.category],
                     ["Location", [open.city, open.country].filter(Boolean).join(", ")],
                     ["Interests", open.interests.join(", ")],
-                    ["Tutorials / hackathon", `${open.tutorials ? "Tutorials" : "—"} · ${open.hackathonInterest ? "Hackathon" : "—"}`],
+                    ["Tutorials / hackathon", `${open.tutorials ? "Tutorials" : "-"} · ${open.hackathonInterest ? "Hackathon" : "-"}`],
                     ["Dietary", open.dietary],
                     ["Accessibility", open.accessibility],
                     ["Heard from", open.heardFrom],
@@ -221,7 +221,7 @@ export function RegistrationsManager() {
               ).map(([k, v]) => (
                 <div key={k}>
                   <dt className="text-xs font-bold tracking-[0.1em] text-subtle uppercase">{k}</dt>
-                  <dd className="mt-0.5 break-words text-fg">{v || "—"}</dd>
+                  <dd className="mt-0.5 break-words text-fg">{v || "-"}</dd>
                 </div>
               ))}
             </dl>

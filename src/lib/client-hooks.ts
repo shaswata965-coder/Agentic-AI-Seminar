@@ -5,7 +5,7 @@ import { useCallback, useSyncExternalStore } from "react";
 /*
  * Browser-only values read through useSyncExternalStore: the server (and the
  * hydration pass) sees the fallback, then React re-renders with the real
- * value — no hydration mismatch and no setState-in-effect.
+ * value: no hydration mismatch and no setState-in-effect.
  */
 
 const noopSubscribe = () => () => {};

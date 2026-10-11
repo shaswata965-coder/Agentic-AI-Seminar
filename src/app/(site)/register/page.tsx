@@ -7,6 +7,7 @@ import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { PageHero } from "@/components/layout/PageHero";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { TagScope } from "@/components/ui/Tag";
 import { getSettings } from "@/lib/content/queries";
 import { eventCalendarLinks, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
@@ -44,7 +45,7 @@ export default async function RegisterPage() {
     );
 
   return (
-    <>
+    <TagScope style="stamp">
       <PageHero
         tone="peach"
         crumb="Registration"
@@ -140,7 +141,7 @@ export default async function RegisterPage() {
           </aside>
         </div>
       </section>
-    </>
+    </TagScope>
   );
 }
 
@@ -154,7 +155,7 @@ function StatusCard({ closed }: { closed: boolean }) {
         <p className="mt-2 max-w-lg text-muted">
           {closed
             ? "Thank you for your interest! Registration for this edition has closed. Follow the announcements for updates."
-            : "We're getting everything ready. Registration details, fees and deadlines will be announced here — check the announcements for the opening date."}
+            : "We're getting everything ready. Registration details, fees and deadlines will be announced here. Check the announcements for the opening date."}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <ButtonLink href="/#news" variant="soft">

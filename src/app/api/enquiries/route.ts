@@ -14,7 +14,7 @@ const LABEL = { contact: "Contact message", exhibitor: "Exhibitor enquiry", spon
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return error(403, "Cross-site requests are not allowed.");
   const limit = rateLimit(`enquiry:${clientIp(req)}`, 5, 10 * 60_000);
-  if (!limit.ok) return error(429, "You've sent several messages already — please wait a few minutes.", { retryAfter: limit.retryAfter });
+  if (!limit.ok) return error(429, "You've sent several messages already. Please wait a few minutes.", { retryAfter: limit.retryAfter });
 
   const body = await readJson(req);
   if (!body || typeof body !== "object") return error(400, "Invalid request.");
@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
           [
             ["Name", d.name],
             ["E-mail", d.email],
-            ["Organisation", d.organisation || "—"],
-            ["Phone", d.phone || "—"],
-            ["Subject", d.subject || "—"],
+            ["Organisation", d.organisation || "-"],
+            ["Phone", d.phone || "-"],
+            ["Subject", d.subject || "-"],
             ["Message", d.message],
           ],
           d.email,

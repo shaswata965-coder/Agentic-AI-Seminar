@@ -7,7 +7,7 @@ import { useEffect } from "react";
  * app/micro.css):
  * - ripple: a soft ink ripple from the pointer on [data-ripple] controls
  * - pop: a springy pop on the toggle that was just used (pressed buttons,
- *   tabs, switches, checkboxes, accordions) — never on page load
+ *   tabs, switches, checkboxes, accordions), never on page load
  * - glow: a light that follows the mouse across [data-glow] cards
  * Nothing runs when the visitor prefers reduced motion.
  */

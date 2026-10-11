@@ -24,7 +24,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     effects: ["orbit", "sparkles"],
     tips: [
       "Hi! I'm Aura, your agentic guide to the workshop.",
-      "Two days of talks, tutorials, demos and a hackathon — 15–16 Dec at IIT Delhi.",
+      "Two days of talks, tutorials, demos and a hackathon, 15–16 Dec at IIT Delhi.",
       "Tap Register to save your seat. I'll keep it warm!",
       "Psst… press Ctrl/⌘ + K any time to ask me something.",
     ],
@@ -44,7 +44,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     emblem: "atom",
     effects: ["orbit"],
     tips: [
-      "Agents perceive, reason, plan, act — and learn from the result.",
+      "Agents perceive, reason, plan, act, and learn from the result.",
       "An agent is more than a chatbot: it uses tools to get things done.",
       "Try clicking each step of the loop!",
     ],
@@ -85,7 +85,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     eyeColor: AURA_EYES.amber,
     tips: [
       "From prototype to product: agentic startups are taking off.",
-      "Investors and founders — meet at the industry kiosks!",
+      "Investors and founders, meet at the industry kiosks!",
     ],
   },
   programme: {
@@ -138,7 +138,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     emblem: "play",
     effects: ["sparkles"],
     eyeColor: AURA_EYES.aqua,
-    tips: ["Live demos of agents in action — come say hi!"],
+    tips: ["Live demos of agents in action. Come say hi!"],
   },
   hackathon: {
     label: "Aura in hacker mode coding on a laptop",
@@ -221,7 +221,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     prop: "suitcase",
     emblem: "pin",
     eyeColor: AURA_EYES.peach,
-    tips: ["Book your stay early — December is busy in Delhi!"],
+    tips: ["Book your stay early: December is busy in Delhi!"],
   },
   sponsors: {
     label: "Aura hugging a big heart to thank partners",
@@ -242,14 +242,14 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     tips: ["Meet the team making this workshop happen!"],
   },
   volunteers: {
-    label: "Aura in a hard hat — volunteer list coming soon",
+    label: "Aura in a hard hat: volunteer list coming soon",
     expression: "focus",
     pose: "raise",
     prop: "wrench",
     headwear: "hardHat",
     emblem: "gear",
     eyeColor: AURA_EYES.amber,
-    tips: ["Volunteer list coming soon — we're building it!"],
+    tips: ["Volunteer list coming soon. We're building it!"],
   },
   faq: {
     label: "Aura thinking about a question",
@@ -276,7 +276,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     prop: "paperPlane",
     emblem: "heart",
     eyeColor: AURA_EYES.blush,
-    tips: ["Drop us a line — we usually reply within two working days."],
+    tips: ["Drop us a line. We usually reply within two working days."],
   },
   notFound: {
     label: "Aura searching with a magnifying glass",
@@ -344,7 +344,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     pose: "think",
     emblem: "gear",
     effects: ["question"],
-    tips: ["Oops — something glitched. Try again?"],
+    tips: ["Oops, something glitched. Try again?"],
   },
 };
 

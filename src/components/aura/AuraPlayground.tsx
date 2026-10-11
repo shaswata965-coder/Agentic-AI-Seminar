@@ -32,7 +32,7 @@ function Group<T extends string>({ title, items, value, onChange }: { title: str
             aria-pressed={value === it}
             onClick={() => onChange(it)}
             data-ripple=""
-            className={cn("rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5", value === it ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}
+            className={cn("rounded-md px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5", value === it ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}
           >
             {label(it)}
           </button>
@@ -101,7 +101,7 @@ export function AuraPlayground() {
             {EFFECTS.map((fx) => {
               const on = effects.includes(fx);
               return (
-                <button key={fx} type="button" aria-pressed={on} onClick={() => setEffects((list) => (on ? list.filter((x) => x !== fx) : [...list, fx]))} data-ripple="" className={cn("rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5", on ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}>
+                <button key={fx} type="button" aria-pressed={on} onClick={() => setEffects((list) => (on ? list.filter((x) => x !== fx) : [...list, fx]))} data-ripple="" className={cn("rounded-md px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5", on ? "bg-brand text-brand-fg" : "bg-surface-2 text-muted hover:text-fg")}>
                   {label(fx)}
                 </button>
               );

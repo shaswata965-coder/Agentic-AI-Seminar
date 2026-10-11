@@ -25,7 +25,7 @@ run(async () => {
     console.log(`✔ Added: ${created.join(", ")}.`);
     console.log(RESTART_HINT);
   } else {
-    console.log("✔ Default content is already in place — nothing to add.");
+    console.log("✔ Default content is already in place, nothing to add.");
   }
   console.log("Next: create an administrator with `npm run create-admin -- --email you@example.com`, or sign in with ADMIN_EMAIL / ADMIN_PASSWORD.");
 });

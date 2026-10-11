@@ -10,6 +10,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { PersonCard } from "@/components/ui/PersonCard";
 import { RichText } from "@/components/ui/RichText";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { TagScope } from "@/components/ui/Tag";
 import { THEME_META } from "@/lib/content/constants";
 import { getFaqs, getHackathon, getPeople, getSettings } from "@/lib/content/queries";
 import { hackathonRegistrationHref } from "@/lib/event";
@@ -57,7 +58,7 @@ export default async function HackathonPage() {
     );
 
   return (
-    <>
+    <TagScope style="slash">
       <JsonLd data={eventJsonLd(s, { "@type": "Event", name: h.title, description: h.tagline, url: absoluteUrl("/hackathon") })} />
       <PageHero tone="aqua" crumb="Hackathon" eyebrow="Hackathon" title={h.title} aura="hackathon" description={<p>{h.tagline}</p>}>
         <ButtonLink href={registerHref} size="lg" icon={<Trophy size={19} aria-hidden />} iconRight={external ? <ExternalLink size={16} aria-hidden /> : undefined}>
@@ -102,7 +103,7 @@ export default async function HackathonPage() {
       </Section>
 
       <Section tone="lilac" labelledBy="tracks-title" band>
-        <SectionHeading id="tracks-title" eyebrow="Problem tracks" title="Pick a track aligned with the workshop themes" description="Final problem statements will be announced at launch — here are examples to get you thinking." />
+        <SectionHeading id="tracks-title" eyebrow="Problem tracks" title="Pick a track aligned with the workshop themes" description="Final problem statements will be announced at launch. Here are examples to get you thinking." />
         <ul className="grid gap-5 lg:grid-cols-3">
           {h.tracks.map((t) => {
             const meta = THEME_META[t.theme] ?? THEME_META.general;
@@ -160,7 +161,7 @@ export default async function HackathonPage() {
             </div>
           </div>
           <div>
-            <SectionHeading eyebrow="Judging" title="How projects are judged" description="Indicative criteria — final weights will be confirmed with the rules." className="mb-8 sm:mb-8" />
+            <SectionHeading eyebrow="Judging" title="How projects are judged" description="Indicative criteria. Final weights will be confirmed with the rules." className="mb-8 sm:mb-8" />
             <ul className="grid gap-4">
               {h.judgingCriteria.map((c) => (
                 <li key={c.name} className="card p-5">
@@ -313,6 +314,6 @@ export default async function HackathonPage() {
           </div>
         </div>
       </section>
-    </>
+    </TagScope>
   );
 }

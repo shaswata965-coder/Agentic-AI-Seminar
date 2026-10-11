@@ -6,10 +6,10 @@ import { Aura } from "@/components/aura/Aura";
 import { cn } from "@/lib/cn";
 
 const STEPS: { title: string; text: string; Icon: LucideIcon; tone: string }[] = [
-  { title: "Perceive", text: "Takes in the goal and its surroundings — user requests, documents, sensor data and tool outputs.", Icon: Eye, tone: "tone-azure" },
+  { title: "Perceive", text: "Takes in the goal and its surroundings: user requests, documents, sensor data and tool outputs.", Icon: Eye, tone: "tone-azure" },
   { title: "Reason", text: "Makes sense of the situation and decides what matters, often with a large language model as its engine.", Icon: Brain, tone: "tone-lilac" },
   { title: "Plan", text: "Breaks the goal into steps and chooses which tools, data or other agents to use.", Icon: Route, tone: "tone-mint" },
-  { title: "Act", text: "Executes the plan — calls APIs, runs code, searches, writes — or asks a human when it should.", Icon: Zap, tone: "tone-peach" },
+  { title: "Act", text: "Executes the plan (calls APIs, runs code, searches, writes) or asks a human when it should.", Icon: Zap, tone: "tone-peach" },
   { title: "Reflect", text: "Checks the outcome, learns from feedback and adapts the plan for the next loop.", Icon: RefreshCw, tone: "tone-blush" },
 ];
 
@@ -95,7 +95,7 @@ export function AgentLoop() {
               >
                 <s.Icon size={24} aria-hidden />
               </span>
-              <span className={cn("rounded-full px-2 text-sm font-bold", on ? "bg-accent-soft text-accent-ink" : "text-muted")}>{s.title}</span>
+              <span className={cn("rounded-[0.3rem] px-2 text-sm font-bold", on ? "bg-accent-soft text-accent-ink" : "text-muted")}>{s.title}</span>
             </button>
           );
         })}

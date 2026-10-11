@@ -62,7 +62,7 @@ export function Countdown({ target, end, className }: { target: string; end: str
           {live ? <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-[var(--accent)]" /> : null}
           <span className="relative inline-flex h-3 w-3 rounded-full bg-[var(--accent-ink)]" />
         </span>
-        <span className="font-display text-lg font-semibold">{live ? "The workshop is happening now!" : "That's a wrap — thank you for joining us!"}</span>
+        <span className="font-display text-lg font-semibold">{live ? "The workshop is happening now!" : "That's a wrap. Thank you for joining us!"}</span>
       </div>
     );
   }

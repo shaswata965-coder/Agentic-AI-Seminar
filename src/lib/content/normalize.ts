@@ -51,3 +51,24 @@ export function mergeDefaults<T extends object>(defaults: T, stored: unknown): T
   }
   return out as T;
 }
+
+/**
+ * The site never shows an em dash. Text saved in the admin (or seeded before this rule) is cleaned
+ * as it is read, without changing the database: "a — b" becomes "a, b", "Title — Name" becomes "Title: Name".
+ */
+export function noEmDash(text: string): string {
+  if (!text.includes("—")) return text;
+  return text
+    .replace(/^[ \t]*—[ \t]*/gm, "")
+    .replace(/[ \t]*—[ \t]*$/gm, "")
+    .replace(/\s*—\s*(?=[A-Z0-9“"(])/g, ": ")
+    .replace(/\s*—\s*/g, ", ");
+}
+
+/** `noEmDash` for every string inside a value, including nested objects and arrays. */
+export function stripEmDashes<T>(value: T): T {
+  if (typeof value === "string") return noEmDash(value) as T;
+  if (Array.isArray(value)) return value.map(stripEmDashes) as T;
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, stripEmDashes(v)])) as T;
+  return value;
+}

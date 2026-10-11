@@ -34,7 +34,7 @@ function transport(): Transporter | null {
 export async function sendMail(input: MailInput): Promise<boolean> {
   const t = transport();
   if (!t) {
-    console.info(`[mail] SMTP not configured — skipped "${input.subject}" to ${input.to}`);
+    console.info(`[mail] SMTP not configured, skipped "${input.subject}" to ${input.to}`);
     return false;
   }
   try {

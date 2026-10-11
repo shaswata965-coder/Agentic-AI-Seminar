@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/layout/PageHero";
 import { TutorialsView } from "@/components/tutorials/TutorialsView";
 import { ButtonLink } from "@/components/ui/Button";
+import { TagScope } from "@/components/ui/Tag";
 import { getDemos, getSettings, getTutorials } from "@/lib/content/queries";
 import { absoluteUrl } from "@/lib/paths";
 
@@ -9,7 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
   return {
     title: "Tutorials & Demos",
-    description: `Hands-on tutorials and live demos at the ${s.eventName} — instructors, prerequisites and materials.`,
+    description: `Hands-on tutorials and live demos at the ${s.eventName}: instructors, prerequisites and materials.`,
     alternates: { canonical: absoluteUrl("/tutorials") },
   };
 }
@@ -17,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function TutorialsPage() {
   const [tutorials, demos] = await Promise.all([getTutorials(), getDemos()]);
   return (
-    <>
+    <TagScope style="tab">
       <PageHero
         tone="mint"
         crumb="Tutorials & Demos"
@@ -38,6 +39,6 @@ export default async function TutorialsPage() {
           <TutorialsView tutorials={tutorials} demos={demos} />
         </div>
       </div>
-    </>
+    </TagScope>
   );
 }

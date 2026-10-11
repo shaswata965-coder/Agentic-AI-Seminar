@@ -48,7 +48,7 @@ export function venueLine(s: SiteSettings) {
 }
 
 export function eventSummary(s: SiteSettings) {
-  return `${s.eventName} — ${formatDateRange(s.startDate, s.endDate)} · ${venueLine(s)}`;
+  return `${s.eventName} · ${formatDateRange(s.startDate, s.endDate)} · ${venueLine(s)}`;
 }
 
 export interface CalendarLinks {

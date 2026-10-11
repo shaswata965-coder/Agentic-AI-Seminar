@@ -10,7 +10,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "basics",
     title: "How it works",
     steps: [
-      "Everything you save here is live on the website within a few seconds — there is no separate “publish” step.",
+      "Everything you save here is live on the website within a few seconds. There is no separate “publish” step.",
       "Each item has a “Published” switch. Turn it off to hide something without deleting it.",
       "Use the ↑ ↓ arrows in a list to change the order items appear on the website.",
       "Text boxes with a “Preview” button support simple formatting: `**bold**`, `*italic*`, `[link text](https://example.com)` and bullet lists (start lines with `- `). Use “Preview” to check.",
@@ -22,7 +22,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     steps: [
       ["Site settings → Event details", "Name, tagline, dates (the countdown uses the start date), venue and hall."],
       ["Site settings → Registration", "Open or close workshop and hackathon registration, set deadlines (forms close automatically once a deadline passes) and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
-      ["Site settings → Branding", "Upload the official IIT Delhi and ScAI logos and set the brand colour."],
+      ["Site settings → Branding", "Set the brand colour, and replace the built-in IIT Delhi and ScAI logos if ever needed."],
       ["Site settings → Contact & social", "Official e-mail, phone and social links shown in the footer and contact section."],
     ],
   },
@@ -63,7 +63,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     title: "Hackathon",
     steps: [
       "Hackathon → Overview, tracks, rules, timeline, prizes, judging criteria and resources.",
-      "Fill in timeline dates as they are confirmed — the timeline shows progress automatically.",
+      "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",
       "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Features.",
     ],
   },
@@ -115,7 +115,7 @@ function Step({ s }: { s: string | [string, string] }) {
 export default function GuidePage() {
   return (
     <div className="max-w-4xl">
-      <PageTitle title="Help guide" description="How to keep the website up to date — no coding needed." />
+      <PageTitle title="Help guide" description="How to keep the website up to date, no coding needed." />
       <div className="card mb-6 flex items-center gap-4 p-5">
         <Aura variant="admin" size={90} lite />
         <p className="text-[15px] text-muted">

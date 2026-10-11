@@ -3,7 +3,7 @@ import type { FieldDef } from "@/lib/schema/fields";
 import { COLLECTION_MAP, COLLECTIONS } from "@/lib/schema/resources";
 
 /* ---------------------------------------------------------------------------
-   Content collections — schemas are generated from the admin field
+   Content collections: schemas are generated from the admin field
    definitions so the CMS form, validation and storage never drift apart.
    ------------------------------------------------------------------------- */
 

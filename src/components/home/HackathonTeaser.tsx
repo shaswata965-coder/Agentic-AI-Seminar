@@ -13,7 +13,7 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
     { Icon: Trophy, label: "Prize pool", value: h.prizePool },
   ];
   return (
-    <section aria-labelledby="hackathon-teaser-title" className="tone-aqua py-16 sm:py-24">
+    <section aria-labelledby="hackathon-teaser-title" data-tags="slash" className="tone-aqua py-16 sm:py-24">
       <div className="container-site">
         <div className="relative overflow-hidden rounded-[2rem] border border-border bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft)_55%,var(--blush-soft))] p-6 shadow-card-lg sm:p-12">
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent)]" />
@@ -31,7 +31,7 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
                 {h.tracks.map((t) => {
                   const meta = THEME_META[t.theme] ?? THEME_META.general;
                   return (
-                    <li key={t.title} className={`tone-${meta.tone} rounded-full bg-surface/80 px-3.5 py-1.5 text-sm font-semibold text-accent-ink ring-1 ring-border`}>
+                    <li key={t.title} className={`tone-${meta.tone} tag text-sm`}>
                       {t.title}
                     </li>
                   );

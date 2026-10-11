@@ -132,7 +132,7 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
                         const Icon = materialIcon(m.url, m.label);
                         return (
                           <li key={k}>
-                            <a href={m.url} target="_blank" rel="noopener noreferrer" data-ripple="" className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-brand">
+                            <a href={m.url} target="_blank" rel="noopener noreferrer" data-ripple="" className="inline-flex items-center gap-1.5 rounded-md border border-border bg-surface px-3 py-1.5 text-sm font-semibold text-muted transition hover:-translate-y-0.5 hover:border-brand hover:text-brand">
                               <span className="btn-ico-l">
                                 <Icon size={15} aria-hidden />
                               </span>{" "}

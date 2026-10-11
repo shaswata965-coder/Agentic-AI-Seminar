@@ -163,7 +163,7 @@ export function RegistrationForm({ calendar, shareUrl, eventName }: { calendar: 
             </fieldset>
             <div className="grid gap-3 sm:grid-cols-2">
               <CheckboxField label="I'd like to join hands-on tutorials" description="We'll share prerequisites closer to the event." checked={Boolean(values.tutorials)} onChange={(e) => set("tutorials", e.target.checked)} />
-              <CheckboxField label="I'm interested in the hackathon" description="Hackathon registration is separate — we'll send you the details." checked={Boolean(values.hackathonInterest)} onChange={(e) => set("hackathonInterest", e.target.checked)} />
+              <CheckboxField label="I'm interested in the hackathon" description="Hackathon registration is separate. We'll send you the details." checked={Boolean(values.hackathonInterest)} onChange={(e) => set("hackathonInterest", e.target.checked)} />
             </div>
             <SelectField
               label="How did you hear about the workshop?"

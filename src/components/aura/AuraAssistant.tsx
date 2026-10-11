@@ -119,7 +119,7 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
           <AuraHead size={32} className="relative transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
         </span>
         <span className="sr-only text-sm font-semibold text-fg sm:not-sr-only">Ask Aura</span>
-        <span className="sr-only"> — search the site</span>
+        <span className="sr-only">, search the site</span>
         <kbd aria-hidden className="hidden rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-sans text-[11px] text-subtle md:inline">
           ⌘K
         </kbd>
@@ -160,7 +160,7 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
                     go(results[active].href);
                   }
                 }}
-                placeholder="Ask Aura — e.g. “hackathon dates” or “metro”"
+                placeholder="Ask Aura, e.g. “hackathon dates” or “metro”"
                 className="h-11 w-full bg-transparent text-base outline-none placeholder:text-subtle"
                 role="combobox"
                 aria-expanded="true"
@@ -182,7 +182,7 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
                         setQuery(q.q);
                         inputRef.current?.focus();
                       }}
-                      className="rounded-full bg-surface-2 px-3 py-1.5 text-sm font-medium text-muted transition hover:bg-accent-soft hover:text-accent-ink"
+                      className="rounded-md bg-surface-2 px-3 py-1.5 text-sm font-medium text-muted transition hover:bg-accent-soft hover:text-accent-ink"
                     >
                       {q.label}
                     </button>

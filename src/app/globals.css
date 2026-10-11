@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./micro.css";
+@import "./tags.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -340,7 +341,7 @@
 /* Lighter motion on small/touch screens and full stop for reduced motion */
 @media (max-width: 767px), (pointer: coarse) {
   .animate-float, .animate-spin-slow { animation-duration: 12s; }
-  /* Background-position animations repaint every frame — skip them on phones. */
+  /* Background-position animations repaint every frame, so skip them on phones. */
   .animate-gradient, .motion-desktop-only { animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -357,7 +358,7 @@
    ------------------------------------------------------------------------- */
 @media print {
   .no-print, header[data-site-header], footer[data-site-footer], [data-aura-assistant] { display: none !important; }
-  /* Scroll-driven reveals never "enter" on paper — show everything in its final state. */
+  /* Scroll-driven reveals never "enter" on paper: show everything in its final state. */
   [data-reveal], .grow-bar { animation: none !important; opacity: 1 !important; transform: none !important; }
   body { background: #fff; color: #000; }
   .card { box-shadow: none; border-color: #ccc; }

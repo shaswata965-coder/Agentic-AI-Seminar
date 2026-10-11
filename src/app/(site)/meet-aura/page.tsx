@@ -5,27 +5,28 @@ import { AURA_PRESETS } from "@/components/aura/presets";
 import type { AuraVariant } from "@/components/aura/types";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/ui/Section";
+import { TagScope } from "@/components/ui/Tag";
 import { absoluteUrl } from "@/lib/paths";
 
 export const metadata: Metadata = {
   title: "Meet Aura",
-  description: "Aura is the workshop's agentic AI mascot — a friendly hovering robot who changes for every part of the site.",
+  description: "Aura is the workshop's agentic AI mascot: a friendly hovering robot who changes for every part of the site.",
   alternates: { canonical: absoluteUrl("/meet-aura") },
 };
 
 const WHERE: Partial<Record<AuraVariant, string>> = {
-  hero: "Home — waving hello", countdown: "Countdown timer", announcements: "Announcements", thinker: "About — the agent loop",
+  hero: "Home: waving hello", countdown: "Countdown timer", announcements: "Announcements", thinker: "About: the agent loop",
   healthcare: "Theme: Healthcare", science: "Theme: Scientific Discovery", entrepreneurship: "Theme: Entrepreneurship",
   programme: "Programme", speakers: "Speakers", tutorials: "Tutorials", demos: "Live demos", hackathon: "Hackathon", trophy: "Prizes & winners",
   registration: "Registration", success: "Registration complete", kiosks: "Industry kiosks", venue: "Venue", travel: "Travel tips",
-  sponsors: "Partners & sponsors", organisers: "Organisers", volunteers: "Volunteers (coming soon)", faq: "FAQ", answer: "FAQ — answer found",
+  sponsors: "Partners & sponsors", organisers: "Organisers", volunteers: "Volunteers (coming soon)", faq: "FAQ", answer: "FAQ: answer found",
   contact: "Contact form", notFound: "Page not found", sleep: "Footer", gallery: "Photo gallery", recordings: "Recordings", admin: "Admin panel", error: "Error page",
 };
 
 export default function MeetAuraPage() {
   const variants = (Object.keys(AURA_PRESETS) as AuraVariant[]).filter((v) => WHERE[v]);
   return (
-    <>
+    <TagScope style="corner">
       <PageHero
         tone="aqua"
         crumb="Meet Aura"
@@ -34,7 +35,7 @@ export default function MeetAuraPage() {
         aura="hero"
         description={
           <p>
-            Aura is the workshop&apos;s agentic AI guide: a rounded, hovering robot with a floating head and glowing eyes. Like a real agent, she adapts to her task — so you&apos;ll find her in a different role in every section of the site. Click her for tips, or press Ctrl/⌘ + K to ask her anything.
+            Aura is the workshop&apos;s agentic AI guide: a rounded, hovering robot with a floating head and glowing eyes. Like a real agent, she adapts to her task, so you&apos;ll find her in a different role in every section of the site. Click her for tips, or press Ctrl/⌘ + K to ask her anything.
           </p>
         }
       />
@@ -53,6 +54,6 @@ export default function MeetAuraPage() {
           ))}
         </ul>
       </Section>
-    </>
+    </TagScope>
   );
 }

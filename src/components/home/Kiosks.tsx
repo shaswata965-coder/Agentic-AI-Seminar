@@ -7,7 +7,7 @@ import type { Kiosk, SiteSettings } from "@/lib/content/types";
 
 export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
   return (
-    <Section id="kiosks" tone="peach" labelledBy="kiosks-title">
+    <Section id="kiosks" tone="peach" labelledBy="kiosks-title" tags="label">
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
           <SectionHeading id="kiosks-title" eyebrow="Industry kiosks" title="Meet the companies building agents" description={s.kioskIntro} className="mb-8 sm:mb-8" />
@@ -21,7 +21,7 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
               icon={<Store size={18} aria-hidden />}
             />
             {s.contactEmail ? (
-              <a className="mi-link text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Exhibitor enquiry — ${s.eventName}`)}`}>
+              <a className="mi-link text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Exhibitor enquiry · ${s.eventName}`)}`}>
                 or e-mail {s.contactEmail}
               </a>
             ) : null}

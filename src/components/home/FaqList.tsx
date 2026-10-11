@@ -46,7 +46,7 @@ export function FaqList({ faqs, showAura = true }: { faqs: Faq[]; showAura?: boo
                   onClick={() => setCat(c)}
                   data-ripple=""
                   className={cn(
-                    "rounded-full px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5",
+                    "rounded-md px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5",
                     cat === c ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
                   )}
                 >

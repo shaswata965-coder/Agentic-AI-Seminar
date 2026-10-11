@@ -37,7 +37,7 @@ export function EnquiryForm({ type = "contact", onDone }: { type?: EnquiryType; 
     }
     form.reset();
     setSentTo(data.email);
-    toast("Message sent — thank you!", "success");
+    toast("Message sent. Thank you!", "success");
   }
 
   if (sentTo) {
