@@ -3,7 +3,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { PDFDocument, rgb, StandardFonts, type PDFFont, type PDFPage } from "pdf-lib";
 import { stripMarkdown } from "@/components/ui/RichText";
 import { SESSION_TYPE_META, THEME_META } from "@/lib/content/constants";
-import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
+import { CONTENT_TAG, getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import type { Session, SiteSettings, Speaker } from "@/lib/content/types";
 import { eventDays, venueLine } from "@/lib/event";
 import { eventDayLabel, formatDate, formatDateRange, timeRange } from "@/lib/format";
@@ -180,7 +180,7 @@ async function build(s: SiteSettings, sessions: Session[], speakers: Speaker[], 
 /** The programme as a PDF, regenerated automatically when sessions, speakers or settings change. */
 export async function getSchedulePdf(): Promise<Uint8Array> {
   "use cache";
-  cacheTag("sessions", "speakers", "settings");
+  cacheTag("sessions", "speakers", "settings", CONTENT_TAG);
   cacheLife("cms");
   const [s, sessions, speakers] = await Promise.all([getSettings(), getSessions(), getSpeakers()]);
   const plain = sessions.map((x) => ({ ...x, description: stripMarkdown(x.description) }));

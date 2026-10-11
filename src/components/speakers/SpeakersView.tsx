@@ -134,30 +134,33 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
         </label>
       </div>
 
-      <ul className="mt-8 grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-4" aria-live="polite">
+      <h2 className="sr-only">Speakers</h2>
+      <p className="sr-only" role="status">
+        {shown.length === 1 ? "1 speaker shown" : `${shown.length} speakers shown`}
+      </p>
+      <ul className="mt-8 grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-4">
         {shown.map((sp) => {
           const cat = SPEAKER_CATEGORY_META[sp.category] ?? SPEAKER_CATEGORY_META.academia;
           return (
             <li key={sp.id}>
-              <button type="button" onClick={() => open(sp.slug)} className="block h-full w-full rounded-3xl text-left" aria-haspopup="dialog" aria-label={`${sp.name}, ${sp.affiliation}. Open profile`}>
-                <PersonCard
-                  name={sp.name}
-                  photo={sp.photo}
-                  title={sp.designation}
-                  subtitle={sp.affiliation}
-                  label={sp.keynote ? "Keynote" : cat.label}
-                  labelTone={sp.keynote ? "butter" : cat.tone}
-                  className={`tone-${cat.tone}`}
-                  highlight={
-                    sp.keynote ? (
-                      <span className="grid h-8 w-8 place-items-center rounded-full bg-butter text-[#5b3d00] shadow-card ring-2 ring-surface">
-                        <Star size={15} aria-hidden fill="currentColor" />
-                      </span>
-                    ) : null
-                  }
-                  footer={sp.talkTitle ? <p className="line-clamp-2 text-sm font-medium text-accent-ink">“{sp.talkTitle}”</p> : <p className="text-sm font-semibold text-accent-ink">View profile</p>}
-                />
-              </button>
+              <PersonCard
+                action={{ onClick: () => open(sp.slug), hasPopup: "dialog", srHint: ", open profile" }}
+                name={sp.name}
+                photo={sp.photo}
+                title={sp.designation}
+                subtitle={sp.affiliation}
+                label={sp.keynote ? "Keynote" : cat.label}
+                labelTone={sp.keynote ? "butter" : cat.tone}
+                className={`tone-${cat.tone}`}
+                highlight={
+                  sp.keynote ? (
+                    <span className="grid h-8 w-8 place-items-center rounded-full bg-butter text-[#5b3d00] shadow-card ring-2 ring-surface">
+                      <Star size={15} aria-hidden fill="currentColor" />
+                    </span>
+                  ) : null
+                }
+                footer={sp.talkTitle ? <p className="line-clamp-2 text-sm font-medium text-accent-ink">“{sp.talkTitle}”</p> : <p className="text-sm font-semibold text-accent-ink">View profile</p>}
+              />
             </li>
           );
         })}

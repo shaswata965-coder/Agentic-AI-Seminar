@@ -68,4 +68,4 @@ export function promptHidden(question: string): Promise<string> {
   });
 }
 
-export const RESTART_HINT = "The website caches content for up to 5 minutes — restart it (or wait) to see changes made by scripts. Changes made in the admin panel appear immediately.";
+export const RESTART_HINT = "The website caches pages for up to 5 minutes: press “Refresh website” on the admin dashboard (or restart the site) to show these changes now. Changes saved in the admin panel appear immediately.";

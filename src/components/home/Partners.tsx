@@ -9,15 +9,17 @@ import { SPONSOR_TIER_META, SPONSOR_TIERS } from "@/lib/content/constants";
 import type { SiteSettings, Sponsor } from "@/lib/content/types";
 
 const SIZE = { xl: "h-28 sm:h-32", lg: "h-24", md: "h-20", sm: "h-16" } as const;
+// Name-only tiles (no logo yet) grow to fit longer names.
+const TEXT_SIZE = { xl: "min-h-28 sm:min-h-32", lg: "min-h-24", md: "min-h-20", sm: "min-h-16" } as const;
 const TIER_TONES = ["butter", "lilac", "peach", "azure", "mint", "blush"] as const;
 
 function Logo({ sp, size }: { sp: Sponsor; size: keyof typeof SIZE }) {
   const inner = sp.logo ? (
     <Img src={sp.logo} alt={sp.name} className="max-h-[70%] max-w-[80%] object-contain" />
   ) : (
-    <span className="px-3 text-center font-display text-lg font-bold text-fg">{sp.name}</span>
+    <span className="px-3 py-3 text-center font-display text-lg leading-snug font-bold break-words text-fg">{sp.name}</span>
   );
-  const cls = cn("grid w-full place-items-center rounded-2xl border border-border bg-white transition hover:-translate-y-0.5 hover:shadow-card dark:bg-surface", SIZE[size]);
+  const cls = cn("grid w-full place-items-center rounded-2xl border border-border bg-white transition hover:-translate-y-0.5 hover:shadow-card dark:bg-surface", sp.logo ? SIZE[size] : TEXT_SIZE[size]);
   return sp.website ? (
     <a href={sp.website} target="_blank" rel="noopener noreferrer" className={cls} title={sp.name}>
       {inner}
@@ -38,7 +40,7 @@ export function Partners({ s, sponsors }: { s: SiteSettings; sponsors: Sponsor[]
         eyebrow="Partners & sponsors"
         title="Supported by organisations that share our vision"
         description={s.sponsorshipIntro}
-        aside={<Aura variant="sponsors" size={130} interactive bubbleSide="left" className="hidden md:inline-block" />}
+        aside={<Aura variant="sponsors" size={130} interactive bubbleSide="left" className="max-md:hidden" />}
       />
 
       {tiers.length ? (

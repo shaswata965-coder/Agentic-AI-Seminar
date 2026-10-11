@@ -1,15 +1,17 @@
 "use client";
 
-import { ArrowRight, CalendarDays, Download, FlaskConical, Inbox, Mail, Megaphone, Mic, Settings, Ticket, Trophy } from "lucide-react";
+import { ArrowRight, CalendarDays, Download, FlaskConical, Inbox, Mail, Megaphone, Mic, RefreshCw, Settings, Ticket, Trophy } from "lucide-react";
 import Link from "next/link";
+import { useState } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { Badge } from "@/components/ui/Badge";
+import { useToast } from "@/components/ui/Toast";
 import { ATTENDEE_CATEGORY_META } from "@/lib/content/constants";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
 import { COLLECTIONS } from "@/lib/schema/resources";
 import { PageTitle, useMe } from "./AdminShell";
-import { useApi } from "./api";
+import { api, useApi } from "./api";
 
 interface Stats {
   workshop: number;
@@ -161,6 +163,7 @@ export function Dashboard() {
                 </li>
               ))}
             </ul>
+            <RefreshSite />
           </section>
           <section className="card p-6" aria-labelledby="by-cat">
             <h2 id="by-cat" className="font-display text-xl font-bold text-fg">
@@ -204,6 +207,37 @@ export function Dashboard() {
         </div>
       </div>
 
+    </div>
+  );
+}
+
+
+/** Expire every cached page so the site shows exactly what is in the database. */
+function RefreshSite() {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  async function refresh() {
+    setBusy(true);
+    try {
+      await api("/revalidate", { method: "POST" });
+      toast("Website refreshed — visitors now see the latest content.", "success");
+    } catch (err) {
+      toast((err as Error).message || "Could not refresh the website", "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <div className="mt-4 border-t border-border pt-4">
+      <button
+        type="button"
+        onClick={refresh}
+        disabled={busy}
+        className="flex w-full items-center gap-3 rounded-xl border border-dashed border-border-strong px-3 py-2.5 text-sm font-semibold text-fg hover:border-brand hover:text-brand disabled:opacity-60"
+      >
+        <RefreshCw size={17} aria-hidden className={busy ? "animate-spin" : undefined} /> {busy ? "Refreshing…" : "Refresh website"}
+      </button>
+      <p className="mt-2 text-xs text-subtle">Only needed after a new deployment or changes made outside this panel — saving here updates the site automatically.</p>
     </div>
   );
 }

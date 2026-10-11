@@ -21,6 +21,8 @@ import { COLLECTION_MAP } from "@/lib/schema/resources";
 import { cliArgs, connect, RESTART_HINT, run } from "./lib/cli";
 
 const NOTE = "Sample content to preview the layout — edit or delete it in the admin panel, or run `npm run seed:demo -- --remove`.";
+// For plain-text fields (no formatting).
+const NOTE_PLAIN = "Sample content to preview the layout — edit or delete it in the admin panel.";
 
 /* ---------------------------------------------------------------- Data -- */
 
@@ -203,9 +205,9 @@ const TUTORIALS = [
 ];
 
 const DEMOS = [
-  { title: "Clinical notes summariser", team: "Sample Health Lab", theme: "healthcare", description: `An agent that reads discharge notes, flags missing information and drafts a patient-friendly summary for a clinician to approve.\n\n${NOTE}` },
-  { title: "Self-driving lab assistant", team: "Example University — Materials Lab", theme: "science", description: `An agent that proposes the next experiment, schedules the instruments and updates its model after every measurement.\n\n${NOTE}` },
-  { title: "Founder's research co-pilot", team: "DemoStack (sample start-up)", theme: "entrepreneurship", description: `An agent that researches a market, compares competitors and drafts an investor memo with sources.\n\n${NOTE}` },
+  { title: "Clinical notes summariser", team: "Sample Health Lab", theme: "healthcare", description: `An agent that reads discharge notes, flags missing information and drafts a patient-friendly summary for a clinician to approve.\n\n${NOTE_PLAIN}` },
+  { title: "Self-driving lab assistant", team: "Example University — Materials Lab", theme: "science", description: `An agent that proposes the next experiment, schedules the instruments and updates its model after every measurement.\n\n${NOTE_PLAIN}` },
+  { title: "Founder's research co-pilot", team: "DemoStack (sample start-up)", theme: "entrepreneurship", description: `An agent that researches a market, compares competitors and drafts an investor memo with sources.\n\n${NOTE_PLAIN}` },
 ];
 
 const KIOSKS = [

@@ -14,6 +14,9 @@ import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from
  * with a short cache life so real content replaces them as soon as possible.
  */
 
+/** Added to every cached query, so "Refresh website" can expire everything at once. */
+export const CONTENT_TAG = "content";
+
 type Loaded<T> = { ok: true; data: T } | { ok: false };
 
 async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
@@ -30,7 +33,7 @@ async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
 
 export async function getSettings(): Promise<SiteSettings> {
   "use cache";
-  cacheTag("settings");
+  cacheTag("settings", CONTENT_TAG);
   const res = await load(() => Singleton.findOne({ key: "settings" }).lean());
   if (!res.ok) {
     cacheLife("fallback");
@@ -42,7 +45,7 @@ export async function getSettings(): Promise<SiteSettings> {
 
 export async function getHackathon(): Promise<HackathonInfo> {
   "use cache";
-  cacheTag("hackathon");
+  cacheTag("hackathon", CONTENT_TAG);
   const res = await load(() => Singleton.findOne({ key: "hackathon" }).lean());
   if (!res.ok) {
     cacheLife("fallback");
@@ -59,7 +62,7 @@ const FALLBACKS: Partial<Record<CollectionKey, object[]>> = {
 
 async function listPublished(key: CollectionKey): Promise<object[]> {
   "use cache";
-  cacheTag(key);
+  cacheTag(key, CONTENT_TAG);
   const def = COLLECTION_MAP[key];
   const res = await load(async () => {
     const docs = await getCollectionModel(key).find({ published: true }).sort(def.sort).lean();

@@ -24,7 +24,7 @@ export function Highlights({ s }: { s: SiteSettings }) {
               <p className="font-display text-2xl leading-none font-bold text-fg sm:text-[1.75rem]">
                 <StatValue value={h.value} />
               </p>
-              <p className="mt-1.5 truncate text-sm font-medium text-muted">{h.label}</p>
+              <p className="mt-1.5 text-sm leading-snug font-medium text-muted">{h.label}</p>
             </div>
           </li>
         ))}

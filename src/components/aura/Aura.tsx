@@ -177,6 +177,7 @@ export function Aura({
       className={cn(
         "aura-bubble-say pointer-events-none absolute bottom-[80%] z-20 w-max max-w-[min(15rem,72vw)] rounded-2xl border border-border bg-surface px-3.5 py-2 text-left font-sans text-[13px] leading-snug font-medium text-fg shadow-card-lg",
         bubbleSide === "right" ? "left-[56%]" : "right-[56%]",
+        size >= 200 && "max-sm:inset-x-[6%] max-sm:w-auto max-sm:max-w-none",
       )}
       style={{ "--bubble-origin": bubbleSide === "right" ? "0% 100%" : "100% 100%" } as CSSProperties}
     >
@@ -204,21 +205,27 @@ export function Aura({
   );
 
   if (interactive) {
+    // The bubble and live region sit beside the button (not inside it), so the
+    // button's accessible name matches what it shows.
     return (
-      <button
+      <span
         ref={(el) => {
           ref.current = el;
         }}
-        type="button"
-        onClick={activate}
-        className={cn(classes, "cursor-pointer rounded-[42%] bg-transparent p-0 [touch-action:manipulation]")}
+        className={classes}
         style={style}
-        aria-label={`${label ?? preset.label}. Press for a tip.`}
       >
-        {art}
+        <button
+          type="button"
+          onClick={activate}
+          className="block w-full cursor-pointer rounded-[42%] bg-transparent p-0 [touch-action:manipulation]"
+          aria-label={`${label ?? preset.label}. Press for a tip.`}
+        >
+          {art}
+        </button>
         {bubbleEl}
         {live}
-      </button>
+      </span>
     );
   }
 

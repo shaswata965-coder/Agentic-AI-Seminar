@@ -28,7 +28,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, Suspense, useContext, useState, type ReactNode } from "react";
 import { AuraHead } from "@/components/aura/AuraHead";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/cn";
@@ -104,8 +104,24 @@ const NAV: { title: string; items: Item[] }[] = [
   },
 ];
 
-function NavList({ me, onNavigate }: { me: AdminMe | null; onNavigate?: () => void }) {
-  const pathname = usePathname();
+type NavProps = { me: AdminMe | null; onNavigate?: () => void };
+
+// usePathname() suspends while a route with an unknown param is prerendered
+// (e.g. the /admin/content/[resource] shell), so the links render without the
+// active state until the pathname is known.
+function NavList(props: NavProps) {
+  return (
+    <Suspense fallback={<NavItems {...props} pathname={null} />}>
+      <ActiveNavItems {...props} />
+    </Suspense>
+  );
+}
+
+function ActiveNavItems(props: NavProps) {
+  return <NavItems {...props} pathname={usePathname()} />;
+}
+
+function NavItems({ me, onNavigate, pathname }: NavProps & { pathname: string | null }) {
   return (
     <nav aria-label="Admin" className="grid gap-5">
       {NAV.map((g) => (
@@ -115,7 +131,7 @@ function NavList({ me, onNavigate }: { me: AdminMe | null; onNavigate?: () => vo
             {g.items
               .filter((i) => !i.adminOnly || me?.role === "admin")
               .map(({ href, label, Icon }) => {
-                const active = href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
+                const active = pathname !== null && (href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`));
                 return (
                   <li key={href}>
                     <Link

@@ -1,5 +1,4 @@
 import { ArrowRight, Star } from "lucide-react";
-import Link from "next/link";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { PersonCard } from "@/components/ui/PersonCard";
@@ -40,25 +39,24 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
             const cat = SPEAKER_CATEGORY_META[sp.category] ?? SPEAKER_CATEGORY_META.academia;
             return (
               <li key={sp.id} data-reveal style={{ ["--reveal-delay" as string]: `${(i % 4) * 80}ms` }}>
-                <Link href={`/speakers?speaker=${encodeURIComponent(sp.slug)}`} className="block h-full rounded-3xl" aria-label={`${sp.name} — view profile`}>
-                  <PersonCard
-                    name={sp.name}
-                    photo={sp.photo}
-                    title={sp.designation}
-                    subtitle={sp.affiliation}
-                    label={sp.keynote ? "Keynote" : cat.label}
-                    labelTone={sp.keynote ? "butter" : cat.tone}
-                    className={`tone-${cat.tone}`}
-                    highlight={
-                      sp.keynote ? (
-                        <span className="grid h-8 w-8 place-items-center rounded-full bg-butter text-[#5b3d00] shadow-card ring-2 ring-surface">
-                          <Star size={15} aria-hidden fill="currentColor" />
-                        </span>
-                      ) : null
-                    }
-                    footer={sp.talkTitle ? <p className="line-clamp-2 text-sm font-medium text-accent-ink">“{sp.talkTitle}”</p> : null}
-                  />
-                </Link>
+                <PersonCard
+                  action={{ href: `/speakers?speaker=${encodeURIComponent(sp.slug)}` }}
+                  name={sp.name}
+                  photo={sp.photo}
+                  title={sp.designation}
+                  subtitle={sp.affiliation}
+                  label={sp.keynote ? "Keynote" : cat.label}
+                  labelTone={sp.keynote ? "butter" : cat.tone}
+                  className={`tone-${cat.tone}`}
+                  highlight={
+                    sp.keynote ? (
+                      <span className="grid h-8 w-8 place-items-center rounded-full bg-butter text-[#5b3d00] shadow-card ring-2 ring-surface">
+                        <Star size={15} aria-hidden fill="currentColor" />
+                      </span>
+                    ) : null
+                  }
+                  footer={sp.talkTitle ? <p className="line-clamp-2 text-sm font-medium text-accent-ink">“{sp.talkTitle}”</p> : null}
+                />
               </li>
             );
           })}

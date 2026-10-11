@@ -23,8 +23,8 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (parsed.data.status && !allowed.includes(parsed.data.status)) return error(400, "Invalid status.");
   const doc =
     modelFor(req) === "hackathon"
-      ? await HackathonRegistration.findByIdAndUpdate(id, { $set: parsed.data }, { new: true }).lean()
-      : await Registration.findByIdAndUpdate(id, { $set: parsed.data }, { new: true }).lean();
+      ? await HackathonRegistration.findByIdAndUpdate(id, { $set: parsed.data }, { returnDocument: "after" }).lean()
+      : await Registration.findByIdAndUpdate(id, { $set: parsed.data }, { returnDocument: "after" }).lean();
   return doc ? json({ ok: true }) : error(404, "Not found.");
 }
 

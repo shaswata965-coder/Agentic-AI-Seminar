@@ -21,7 +21,7 @@ export function FieldShell({ label, required, hint, error, className, children }
   const errId = error ? `${id}-err` : undefined;
   const describedBy = [hintId, errId].filter(Boolean).join(" ") || undefined;
   return (
-    <div className={cn("grid gap-1.5", className)}>
+    <div className={cn("grid content-start gap-1.5", className)}>
       <label htmlFor={id} className="text-sm font-semibold text-fg">
         {label}
         {required ? (

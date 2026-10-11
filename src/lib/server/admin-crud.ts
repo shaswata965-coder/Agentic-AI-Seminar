@@ -78,7 +78,7 @@ export async function updateItem(def: CollectionDef, id: string, input: unknown)
   if (!isId(id)) return null;
   const data = validate(def, input);
   await connectDb();
-  const doc = await getCollectionModel(def.key).findByIdAndUpdate(id, await prepare(def, data, id), { new: true, runValidators: true }).lean();
+  const doc = await getCollectionModel(def.key).findByIdAndUpdate(id, await prepare(def, data, id), { returnDocument: "after", runValidators: true }).lean();
   if (!doc) return null;
   expireTags(def.tags);
   return fillDefaults<Record<string, unknown>>(def.fields, toPlain<Record<string, unknown>>(doc));
@@ -119,7 +119,7 @@ export async function saveSingleton(key: SingletonKey, input: unknown) {
   const parsed = objectSchema(flattenFields(def.sections)).safeParse(input ?? {});
   if (!parsed.success) throw new ValidationError(zodFieldErrors(parsed.error));
   await connectDb();
-  const doc = await Singleton.findOneAndUpdate({ key }, { $set: { data: parsed.data } }, { upsert: true, new: true }).lean();
+  const doc = await Singleton.findOneAndUpdate({ key }, { $set: { data: parsed.data } }, { upsert: true, returnDocument: "after" }).lean();
   expireTags(def.tags);
   return { data: mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data), updatedAt: doc?.updatedAt ?? null };
 }

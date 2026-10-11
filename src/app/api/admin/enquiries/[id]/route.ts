@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (!mongoose.isValidObjectId(id)) return error(404, "Not found.");
   const parsed = z.object({ status: z.enum(["new", "in-progress", "closed"]).optional(), notes: z.string().max(5000).optional() }).safeParse(await readJson(req));
   if (!parsed.success) return error(400, "Invalid update.");
-  const doc = await Enquiry.findByIdAndUpdate(id, { $set: parsed.data }, { new: true }).lean();
+  const doc = await Enquiry.findByIdAndUpdate(id, { $set: parsed.data }, { returnDocument: "after" }).lean();
   return doc ? json({ ok: true }) : error(404, "Not found.");
 }
 

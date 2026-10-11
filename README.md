@@ -63,7 +63,7 @@ npm run seed:demo -- --remove     # removes exactly those items (your own conten
 
 While samples are loaded, the admin dashboard shows a warning. **Remove them before launch.**
 
-> Scripts write straight to the database, so the running site can take up to 5 minutes to show their changes (or restart it). Changes made in the admin panel show up immediately.
+> Scripts write straight to the database, so the running site can take up to 5 minutes to show their changes. To show them at once, press **Refresh website** on the admin dashboard (or restart the site). Changes made in the admin panel show up immediately.
 
 ### Useful commands
 
@@ -115,6 +115,8 @@ docker compose run --rm tools create-admin -- --email you@iitd.ac.in --password 
 ```
 
 The site listens on port 3000 (`PORT` in `.env` changes it). MongoDB data persists in the `mongo-data` volume. To update, run `git pull && docker compose up -d --build`.
+
+The image is built without database access, so its pages start with the default content and switch to what is in MongoDB within about a minute of starting. Press **Refresh website** on the admin dashboard to switch them at once.
 
 ### Option B — Node.js + PM2 on a server
 
@@ -189,7 +191,7 @@ src/
     server/            auth, e-mail, PDF, CSV, validation, admin CRUD (server-only)
   proxy.ts             protects /admin pages
 scripts/               seed, seed:demo, create-admin
-assets/fonts/          fonts for the social preview images (SIL Open Font License)
+assets/fonts/          fonts for the social preview images (SIL Open Font License); site fonts are in src/app/fonts
 docs/                  admin guide and requirements checklist
 ```
 
@@ -217,4 +219,4 @@ docs/                  admin guide and requirements checklist
 
 ## Credits and licences
 
-Aura is an original character drawn in SVG for this site. Fonts: Inter and Outfit (SIL Open Font License; see `assets/fonts/OFL-LICENSE.txt`). Icons: Lucide (ISC). Replace the logo placeholders with the official IIT Delhi and ScAI logos under Admin → Site settings → Branding.
+Aura is an original character drawn in SVG for this site. Fonts: Inter and Outfit, bundled in `src/app/fonts` so builds need no internet access (SIL Open Font License; see `src/app/fonts/LICENSE.md`). Icons: Lucide (ISC). Replace the logo placeholders with the official IIT Delhi and ScAI logos under Admin → Site settings → Branding.

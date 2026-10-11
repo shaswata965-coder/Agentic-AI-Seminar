@@ -27,11 +27,11 @@ export function Venue({ s }: { s: SiteSettings }) {
         eyebrow="Venue & travel"
         title="Getting to IIT Delhi"
         description="Everything you need to reach the campus, find the venue and plan your stay."
-        aside={<Aura variant="venue" size={130} interactive bubbleSide="left" className="hidden md:inline-block" />}
+        aside={<Aura variant="venue" size={130} interactive bubbleSide="left" className="max-md:hidden" />}
       />
-      <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="card flex flex-col overflow-hidden" data-reveal>
-          <div className="aspect-[16/11] w-full flex-1 bg-surface-2 sm:aspect-[16/9] lg:aspect-auto lg:min-h-[420px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="card flex min-w-0 flex-col overflow-hidden" data-reveal>
+          <div className="aspect-[4/3] w-full min-w-0 flex-1 bg-surface-2 sm:aspect-[16/9] lg:aspect-auto lg:min-h-[420px]">
             <MapEmbed query={q} embedUrl={s.mapEmbedUrl} title={`Map showing ${s.venueName}`} />
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 p-4">
@@ -50,7 +50,7 @@ export function Venue({ s }: { s: SiteSettings }) {
           </div>
         </div>
 
-        <div className="grid content-start gap-6">
+        <div className="grid min-w-0 grid-cols-1 content-start gap-6">
           <div className="card p-6" data-reveal>
             <p className="text-xs font-bold tracking-[0.14em] text-subtle uppercase">Venue</p>
             <p className="mt-2 font-display text-xl font-semibold text-fg">{s.venueName}</p>
@@ -94,7 +94,7 @@ export function Venue({ s }: { s: SiteSettings }) {
         </div>
       </div>
 
-      <div className="mt-12 grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
+      <div className="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_0.6fr]">
         <div>
           <h3 className="flex items-center gap-2 font-display text-2xl font-bold text-fg">
             <BedDouble size={24} aria-hidden className="text-mint-ink" /> Nearby accommodation

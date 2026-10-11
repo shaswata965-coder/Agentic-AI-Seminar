@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   const { password, ...rest } = parsed.data;
   const update: Record<string, unknown> = { ...rest };
   if (password) update.passwordHash = await hashPassword(password);
-  const u = await User.findByIdAndUpdate(id, { $set: update }, { new: true }).lean();
+  const u = await User.findByIdAndUpdate(id, { $set: update }, { returnDocument: "after" }).lean();
   return u ? json({ ok: true }) : error(404, "Not found.");
 }
 

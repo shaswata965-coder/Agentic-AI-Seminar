@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Outfit } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
@@ -7,8 +7,9 @@ import { getSettings } from "@/lib/content/queries";
 import { formatDateRange } from "@/lib/format";
 import { BASE_PATH, SITE_ORIGIN, withBase } from "@/lib/paths";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
-const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit", display: "swap" });
+// Self-hosted variable fonts (latin), so builds don't depend on Google Fonts. See app/fonts/LICENSE.md.
+const inter = localFont({ src: "./fonts/inter-latin-var.woff2", weight: "100 900", variable: "--font-inter", display: "swap" });
+const outfit = localFont({ src: "./fonts/outfit-latin-var.woff2", weight: "100 900", variable: "--font-outfit", display: "swap" });
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();

@@ -64,12 +64,13 @@ export function AuraPlayground() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-      <div className="card sticky top-24 flex flex-col items-center p-6">
-        <div className="relative grid min-h-[380px] w-full place-items-center rounded-3xl bg-[radial-gradient(circle_at_50%_40%,var(--azure-soft),transparent_70%)]">
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <div className="card sticky top-24 flex min-w-0 flex-col items-center p-4 sm:p-6">
+        <div className="relative grid min-h-[380px] w-full grid-cols-1 place-items-center rounded-3xl bg-[radial-gradient(circle_at_50%_40%,var(--azure-soft),transparent_70%)]">
           <Aura
             variant="hero"
             size={300}
+            className="max-w-full"
             interactive
             tips={["Nice combo!", "I love this look.", "Try the surprise button!"]}
             overrides={{ expression, pose, prop: prop === "none" ? undefined : prop, headwear: headwear === "none" ? undefined : headwear, emblem, effects, eyeColor: eye }}
@@ -79,7 +80,7 @@ export function AuraPlayground() {
           <Shuffle size={17} aria-hidden /> Surprise me
         </button>
       </div>
-      <div className="card grid gap-6 p-6">
+      <div className="card grid min-w-0 gap-6 p-4 sm:p-6">
         <Group title="Expression" items={EXPRESSIONS} value={expression} onChange={setExpression} />
         <Group title="Pose" items={POSES} value={pose} onChange={setPose} />
         <Group

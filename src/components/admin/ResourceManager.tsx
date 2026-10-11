@@ -197,7 +197,7 @@ export function ResourceManager({ resourceKey }: { resourceKey: string }) {
               <tr>
                 {def.columns.map((c) => (
                   <th key={c.key} scope="col" className="px-4 py-3 font-bold">
-                    {c.label}
+                    {c.label || <span className="sr-only">{c.kind === "image" ? "Image" : c.key}</span>}
                   </th>
                 ))}
                 <th scope="col" className="px-4 py-3 text-right font-bold">

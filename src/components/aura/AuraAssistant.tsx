@@ -112,14 +112,17 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
         data-aura-assistant
         onClick={() => setOpen(true)}
         className="group fixed right-4 bottom-4 z-40 flex items-center gap-2 rounded-full border border-border bg-surface/95 py-1.5 pr-4 pl-1.5 shadow-card-lg backdrop-blur transition hover:-translate-y-0.5 sm:right-6 sm:bottom-6"
-        aria-label="Ask Aura — search the site (Ctrl+K)"
+        aria-keyshortcuts="Control+K Meta+K"
       >
         <span className="relative grid h-11 w-11 place-items-center rounded-full bg-[linear-gradient(135deg,var(--azure-soft),var(--lilac-soft))]">
           <span aria-hidden className="absolute inset-0 animate-ping-soft rounded-full bg-[var(--aqua)] opacity-30 motion-desktop-only" />
           <AuraHead size={32} className="relative transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
         </span>
-        <span className="hidden text-sm font-semibold text-fg sm:inline">Ask Aura</span>
-        <kbd className="hidden rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-sans text-[11px] text-subtle md:inline">⌘K</kbd>
+        <span className="sr-only text-sm font-semibold text-fg sm:not-sr-only">Ask Aura</span>
+        <span className="sr-only"> — search the site</span>
+        <kbd aria-hidden className="hidden rounded-md border border-border bg-surface-2 px-1.5 py-0.5 font-sans text-[11px] text-subtle md:inline">
+          ⌘K
+        </kbd>
       </button>
 
       <dialog

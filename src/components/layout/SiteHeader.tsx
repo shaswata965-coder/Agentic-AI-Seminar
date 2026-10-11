@@ -91,8 +91,8 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
       )}
     >
       <div className="container-site flex h-16 items-center gap-3 lg:h-[72px]">
-        <Link href="/" className="rounded-2xl" aria-label="Agentic AI Workshop 2026 — home">
-          <BrandMark shortName={shortName} />
+        <Link href="/" className="rounded-2xl">
+          <BrandMark shortName={shortName} srSuffix=", home page" />
         </Link>
 
         <nav aria-label="Main" className="ml-auto hidden items-center gap-0.5 lg:flex">
@@ -155,7 +155,7 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
 
         <div className="ml-auto flex items-center gap-2 lg:ml-3">
           <ThemeToggle />
-          <ButtonLink href={registerHref} size="sm" className="hidden sm:inline-flex" icon={<Ticket size={16} aria-hidden />}>
+          <ButtonLink href={registerHref} size="sm" className="max-[359px]:hidden" icon={<Ticket size={16} aria-hidden />}>
             Register
           </ButtonLink>
           <button
@@ -185,7 +185,7 @@ export function SiteHeader({ shortName, registerHref, extraNav }: SiteHeaderProp
           <div className="flex min-h-full flex-col">
             <div className="container-site flex h-16 items-center justify-between">
               <Link href="/" onClick={() => setMenuOpen(false)}>
-                <BrandMark shortName={shortName} />
+                <BrandMark shortName={shortName} srSuffix=", home page" />
               </Link>
               <div className="flex items-center gap-2">
                 <ThemeToggle />

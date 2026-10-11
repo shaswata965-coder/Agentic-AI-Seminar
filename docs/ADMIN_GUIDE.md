@@ -21,6 +21,7 @@ This guide is for the organising team of the **Agentic AI Workshop 2026**. It ex
 - **Images.** Click **Upload** next to any image field, choose **Library** to reuse an uploaded file, or paste a link. Photos are resized and compressed automatically. Square photos of at least 400 × 400 px look best for people.
 - **Unsaved changes.** In **Site settings** and **Hackathon**, a bar at the bottom shows when you have unsaved changes. Press **Save changes**.
 - **"To be announced".** Wherever something isn't ready (speakers, schedule, venue hall, prizes), the website automatically shows a friendly placeholder.
+- **Refresh website** (on the dashboard). Only needed if the site shows old content after the website host deploys an update or changes the database directly. Normal saves don't need it.
 
 ## 2. Signing in and your account
 

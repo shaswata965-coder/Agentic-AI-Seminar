@@ -148,10 +148,14 @@ export function ProgrammeView({
     for (const s of filtered) map.set(s.start, [...(map.get(s.start) ?? []), s]);
     return [...map.entries()];
   }, [filtered]);
+  const shownCount = filtered.length;
+  const dayLabel = days.find((d) => d.day === day)?.label ?? "";
 
   const upcomingId = useMemo(() => {
     if (now === null) return null;
-    return sessions.filter((s) => Date.parse(s.startIso) > now).sort((a, b) => Date.parse(a.startIso) - Date.parse(b.startIso))[0]?.id ?? null;
+    // Only meaningful on the day: flag the next session when it starts within 12 hours.
+    const soon = sessions.filter((s) => Date.parse(s.startIso) > now && Date.parse(s.startIso) - now < 12 * 3_600_000);
+    return soon.sort((a, b) => Date.parse(a.startIso) - Date.parse(b.startIso))[0]?.id ?? null;
   }, [now, sessions]);
 
   const activeFilters = themes.size + types.size + (q ? 1 : 0) + (agendaOnly ? 1 : 0);
@@ -168,9 +172,11 @@ export function ProgrammeView({
           return (
             <button
               key={d.day}
+              id={`day-tab-${d.day}`}
               role="tab"
               type="button"
               aria-selected={on}
+              aria-controls="programme-panel"
               onClick={() => setDay(d.day)}
               className={cn(
                 "group flex items-center gap-3 rounded-2xl border px-5 py-3 text-left transition",
@@ -252,7 +258,14 @@ export function ProgrammeView({
       </div>
 
       {/* Timeline */}
-      <div className="mt-8" aria-live="polite">
+      <div id="programme-panel" role="tabpanel" aria-labelledby={`day-tab-${day}`} className="mt-8">
+        <h2 className="sr-only">
+          Day {day}
+          {dayLabel ? ` · ${dayLabel}` : ""}
+        </h2>
+        <p className="sr-only" role="status">
+          {shownCount === 1 ? "1 session shown" : `${shownCount} sessions shown`}
+        </p>
         {groups.length ? (
           <ol className="relative grid gap-6 before:absolute before:top-2 before:bottom-2 before:left-[4.6rem] before:hidden before:w-px before:bg-border sm:before:block">
             {groups.map(([start, list]) => (

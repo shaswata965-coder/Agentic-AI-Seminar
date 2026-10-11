@@ -7,7 +7,7 @@ export function MapEmbed({ query, embedUrl, title }: { query: string; embedUrl?:
       loading="lazy"
       referrerPolicy="no-referrer-when-downgrade"
       allowFullScreen
-      className="h-full min-h-[320px] w-full border-0"
+      className="h-full w-full border-0"
     />
   );
 }

@@ -98,7 +98,7 @@ export function ProgrammePreview({ s, sessions, speakers }: { s: SiteSettings; s
               id: `day-${d.day}`,
               label: (
                 <span>
-                  Day {d.day} <span className="font-medium opacity-75">· {eventDayLabel(s.startDate, d.day)}</span>
+                  Day {d.day} <span className="font-medium">· {eventDayLabel(s.startDate, d.day)}</span>
                 </span>
               ),
               panel: list.length ? (

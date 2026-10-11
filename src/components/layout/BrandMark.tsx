@@ -1,6 +1,7 @@
 import { AuraHead } from "@/components/aura/AuraHead";
 
-export function BrandMark({ shortName, compact = false }: { shortName: string; compact?: boolean }) {
+/** Logo lockup. Inside a home link, pass `srSuffix` (e.g. ", home page") so the link name includes the visible text. */
+export function BrandMark({ shortName, compact = false, srSuffix }: { shortName: string; compact?: boolean; srSuffix?: string }) {
   return (
     <span className="flex items-center gap-2.5">
       <span className="grid h-10 w-10 place-items-center rounded-2xl bg-[linear-gradient(135deg,var(--azure-soft),var(--lilac-soft))] ring-1 ring-border">
@@ -15,6 +16,7 @@ export function BrandMark({ shortName, compact = false }: { shortName: string; c
             {shortName.replace(/[^0-9]/g, "") || "2026"} · IIT Delhi
           </span>
         ) : null}
+        {srSuffix ? <span className="sr-only">{srSuffix}</span> : null}
       </span>
     </span>
   );

@@ -20,7 +20,7 @@
   --border-strong: #c7d1e2;
   --fg: #0f172a;
   --muted: #475569;
-  --subtle: #64748b;
+  --subtle: #5a6577;
 
   /* Brand (IIT Delhi / ScAI colours can be set from Admin → Settings → Branding) */
   --brand: #3b5bdb;
@@ -83,7 +83,7 @@
   --border-strong: #33446b;
   --fg: #e8edf7;
   --muted: #aab5cc;
-  --subtle: #8592ad;
+  --subtle: #8f9bb5;
 
   --brand: #8fa8ff;
   --brand-strong: #b3c3ff;
@@ -337,7 +337,8 @@
 /* Lighter motion on small/touch screens and full stop for reduced motion */
 @media (max-width: 767px), (pointer: coarse) {
   .animate-float, .animate-spin-slow { animation-duration: 12s; }
-  .motion-desktop-only { animation: none !important; }
+  /* Background-position animations repaint every frame — skip them on phones. */
+  .animate-gradient, .motion-desktop-only { animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -353,6 +354,8 @@
    ------------------------------------------------------------------------- */
 @media print {
   .no-print, header[data-site-header], footer[data-site-footer], [data-aura-assistant] { display: none !important; }
+  /* Scroll-driven reveals never "enter" on paper — show everything in its final state. */
+  [data-reveal], .grow-bar { animation: none !important; opacity: 1 !important; transform: none !important; }
   body { background: #fff; color: #000; }
   .card { box-shadow: none; border-color: #ccc; }
 }

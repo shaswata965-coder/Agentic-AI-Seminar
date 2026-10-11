@@ -9,8 +9,8 @@ export default function NotFound() {
   return (
     <>
       <header className="container-site flex h-16 items-center">
-        <Link href="/" aria-label="Agentic AI Workshop 2026 — home">
-          <BrandMark shortName="AAIW 2026" />
+        <Link href="/">
+          <BrandMark shortName="AAIW 2026" srSuffix=", home page" />
         </Link>
       </header>
       <main>

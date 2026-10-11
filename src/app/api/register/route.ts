@@ -38,10 +38,12 @@ export async function POST(req: NextRequest) {
 
   const existing = await Registration.findOne({ email: data.email }).lean();
   if (existing) {
-    if (rateLimit(`resend:${data.email}`, 1, 30 * 60_000).ok) {
+    const mail = mailConfigured();
+    if (mail && rateLimit(`resend:${data.email}`, 1, 30 * 60_000).ok) {
       after(() => sendMail(registrationEmail(s, { name: existing.name, email: existing.email, regId: existing.regId })));
     }
-    return error(409, "This e-mail address is already registered. We've re-sent your confirmation e-mail.", { fieldErrors: { email: "Already registered" } });
+    const hint = mail ? "We've sent your confirmation e-mail again." : "Contact the organisers if you need your registration details.";
+    return error(409, `This e-mail address is already registered. ${hint}`, { fieldErrors: { email: "Already registered" } });
   }
 
   for (let attempt = 0; attempt < 5; attempt++) {
