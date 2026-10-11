@@ -53,16 +53,17 @@ export function mergeDefaults<T extends object>(defaults: T, stored: unknown): T
 }
 
 /**
- * The site never shows an em dash. Text saved in the admin (or seeded before this rule) is cleaned
- * as it is read, without changing the database: "a — b" becomes "a, b", "Title — Name" becomes "Title: Name".
+ * The site never shows an em dash (U+2014). Text saved in the admin (or seeded before this rule) is cleaned
+ * as it is read, without changing the database: "a <em dash> b" becomes "a, b", and before a capital or a
+ * number it becomes a colon ("Title: Name").
  */
 export function noEmDash(text: string): string {
-  if (!text.includes("—")) return text;
+  if (!text.includes("\u2014")) return text;
   return text
-    .replace(/^[ \t]*—[ \t]*/gm, "")
-    .replace(/[ \t]*—[ \t]*$/gm, "")
-    .replace(/\s*—\s*(?=[A-Z0-9“"(])/g, ": ")
-    .replace(/\s*—\s*/g, ", ");
+    .replace(/^[ \t]*\u2014[ \t]*/gm, "")
+    .replace(/[ \t]*\u2014[ \t]*$/gm, "")
+    .replace(/\s*\u2014\s*(?=[A-Z0-9“"(])/g, ": ")
+    .replace(/\s*\u2014\s*/g, ", ");
 }
 
 /** `noEmDash` for every string inside a value, including nested objects and arrays. */
