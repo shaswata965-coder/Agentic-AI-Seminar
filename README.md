@@ -183,7 +183,7 @@ src/
     api/               public APIs (register, hackathon/register, enquiries, calendar, programme/pdf, media, health) and /api/admin/*
     opengraph-image.tsx, sitemap.ts, robots.ts, manifest.ts, icon.svg …
   components/
-    aura/              Aura mascot: SVG art, 33 presets, eye-tracking, reactions, assistant, playground
+    aura/              Aura mascot: SVG art, 33 presets, eye-tracking, reactions, fly-in entrances, assistant, playground
     home/ programme/ speakers/ tutorials/ hackathon/ gallery/ forms/ share/ layout/ ui/ effects/ admin/
   lib/
     schema/            field definitions for every content type (drive the admin forms, validation and database schemas)
@@ -198,6 +198,8 @@ docs/                  admin guide and requirements checklist
 **Adding a field to a content type** (for example a "pronouns" field for speakers): add it to the collection's `fields` in `src/lib/schema/resources.ts` and to its type in `src/lib/content/types.ts`, then render it. The admin form, validation and database schema follow automatically.
 
 **Caching:** public pages are rendered once and cached (`'use cache'` with tags). Saving in the admin expires the matching tags, so the next visitor gets fresh content. Time-based refresh (5 minutes) is only a safety net for direct database edits.
+
+**Motion:** every `<Aura>` flies into place. Page heroes use `entrance="load"` (pure CSS, on page load); other Auras fly in from the nearest edge when scrolled into view (`components/aura/entrance.ts`). Pass `entrance="zip" | "drift" | "none"` to change that. Micro-interactions live in `src/app/micro.css` with one delegated script (`components/effects/MicroInteractions.tsx`). Opt an element in with `data-ripple` (ink ripple on press), `data-glow` (cursor-following light on cards), `data-burst` (star spin and ring when pressed), or the `mi-link`, `mi-underline` and `mi-stagger` classes. Segmented controls use `useSlidingPill` (`components/ui/SlidingPill.tsx`). With *reduced motion* turned on, Auras simply appear in place; with JavaScript off, nothing is left hidden.
 
 ---
 
