@@ -9,7 +9,8 @@ import type { IconItem } from "@/lib/content/types";
 const TONES = ["azure", "lilac", "mint", "peach", "butter", "blush"] as const;
 // Aura's drawing is 260 × 300; her shoulders sit at (62, 170) and (198, 170) and her arms are 54 long.
 const SHOULDER = { l: 62 / 260, r: 198 / 260, y: 170 / 300, arm: 54 / 260 };
-const THINK_MS = 450;
+// How long she "thinks" (typing dots) before the answer appears.
+const THINK_MS = 800;
 // A short grace period when the mouse leaves a topic, so brushing past an edge doesn't flicker the answer.
 const LEAVE_MS = 120;
 
@@ -36,13 +37,13 @@ const useReducedMotion = () =>
 /**
  * Aura in the middle of a circle of About topics. At rest she strikes a thinking pose and says
  * nothing. Hovering, focusing or tapping a topic makes her turn and point at it; then she answers:
- * a speech bubble unfolds above her head, shows a typing indicator and types the summary out.
+ * a speech bubble unfolds above her head, shows a typing indicator, then the whole summary fades
+ * into view at once.
  * Moving off the topic (or tapping elsewhere) sends her back to thinking.
  * Circle size comes from --rx / --ry / --cy on the container.
  */
 export function AboutOrbit({ points }: { points: IconItem[] }) {
   const [active, setActive] = useState<number | null>(null);
-  const [typed, setTyped] = useState(Infinity);
   const [thinking, setThinking] = useState(false);
   const [pointing, setPointing] = useState<{ side: "l" | "r"; aim: number } | null>(null);
   const shown = useRef<number | null>(null);
@@ -57,13 +58,12 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
   const current = active === null ? null : points[Math.min(active, n - 1)];
   const text = current?.description ?? "";
 
-  // Pick a topic: Aura points at it, thinks for a moment, then types the summary.
+  // Pick a topic: Aura points at it, thinks for a moment, then shows the summary.
   const select = (i: number) => {
     window.clearTimeout(leaveTimer.current);
     if (i === shown.current) return;
     shown.current = i;
     setActive(i);
-    setTyped(reduced ? Infinity : 0);
     setThinking(!reduced);
   };
   // Back to the thinking pose, with an empty head.
@@ -94,17 +94,12 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
     return () => document.removeEventListener("pointerdown", onDown);
   }, [active]);
 
-  // Answering: a moment of "typing…", then the summary types itself out two letters at a time.
+  // Answering: a moment of "typing…", then the whole summary appears (see .answer-text).
   useEffect(() => {
     if (!thinking) return;
     const t = window.setTimeout(() => setThinking(false), THINK_MS);
     return () => window.clearTimeout(t);
   }, [thinking, active]);
-  useEffect(() => {
-    if (thinking || typed >= text.length) return;
-    const t = window.setTimeout(() => setTyped((c) => c + 2), 18);
-    return () => window.clearTimeout(t);
-  }, [thinking, typed, text.length]);
 
   // Which arm points at the active topic, and at what angle (measured, so it follows every layout).
   useLayoutEffect(() => {
@@ -143,7 +138,6 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
   const deg = active === null ? null : large[active];
   const side = deg === null ? undefined : (pointing?.side ?? (Math.cos(rad(deg)) >= 0 ? "r" : "l"));
   const aim = deg === null ? 0 : (pointing?.aim ?? (side === "r" ? Math.min(deg - 90, -25) : Math.max(deg - 90, 25)));
-  const done = typed >= text.length;
   // At rest she looks up and to the side with one eye narrowed, the way people do when they ponder.
   const look = deg === null ? { x: 0.5, y: -0.8 } : { x: Number((Math.cos(rad(deg)) * 0.85).toFixed(2)), y: Number((Math.sin(rad(deg)) * 0.6).toFixed(2)) };
 
@@ -174,7 +168,7 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
                 {current.title}
               </p>
               <div className="mt-1.5 grid font-display text-[15px] leading-snug font-medium text-fg sm:text-[16.5px]">
-                {/* The full text reserves the bubble's size; the typed part sits on top of it. */}
+                {/* The full text reserves the bubble's size; the dots, then the answer, sit on top of it. */}
                 <span className="invisible [grid-area:1/1]">{text}</span>
                 {thinking ? (
                   <span className="typing-dots flex items-center justify-center gap-1.5 [grid-area:1/1]">
@@ -183,10 +177,7 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
                     <i />
                   </span>
                 ) : (
-                  <span className="[grid-area:1/1]">
-                    {text.slice(0, typed)}
-                    {!done ? <span className="answer-caret" /> : null}
-                  </span>
+                  <span className="answer-text [grid-area:1/1]">{text}</span>
                 )}
               </div>
             </div>
@@ -199,7 +190,7 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
           variant="thinker"
           size={260}
           look={look}
-          overrides={{ effects: [], expression: !current ? "confused" : thinking ? "focus" : done ? "happy" : "curious" }}
+          overrides={{ effects: [], expression: !current ? "confused" : thinking ? "focus" : "happy" }}
           className="max-w-full"
         />
       </div>
