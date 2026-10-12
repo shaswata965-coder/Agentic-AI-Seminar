@@ -1,6 +1,6 @@
 import "server-only";
 import mongoose from "mongoose";
-import { DEFAULT_HACKATHON, DEFAULT_SETTINGS } from "@/lib/content/defaults";
+import { DEFAULT_HACKATHON, DEFAULT_SETTINGS, withCurrentAboutPoints } from "@/lib/content/defaults";
 import { fillDefaults, mergeDefaults, toPlain } from "@/lib/content/normalize";
 import { connectDb } from "@/lib/db";
 import { slugify } from "@/lib/format";
@@ -111,7 +111,8 @@ export function isSingletonKey(key: string): key is SingletonKey {
 export async function getSingleton(key: SingletonKey) {
   await connectDb();
   const doc = await Singleton.findOne({ key }).lean();
-  return { data: mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data), updatedAt: doc?.updatedAt ?? null };
+  const data = mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data);
+  return { data: key === "settings" ? withCurrentAboutPoints(data) : data, updatedAt: doc?.updatedAt ?? null };
 }
 
 export async function saveSingleton(key: SingletonKey, input: unknown) {

@@ -7,8 +7,8 @@ import { formatDateRange } from "@/lib/format";
 import { AboutOrbit } from "./AboutOrbit";
 
 /**
- * Home page About: Aura with the short "about points" (Site settings → About & themes) around her;
- * each point's answer rises from her head. The full About text lives on /about.
+ * Home page About: Aura with About topics (Site settings → About & themes) around her; she points at
+ * the topic you hover and answers with its summary. The full About text lives on /about.
  * Answers may use {dates}, {venue} and {event}, filled in from Site settings.
  */
 export function About({ s }: { s: SiteSettings }) {
@@ -17,7 +17,7 @@ export function About({ s }: { s: SiteSettings }) {
       .replaceAll("{dates}", formatDateRange(s.startDate, s.endDate))
       .replaceAll("{venue}", venueLine(s))
       .replaceAll("{event}", s.eventName);
-  const points = s.aboutPoints.slice(0, 10).map((p) => ({ ...p, title: fill(p.title), description: fill(p.description) }));
+  const points = s.aboutPoints.slice(0, 8).map((p) => ({ ...p, title: fill(p.title), description: fill(p.description) }));
   return (
     <Section id="about" tone="mint" wash labelledBy="about-title" tags="underline">
       <div className="text-center">

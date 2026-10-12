@@ -3,7 +3,7 @@ import { connectDb, isDbConfigured, once } from "@/lib/db";
 import { getCollectionModel, Singleton } from "@/lib/models";
 import { COLLECTION_MAP } from "@/lib/schema/resources";
 import { ensureDefaultContent } from "./bootstrap";
-import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS } from "./defaults";
+import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS, withCurrentAboutPoints } from "./defaults";
 import { fillDefaults, mergeDefaults, stripEmDashes, toPlain } from "./normalize";
 import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from "./types";
 
@@ -41,7 +41,7 @@ export async function getSettings(): Promise<SiteSettings> {
     return DEFAULT_SETTINGS;
   }
   cacheLife("cms");
-  return stripEmDashes(mergeDefaults(DEFAULT_SETTINGS, toPlain<{ data?: unknown }>(res.data ?? {}).data));
+  return stripEmDashes(withCurrentAboutPoints(mergeDefaults(DEFAULT_SETTINGS, toPlain<{ data?: unknown }>(res.data ?? {}).data)));
 }
 
 export async function getHackathon(): Promise<HackathonInfo> {

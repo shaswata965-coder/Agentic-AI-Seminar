@@ -324,24 +324,94 @@
   }
 }
 
-/* The home About answer floats up out of Aura's head: the small dots first, then the bubble. */
-.thought-bubble {
-  transform-origin: 50% 100%;
-  animation: thought-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.16s both;
+/* Home About: Aura leans toward the topic she points at and swings that arm to it (aura.css animates arms through transform). */
+.about-aura {
+  translate: -50% -50%;
 }
-.thought-dot {
-  animation: thought-dot 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+.about-aura > .aura-wrap {
+  rotate: var(--lean, 0deg);
+  transform-origin: 50% 85%;
+  transition: rotate 0.6s cubic-bezier(0.34, 1.4, 0.5, 1);
 }
-@keyframes thought-in {
+.about-aura[data-aim="r"] .aura-svg .aura-arm-r,
+.about-aura[data-aim="l"] .aura-svg .aura-arm-l {
+  transform: rotate(var(--aim));
+  animation: none;
+}
+/* The beam from her hand to the topic fades in, then its dashes flow toward the topic. */
+.orbit-beam {
+  animation:
+    beam-in 0.35s ease-out both,
+    beam-flow 0.9s linear 0.35s infinite;
+}
+@keyframes beam-in {
   from {
     opacity: 0;
-    transform: translateY(18px) scale(0.6);
   }
 }
-@keyframes thought-dot {
+@keyframes beam-flow {
+  to {
+    stroke-dashoffset: -18;
+  }
+}
+/* Answering: dots rise out of her head, the speech bubble unfolds upward, then the text types itself. */
+.rising-dot {
+  animation: rise-dot 0.4s ease-out both;
+}
+@keyframes rise-dot {
   from {
     opacity: 0;
-    transform: scale(0);
+    translate: 0 10px;
+    scale: 0.4;
+  }
+}
+.answer-bubble {
+  animation: answer-unfold 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+}
+@keyframes answer-unfold {
+  from {
+    opacity: 0.3;
+    translate: 0 12px;
+    clip-path: inset(100% 38% 0 38% round 1.6rem);
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+    clip-path: inset(0 0 0 0 round 1.6rem);
+  }
+}
+.typing-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--accent-ink);
+  opacity: 0.35;
+  animation: typing-dot 0.9s ease-in-out infinite;
+}
+.typing-dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.typing-dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes typing-dot {
+  30% {
+    opacity: 1;
+    translate: 0 -4px;
+  }
+}
+.answer-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  vertical-align: -0.12em;
+  background: var(--accent-ink);
+  animation: caret-blink 0.7s steps(1) infinite;
+}
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
   }
 }
 
