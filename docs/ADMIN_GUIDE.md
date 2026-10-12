@@ -115,9 +115,9 @@ Mentors and judges are added under **Organisers & volunteers** (section 7).
 
 ## 9. Venue and travel
 
-**Site settings → Venue & travel**
+**Site settings → Venue & travel.** The home page shows a route map: visitors pick how they're arriving and see the route to IIT Delhi. Everything else is on the **Venue & travel** page (`/venue`).
 - **Map location:** the text the embedded Google Map searches for (e.g. "Lecture Hall Complex, IIT Delhi"). For an exact pin, paste the link from Google Maps → *Share* → *Embed a map* → copy the `src` value.
-- **Directions:** by air, train, metro and road.
+- **Directions:** by air, train, metro and road. Each one becomes a button on the home page route map, which draws the matching route (airport, railway stations, metro or road), and a card on the Venue & travel page.
 - **Campus entry information**, e.g. ID requirements and which gate to use.
 - **Nearby accommodation:** guest houses, hotels or areas, with distance and links.
 - **Local tips.**

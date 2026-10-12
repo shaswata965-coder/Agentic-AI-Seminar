@@ -9,7 +9,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Event name (final name/logo to be confirmed) | Admin → Site settings → Event details; event logo under Branding |
 | Organised by IIT Delhi and ScAI, IIT Delhi | Hero, footer, About, JSON-LD organiser data |
 | Tue 15 – Wed 16 December 2026 | Hero, countdown, calendar files, programme day tabs (dates come from the start/end settings) |
-| Venue IIT Delhi, Hauz Khas (hall TBA) | Hero and Venue section; the hall shows "to be announced" until it is set |
+| Venue IIT Delhi, Hauz Khas (hall TBA) | Hero, the home route map and `/venue`; the hall shows "to be announced" until it is set |
 | Three themes; activities; audience | Themes section; About section (activities, who should attend), all editable |
 | Goal: inform, drive registrations, showcase speakers and partners, single source for updates | Announcements box, registration forms, speakers and partners sections, site-wide banner |
 
@@ -27,7 +27,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Hackathon | Page `/hackathon` (+ `/hackathon/register`; teaser on home) |
 | Registration | Page `/register`, or an external form link (Admin → Site settings → Registration) |
 | Organisers | Page `/organisers` |
-| Venue & Travel | Section `/#venue` |
+| Venue & Travel | Page `/venue`, with the interactive route map at `/#venue` |
 | Partners / Sponsors | Page `/partners` (logo strip on home at `/#partners`) |
 | FAQ & Contact | Section `/#faq` and `/#contact` |
 
@@ -49,7 +49,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Panel discussions | Title, theme, moderator, panelists (linked to speaker cards), time slot | ✅ On `/speakers#panels` and in the programme |
 | Tutorials & Demos | Title, instructors, duration, level, prerequisites, material / GitHub links; demos with title, team/company, description, image/video | ✅ Videos load only when clicked (YouTube privacy-enhanced mode or Vimeo) |
 | Industry Kiosks | Logo, name, description; "Exhibit with us" enquiry | ✅ The enquiry form goes to Admin → Enquiries (+ e-mail notification) |
-| Venue & Travel | Embedded Google Map, directions from airport / railway / metro, campus entry, nearby accommodation | ✅ Plus local tips |
+| Venue & Travel | Embedded Google Map, directions from airport / railway / metro, campus entry, nearby accommodation | ✅ Plus local tips and an interactive route map on the home page |
 | FAQ / Contact | Accordion FAQ; official e-mail, optional phone, LinkedIn / X; contact form | ✅ FAQ search and category filter |
 
 ## 4. Hackathon page

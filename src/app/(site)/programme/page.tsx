@@ -53,7 +53,7 @@ export default async function ProgrammePage() {
   const mini: Record<string, MiniSpeaker> = Object.fromEntries(speakers.map((sp) => [sp.id, { id: sp.id, name: sp.name, slug: sp.slug, affiliation: sp.affiliation }]));
   const pdfHref = s.schedulePdf || "/api/programme/pdf";
   const plan: { href: string; title: string; text: string; icon: ReactNode; tone: string }[] = [
-    { href: "/#venue", title: "Venue & travel", text: `${venueLine(s)}. Maps, directions and places to stay.`, icon: <MapPin size={21} aria-hidden />, tone: "tone-mint" },
+    { href: "/venue", title: "Venue & travel", text: `${venueLine(s)}. Maps, directions and places to stay.`, icon: <MapPin size={21} aria-hidden />, tone: "tone-mint" },
     { href: registrationHref(s), title: "Registration", text: registrationText(s), icon: <Ticket size={21} aria-hidden />, tone: "tone-butter" },
     { href: "/tutorials", title: "Tutorials & demos", text: "Levels, prerequisites and materials for the hands-on sessions.", icon: <GraduationCap size={21} aria-hidden />, tone: "tone-lilac" },
     { href: "/speakers", title: "Speakers", text: "Who is speaking, their talks and the panels.", icon: <Mic size={21} aria-hidden />, tone: "tone-peach" },

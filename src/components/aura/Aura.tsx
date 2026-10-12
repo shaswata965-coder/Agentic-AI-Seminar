@@ -127,7 +127,7 @@ export function Aura({
     if (!text) return;
     tipIndex.current = typeof greet === "string" ? 0 : 1;
     // Say hello once Aura has landed.
-    const delay = arrival === "load" ? 1900 : 900;
+    const delay = arrival === "load" ? 2600 : 900;
     const show = setTimeout(() => setBubble(text), delay);
     const hide = setTimeout(() => setBubble(null), delay + 5500);
     return () => {

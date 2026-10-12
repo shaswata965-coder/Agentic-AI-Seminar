@@ -11,6 +11,7 @@ const PAGES: AssistantEntry[] = [
   { kind: "Page", title: "Hackathon registration", href: "/hackathon/register", keywords: "hackathon register team sign up apply" },
   { kind: "Page", title: "Registration", subtitle: "Register for the workshop", href: "/register", keywords: "register registration sign up ticket fee fees deadline seat" },
   { kind: "Page", title: "About the workshop", subtitle: "Why agentic AI, who should attend, what happens", href: "/about", keywords: "about motivation what is agentic ai who should attend audience activities" },
+  { kind: "Page", title: "Venue & travel", subtitle: "Directions, campus entry, stays and local tips", href: "/venue", keywords: "venue travel directions airport flight railway station train metro road cab taxi hotel accommodation stay guest house campus entry gate id tips weather" },
   { kind: "Page", title: "Partners & sponsors", subtitle: "Partners, sponsorship tiers and enquiries", href: "/partners", keywords: "sponsor sponsorship partner partners tiers brochure become a partner logo" },
   { kind: "Page", title: "Organisers", subtitle: "Faculty, student organisers and volunteers", href: "/organisers", keywords: "team organisers organizers faculty students volunteers committee" },
   { kind: "Page", title: "Meet Aura", subtitle: "Our agentic mascot", href: "/meet-aura", keywords: "mascot aura robot" },
@@ -20,7 +21,7 @@ const SECTIONS: AssistantEntry[] = [
   { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Entrepreneurship", href: "/#themes", keywords: "themes healthcare science discovery entrepreneurship startups" },
   { kind: "Section", title: "Announcements", href: "/#news", keywords: "news updates announcements" },
   { kind: "Section", title: "Industry kiosks", subtitle: "On the programme page", href: "/programme#kiosks", keywords: "industry kiosk exhibit exhibitor booth companies" },
-  { kind: "Section", title: "Venue & travel", subtitle: "Map, directions and accommodation", href: "/#venue", keywords: "venue travel map directions airport railway train metro road hotel accommodation stay campus entry gate" },
+  { kind: "Section", title: "Route map", subtitle: "Interactive map of the way to IIT Delhi", href: "/#venue", keywords: "map route directions airport railway metro road how to reach" },
   { kind: "Section", title: "FAQ", href: "/#faq", keywords: "faq questions help" },
   { kind: "Section", title: "Contact", href: "/#contact", keywords: "contact email phone social linkedin message" },
 ];

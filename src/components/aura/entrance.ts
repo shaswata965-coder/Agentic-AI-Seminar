@@ -26,7 +26,7 @@ function launch(el: HTMLElement, order: number) {
   el.style.setProperty("--fly-x", `${Math.round(x)}px`);
   el.style.setProperty("--fly-y", `${Math.round(y)}px`);
   el.style.setProperty("--fly-dir", fromRight ? "1" : "-1");
-  el.style.setProperty("--fly-delay", `${order * 110}ms`);
+  el.style.setProperty("--fly-delay", `${order * 160}ms`);
   el.dataset.fly = "go";
 }
 
