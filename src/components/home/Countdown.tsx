@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { Fragment, useSyncExternalStore } from "react";
 import { cn } from "@/lib/cn";
 
 // A shared 1-second clock. The server snapshot is null so the countdown never
@@ -40,12 +40,15 @@ function parts(ms: number) {
   return { days: Math.floor(s / 86400), hours: Math.floor((s % 86400) / 3600), minutes: Math.floor((s % 3600) / 60), seconds: s % 60 };
 }
 
-const TILES = [
-  { key: "days", label: "Days", tone: "tone-azure" },
-  { key: "hours", label: "Hours", tone: "tone-lilac" },
-  { key: "minutes", label: "Minutes", tone: "tone-mint" },
-  { key: "seconds", label: "Seconds", tone: "tone-peach" },
+const UNITS = [
+  { key: "days", label: "Days" },
+  { key: "hours", label: "Hours" },
+  { key: "minutes", label: "Minutes" },
+  { key: "seconds", label: "Seconds" },
 ] as const;
+
+// 60 ticks across the bar, one per second of the current minute.
+const TICKS = "repeating-linear-gradient(90deg, #000 0 calc(100% / 60 - 3px), transparent calc(100% / 60 - 3px) calc(100% / 60))";
 
 export function Countdown({ target, end, className }: { target: string; end: string; className?: string }) {
   const t = useNow();
@@ -67,20 +70,36 @@ export function Countdown({ target, end, className }: { target: string; end: str
     );
   }
 
+  // Share of the current minute that has gone by: the tick bar fills up once a minute.
+  const minute = values ? ((60 - values.seconds) / 60) * 100 : 0;
   return (
-    <div className={cn("grid grid-cols-4 gap-2 sm:gap-3", className)} role="timer" aria-live="off" aria-label="Time remaining until the workshop starts">
-      {TILES.map(({ key, label, tone }) => {
-        const v = values ? values[key] : null;
-        const text = v === null ? "--" : String(v).padStart(2, "0");
-        return (
-          <div key={key} className={cn(tone, "relative overflow-hidden rounded-2xl bg-accent-soft px-2 py-3 text-center ring-1 ring-inset ring-[color-mix(in_oklab,var(--accent)_35%,transparent)] sm:py-4")}>
-            <span key={text} className="mi-tick block font-display text-3xl font-bold text-fg tabular sm:text-[2.6rem] sm:leading-none">
-              {text}
-            </span>
-            <span className="mt-1.5 block text-[11px] font-bold tracking-[0.14em] text-accent-ink uppercase sm:text-xs">{label}</span>
-          </div>
-        );
-      })}
+    <div className={cn("min-w-0", className)} role="timer" aria-live="off" aria-label="Time remaining until the workshop starts">
+      <div className="flex items-start justify-between">
+        {UNITS.map(({ key, label }, i) => {
+          const v = values ? values[key] : null;
+          const text = v === null ? "--" : String(v).padStart(2, "0");
+          return (
+            <Fragment key={key}>
+              {i ? (
+                <span aria-hidden className="px-0.5 font-display text-3xl leading-none font-light text-border-strong sm:text-[3.25rem] lg:text-[4rem]">
+                  :
+                </span>
+              ) : null}
+              <div className="min-w-[2.6ch] text-center">
+                <span key={text} className={cn("mi-tick block font-display text-[2.4rem] leading-none font-bold tracking-tight tabular sm:text-[3.5rem] lg:text-[4.25rem]", i === 0 ? "text-gradient" : "text-fg")}>
+                  {text}
+                </span>
+                <span className="mt-2 block text-[10px] font-bold tracking-[0.2em] text-subtle uppercase sm:text-[11px]">{label}</span>
+              </div>
+            </Fragment>
+          );
+        })}
+      </div>
+      <div aria-hidden className="mt-5 h-1.5" style={{ maskImage: TICKS, WebkitMaskImage: TICKS }}>
+        <div className="relative h-full bg-border">
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,var(--azure),var(--lilac),var(--blush))] transition-[clip-path] duration-500" style={{ clipPath: `inset(0 ${100 - minute}% 0 0)` }} />
+        </div>
+      </div>
     </div>
   );
 }

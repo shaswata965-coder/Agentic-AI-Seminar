@@ -8,13 +8,10 @@ import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
 import { EXPLORE_PAGES, HOME_NAV, PRIMARY_NAV, SECTION_NAV, type NavItem } from "@/lib/nav";
-import { BrandMark } from "./BrandMark";
 import { InstituteLogo } from "./InstituteLogo";
 import { ThemeToggle } from "./ThemeToggle";
 
 export interface SiteHeaderProps {
-  /** From `brandName()`. */
-  brand: { title: string; year: string };
   /** Logos uploaded under Admin → Branding; empty uses the bundled ones. */
   logos: { iitd: string; scai: string };
   registerHref: string;
@@ -26,7 +23,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderProps) {
+export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -34,17 +31,46 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
   const [menuOpen, setMenuOpen] = useState(false);
   const exploreRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const sections = [...SECTION_NAV, ...EXPLORE_PAGES, ...extraNav];
+  const explorePages = [...EXPLORE_PAGES, ...extraNav];
+  const exploreItems = [...explorePages, ...SECTION_NAV];
   const pages = [HOME_NAV, ...PRIMARY_NAV, { href: "/register", label: "Registration" }];
-  const exploreActive = sections.some((item) => isActive(pathname, item.href));
-  const barCls = "flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:h-[72px] xl:px-8";
-  const iitdLogo = <InstituteLogo kind="iitd" upload={logos.iitd} className="h-9 lg:h-11" />;
+  const exploreActive = explorePages.some((item) => isActive(pathname, item.href));
+  // Phones: logo, then the buttons pushed right. Desktop: three columns, so the links and Register sit centred between the logos.
+  const barCls = "flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:grid lg:h-[72px] lg:grid-cols-[1fr_auto_1fr] xl:px-8";
+  const iitdLogo = (
+    <Link href="/" aria-label="IIT Delhi, home page" className="group/logo flex items-center gap-2.5 justify-self-start rounded-full pr-2">
+      <span className="rounded-full bg-[conic-gradient(from_210deg,var(--azure),var(--lilac),var(--blush),var(--mint),var(--azure))] p-[2px] shadow-card transition-[rotate,scale] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/logo:scale-105 group-hover/logo:rotate-12">
+        <span className="flex rounded-full bg-surface p-[3px]">
+          <InstituteLogo kind="iitd" upload={logos.iitd} decorative className="h-8 lg:h-9" />
+        </span>
+      </span>
+      <span className="font-display text-[17px] leading-none font-extrabold tracking-tight whitespace-nowrap text-fg lg:text-lg">
+        IIT <span className="text-gradient">Delhi</span>
+      </span>
+    </Link>
+  );
   // The full ScAI wordmark where the header has room, otherwise just its "ScAI" letters.
   const scaiLogo = (
-    <>
-      <InstituteLogo kind="scai" upload={logos.scai} monogram className="h-6 2xl:hidden" />
-      <InstituteLogo kind="scai" upload={logos.scai} className="hidden h-6 2xl:flex" />
-    </>
+    <div className="flex justify-self-end">
+      <InstituteLogo kind="scai" upload={logos.scai} monogram className="h-6 min-[1360px]:hidden" />
+      <InstituteLogo kind="scai" upload={logos.scai} className="hidden h-6 min-[1360px]:flex" />
+    </div>
+  );
+  const exploreLink = (item: NavItem, i: number) => (
+    <Link
+      key={item.href}
+      href={item.href}
+      onClick={() => setExploreOpen(false)}
+      aria-current={isActive(pathname, item.href) ? "page" : undefined}
+      style={{ "--i": i } as CSSProperties}
+      className={cn("group block rounded-2xl p-3 transition-colors hover:bg-accent-soft", ["tone-mint", "tone-lilac", "tone-peach", "tone-aqua", "tone-butter", "tone-blush"][i % 6])}
+    >
+      <span className="flex items-center gap-2 font-display text-[15px] font-semibold text-fg transition-[translate,color] duration-200 group-hover:translate-x-0.5 group-hover:text-accent-ink">
+        <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--accent)] transition-[scale] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-150" />
+        {item.label}
+      </span>
+      {item.description ? <span className="mt-1 block text-[13px] leading-snug text-muted">{item.description}</span> : null}
+    </Link>
   );
 
   // Glass background + reading progress bar.
@@ -107,11 +133,9 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
     >
       <div className={barCls}>
         {iitdLogo}
-        <Link href="/" className="rounded-2xl">
-          <BrandMark {...brand} icon={false} srSuffix=", home page" />
-        </Link>
 
-        <nav aria-label="Main" className="ml-auto hidden items-center gap-0.5 xl:flex">
+        <div className="ml-auto flex items-center gap-2 lg:ml-0">
+        <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
           {[HOME_NAV, ...PRIMARY_NAV].map((item) => {
             const active = isActive(pathname, item.href);
             return (
@@ -150,34 +174,23 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
             {exploreOpen ? (
               <div
                 id="explore-menu"
-                className="absolute top-full right-0 mt-3 w-[34rem] origin-top-right animate-pop rounded-3xl border border-border bg-surface p-3 shadow-card-lg"
+                className="absolute top-full left-1/2 mt-3 w-[40rem] -translate-x-1/2 origin-top animate-pop rounded-3xl border border-border bg-surface p-3 shadow-card-lg"
               >
-                <div className="mi-stagger grid grid-cols-2 gap-1">
-                  {sections.map((item, i) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setExploreOpen(false)}
-                      style={{ "--i": i } as CSSProperties}
-                      className={cn(
-                        "group rounded-2xl p-3 transition-colors hover:bg-accent-soft",
-                        ["tone-mint", "tone-lilac", "tone-peach", "tone-aqua", "tone-butter", "tone-blush"][i % 6],
-                      )}
-                    >
-                      <span className="flex items-center gap-2 font-display text-[15px] font-semibold text-fg transition-[translate,color] duration-200 group-hover:translate-x-0.5 group-hover:text-accent-ink">
-                        <span aria-hidden className="h-2 w-2 rounded-full bg-[var(--accent)] transition-[scale] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-150" />
-                        {item.label}
-                      </span>
-                      {item.description ? <span className="mt-1 block text-[13px] leading-snug text-muted">{item.description}</span> : null}
-                    </Link>
-                  ))}
+                <div className="mi-stagger grid grid-cols-[0.85fr_1.15fr] gap-2">
+                  <div className="rounded-2xl bg-surface-2 p-1">
+                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">Pages</p>
+                    {explorePages.map((item, i) => exploreLink(item, i))}
+                  </div>
+                  <div>
+                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">On the home page</p>
+                    <div className="grid grid-cols-2">{SECTION_NAV.map((item, i) => exploreLink(item, explorePages.length + i))}</div>
+                  </div>
                 </div>
               </div>
             ) : null}
           </div>
         </nav>
-
-        <div className="ml-auto flex items-center gap-2 xl:ml-3">
+          <span aria-hidden className="mx-1 hidden h-6 w-px bg-border lg:block" />
           {/* On phones the theme switch lives in the menu, and Register shrinks to its icon. */}
           <ThemeToggle className="max-sm:hidden" />
           <ButtonLink href={registerHref} size="sm" className="max-sm:w-9 max-sm:px-0" icon={<Ticket size={16} aria-hidden />}>
@@ -186,7 +199,7 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
           <button
             type="button"
             data-ripple=""
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg xl:hidden"
+            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg lg:hidden"
             aria-label="Open menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
@@ -212,10 +225,7 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
           <div className="flex min-h-full flex-col">
             <div className={barCls}>
               {iitdLogo}
-              <Link href="/" onClick={() => setMenuOpen(false)}>
-                <BrandMark {...brand} icon={false} srSuffix=", home page" />
-              </Link>
-              <div className="ml-auto flex items-center gap-2">
+              <div className="ml-auto flex items-center gap-2 lg:ml-0">
                 <ThemeToggle />
                 <button
                   type="button"
@@ -253,7 +263,7 @@ export function SiteHeader({ brand, logos, registerHref, extraNav }: SiteHeaderP
               <div>
                 <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">Explore</p>
                 <ul className="mi-stagger grid grid-cols-2 gap-2">
-                  {sections.map((item, i) => (
+                  {exploreItems.map((item, i) => (
                     <li key={item.href} style={{ "--i": pages.length + i } as CSSProperties}>
                       <Link
                         href={item.href}

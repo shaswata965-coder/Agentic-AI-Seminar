@@ -10,9 +10,10 @@ const LOGOS = {
 /**
  * IIT Delhi and ScAI logos for the header. The bundled files are white on transparent, so they are
  * drawn dark in light mode. A logo uploaded in Admin → Site settings → Branding is shown as uploaded.
- * `monogram` shows only the "ScAI" letters of the wordmark, for narrow headers.
+ * `monogram` shows only the "ScAI" letters of the wordmark, for narrow headers; `decorative` drops the
+ * alt text when the name is written next to the logo.
  */
-export function InstituteLogo({ kind, upload, monogram = false, className }: { kind: keyof typeof LOGOS; upload?: string; monogram?: boolean; className?: string }) {
+export function InstituteLogo({ kind, upload, monogram = false, decorative = false, className }: { kind: keyof typeof LOGOS; upload?: string; monogram?: boolean; decorative?: boolean; className?: string }) {
   const logo = LOGOS[kind];
   const crop = monogram && !upload;
   return (
@@ -20,7 +21,7 @@ export function InstituteLogo({ kind, upload, monogram = false, className }: { k
     <span className={cn("flex shrink-0", crop && "aspect-[117/38] overflow-hidden", className)}>
       <img
         src={withBase(upload || logo.src)}
-        alt={logo.alt}
+        alt={decorative ? "" : logo.alt}
         width={logo.width}
         height={logo.height}
         decoding="async"

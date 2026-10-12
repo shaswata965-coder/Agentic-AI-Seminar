@@ -98,7 +98,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
                 Home
               </Link>
             </li>
-            {[...PRIMARY_NAV, { href: "/register", label: "Registration" }].map((i) => (
+            {[...PRIMARY_NAV, ...EXPLORE_PAGES, { href: "/register", label: "Registration" }].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}
@@ -110,7 +110,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
         <nav aria-label="Explore">
           <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">Explore</h2>
           <ul className="mt-4 space-y-2.5">
-            {[...SECTION_NAV, ...EXPLORE_PAGES, ...postEventNav(s), { href: "/meet-aura", label: "Meet Aura" }].map((i) => (
+            {[...SECTION_NAV, ...postEventNav(s), { href: "/meet-aura", label: "Meet Aura" }].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}

@@ -122,12 +122,13 @@ export function Hero({ s }: { s: SiteSettings }) {
 
       {s.showCountdown ? (
         <div className="container-site pb-6">
-          <div data-graph-avoid="" className="card glass relative flex flex-col gap-5 p-4 sm:p-6 md:flex-row md:items-center">
-            <div className="flex items-center gap-3 md:w-64 md:shrink-0">
-              <Aura variant="countdown" size={72} lite />
+          <div data-graph-avoid="" className="card glass relative flex flex-col gap-5 p-5 sm:p-7 md:flex-row md:items-center md:gap-8">
+            <div className="flex items-center gap-3 md:w-[17.5rem] md:shrink-0 md:border-r md:border-border md:pr-6">
+              <Aura variant="countdown" size={68} lite />
               <div>
-                <p className="font-display text-lg font-semibold text-fg">Countdown</p>
-                <p className="text-sm text-muted">to {formatDate(s.startDate, { day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit", hour12: false })} IST</p>
+                <p className="text-[11px] font-bold tracking-[0.2em] text-subtle uppercase">Starts</p>
+                <p className="mt-1 font-display text-lg leading-snug font-semibold text-fg">{formatDate(s.startDate, { day: "numeric", month: "long", year: "numeric" })}</p>
+                <p className="text-sm text-muted">{formatDate(s.startDate, { hour: "2-digit", minute: "2-digit", hour12: false })} IST</p>
               </div>
             </div>
             <Countdown target={s.startDate} end={s.endDate} className="flex-1" />

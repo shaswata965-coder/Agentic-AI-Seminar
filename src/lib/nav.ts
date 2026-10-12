@@ -8,14 +8,16 @@ export interface NavItem {
 export const PRIMARY_NAV: NavItem[] = [
   { href: "/programme", label: "Programme" },
   { href: "/speakers", label: "Speakers" },
-  { href: "/tutorials", label: "Tutorials & Demos" },
-  { href: "/hackathon", label: "Hackathon" },
 ];
 
 export const HOME_NAV: NavItem = { href: "/", label: "Home" };
 
-/** Dedicated pages listed under Explore, with the home page sections. */
-export const EXPLORE_PAGES: NavItem[] = [{ href: "/organisers", label: "Organisers", description: "Faculty, student organisers and volunteers" }];
+/** Dedicated pages listed under Explore, next to the home page sections. */
+export const EXPLORE_PAGES: NavItem[] = [
+  { href: "/tutorials", label: "Tutorials & Demos", description: "Hands-on sessions and live agent demos" },
+  { href: "/hackathon", label: "Hackathon", description: "Tracks, rules, prizes and team registration" },
+  { href: "/organisers", label: "Organisers", description: "Faculty, student organisers and volunteers" },
+];
 
 /** Sections of the single-scroll home page. */
 export const SECTION_NAV: NavItem[] = [
