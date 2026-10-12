@@ -552,10 +552,10 @@ export const SETTINGS_DEF: SingletonDef = {
       title: "About & themes",
       fields: [
         objects("aboutPoints", "Home page: points around Aura", "Point", [
-          text("title", "Title", { required: true, width: "half", maxLength: 28 }),
+          text("title", "Point (a short question or topic)", { required: true, width: "half", maxLength: 28 }),
           select("icon", "Icon", iconOptions, { width: "half" }),
-          text("description", "One line", { maxLength: 70 }),
-        ], { maxItems: 6, help: "Short points circled around Aura in the About section of the home page. The full text below appears on the About page." }),
+          textarea("description", "Answer (shown in Aura's thought bubble)", { rows: 2, maxLength: 150, help: "You can write {dates}, {venue} or {event}; they are filled in from these settings." }),
+        ], { maxItems: 10, help: "Up to 10 points around Aura in the About section of the home page. Hovering or tapping one shows its answer above her head. The full text below appears on the About page." }),
         richtext("motivation", "Workshop motivation", { help: "Shown on the About page." }),
         richtext("agenticAI", "What is agentic AI?", { help: "Shown on the About page." }),
         objects("audience", "Who should attend", "Audience", [

@@ -47,7 +47,7 @@ This guide is for the organising team of the **Agentic AI Workshop 2026**. It ex
 
 **Site settings → Home page:** the highlight strip (e.g. *Speakers — TBA*, *Prize pool — TBA*; up to 6), whether the countdown is shown, and how many featured speakers appear on the home page.
 
-**Site settings → About & themes:** the short points circled around Aura in the home page About section (up to 6: title, icon, one line); the text of the About page (workshop motivation, "What is agentic AI?", who should attend, activities); and the three theme cards (title and a 2–3 line description).
+**Site settings → About & themes:** the points circled around Aura in the home page About section (up to 10: a short question or topic, an icon, and the answer shown in her thought bubble; write {dates}, {venue} or {event} in an answer to fill them in from these settings); the text of the About page (workshop motivation, "What is agentic AI?", who should attend, activities); and the three theme cards (title and a 2–3 line description).
 
 ## 4. Announcements
 

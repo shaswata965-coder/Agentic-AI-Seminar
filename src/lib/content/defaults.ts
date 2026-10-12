@@ -49,12 +49,16 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   agenticAI:
     "Agentic AI refers to systems that pursue goals with a degree of autonomy. Instead of producing a single response, an agent **perceives** its environment, **reasons** about what to do, **plans** a sequence of steps, **acts** using tools, APIs or other agents, and **reflects** on the outcome to improve. Large language models often act as the reasoning engine, combined with memory, tool use and human oversight.",
   aboutPoints: [
-    { title: "Agents that act", icon: "sparkles", description: "AI that plans, uses tools and works alongside people" },
-    { title: "Three themes", icon: "heart", description: "Healthcare, scientific discovery and entrepreneurship" },
-    { title: "Talks and panels", icon: "mic", description: "Leading voices from academia and industry" },
-    { title: "Learn by doing", icon: "graduation", description: "Hands-on tutorials and live agent demos" },
-    { title: "Build and compete", icon: "trophy", description: "A hackathon with the finals at the workshop" },
-    { title: "Open to all", icon: "users", description: "Researchers, students, industry, founders and investors" },
+    { title: "What is agentic AI?", icon: "sparkles", description: "AI that perceives, plans, uses tools and acts, with people in the loop." },
+    { title: "When and where?", icon: "calendar", description: "{dates} at {venue}." },
+    { title: "Why now?", icon: "rocket", description: "Agents are moving from demos to real work. This is the moment to shape how they are built and used." },
+    { title: "Which themes?", icon: "heart", description: "Healthcare, scientific discovery and entrepreneurship." },
+    { title: "Who is speaking?", icon: "mic", description: "Leading voices from academia and industry, in keynotes, talks and panels." },
+    { title: "Can I get hands-on?", icon: "graduation", description: "Yes: tutorials walk you through building agents, and live demos show them at work." },
+    { title: "Is there a hackathon?", icon: "trophy", description: "Yes: teams build agents for health, science or startups, with the finals at the workshop." },
+    { title: "Industry presence?", icon: "store", description: "Kiosks where companies show agentic products and meet researchers and students." },
+    { title: "Who should come?", icon: "users", description: "Researchers, students, industry teams, founders and investors." },
+    { title: "Who organises it?", icon: "landmark", description: "IIT Delhi and the Yardi School of Artificial Intelligence (ScAI)." },
   ],
   audience: [
     { title: "Researchers & faculty", icon: "landmark", description: "Share and discover the latest advances in agents, planning and multi-agent systems." },
