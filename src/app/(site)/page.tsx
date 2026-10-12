@@ -39,8 +39,8 @@ export default async function HomePage() {
       <Hero s={s} />
       <Highlights s={s} />
       <Announcements items={announcements} />
-      <About s={s} />
       <Themes s={s} />
+      <About s={s} />
       <ProgrammePreview s={s} sessions={sessions} speakers={speakers} />
       <SpeakersPreview s={s} speakers={speakers} />
       <HackathonTeaser s={s} h={h} />

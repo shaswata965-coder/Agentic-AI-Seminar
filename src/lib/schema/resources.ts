@@ -551,8 +551,13 @@ export const SETTINGS_DEF: SingletonDef = {
       key: "about",
       title: "About & themes",
       fields: [
-        richtext("motivation", "Workshop motivation"),
-        richtext("agenticAI", "What is agentic AI?"),
+        objects("aboutPoints", "Home page: points around Aura", "Point", [
+          text("title", "Title", { required: true, width: "half", maxLength: 28 }),
+          select("icon", "Icon", iconOptions, { width: "half" }),
+          text("description", "One line", { maxLength: 70 }),
+        ], { maxItems: 6, help: "Short points circled around Aura in the About section of the home page. The full text below appears on the About page." }),
+        richtext("motivation", "Workshop motivation", { help: "Shown on the About page." }),
+        richtext("agenticAI", "What is agentic AI?", { help: "Shown on the About page." }),
         objects("audience", "Who should attend", "Audience", [
           text("title", "Title", { required: true, width: "half" }),
           select("icon", "Icon", iconOptions, { width: "half" }),

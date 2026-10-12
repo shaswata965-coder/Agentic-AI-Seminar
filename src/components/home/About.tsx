@@ -1,94 +1,67 @@
-import type { CSSProperties } from "react";
 import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { AddToCalendar } from "@/components/share/AddToCalendar";
-import { ShareButtons } from "@/components/share/ShareButtons";
+import type { CSSProperties } from "react";
+import { Aura } from "@/components/aura/Aura";
+import { ButtonLink } from "@/components/ui/Button";
 import { CmsIcon } from "@/components/ui/Icon";
-import { RichText } from "@/components/ui/RichText";
-import { Section, SectionHeading } from "@/components/ui/Section";
+import { Eyebrow, Section } from "@/components/ui/Section";
 import type { SiteSettings } from "@/lib/content/types";
-import { eventCalendarLinks } from "@/lib/event";
-import { formatDateRange } from "@/lib/format";
-import { absoluteUrl } from "@/lib/paths";
-import { AgentLoop } from "./AgentLoop";
 
 const TONES = ["azure", "lilac", "mint", "peach", "butter", "blush"] as const;
 
-function activityHref(title: string) {
-  if (/panel/i.test(title)) return "/speakers#panels";
-  if (/talk|keynote|speaker/i.test(title)) return "/speakers";
-  if (/tutorial/i.test(title)) return "/tutorials";
-  if (/demo/i.test(title)) return "/tutorials#demos";
-  if (/kiosk|exhibit|industry/i.test(title)) return "/#kiosks";
-  if (/hack/i.test(title)) return "/hackathon";
-  return "/programme";
-}
-
+/**
+ * Home page About: Aura in the middle with the short "about points" (Site settings → About & themes)
+ * on an orbit around her. The full About text lives on /about.
+ * --rx / --ry are the orbit's radii; each point's centre sits on that ellipse.
+ */
 export function About({ s }: { s: SiteSettings }) {
+  const points = s.aboutPoints.slice(0, 6);
   return (
     <Section id="about" tone="mint" wash labelledBy="about-title" tags="underline">
-      <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
-        <div>
-          <SectionHeading id="about-title" eyebrow="About the workshop" title="Why agentic AI, and why now?" className="mb-6 sm:mb-8" />
-          <RichText text={s.motivation} className="text-[17px] leading-relaxed text-muted" />
-          <div className="tone-lilac card mt-8 p-6" data-reveal>
-            <h3 className="flex items-center gap-2 font-display text-xl font-semibold text-fg">
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-accent-soft text-accent-ink">
-                <CmsIcon name="sparkles" size={18} />
-              </span>
-              What is agentic AI?
-            </h3>
-            <RichText text={s.agenticAI} className="mt-3 text-[15.5px] leading-relaxed text-muted" />
-          </div>
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <AddToCalendar links={eventCalendarLinks(s)} variant="outline" size="sm" />
-            <ShareButtons url={absoluteUrl("/")} text={`${s.eventName} at IIT Delhi, ${formatDateRange(s.startDate, s.endDate)}`} />
-          </div>
-        </div>
-        <div data-reveal>
-          <AgentLoop />
-        </div>
+      <div className="text-center">
+        <Eyebrow>About the workshop</Eyebrow>
+        <h2 id="about-title" className="sr-only">
+          About the workshop
+        </h2>
       </div>
 
-      <div className="mt-20">
-        <h3 className="font-display text-2xl font-bold text-fg sm:text-3xl">Who should attend</h3>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          {s.audience.map((a, i) => (
-            <li key={a.title} data-reveal data-glow="" style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties} className={`tone-${TONES[i % 6]} card group p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
-              <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6">
-                <CmsIcon name={a.icon} size={21} />
-              </span>
-              <p className="mt-4 font-display text-lg font-semibold text-fg">{a.title}</p>
-              <p className="mt-1.5 text-sm text-muted">{a.description}</p>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <div className="about-orbit relative mx-auto mt-6 aspect-[10/11] w-full max-w-[26rem] [--rx:37%] [--ry:35%] sm:aspect-[16/11] sm:max-w-none sm:[--rx:38%] sm:[--ry:34%] lg:aspect-[16/9] lg:[--rx:39%] lg:[--ry:34%]">
+        {/* Orbit rings, a soft glow and two travelling sparks. */}
+        <div aria-hidden className="absolute top-[calc(50%-var(--ry))] left-[calc(50%-var(--rx))] h-[calc(2*var(--ry))] w-[calc(2*var(--rx))] rounded-[50%] border-2 border-dashed border-border-strong opacity-70" />
+        <div aria-hidden className="absolute top-[calc(50%-var(--ry)*0.48)] left-[calc(50%-var(--rx)*0.48)] h-[calc(0.96*var(--ry))] w-[calc(0.96*var(--rx))] rounded-[50%] border border-border" />
+        <div aria-hidden className="absolute top-1/2 left-1/2 h-[46%] w-[34%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,color-mix(in_oklab,var(--mint)_45%,transparent),color-mix(in_oklab,var(--lilac)_25%,transparent)_60%,transparent)] blur-xl" />
+        <span aria-hidden className="orbit-spark" />
+        <span aria-hidden className="orbit-spark" />
 
-      <div className="mt-16">
-        <h3 className="font-display text-2xl font-bold text-fg sm:text-3xl">What happens over the two days</h3>
-        <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {s.activities.map((a, i) => (
-            <li key={a.title} data-reveal style={{ "--reveal-delay": `${i * 60}ms` } as CSSProperties}>
-              <Link
-                href={activityHref(a.title)}
-                data-glow=""
-                className={`tone-${TONES[(i + 2) % 6]} card group flex h-full items-start gap-4 p-5 transition-[translate,scale,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}
+        <div className="absolute inset-0 grid place-items-center">
+          <Aura variant="thinker" size={210} interactive overrides={{ effects: [] }} className="max-w-[34%]" />
+        </div>
+
+        <ul>
+          {points.map((p, i) => {
+            const a = ((-90 + (i * 360) / points.length) * Math.PI) / 180;
+            return (
+              <li
+                key={`${p.title}-${i}`}
+                className={`tone-${TONES[i % TONES.length]} absolute flex w-[7.25rem] -translate-x-1/2 -translate-y-6 flex-col items-center text-center sm:w-48 sm:-translate-y-7`}
+                style={{ left: `calc(50% + ${Math.cos(a).toFixed(4)} * var(--rx))`, top: `calc(50% + ${Math.sin(a).toFixed(4)} * var(--ry))` } as CSSProperties}
               >
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
-                  <CmsIcon name={a.icon} size={22} />
-                </span>
-                <span className="min-w-0">
-                  <span className="flex items-center gap-1.5 font-display text-lg font-semibold text-fg">
-                    {a.title}
-                    <ArrowRight size={16} aria-hidden className="opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100" />
+                <div data-reveal style={{ "--reveal-delay": `${i * 80}ms` } as CSSProperties} className="group flex flex-col items-center">
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-surface text-accent-ink shadow-card ring-2 ring-[color-mix(in_oklab,var(--accent)_70%,transparent)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 sm:h-14 sm:w-14">
+                    <CmsIcon name={p.icon} size={22} />
                   </span>
-                  <span className="mt-1 block text-sm text-muted">{a.description}</span>
-                </span>
-              </Link>
-            </li>
-          ))}
+                  <p className="mt-2 font-display text-[15px] leading-tight font-semibold text-fg sm:text-base">{p.title}</p>
+                  {p.description ? <p className="mt-1 hidden text-sm leading-snug text-muted sm:block">{p.description}</p> : null}
+                </div>
+              </li>
+            );
+          })}
         </ul>
+      </div>
+
+      <div className="mt-4 flex justify-center sm:mt-2">
+        <ButtonLink href="/about" variant="outline" iconRight={<ArrowRight size={17} aria-hidden />}>
+          More about the workshop
+        </ButtonLink>
       </div>
     </Section>
   );

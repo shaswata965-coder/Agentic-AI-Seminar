@@ -48,6 +48,14 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
   agenticAI:
     "Agentic AI refers to systems that pursue goals with a degree of autonomy. Instead of producing a single response, an agent **perceives** its environment, **reasons** about what to do, **plans** a sequence of steps, **acts** using tools, APIs or other agents, and **reflects** on the outcome to improve. Large language models often act as the reasoning engine, combined with memory, tool use and human oversight.",
+  aboutPoints: [
+    { title: "Agents that act", icon: "sparkles", description: "AI that plans, uses tools and works alongside people" },
+    { title: "Three themes", icon: "heart", description: "Healthcare, scientific discovery and entrepreneurship" },
+    { title: "Talks and panels", icon: "mic", description: "Leading voices from academia and industry" },
+    { title: "Learn by doing", icon: "graduation", description: "Hands-on tutorials and live agent demos" },
+    { title: "Build and compete", icon: "trophy", description: "A hackathon with the finals at the workshop" },
+    { title: "Open to all", icon: "users", description: "Researchers, students, industry, founders and investors" },
+  ],
   audience: [
     { title: "Researchers & faculty", icon: "landmark", description: "Share and discover the latest advances in agents, planning and multi-agent systems." },
     { title: "Students", icon: "graduation", description: "Learn hands-on in tutorials, meet mentors and build in the hackathon." },

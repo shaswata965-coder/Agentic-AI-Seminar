@@ -6,6 +6,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const s = await getSettings();
   const pages: { path: string; priority: number; freq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
     { path: "/", priority: 1, freq: "daily" },
+    { path: "/about", priority: 0.8, freq: "monthly" },
     { path: "/programme", priority: 0.9, freq: "daily" },
     { path: "/speakers", priority: 0.9, freq: "daily" },
     { path: "/register", priority: 0.9, freq: "weekly" },

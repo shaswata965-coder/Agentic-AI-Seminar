@@ -279,6 +279,51 @@
   }
 }
 
+/* Ticket stub (home highlights): a half-circle notch cut from each corner, so stubs set side by side meet in notched, perforated seams. */
+.ticket-stub {
+  border-radius: 0.35rem;
+  mask:
+    radial-gradient(11px at 0 0, #0000 97%, #000) top left / 51% 51% no-repeat,
+    radial-gradient(11px at 100% 0, #0000 97%, #000) top right / 51% 51% no-repeat,
+    radial-gradient(11px at 0 100%, #0000 97%, #000) bottom left / 51% 51% no-repeat,
+    radial-gradient(11px at 100% 100%, #0000 97%, #000) bottom right / 51% 51% no-repeat;
+}
+
+/* Sparks travelling round the home About orbit; the path follows the --rx / --ry ellipse. */
+.orbit-spark {
+  display: none;
+}
+@supports (offset-path: ellipse(10% 10% at 50% 50%)) {
+  .orbit-spark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background: var(--aqua);
+    box-shadow: 0 0 0 5px color-mix(in oklab, var(--aqua) 25%, transparent), 0 0 18px var(--aqua);
+    offset-path: ellipse(var(--rx) var(--ry) at 50% 50%);
+    offset-rotate: 0deg;
+    animation: orbit-travel 22s linear infinite;
+  }
+  /* The second spark runs half an orbit behind the first. */
+  .orbit-spark ~ .orbit-spark {
+    animation-delay: -11s;
+  }
+}
+@keyframes orbit-travel {
+  to {
+    offset-distance: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .orbit-spark {
+    display: none;
+  }
+}
+
 @utility bg-dots {
   background-image: radial-gradient(color-mix(in oklab, var(--fg) 9%, transparent) 1px, transparent 1px);
   background-size: 22px 22px;

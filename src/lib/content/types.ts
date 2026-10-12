@@ -43,6 +43,8 @@ export interface SiteSettings {
 
   motivation: string;
   agenticAI: string;
+  /** Short points circled around Aura in the home page About section. */
+  aboutPoints: IconItem[];
   audience: IconItem[];
   activities: IconItem[];
   themes: { key: Exclude<ThemeKey, "general">; title: string; description: string }[];

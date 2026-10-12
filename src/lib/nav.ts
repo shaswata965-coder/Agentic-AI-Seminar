@@ -14,6 +14,7 @@ export const HOME_NAV: NavItem = { href: "/", label: "Home" };
 
 /** Dedicated pages listed under Explore, next to the home page sections. */
 export const EXPLORE_PAGES: NavItem[] = [
+  { href: "/about", label: "About", description: "Why this workshop, what agentic AI is, who should attend" },
   { href: "/tutorials", label: "Tutorials & Demos", description: "Hands-on sessions and live agent demos" },
   { href: "/hackathon", label: "Hackathon", description: "Tracks, rules, prizes and team registration" },
   { href: "/organisers", label: "Organisers", description: "Faculty, student organisers and volunteers" },
@@ -21,7 +22,6 @@ export const EXPLORE_PAGES: NavItem[] = [
 
 /** Sections of the single-scroll home page. */
 export const SECTION_NAV: NavItem[] = [
-  { href: "/#about", label: "About", description: "Why this workshop, what agentic AI is, who should attend" },
   { href: "/#themes", label: "Themes", description: "Healthcare, scientific discovery and entrepreneurship" },
   { href: "/#kiosks", label: "Industry kiosks", description: "Companies showcasing agentic technology" },
   { href: "/#venue", label: "Venue & travel", description: "Map, directions, campus entry and stays" },

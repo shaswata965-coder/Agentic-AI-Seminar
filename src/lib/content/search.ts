@@ -10,12 +10,12 @@ const PAGES: AssistantEntry[] = [
   { kind: "Page", title: "Hackathon", subtitle: "Tracks, timeline, prizes and rules", href: "/hackathon", keywords: "hackathon team prize prizes track judging criteria mentors judges rules code of conduct timeline" },
   { kind: "Page", title: "Hackathon registration", href: "/hackathon/register", keywords: "hackathon register team sign up apply" },
   { kind: "Page", title: "Registration", subtitle: "Register for the workshop", href: "/register", keywords: "register registration sign up ticket fee fees deadline seat" },
+  { kind: "Page", title: "About the workshop", subtitle: "Why agentic AI, who should attend, what happens", href: "/about", keywords: "about motivation what is agentic ai who should attend audience activities" },
   { kind: "Page", title: "Organisers", subtitle: "Faculty, student organisers and volunteers", href: "/organisers", keywords: "team organisers organizers faculty students volunteers committee" },
   { kind: "Page", title: "Meet Aura", subtitle: "Our agentic mascot", href: "/meet-aura", keywords: "mascot aura robot" },
 ];
 
 const SECTIONS: AssistantEntry[] = [
-  { kind: "Section", title: "About the workshop", href: "/#about", keywords: "about motivation what is agentic ai who should attend audience" },
   { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Entrepreneurship", href: "/#themes", keywords: "themes healthcare science discovery entrepreneurship startups" },
   { kind: "Section", title: "Announcements", href: "/#news", keywords: "news updates announcements" },
   { kind: "Section", title: "Industry kiosks", href: "/#kiosks", keywords: "industry kiosk exhibit exhibitor booth companies" },
