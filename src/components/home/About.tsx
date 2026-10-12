@@ -22,7 +22,7 @@ export function About({ s }: { s: SiteSettings }) {
   return (
     <Section id="about" tone="mint" wash labelledBy="about-title" tags="underline">
       <div className="text-center">
-        <Eyebrow>About the workshop</Eyebrow>
+        <Eyebrow centered>About the workshop</Eyebrow>
         <h2 id="about-title" className="sr-only">
           About the workshop
         </h2>

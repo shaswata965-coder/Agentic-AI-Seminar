@@ -42,18 +42,26 @@ export function Section({
   );
 }
 
-/** Section header label: an "agent node" with a slowly orbiting signal, and the label on a card with a gradient edge (see tags.css). */
-export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
+/** A tiny agent network beside the header label: three nodes on a line, with a signal hopping toward the text. */
+function Trace({ flip }: { flip?: boolean }) {
+  return (
+    <svg viewBox="0 0 56 16" aria-hidden focusable="false" className={cn("eyebrow-trace", flip && "-scale-x-100")}>
+      <line x1="5" y1="8" x2="50" y2="8" className="eyebrow-edge" />
+      <circle cx="5" cy="8" r="4" className="eyebrow-source" />
+      <circle cx="27.5" cy="8" r="2.6" className="eyebrow-hop" />
+      <circle cx="50" cy="8" r="3.3" className="eyebrow-target" />
+      <circle cx="5" cy="8" r="2.1" className="eyebrow-pulse" />
+    </svg>
+  );
+}
+
+/** Section header label: open, letter-spaced text led by an agent trace (no box; see tags.css). Centred headings get a trace on both sides. */
+export function Eyebrow({ children, className, centered }: { children: ReactNode; className?: string; centered?: boolean }) {
   return (
     <span className={cn("eyebrow", className)}>
-      <span aria-hidden className="eyebrow-mark">
-        <svg viewBox="0 0 24 24" focusable="false">
-          <circle cx="12" cy="12" r="8.5" className="eyebrow-ring" />
-          <circle cx="12" cy="12" r="3.6" className="eyebrow-core" />
-          <circle cx="20.5" cy="12" r="2.6" className="eyebrow-signal" />
-        </svg>
-      </span>
+      <Trace />
       <span className="min-w-0">{children}</span>
+      {centered ? <Trace flip /> : null}
     </span>
   );
 }
@@ -87,7 +95,7 @@ export function SectionHeading({
       )}
     >
       <div className={cn("max-w-2xl", align === "center" && "mx-auto")}>
-        {eyebrow ? <Eyebrow>{eyebrow}</Eyebrow> : null}
+        {eyebrow ? <Eyebrow centered={align === "center"}>{eyebrow}</Eyebrow> : null}
         <Tag
           id={id}
           className={cn(
