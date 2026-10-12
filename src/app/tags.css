@@ -37,12 +37,11 @@
     font-weight: 800;
   }
   /* Section header label (components/ui/Section.tsx → Eyebrow). No box at all: larger,
-     letter-spaced display text in the section tone, led by an agent trace whose signal
-     hops from node to node and lands beside the label. */
+     letter-spaced display text in the section tone, led by a mini Aura in the same tone. */
   .eyebrow {
     display: inline-flex;
     align-items: center;
-    gap: 0.85rem;
+    gap: 0.75rem;
     max-width: 100%;
     font-family: var(--font-display);
     font-size: 0.9375rem;
@@ -52,42 +51,70 @@
     text-transform: uppercase;
     color: var(--accent-ink);
   }
-  .eyebrow-trace {
-    flex-shrink: 0;
-    width: 3.5rem;
-    height: 1rem;
-    overflow: visible;
-  }
-  .eyebrow-edge {
-    stroke: color-mix(in oklab, var(--accent) 70%, var(--accent-ink));
-    stroke-width: 2;
-    stroke-linecap: round;
-  }
-  .eyebrow-source {
-    fill: var(--accent-ink);
-  }
-  .eyebrow-hop {
-    fill: var(--bg);
-    stroke: var(--accent-ink);
-    stroke-width: 1.5;
-  }
-  .eyebrow-target {
-    fill: var(--accent);
-    stroke: var(--accent-ink);
-    stroke-width: 1.5;
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: eyebrow-receive 3.6s ease-in-out infinite;
-  }
-  .eyebrow-pulse {
-    fill: var(--accent-ink);
-    opacity: 0;
-    animation: eyebrow-pulse 3.6s ease-in-out infinite;
-  }
   @media (min-width: 640px) {
     .eyebrow {
       font-size: 1.0625rem;
     }
+  }
+
+  /* Mini Aura (components/aura/MiniAura.tsx), coloured by the surrounding tone. She floats,
+     blinks, glances toward the label and every few seconds waves. */
+  .mini-aura {
+    flex-shrink: 0;
+    width: 1.9rem;
+    height: 2.2rem;
+    overflow: visible;
+  }
+  .mini-aura-shell {
+    fill: color-mix(in oklab, var(--accent) 40%, #fff);
+    stroke: color-mix(in oklab, var(--accent-ink) 45%, transparent);
+    stroke-width: 1.2;
+  }
+  .dark .mini-aura-shell {
+    fill: color-mix(in oklab, var(--accent) 72%, #fff);
+    stroke: color-mix(in oklab, var(--accent) 60%, transparent);
+  }
+  .mini-aura-visor {
+    fill: #0d1426;
+  }
+  .mini-aura-core {
+    fill: var(--accent);
+    stroke: var(--accent-ink);
+    stroke-width: 0.8;
+    animation: mini-aura-glow 2.8s ease-in-out infinite;
+  }
+  .mini-aura-eyes {
+    fill: color-mix(in oklab, var(--accent) 60%, #fff);
+    transform-box: fill-box;
+    transform-origin: center;
+    animation:
+      mini-aura-blink 4.6s infinite,
+      mini-aura-glance 9s ease-in-out infinite;
+  }
+  .mini-aura-bot {
+    animation: mini-aura-float 2.8s ease-in-out infinite;
+  }
+  .mini-aura-shadow {
+    fill: var(--accent-ink);
+    opacity: 0.2;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: mini-aura-shadow 2.8s ease-in-out infinite;
+  }
+  .mini-aura-wave {
+    transform-box: fill-box;
+    transform-origin: 50% 12%;
+    animation: mini-aura-wave 7s ease-in-out infinite;
+  }
+  /* The second Aura beside a centred label runs a beat behind the first. */
+  .mini-aura-late :is(.mini-aura-bot, .mini-aura-shadow, .mini-aura-core) {
+    animation-delay: -1.4s;
+  }
+  .mini-aura-late .mini-aura-wave {
+    animation-delay: -3.5s;
+  }
+  .mini-aura-late .mini-aura-eyes {
+    animation-delay: -2.3s, -4.5s;
   }
   /* Other headline tags (e.g. "Theme 1"). */
   .tag-eyebrow {
@@ -172,33 +199,64 @@
   }
 }
 
-/* The signal leaves the first node, passes the middle one and arrives at the node next to the label, which swells as it lands. */
-@keyframes eyebrow-pulse {
-  0% {
-    translate: 0 0;
-    opacity: 0;
-  }
-  8% {
-    opacity: 1;
-  }
-  62% {
-    translate: 45px 0;
-    opacity: 1;
-  }
-  72%,
-  100% {
-    translate: 45px 0;
-    opacity: 0;
+@keyframes mini-aura-float {
+  50% {
+    translate: 0 -2.5px;
   }
 }
-@keyframes eyebrow-receive {
+@keyframes mini-aura-shadow {
+  50% {
+    scale: 0.72 1;
+    opacity: 0.12;
+  }
+}
+@keyframes mini-aura-glow {
+  50% {
+    opacity: 0.55;
+  }
+}
+@keyframes mini-aura-blink {
   0%,
-  58%,
-  86%,
+  90%,
+  97%,
   100% {
-    scale: 1;
+    scale: 1 1;
+  }
+  93.5% {
+    scale: 1 0.12;
+  }
+}
+/* Eyes drift toward the label (to her right), rest, then come back. */
+@keyframes mini-aura-glance {
+  0%,
+  22%,
+  78%,
+  100% {
+    translate: 0 0;
+  }
+  30%,
+  70% {
+    translate: 1.6px 0.3px;
+  }
+}
+/* A quick wave: the arm swings up, waggles twice and comes down. */
+@keyframes mini-aura-wave {
+  0%,
+  62%,
+  92%,
+  100% {
+    rotate: 0deg;
   }
   68% {
-    scale: 1.45;
+    rotate: -150deg;
+  }
+  73% {
+    rotate: -120deg;
+  }
+  78% {
+    rotate: -150deg;
+  }
+  83% {
+    rotate: -120deg;
   }
 }

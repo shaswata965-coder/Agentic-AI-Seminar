@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MiniAura } from "@/components/aura/MiniAura";
 import { cn } from "@/lib/cn";
 import type { Tone } from "@/lib/content/constants";
 import type { TagStyle } from "./Tag";
@@ -42,26 +43,13 @@ export function Section({
   );
 }
 
-/** A tiny agent network beside the header label: three nodes on a line, with a signal hopping toward the text. */
-function Trace({ flip }: { flip?: boolean }) {
-  return (
-    <svg viewBox="0 0 56 16" aria-hidden focusable="false" className={cn("eyebrow-trace", flip && "-scale-x-100")}>
-      <line x1="5" y1="8" x2="50" y2="8" className="eyebrow-edge" />
-      <circle cx="5" cy="8" r="4" className="eyebrow-source" />
-      <circle cx="27.5" cy="8" r="2.6" className="eyebrow-hop" />
-      <circle cx="50" cy="8" r="3.3" className="eyebrow-target" />
-      <circle cx="5" cy="8" r="2.1" className="eyebrow-pulse" />
-    </svg>
-  );
-}
-
-/** Section header label: open, letter-spaced text led by an agent trace (no box; see tags.css). Centred headings get a trace on both sides. */
+/** Section header label: open, letter-spaced text led by a mini Aura in the section's colour (no box; see tags.css). Centred headings get one on each side, facing the label. */
 export function Eyebrow({ children, className, centered }: { children: ReactNode; className?: string; centered?: boolean }) {
   return (
     <span className={cn("eyebrow", className)}>
-      <Trace />
+      <MiniAura />
       <span className="min-w-0">{children}</span>
-      {centered ? <Trace flip /> : null}
+      {centered ? <MiniAura flip className="mini-aura-late" /> : null}
     </span>
   );
 }
