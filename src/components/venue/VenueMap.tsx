@@ -162,7 +162,7 @@ export function VenueMap({ directions, query, children }: { directions: SiteSett
           How are you arriving?
         </p>
         <div ref={listRef} role="group" aria-labelledby="arrive-label" className="group/seg relative isolate mt-3 grid grid-cols-2 gap-1.5 rounded-3xl border border-border bg-surface p-1.5 shadow-card sm:grid-cols-4 lg:grid-cols-2">
-          <SlidingPill pillRef={pillRef} className="rounded-[1.1rem]! bg-accent-soft ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
+          <SlidingPill pillRef={pillRef} shape="rounded-[1.1rem]" className="bg-accent-soft ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
           {directions.map((d, i) => {
             const m = MODE[d.mode] ?? MODE.road;
             const on = i === active;
@@ -302,7 +302,7 @@ export function VenueMap({ directions, query, children }: { directions: SiteSett
             type="button"
             onClick={() => setRun((r) => r + 1)}
             data-ripple=""
-            className="group/replay absolute top-2.5 right-2.5 z-40 inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/90 px-2 py-2 text-xs font-semibold text-fg shadow-card backdrop-blur transition hover:-translate-y-0.5 hover:border-brand hover:text-brand sm:px-3 sm:py-1.5"
+            className="group/replay key key-line absolute top-2.5 right-2.5 z-40 inline-flex items-center gap-1.5 rounded-[0.65rem] border border-border-strong bg-surface/90 px-2 py-2 text-xs font-semibold text-fg backdrop-blur hover:border-brand hover:text-brand sm:px-3 sm:py-1.5"
           >
             <RotateCcw size={14} aria-hidden className="transition-transform duration-500 group-hover/replay:-rotate-180" />
             <span className="max-sm:sr-only">Replay route</span>

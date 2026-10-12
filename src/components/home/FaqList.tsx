@@ -33,7 +33,7 @@ export function FaqList({ faqs, showAura = true }: { faqs: Faq[]; showAura?: boo
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search questions…"
-              className="h-12 w-full rounded-full border border-border bg-surface pr-4 pl-11 text-[15px] focus:border-brand focus:ring-4 focus:ring-[color-mix(in_oklab,var(--brand)_18%,transparent)] focus:outline-none"
+              className="h-12 w-full rounded-xl border border-border bg-surface pr-4 pl-11 text-[15px] focus:border-brand focus:ring-4 focus:ring-[color-mix(in_oklab,var(--brand)_18%,transparent)] focus:outline-none"
             />
           </label>
           {cats.length > 1 ? (
@@ -46,8 +46,8 @@ export function FaqList({ faqs, showAura = true }: { faqs: Faq[]; showAura?: boo
                   onClick={() => setCat(c)}
                   data-ripple=""
                   className={cn(
-                    "rounded-md px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5",
-                    cat === c ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
+                    "key key-sm rounded-[0.6rem] border px-3 py-1.5 text-sm font-semibold",
+                    cat === c ? "bg-accent-soft text-accent-ink border-[color-mix(in_oklab,var(--accent)_55%,transparent)] [--key-edge:color-mix(in_oklab,var(--accent)_70%,var(--accent-ink))]" : "key-line border-border bg-surface text-muted hover:text-fg",
                   )}
                 >
                   {c === "all" ? "All" : (FAQ_CATEGORY_META[c as keyof typeof FAQ_CATEGORY_META] ?? c)}

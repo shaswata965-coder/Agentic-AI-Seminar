@@ -19,7 +19,7 @@ export function ShareButtons({ url, text, className, label = "Share" }: { url: s
     { name: "Facebook", href: `https://www.facebook.com/sharer/sharer.php?u=${enc(url)}`, Icon: FacebookIcon },
   ];
   const btn =
-    "grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-muted transition hover:-translate-y-1 hover:border-brand hover:text-brand hover:shadow-card";
+    "key key-line grid h-10 w-10 place-items-center rounded-xl border border-border-strong bg-surface text-muted hover:border-brand hover:text-brand";
 
   async function copy() {
     try {

@@ -144,7 +144,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "group relative rounded-full px-3 py-2 text-[14.5px] font-semibold whitespace-nowrap transition-colors",
+                  "group relative rounded-lg px-3 py-2 text-[14.5px] font-semibold whitespace-nowrap transition-colors",
                   active ? "text-brand" : "text-muted hover:text-fg",
                 )}
               >
@@ -166,7 +166,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
               aria-controls="explore-menu"
               onClick={() => setExploreOpen((v) => !v)}
               data-ripple=""
-              className={cn("inline-flex items-center gap-1 rounded-full px-3 py-2 text-[14.5px] font-semibold transition-colors hover:bg-surface-2 hover:text-fg", exploreOpen ? "bg-surface-2 text-fg" : exploreActive ? "text-brand" : "text-muted")}
+              className={cn("inline-flex items-center gap-1 rounded-lg px-3 py-2 text-[14.5px] font-semibold transition-colors hover:bg-surface-2 hover:text-fg", exploreOpen ? "bg-surface-2 text-fg" : exploreActive ? "text-brand" : "text-muted")}
             >
               Explore
               <ChevronDown size={16} aria-hidden className={cn("transition-transform duration-300", exploreOpen && "rotate-180")} />
@@ -199,7 +199,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
           <button
             type="button"
             data-ripple=""
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-fg lg:hidden"
+            className="key key-line grid h-10 w-10 place-items-center rounded-xl border border-border-strong bg-surface text-fg lg:hidden"
             aria-label="Open menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
@@ -231,7 +231,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
                   type="button"
                   onClick={() => setMenuOpen(false)}
                   data-ripple=""
-                  className="group grid h-10 w-10 place-items-center rounded-full border border-border bg-surface"
+                  className="group key key-line grid h-10 w-10 place-items-center rounded-xl border border-border-strong bg-surface"
                   aria-label="Close menu"
                 >
                   <X size={20} aria-hidden className="transition-transform duration-300 group-hover:rotate-90" />

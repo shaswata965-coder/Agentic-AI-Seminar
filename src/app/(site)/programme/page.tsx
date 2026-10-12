@@ -85,7 +85,7 @@ export default async function ProgrammePage() {
         <ol className="container-site flex gap-1 overflow-x-auto py-2 [scrollbar-width:none]">
           {JUMPS.map((j, i) => (
             <li key={j.href} className="shrink-0">
-              <a href={j.href} className="group flex items-center gap-2 rounded-full px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-surface hover:text-fg">
+              <a href={j.href} className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-surface hover:text-fg">
                 <span className="font-mono text-[11px] text-subtle transition-colors group-hover:text-brand">{String(i + 1).padStart(2, "0")}</span>
                 {j.label}
               </a>

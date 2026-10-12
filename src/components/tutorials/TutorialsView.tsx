@@ -51,8 +51,8 @@ export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; dem
               data-ripple=""
               className={cn(
                 t === "all" ? "tone-mint" : `tone-${THEME_META[t].tone}`,
-                "rounded-full px-4 py-2 text-sm font-semibold transition hover:-translate-y-0.5",
-                theme === t ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_55%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
+                "key key-sm rounded-[0.7rem] border px-4 py-2 text-sm font-semibold",
+                theme === t ? "bg-accent-soft text-accent-ink border-[color-mix(in_oklab,var(--accent)_55%,transparent)] [--key-edge:color-mix(in_oklab,var(--accent)_70%,var(--accent-ink))]" : "key-line border-border bg-surface text-muted hover:text-fg",
               )}
             >
               {t === "all" ? "All themes" : THEME_META[t].short}

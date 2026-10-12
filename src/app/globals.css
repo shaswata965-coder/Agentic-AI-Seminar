@@ -415,6 +415,119 @@
   }
 }
 
+/* Portals (components/ui/Portal.tsx): links to other pages drawn as previews of where they lead.
+   On hover the card rises, a signal runs along the trace to the arrow and the picture comes alive. */
+.portal {
+  transition: translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+}
+.portal:is(:hover, :focus-visible) {
+  translate: 0 -3px;
+  border-color: color-mix(in oklab, var(--accent) 65%, var(--border));
+  box-shadow: var(--card-shadow-lg);
+}
+.portal-go {
+  transition: background-color 0.3s ease, color 0.3s ease, rotate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.portal-go svg {
+  transition: translate 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.portal:is(:hover, :focus-visible) .portal-go {
+  background: var(--brand);
+  color: var(--brand-fg);
+  rotate: -6deg;
+}
+.portal:is(:hover, :focus-visible) .portal-go svg {
+  translate: 2px 0;
+}
+.portal-edge {
+  stroke: color-mix(in oklab, var(--accent) 70%, var(--accent-ink));
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-dasharray: 3 4;
+}
+.portal-node {
+  fill: var(--accent-ink);
+}
+.portal-pulse {
+  fill: var(--brand);
+  opacity: 0;
+}
+.portal:is(:hover, :focus-visible) .portal-edge {
+  animation: portal-flow 0.5s linear infinite;
+}
+.portal:is(:hover, :focus-visible) .portal-pulse {
+  animation: portal-pulse 1.1s ease-in-out infinite;
+}
+/* Art: faces fan out, the loop signal circles, timetable bars fill in, the route marches, bubbles bob. */
+.portal-face {
+  transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.portal:is(:hover, :focus-visible) .portal-face {
+  translate: calc((var(--i) - 1) * 4px) -2px;
+}
+.portal-orbit {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  animation: spin-slow 9s linear infinite;
+}
+.portal:is(:hover, :focus-visible) .portal-orbit {
+  animation-duration: 3s;
+}
+.portal-bar {
+  transform-origin: left;
+  transition: scale 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: calc(var(--i) * 60ms);
+}
+.portal:is(:hover, :focus-visible) .portal-bar {
+  scale: 1.15 1;
+}
+.portal-march {
+  animation: portal-flow-route 2.4s linear infinite;
+}
+.portal-spin {
+  animation: spin-slow 14s linear infinite;
+}
+.portal:is(:hover, :focus-visible) .portal-spin {
+  animation-duration: 4s;
+}
+.portal-bubble {
+  transition: translate 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition-delay: calc(var(--i, 0) * 80ms);
+}
+.portal:is(:hover, :focus-visible) .portal-bubble {
+  translate: 0 -3px;
+}
+.portal-ping {
+  animation: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+@keyframes portal-flow {
+  to {
+    stroke-dashoffset: -7;
+  }
+}
+@keyframes portal-flow-route {
+  to {
+    stroke-dashoffset: -27;
+  }
+}
+@keyframes portal-pulse {
+  0% {
+    translate: 0 0;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  80% {
+    translate: 33px 0;
+    opacity: 1;
+  }
+  100% {
+    translate: 33px 0;
+    opacity: 0;
+  }
+}
+
 /* Venue route map (components/venue/VenueMap.tsx): pin labels, the travelling Aura and the touch-down ring. */
 .venue-pin-label[data-side="right"] { left: calc(100% + 6px); top: 50%; translate: 0 -50%; }
 .venue-pin-label[data-side="left"] { right: calc(100% + 6px); top: 50%; translate: 0 -50%; }

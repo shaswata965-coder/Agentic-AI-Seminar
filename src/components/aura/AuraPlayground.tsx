@@ -77,7 +77,7 @@ export function AuraPlayground() {
             overrides={{ expression, pose, prop: prop === "none" ? undefined : prop, headwear: headwear === "none" ? undefined : headwear, emblem, effects, eyeColor: eye }}
           />
         </div>
-        <button type="button" onClick={surprise} data-ripple="" className="btn-shine group mt-4 inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 font-semibold text-brand-fg transition hover:-translate-y-0.5 hover:bg-brand-strong">
+        <button type="button" onClick={surprise} data-ripple="" className="btn-shine key key-brand group mt-4 inline-flex items-center gap-2 rounded-[0.85rem] bg-brand px-5 py-2.5 font-semibold text-brand-fg hover:bg-brand-strong">
           <Shuffle size={17} aria-hidden className="transition-transform duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:rotate-180" /> Surprise me
         </button>
       </div>

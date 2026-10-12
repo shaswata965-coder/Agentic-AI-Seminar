@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Aura } from "@/components/aura/Aura";
 import { PageHero } from "@/components/layout/PageHero";
+import { ScheduleArt } from "@/components/portals/PortalArt";
 import { SpeakersView, type SpeakerSession } from "@/components/speakers/SpeakersView";
 import { ButtonLink } from "@/components/ui/Button";
+import { Portal } from "@/components/ui/Portal";
 import { TagScope } from "@/components/ui/Tag";
 import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import { eventDayLabel } from "@/lib/format";
@@ -44,9 +46,7 @@ export default async function SpeakersPage() {
         aura="speakers"
         description={<p>Researchers, practitioners and founders shaping agentic AI. Tap a card to read the bio, talk title and abstract.</p>}
       >
-        <ButtonLink href="/programme" variant="outline">
-          See the programme
-        </ButtonLink>
+        <Portal href="/programme" tone="azure" compact kicker="Programme" title="When each talk happens" text="Day-wise schedule, panels and your own agenda." art={<ScheduleArt />} className="w-full max-w-md" />
       </PageHero>
       <section className="tone-lilac py-12 sm:py-16">
         <div className="container-site">

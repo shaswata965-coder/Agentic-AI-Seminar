@@ -111,11 +111,11 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
         type="button"
         data-aura-assistant
         onClick={() => setOpen(true)}
-        className="group fixed right-4 bottom-4 z-40 flex items-center gap-2 rounded-full border border-border bg-surface/95 py-1.5 pr-4 pl-1.5 shadow-card-lg backdrop-blur transition hover:-translate-y-0.5 sm:right-6 sm:bottom-6"
+        className="group key key-line fixed right-4 bottom-4 z-40 flex items-center gap-2 rounded-2xl border border-border-strong bg-surface/95 py-1.5 pr-4 pl-1.5 backdrop-blur hover:border-brand sm:right-6 sm:bottom-6"
         aria-keyshortcuts="Control+K Meta+K"
       >
-        <span className="relative grid h-11 w-11 place-items-center rounded-full bg-[linear-gradient(135deg,var(--azure-soft),var(--lilac-soft))]">
-          <span aria-hidden className="absolute inset-0 animate-ping-soft rounded-full bg-[var(--aqua)] opacity-30 motion-desktop-only" />
+        <span className="relative grid h-11 w-11 place-items-center rounded-xl bg-[linear-gradient(135deg,var(--azure-soft),var(--lilac-soft))]">
+          <span aria-hidden className="absolute inset-0 animate-ping-soft rounded-xl bg-[var(--aqua)] opacity-30 motion-desktop-only" />
           <AuraHead size={32} className="relative transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6" />
         </span>
         <span className="sr-only text-sm font-semibold text-fg sm:not-sr-only">Ask Aura</span>
@@ -205,14 +205,14 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
                     <Link
                       href={facts.registerHref}
                       onClick={() => setOpen(false)}
-                      className="rounded-full bg-brand px-3.5 py-1.5 text-sm font-semibold text-brand-fg"
+                      className="key key-brand rounded-[0.7rem] bg-brand px-3.5 py-1.5 text-sm font-semibold text-brand-fg"
                     >
                       Register
                     </Link>
                     <Link
                       href={facts.hackathonHref}
                       onClick={() => setOpen(false)}
-                      className="rounded-full bg-surface px-3.5 py-1.5 text-sm font-semibold text-fg ring-1 ring-border"
+                      className="key key-line rounded-[0.7rem] border border-border-strong bg-surface px-3.5 py-1.5 text-sm font-semibold text-fg"
                     >
                       Join the hackathon
                     </Link>

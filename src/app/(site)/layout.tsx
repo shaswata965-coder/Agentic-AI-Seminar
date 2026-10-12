@@ -17,7 +17,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
     <ToastProvider>
       <a
         href="#main"
-        className="sr-only z-[70] rounded-full bg-brand px-4 py-2 font-semibold text-brand-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        className="sr-only z-[70] rounded-lg bg-brand px-4 py-2 font-semibold text-brand-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Skip to content
       </a>

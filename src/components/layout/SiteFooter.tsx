@@ -29,7 +29,7 @@ export function SocialLinks({ s, className }: { s: SiteSettings; className?: str
             rel="noopener noreferrer"
             aria-label={`${label} (opens in a new tab)`}
             data-ripple=""
-            className="grid h-10 w-10 place-items-center rounded-full border border-border bg-surface text-muted transition hover:-translate-y-1 hover:border-brand hover:text-brand hover:shadow-card"
+            className="key key-line grid h-10 w-10 place-items-center rounded-xl border border-border-strong bg-surface text-muted hover:border-brand hover:text-brand"
           >
             <span className="btn-ico-l">
               <Icon size={17} />

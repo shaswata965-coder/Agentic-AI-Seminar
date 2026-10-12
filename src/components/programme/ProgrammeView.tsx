@@ -50,8 +50,8 @@ function Chip({ on, onClick, children, tone }: { on: boolean; onClick: () => voi
       data-ripple=""
       className={cn(
         tone,
-        "rounded-md px-3 py-1.5 text-sm font-semibold transition hover:-translate-y-0.5",
-        on ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_55%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
+        "key key-sm rounded-[0.6rem] border px-3 py-1.5 text-sm font-semibold",
+        on ? "bg-accent-soft text-accent-ink border-[color-mix(in_oklab,var(--accent)_55%,transparent)] [--key-edge:color-mix(in_oklab,var(--accent)_70%,var(--accent-ink))]" : "key-line border-border bg-surface text-muted hover:text-fg",
       )}
     >
       {children}
@@ -208,7 +208,7 @@ export function ProgrammeView({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search titles, speakers, rooms…"
-              className="h-11 w-full rounded-full border border-border bg-surface pr-4 pl-10 text-[15px] focus:border-brand focus:ring-4 focus:ring-[color-mix(in_oklab,var(--brand)_18%,transparent)] focus:outline-none"
+              className="h-11 w-full rounded-xl border border-border bg-surface pr-4 pl-10 text-[15px] focus:border-brand focus:ring-4 focus:ring-[color-mix(in_oklab,var(--brand)_18%,transparent)] focus:outline-none"
             />
           </label>
           <button
@@ -217,8 +217,8 @@ export function ProgrammeView({
             onClick={() => setAgendaOnly((v) => !v)}
             data-ripple=""
             className={cn(
-              "tone-butter inline-flex h-11 items-center gap-2 rounded-full px-4 text-sm font-semibold transition hover:-translate-y-0.5",
-              agendaOnly ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_55%,transparent)]" : "bg-surface text-muted ring-1 ring-border hover:text-fg",
+              "tone-butter key key-sm inline-flex h-11 items-center gap-2 rounded-[0.75rem] border px-4 text-sm font-semibold",
+              agendaOnly ? "bg-accent-soft text-accent-ink border-[color-mix(in_oklab,var(--accent)_55%,transparent)] [--key-edge:color-mix(in_oklab,var(--accent)_70%,var(--accent-ink))]" : "key-line border-border bg-surface text-muted hover:text-fg",
             )}
           >
             <Star size={16} aria-hidden fill={agendaOnly ? "currentColor" : "none"} /> My agenda ({agenda.size})
@@ -318,7 +318,7 @@ export function ProgrammeView({
                                 href={withBase(`/api/calendar?session=${encodeURIComponent(s.id)}`)}
                                 download
                                 data-ripple=""
-                                className="grid h-9 w-9 place-items-center rounded-full text-subtle transition hover:-translate-y-0.5 hover:bg-surface-2 hover:text-fg"
+                                className="grid h-9 w-9 place-items-center rounded-lg text-subtle transition hover:-translate-y-0.5 hover:bg-surface-2 hover:text-fg"
                                 aria-label={`Add “${s.title}” to your calendar`}
                                 title="Add to calendar"
                               >
@@ -331,7 +331,7 @@ export function ProgrammeView({
                                 aria-label={starred ? `Remove “${s.title}” from my agenda` : `Add “${s.title}” to my agenda`}
                                 title={starred ? "In my agenda" : "Add to my agenda"}
                                 data-burst=""
-                                className={cn("grid h-9 w-9 place-items-center rounded-full transition hover:bg-surface-2", starred ? "text-butter-ink" : "text-subtle hover:text-fg")}
+                                className={cn("grid h-9 w-9 place-items-center rounded-lg transition hover:bg-surface-2", starred ? "text-butter-ink" : "text-subtle hover:text-fg")}
                               >
                                 <Star size={18} aria-hidden fill={starred ? "currentColor" : "none"} />
                               </button>

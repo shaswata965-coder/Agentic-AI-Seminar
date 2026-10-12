@@ -5,8 +5,10 @@ import { Deadline } from "@/components/forms/Deadline";
 import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { PageHero } from "@/components/layout/PageHero";
+import { TrophyArt } from "@/components/portals/PortalArt";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { Portal } from "@/components/ui/Portal";
 import { TagScope } from "@/components/ui/Tag";
 import { getSettings } from "@/lib/content/queries";
 import { eventCalendarLinks, venueLine } from "@/lib/event";
@@ -126,17 +128,17 @@ export default async function RegisterPage() {
               {s.workshopDeadline ? <Deadline iso={s.workshopDeadline} label="Workshop registration closes" /> : <p className="text-sm text-muted">Workshop registration deadline: to be announced.</p>}
               {s.hackathonDeadline ? <Deadline iso={s.hackathonDeadline} label="Hackathon registration closes" /> : <p className="text-sm text-muted">Hackathon registration deadline: to be announced.</p>}
             </div>
-            <div id="hackathon-note" className="tone-lilac card scroll-mt-28 p-6">
-              <div className="flex items-center gap-3">
-                <Aura variant="hackathon" size={64} lite />
-                <h2 className="font-display text-xl font-bold text-fg">Joining the hackathon?</h2>
-              </div>
-              <p className="mt-3 text-sm text-muted">Hackathon teams register separately. One member registers on behalf of the whole team.</p>
-              <div className="mt-4">
-                <ButtonLink href="/hackathon" variant="soft" size="sm">
-                  Hackathon details
-                </ButtonLink>
-              </div>
+            <div id="hackathon-note" className="scroll-mt-28">
+              <h2 className="sr-only">Joining the hackathon?</h2>
+              <Portal
+                href="/hackathon"
+                tone="lilac"
+                compact
+                kicker="Joining the hackathon?"
+                title="Hackathon details"
+                text="Teams register separately: one member registers for the whole team."
+                art={<TrophyArt />}
+              />
             </div>
           </aside>
         </div>

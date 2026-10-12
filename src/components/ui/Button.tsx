@@ -6,24 +6,24 @@ import { withBase } from "@/lib/paths";
 type Variant = "primary" | "secondary" | "soft" | "outline" | "ghost";
 type Size = "sm" | "md" | "lg";
 
-// Micro-interactions (see app/micro.css): lift on hover, dip on press, ink
-// ripple (data-ripple), sheen on primary buttons and nudging icons.
+// Keycap buttons (see .key in app/micro.css): rounded rectangles on a solid edge that rise on
+// hover and press down while held; plus the ink ripple (data-ripple), a sheen on primary buttons
+// and nudging icons. Links to other pages in a section use <Portal> instead (components/ui/Portal.tsx).
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-[translate,scale,background-color,box-shadow,color,border-color,opacity] duration-200 ease-out active:scale-[0.96] disabled:pointer-events-none disabled:opacity-60";
+  "inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap transition-[translate,box-shadow,background-color,color,border-color,opacity] duration-150 ease-out disabled:pointer-events-none disabled:opacity-60";
 
 const variants: Record<Variant, string> = {
-  primary:
-    "btn-shine bg-brand text-brand-fg shadow-[0_10px_28px_-12px_color-mix(in_oklab,var(--brand)_80%,transparent)] hover:-translate-y-0.5 hover:bg-brand-strong hover:shadow-[0_16px_34px_-12px_color-mix(in_oklab,var(--brand)_85%,transparent)]",
-  secondary: "bg-fg text-bg hover:-translate-y-0.5 hover:opacity-90",
-  soft: "bg-accent-soft text-accent-ink ring-1 ring-inset ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] hover:-translate-y-0.5 hover:bg-[color-mix(in_oklab,var(--accent)_28%,var(--accent-soft))]",
-  outline: "border border-border-strong bg-surface text-fg hover:-translate-y-0.5 hover:border-brand hover:text-brand hover:shadow-card",
+  primary: "key key-brand btn-shine bg-brand text-brand-fg hover:bg-brand-strong",
+  secondary: "key key-ink bg-fg text-bg hover:opacity-90",
+  soft: "key key-accent border border-[color-mix(in_oklab,var(--accent)_55%,transparent)] bg-accent-soft text-accent-ink hover:bg-[color-mix(in_oklab,var(--accent)_28%,var(--accent-soft))]",
+  outline: "key key-line border border-border-strong bg-surface text-fg hover:border-brand hover:text-brand",
   ghost: "text-fg hover:bg-surface-2",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-9 px-4 text-sm",
-  md: "h-11 px-5 text-[15px]",
-  lg: "h-13 px-7 text-base",
+  sm: "h-9 rounded-[0.7rem] px-3.5 text-sm",
+  md: "h-11 rounded-[0.85rem] px-5 text-[15px]",
+  lg: "h-13 rounded-[1rem] px-6 text-base",
 };
 
 interface CommonProps {

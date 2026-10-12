@@ -36,11 +36,11 @@ export function GalleryGrid({ items }: { items: GalleryItem[] }) {
           <figure className="p-3">
             <Img src={cur.image} alt={cur.alt || cur.caption || "Workshop photo"} className="max-h-[75dvh] w-full rounded-2xl object-contain" loading="eager" />
             <figcaption id="gallery-caption" className="flex items-center justify-between gap-3 px-2 pt-3 text-sm text-muted">
-              <button type="button" onClick={() => go(-1)} data-ripple="" className="grid h-10 w-10 place-items-center rounded-full bg-surface-2 hover:-translate-x-0.5 hover:text-fg" aria-label="Previous photo">
+              <button type="button" onClick={() => go(-1)} data-ripple="" className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 hover:-translate-x-0.5 hover:text-fg" aria-label="Previous photo">
                 <ChevronLeft size={18} />
               </button>
               <span className="text-center">{cur.caption || `Photo ${open! + 1} of ${items.length}`}</span>
-              <button type="button" onClick={() => go(1)} data-ripple="" className="grid h-10 w-10 place-items-center rounded-full bg-surface-2 hover:translate-x-0.5 hover:text-fg" aria-label="Next photo">
+              <button type="button" onClick={() => go(1)} data-ripple="" className="grid h-10 w-10 place-items-center rounded-xl bg-surface-2 hover:translate-x-0.5 hover:text-fg" aria-label="Next photo">
                 <ChevronRight size={18} />
               </button>
             </figcaption>

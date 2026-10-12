@@ -115,6 +115,33 @@
   :hover > .btn-ico-l,
   :focus-visible > .btn-ico-l { rotate: -8deg; scale: 1.12; }
 
+  /* Keycap buttons: rounded rectangles resting on a solid edge, like the keys an agent's operator
+     presses. They rise a touch on hover and press down onto the edge while held; toggles that are
+     on (aria-pressed / aria-selected) stay pressed in. Box shadows draw the edge, so don't add
+     Tailwind ring-* or shadow-* utilities to a .key (they replace the box-shadow). */
+  .key {
+    --key-edge: var(--border-strong);
+    --key-depth: 3px;
+    --key-lift: 0px;
+    translate: 0 var(--key-lift);
+    box-shadow:
+      var(--key-inset, 0 0 #0000),
+      0 var(--key-depth) 0 0 var(--key-edge),
+      0 calc(var(--key-depth) + 6px) 14px -9px rgb(15 23 42 / 0.3);
+  }
+  .key:not(:disabled):hover { --key-lift: -1px; --key-depth: 4px; }
+  .key:not(:disabled):active { --key-lift: 2px; --key-depth: 1px; scale: 1; }
+  .key:is([aria-pressed="true"], [aria-selected="true"]):not(:disabled),
+  .key:is([aria-pressed="true"], [aria-selected="true"]):not(:disabled):hover { --key-lift: 2px; --key-depth: 1px; }
+  /* Edge colours */
+  .key-brand { --key-edge: color-mix(in oklab, var(--brand) 55%, #0a1033); --key-inset: inset 0 1px 0 rgb(255 255 255 / 0.22); }
+  .key-ink { --key-edge: color-mix(in oklab, var(--fg) 70%, #000); }
+  .key-accent { --key-edge: color-mix(in oklab, var(--accent) 70%, var(--accent-ink)); }
+  .key-line:not(:disabled):hover { --key-edge: color-mix(in oklab, var(--brand) 60%, var(--border-strong)); }
+  /* Small toggle keys (filters): a shallower edge */
+  .key-sm { --key-depth: 2px; }
+  .key-sm:not(:disabled):hover { --key-depth: 3px; }
+
   /* A sheen sweeps across primary buttons on hover */
   .btn-shine::after {
     content: "";

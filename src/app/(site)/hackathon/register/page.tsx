@@ -5,8 +5,10 @@ import { Deadline } from "@/components/forms/Deadline";
 import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { HackathonForm } from "@/components/forms/HackathonForm";
 import { PageHero } from "@/components/layout/PageHero";
+import { TrophyArt } from "@/components/portals/PortalArt";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { Portal } from "@/components/ui/Portal";
 import { TagScope } from "@/components/ui/Tag";
 import { THEME_META } from "@/lib/content/constants";
 import { getHackathon, getSettings } from "@/lib/content/queries";
@@ -83,11 +85,7 @@ function StatusCard({ closed }: { closed: boolean }) {
             ? "Thanks to everyone who registered! Shortlisted teams will be contacted by e-mail."
             : "Start forming your team! When registration opens you will need a team name, your preferred track, member details and a short idea summary."}
         </p>
-        <div className="mt-5 flex flex-wrap gap-3">
-          <ButtonLink href="/hackathon" variant="soft">
-            Read the hackathon details
-          </ButtonLink>
-        </div>
+        <Portal href="/hackathon" tone="aqua" compact kicker="Hackathon" title="Tracks, rules and prizes" art={<TrophyArt />} className="mt-5 max-w-md" />
       </div>
     </div>
   );

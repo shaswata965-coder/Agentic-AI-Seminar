@@ -58,7 +58,7 @@ export function Modal({
             type="button"
             onClick={onClose}
             data-ripple=""
-            className="group absolute top-3 right-3 z-10 grid h-10 w-10 place-items-center rounded-full bg-surface-2 text-muted transition hover:bg-surface-3 hover:text-fg"
+            className="group absolute top-3 right-3 z-10 grid h-10 w-10 place-items-center rounded-xl bg-surface-2 text-muted transition hover:bg-surface-3 hover:text-fg"
             aria-label="Close"
           >
             <X size={18} className="transition-transform duration-300 group-hover:rotate-90" />

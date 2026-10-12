@@ -55,9 +55,9 @@ export function Tabs({
         ref={listRef}
         role="tablist"
         aria-label={ariaLabel}
-        className={cn("group/seg relative isolate inline-flex max-w-full gap-1 overflow-x-auto rounded-full border border-border bg-surface p-1 shadow-card", listClassName)}
+        className={cn("group/seg relative isolate inline-flex max-w-full gap-1 overflow-x-auto rounded-[1rem] border border-border bg-surface p-1 shadow-card", listClassName)}
       >
-        <SlidingPill pillRef={pillRef} className="bg-accent-soft shadow-sm ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
+        <SlidingPill pillRef={pillRef} shape="rounded-[0.7rem]" className="bg-accent-soft shadow-sm ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
         {items.map((t, i) => {
           const selected = t.id === active;
           return (
@@ -76,7 +76,7 @@ export function Tabs({
               onKeyDown={(e) => onKey(e, i)}
               data-ripple=""
               className={cn(
-                "relative rounded-full px-4 py-2 text-sm font-semibold whitespace-nowrap transition-[color,background-color,scale] duration-200",
+                "relative rounded-[0.7rem] px-4 py-2 text-sm font-semibold whitespace-nowrap transition-[color,background-color,scale] duration-200",
                 selected
                   ? "bg-accent-soft text-accent-ink shadow-sm ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset group-data-[pill=on]/seg:bg-transparent group-data-[pill=on]/seg:shadow-none group-data-[pill=on]/seg:ring-0"
                   : "text-muted hover:bg-surface-2 hover:text-fg",

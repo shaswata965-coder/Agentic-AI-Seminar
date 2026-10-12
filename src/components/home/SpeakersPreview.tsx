@@ -1,7 +1,9 @@
-import { ArrowRight, Star } from "lucide-react";
+import { Star } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
+import { FacesArt } from "@/components/portals/PortalArt";
 import { ButtonLink } from "@/components/ui/Button";
 import { PersonCard } from "@/components/ui/PersonCard";
+import { Portal } from "@/components/ui/Portal";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { SPEAKER_CATEGORY_META } from "@/lib/content/constants";
 import type { SiteSettings, Speaker } from "@/lib/content/types";
@@ -27,11 +29,6 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
         eyebrow="Speakers"
         title="Voices from academia and industry"
         description="Invited talks and panel discussions from researchers, practitioners and founders building agentic AI."
-        aside={
-          <ButtonLink href="/speakers" variant="outline" iconRight={<ArrowRight size={17} aria-hidden />}>
-            All speakers
-          </ButtonLink>
-        }
       />
       {list.length ? (
         <ul className="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-4">
@@ -82,6 +79,17 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
           </div>
         </div>
       )}
+      <div className="mt-10 flex justify-center sm:mt-12">
+        <Portal
+          href="/speakers"
+          tone="lilac"
+          kicker="Speakers"
+          title={speakers.length ? `Meet all ${speakers.length} ${speakers.length === 1 ? "speaker" : "speakers"}` : "Speaker profiles"}
+          text={speakers.length ? "Keynotes, invited talks and panelists, with their bios, talk titles and abstracts." : "Profiles, talk titles and abstracts appear here as speakers confirm."}
+          art={<FacesArt people={speakers.slice(0, 3)} total={speakers.length} />}
+          className="w-full max-w-xl"
+        />
+      </div>
     </Section>
   );
 }

@@ -1,11 +1,13 @@
-import { ArrowRight, BedDouble, Building, Car, ExternalLink, Lightbulb, MapPin, Navigation, Plane, Route, ShieldCheck, TrainFront, TramFront } from "lucide-react";
+import { BedDouble, Building, Car, ExternalLink, Lightbulb, MapPin, Navigation, Plane, ShieldCheck, TrainFront, TramFront } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { CSSProperties } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { PageHero } from "@/components/layout/PageHero";
+import { FaqArt, RouteArt } from "@/components/portals/PortalArt";
 import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
+import { Portal } from "@/components/ui/Portal";
 import { RichText } from "@/components/ui/RichText";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
@@ -48,9 +50,7 @@ export default async function VenuePage() {
         <ButtonLink href={directions} icon={<Navigation size={17} aria-hidden />}>
           Directions
         </ButtonLink>
-        <ButtonLink href="/#venue" variant="outline" icon={<Route size={17} aria-hidden />}>
-          Interactive route map
-        </ButtonLink>
+        <Portal href="/#venue" tone="mint" compact kicker="Route map" title="Follow your route to campus" art={<RouteArt />} className="w-full max-w-sm" />
       </PageHero>
 
       <Section tone="mint" labelledBy="venue-place-title">
@@ -196,10 +196,8 @@ export default async function VenuePage() {
             </div>
           ) : null}
         </div>
-        <div className="mt-10 flex flex-wrap items-center gap-3">
-          <ButtonLink href="/#faq" variant="outline" iconRight={<ArrowRight size={17} aria-hidden />}>
-            Travel questions? See the FAQ
-          </ButtonLink>
+        <div className="mt-10 flex">
+          <Portal href="/#faq" tone="blush" kicker="Travel questions?" title="See the FAQ" text="Answers on registration, travel, the hackathon and more." art={<FaqArt />} className="w-full max-w-xl" />
         </div>
       </Section>
     </TagScope>

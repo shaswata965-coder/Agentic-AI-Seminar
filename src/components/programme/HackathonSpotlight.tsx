@@ -1,6 +1,8 @@
-import { ArrowRight, CalendarClock, Clock, Trophy, Users } from "lucide-react";
+import { CalendarClock, Clock, Trophy, Users } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
+import { TrophyArt } from "@/components/portals/PortalArt";
 import { ButtonLink } from "@/components/ui/Button";
+import { Portal } from "@/components/ui/Portal";
 import { Eyebrow } from "@/components/ui/Section";
 import { THEME_META } from "@/lib/content/constants";
 import type { HackathonInfo, Session, SiteSettings } from "@/lib/content/types";
@@ -51,13 +53,11 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
                   </div>
                 ))}
               </dl>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <ButtonLink href={hackathonRegistrationHref(s)} size="lg">
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                <ButtonLink href={hackathonRegistrationHref(s)} size="lg" className="self-start sm:self-center">
                   Register your team
                 </ButtonLink>
-                <ButtonLink href="/hackathon" size="lg" variant="outline" iconRight={<ArrowRight size={18} aria-hidden />}>
-                  Rules, prizes and judging
-                </ButtonLink>
+                <Portal href="/hackathon" tone="aqua" compact kicker="Hackathon" title="Rules, prizes and judging" art={<TrophyArt />} className="sm:max-w-sm sm:flex-1" />
               </div>
             </div>
           </div>

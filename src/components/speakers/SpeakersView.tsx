@@ -110,8 +110,8 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <div ref={listRef} role="tablist" aria-label="Filter speakers" className="group/seg relative isolate inline-flex flex-wrap gap-1 rounded-full border border-border bg-surface p-1 shadow-card">
-          <SlidingPill pillRef={pillRef} className="bg-accent-soft ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
+        <div ref={listRef} role="tablist" aria-label="Filter speakers" className="group/seg relative isolate inline-flex flex-wrap gap-1 rounded-[1rem] border border-border bg-surface p-1 shadow-card">
+          <SlidingPill pillRef={pillRef} shape="rounded-[0.7rem]" className="bg-accent-soft ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] ring-inset" />
           {FILTERS.map((f) => (
             <button
               key={f.id}
@@ -121,7 +121,7 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
               onClick={() => setFilter(f.id)}
               data-ripple=""
               className={cn(
-                "rounded-full px-4 py-2 text-sm font-semibold transition",
+                "rounded-[0.7rem] px-4 py-2 text-sm font-semibold transition",
                 filter === f.id
                   ? "bg-accent-soft text-accent-ink ring-1 ring-[color-mix(in_oklab,var(--accent)_45%,transparent)] group-data-[pill=on]/seg:bg-transparent group-data-[pill=on]/seg:ring-0"
                   : "text-muted hover:bg-surface-2 hover:text-fg",
@@ -139,7 +139,7 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name or affiliation"
-            className="h-11 w-full rounded-full border border-border bg-surface pr-4 pl-10 text-[15px] focus:border-brand focus:ring-4 focus:ring-[color-mix(in_oklab,var(--brand)_18%,transparent)] focus:outline-none"
+            className="h-11 w-full rounded-xl border border-border bg-surface pr-4 pl-10 text-[15px] focus:border-brand focus:ring-4 focus:ring-[color-mix(in_oklab,var(--brand)_18%,transparent)] focus:outline-none"
           />
         </label>
       </div>
@@ -217,7 +217,7 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
                         <span className="inline-flex items-center gap-1 font-semibold text-subtle">
                           <Mic2 size={15} aria-hidden /> Moderator
                         </span>
-                        <button type="button" onClick={() => open(moderator.slug)} data-ripple="" className="group/chip inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pr-3 pl-1 font-semibold text-fg hover:-translate-y-0.5 hover:bg-accent-soft">
+                        <button type="button" onClick={() => open(moderator.slug)} data-ripple="" className="group/chip key key-sm key-line inline-flex items-center gap-2 rounded-[0.7rem] border border-border bg-surface py-1 pr-3 pl-1 font-semibold text-fg hover:bg-accent-soft">
                           <Avatar name={moderator.name} src={moderator.photo} size={26} className="transition-[scale,rotate] duration-300 group-hover/chip:scale-110 group-hover/chip:-rotate-6" />
                           {moderator.name}
                         </button>
@@ -232,7 +232,7 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
                           .map((id) => byId[id])
                           .filter(Boolean)
                           .map((sp) => (
-                            <button key={sp.id} type="button" onClick={() => open(sp.slug)} data-ripple="" className="group/chip inline-flex items-center gap-2 rounded-full bg-surface-2 py-1 pr-3 pl-1 font-semibold text-fg hover:-translate-y-0.5 hover:bg-accent-soft">
+                            <button key={sp.id} type="button" onClick={() => open(sp.slug)} data-ripple="" className="group/chip key key-sm key-line inline-flex items-center gap-2 rounded-[0.7rem] border border-border bg-surface py-1 pr-3 pl-1 font-semibold text-fg hover:bg-accent-soft">
                               <Avatar name={sp.name} src={sp.photo} size={26} className="transition-[scale,rotate] duration-300 group-hover/chip:scale-110 group-hover/chip:-rotate-6" />
                               {sp.name}
                             </button>
