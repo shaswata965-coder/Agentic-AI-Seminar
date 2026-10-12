@@ -27,6 +27,14 @@
   transform-box: fill-box;
   transform-origin: center;
 }
+/* The orbit and its orbs turn about their own local origin (the orbit's centre, each orb's centre).
+   Their bounding boxes shift as the orbs move, so a fill-box centre would make the ring wobble
+   and push the orbs off the side of the drawing. */
+.aura-svg .aura-orbit-spin,
+.aura-svg .aura-orbit-node {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
 
 /* Hover & float */
 .aura-svg .aura-float { animation: aura-float 4.2s ease-in-out infinite; animation-delay: var(--aura-phase, 0s); }

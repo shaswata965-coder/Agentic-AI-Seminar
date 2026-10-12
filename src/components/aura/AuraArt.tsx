@@ -195,11 +195,12 @@ export function AuraArt({
         <clipPath id={id("visorClip")}>
           <path d={VISOR_PATH} />
         </clipPath>
+        {/* Back and front halves of the orbit (behind and in front of the body), with room either side for the orbs. */}
         <clipPath id={id("orbitBack")}>
-          <rect x="0" y="0" width={AURA_W} height="190" />
+          <rect x="-40" y="0" width={AURA_W + 80} height="190" />
         </clipPath>
         <clipPath id={id("orbitFront")}>
-          <rect x="0" y="190" width={AURA_W} height="110" />
+          <rect x="-40" y="190" width={AURA_W + 80} height="110" />
         </clipPath>
       </defs>
 

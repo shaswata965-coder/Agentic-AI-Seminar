@@ -42,9 +42,19 @@ export function Section({
   );
 }
 
+/** Section header label: an "agent node" with a slowly orbiting signal, and the label on a card with a gradient edge (see tags.css). */
 export function Eyebrow({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <span className={cn("tag tag-eyebrow", className)}>{children}</span>
+    <span className={cn("eyebrow", className)}>
+      <span aria-hidden className="eyebrow-mark">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <circle cx="12" cy="12" r="8.5" className="eyebrow-ring" />
+          <circle cx="12" cy="12" r="3.6" className="eyebrow-core" />
+          <circle cx="20.5" cy="12" r="2.6" className="eyebrow-signal" />
+        </svg>
+      </span>
+      <span className="min-w-0">{children}</span>
+    </span>
   );
 }
 
