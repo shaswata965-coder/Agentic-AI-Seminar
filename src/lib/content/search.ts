@@ -4,13 +4,14 @@ import { getFaqs, getSessions, getSettings, getSpeakers, getTutorials } from "./
 
 const PAGES: AssistantEntry[] = [
   { kind: "Page", title: "Home", href: "/", keywords: "overview countdown announcements news highlights" },
-  { kind: "Page", title: "Programme", subtitle: "Day-wise schedule for 15 & 16 Dec", href: "/programme", keywords: "schedule agenda timetable sessions keynote talk panel pdf download calendar" },
+  { kind: "Page", title: "Programme", subtitle: "Day-wise schedule for 15 & 16 Dec", href: "/programme", keywords: "schedule agenda timetable sessions keynote talk panel pdf download calendar kiosks exhibitors hackathon" },
   { kind: "Page", title: "Speakers", subtitle: "Academic & industry speakers, panelists", href: "/speakers", keywords: "keynote panel panelists bio talk abstract" },
   { kind: "Page", title: "Tutorials & Demos", subtitle: "Hands-on tutorials and live demos", href: "/tutorials", keywords: "tutorial workshop hands on prerequisites laptop github material demo" },
   { kind: "Page", title: "Hackathon", subtitle: "Tracks, timeline, prizes and rules", href: "/hackathon", keywords: "hackathon team prize prizes track judging criteria mentors judges rules code of conduct timeline" },
   { kind: "Page", title: "Hackathon registration", href: "/hackathon/register", keywords: "hackathon register team sign up apply" },
   { kind: "Page", title: "Registration", subtitle: "Register for the workshop", href: "/register", keywords: "register registration sign up ticket fee fees deadline seat" },
   { kind: "Page", title: "About the workshop", subtitle: "Why agentic AI, who should attend, what happens", href: "/about", keywords: "about motivation what is agentic ai who should attend audience activities" },
+  { kind: "Page", title: "Partners & sponsors", subtitle: "Partners, sponsorship tiers and enquiries", href: "/partners", keywords: "sponsor sponsorship partner partners tiers brochure become a partner logo" },
   { kind: "Page", title: "Organisers", subtitle: "Faculty, student organisers and volunteers", href: "/organisers", keywords: "team organisers organizers faculty students volunteers committee" },
   { kind: "Page", title: "Meet Aura", subtitle: "Our agentic mascot", href: "/meet-aura", keywords: "mascot aura robot" },
 ];
@@ -18,9 +19,8 @@ const PAGES: AssistantEntry[] = [
 const SECTIONS: AssistantEntry[] = [
   { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Entrepreneurship", href: "/#themes", keywords: "themes healthcare science discovery entrepreneurship startups" },
   { kind: "Section", title: "Announcements", href: "/#news", keywords: "news updates announcements" },
-  { kind: "Section", title: "Industry kiosks", href: "/#kiosks", keywords: "industry kiosk exhibit exhibitor booth companies" },
+  { kind: "Section", title: "Industry kiosks", subtitle: "On the programme page", href: "/programme#kiosks", keywords: "industry kiosk exhibit exhibitor booth companies" },
   { kind: "Section", title: "Venue & travel", subtitle: "Map, directions and accommodation", href: "/#venue", keywords: "venue travel map directions airport railway train metro road hotel accommodation stay campus entry gate" },
-  { kind: "Section", title: "Partners & sponsors", href: "/#partners", keywords: "sponsor sponsorship partner partners tiers brochure" },
   { kind: "Section", title: "FAQ", href: "/#faq", keywords: "faq questions help" },
   { kind: "Section", title: "Contact", href: "/#contact", keywords: "contact email phone social linkedin message" },
 ];

@@ -83,8 +83,8 @@ The **PDF schedule** is generated automatically from the programme. To use your 
 
 - **Tutorials:** title, instructors (name, affiliation, link), level, duration, schedule text, prerequisites (one per line, e.g. "Laptop with Python 3.11"), materials and GitHub links, capacity.
 - **Demos:** title, team or company, short description, an image and/or a YouTube/Vimeo link.
-- **Industry kiosks:** company, booth, logo, short description of what they show, website. Companies can apply through the **Exhibit with us** button; applications arrive under **Enquiries**.
-- **Partners & sponsors:** name, tier (*Title*, *Platinum*, *Gold* …), logo, website, short text. Edit the sponsorship tiers, introduction and brochure in **Site settings → Partners & kiosks**.
+- **Industry kiosks:** company, booth, logo, short description of what they show, website. They are listed on the Programme page. Companies can apply through the **Exhibit with us** button there; applications arrive under **Enquiries**.
+- **Partners & sponsors:** name, tier (*Title*, *Platinum*, *Gold* …), logo, website, short text. Their logos loop in a strip near the bottom of the home page (placeholder tiles until the first partner is added) and are grouped by tier on the **Partners & sponsors** page (`/partners`, under *Explore*). Edit the sponsorship tiers, introduction and brochure in **Site settings → Partners & kiosks**; they appear on that page with the **Become a partner** button.
 
 ## 7. Organisers, volunteers, mentors and judges
 

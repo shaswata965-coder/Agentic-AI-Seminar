@@ -47,8 +47,8 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
   const involve = [
     { href: registrationHref(s), label: "Register for the workshop" },
     { href: hackathonRegistrationHref(s), label: "Join the hackathon" },
-    { href: "/#kiosks", label: "Exhibit with us" },
-    { href: "/#partners", label: "Become a partner" },
+    { href: "/programme#kiosks", label: "Exhibit with us" },
+    { href: "/partners#become-a-partner", label: "Become a partner" },
     { href: "/#contact", label: "Contact the organisers" },
   ];
   return (

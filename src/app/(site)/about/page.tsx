@@ -31,7 +31,7 @@ function activityHref(title: string) {
   if (/talk|keynote|speaker/i.test(title)) return "/speakers";
   if (/tutorial/i.test(title)) return "/tutorials";
   if (/demo/i.test(title)) return "/tutorials#demos";
-  if (/kiosk|exhibit|industry/i.test(title)) return "/#kiosks";
+  if (/kiosk|exhibit|industry/i.test(title)) return "/programme#kiosks";
   if (/hack/i.test(title)) return "/hackathon";
   return "/programme";
 }

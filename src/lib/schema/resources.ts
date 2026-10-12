@@ -287,7 +287,7 @@ export const COLLECTIONS: CollectionDef[] = [
     group: "Content",
     titleKey: "company",
     tags: ["kiosks"],
-    publicPath: "/#kiosks",
+    publicPath: "/programme#kiosks",
     sort: { order: 1, company: 1 },
     defaults: { published: true, order: 100 },
     columns: [
@@ -312,12 +312,12 @@ export const COLLECTIONS: CollectionDef[] = [
     model: "Sponsor",
     label: "Partners & sponsors",
     singular: "Partner",
-    description: "Logo wall grouped by tier. Sponsorship tiers and the enquiry text live in Settings → Partners.",
+    description: "Logos loop on the home page and are grouped by tier on the Partners & sponsors page. Sponsorship tiers and the enquiry text live in Settings → Partners & kiosks.",
     icon: "handshake",
     group: "Content",
     titleKey: "name",
     tags: ["sponsors"],
-    publicPath: "/#partners",
+    publicPath: "/partners",
     sort: { order: 1, name: 1 },
     defaults: { published: true, tier: "partner", order: 100 },
     columns: [
@@ -624,14 +624,14 @@ export const SETTINGS_DEF: SingletonDef = {
       key: "partners",
       title: "Partners & kiosks",
       fields: [
-        textarea("sponsorshipIntro", "Sponsorship introduction"),
+        textarea("sponsorshipIntro", "Sponsorship introduction", { help: "Opens the Partners & sponsors page." }),
         objects("sponsorTiers", "Sponsorship tiers", "Tier", [
           text("name", "Tier name", { required: true, width: "half" }),
           text("price", "Contribution", { width: "half", placeholder: "On request" }),
           list("perks", "Benefits", { itemLabel: "Benefit" }),
         ]),
         file("sponsorBrochure", "Sponsorship brochure (PDF)", { accept: "application/pdf" }),
-        textarea("kioskIntro", "Industry kiosks introduction"),
+        textarea("kioskIntro", "Industry kiosks introduction", { help: "Shown in the Industry kiosks part of the Programme page." }),
       ],
     },
     {

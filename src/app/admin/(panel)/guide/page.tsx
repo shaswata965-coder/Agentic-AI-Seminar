@@ -46,7 +46,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     steps: [
       "Tutorials: instructors, level, duration, prerequisites (laptop, software, accounts) and material links such as GitHub.",
       "Demos: title, team or company, description, an image and/or a YouTube link.",
-      "Industry kiosks and Partners & sponsors: logo, name, website and description. Sponsor tiers and intro text are in Site settings → Partners & kiosks.",
+      "Industry kiosks and Partners & sponsors: logo, name, website and description. Kiosks are listed on the Programme page; partner logos loop on the home page and are grouped by tier on the Partners & sponsors page. Sponsor tiers and intro text are in Site settings → Partners & kiosks.",
     ],
   },
   {

@@ -18,24 +18,24 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Menu item | Implemented as |
 | --- | --- |
 | Home | `/`: single scroll with sticky top navigation and reading-progress bar |
-| About | Section `/#about` |
+| About | Page `/about` (in the navigation bar; topics around Aura on home at `/#about`) |
 | Themes | Section `/#themes` |
-| Programme | Page `/programme` (preview on home) |
+| Programme | Page `/programme` with an overview, the schedule, industry kiosks and the hackathon |
 | Speakers | Page `/speakers` (featured speakers on home) |
 | Tutorials & Demos | Page `/tutorials` |
-| Industry Kiosks | Section `/#kiosks` |
+| Industry Kiosks | Section `/programme#kiosks` |
 | Hackathon | Page `/hackathon` (+ `/hackathon/register`; teaser on home) |
 | Registration | Page `/register`, or an external form link (Admin → Site settings → Registration) |
 | Organisers | Page `/organisers` |
 | Venue & Travel | Section `/#venue` |
-| Partners / Sponsors | Section `/#partners` |
+| Partners / Sponsors | Page `/partners` (logo strip on home at `/#partners`) |
 | FAQ & Contact | Section `/#faq` and `/#contact` |
 
 ## 3. Section-wise content
 
 | Section | Requirement | Status |
 | --- | --- | --- |
-| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register is in the navigation bar, and the hackathon and programme are in the menu. Add to calendar and share are in About and the footer |
+| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register and the Programme are in the navigation bar, and the hackathon is under *Explore*. Add to calendar and share are in About and the footer |
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
 | Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the matching hackathon track |
