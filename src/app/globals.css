@@ -338,20 +338,17 @@
   transform: rotate(var(--aim));
   animation: none;
 }
-/* The beam from her hand to the topic fades in, then its dashes flow toward the topic. */
-.orbit-beam {
-  animation:
-    beam-in 0.35s ease-out both,
-    beam-flow 0.9s linear 0.35s infinite;
+/* At rest she ponders, tapping her chin. The delay lets her arm swing back from pointing first. */
+.about-aura:not([data-aim]) .aura-svg .aura-arm-l {
+  animation: aura-ponder 2.6s ease-in-out 0.6s infinite;
 }
-@keyframes beam-in {
-  from {
-    opacity: 0;
+@keyframes aura-ponder {
+  0%,
+  100% {
+    transform: rotate(-150deg);
   }
-}
-@keyframes beam-flow {
-  to {
-    stroke-dashoffset: -18;
+  50% {
+    transform: rotate(-138deg);
   }
 }
 /* Answering: dots rise out of her head, the speech bubble unfolds upward, then the text types itself. */

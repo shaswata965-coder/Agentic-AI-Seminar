@@ -7,8 +7,9 @@ import { formatDateRange } from "@/lib/format";
 import { AboutOrbit } from "./AboutOrbit";
 
 /**
- * Home page About: Aura with About topics (Site settings → About & themes) around her; she points at
- * the topic you hover and answers with its summary. The full About text lives on /about.
+ * Home page About: Aura with About topics (Site settings → About & themes) around her. She thinks
+ * quietly until you hover a topic, then points at it and answers with its summary. The full About
+ * text lives on /about.
  * Answers may use {dates}, {venue} and {event}, filled in from Site settings.
  */
 export function About({ s }: { s: SiteSettings }) {

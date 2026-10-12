@@ -555,7 +555,7 @@ export const SETTINGS_DEF: SingletonDef = {
           text("title", "Topic (two or three words)", { required: true, width: "half", maxLength: 24 }),
           select("icon", "Icon", iconOptions, { width: "half" }),
           textarea("description", "Summary (shown in Aura's speech bubble)", { rows: 2, maxLength: 150, help: "You can write {dates}, {venue} or {event}; they are filled in from these settings." }),
-        ], { maxItems: 8, help: "Up to 8 topics around Aura in the About section of the home page, each summarising part of the About page. Hovering or tapping one makes Aura point at it and answer with its summary. The full text below appears on the About page." }),
+        ], { maxItems: 8, help: "Up to 8 topics around Aura in the About section of the home page, each summarising part of the About page. Aura waits in a thinking pose; hovering or tapping a topic makes her point at it and answer with its summary. The full text below appears on the About page." }),
         richtext("motivation", "Workshop motivation", { help: "Shown on the About page." }),
         richtext("agenticAI", "What is agentic AI?", { help: "Shown on the About page." }),
         objects("audience", "Who should attend", "Audience", [

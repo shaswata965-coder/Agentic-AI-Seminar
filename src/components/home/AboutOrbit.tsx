@@ -10,7 +10,8 @@ const TONES = ["azure", "lilac", "mint", "peach", "butter", "blush"] as const;
 // Aura's drawing is 260 × 300; her shoulders sit at (62, 170) and (198, 170) and her arms are 54 long.
 const SHOULDER = { l: 62 / 260, r: 198 / 260, y: 170 / 300, arm: 54 / 260 };
 const THINK_MS = 450;
-const CYCLE_MS = 6500;
+// A short grace period when the mouse leaves a topic, so brushing past an edge doesn't flicker the answer.
+const LEAVE_MS = 120;
 
 /** Angles (degrees, 0 = right, 90 = down) for n topics spread clockwise over `arc`, leaving the gap at the top. */
 function angles(n: number, arc: number) {
@@ -33,18 +34,19 @@ const useReducedMotion = () =>
   );
 
 /**
- * Aura in the middle of a circle of About topics. Hovering, focusing or tapping a topic makes her
- * turn and point at it (a beam runs from her hand); then she answers: a speech bubble unfolds above
- * her head, shows a typing indicator and types the summary out. Idle and on screen, she walks
- * through the topics by herself. Circle size comes from --rx / --ry / --cy on the container.
+ * Aura in the middle of a circle of About topics. At rest she strikes a thinking pose and says
+ * nothing. Hovering, focusing or tapping a topic makes her turn and point at it; then she answers:
+ * a speech bubble unfolds above her head, shows a typing indicator and types the summary out.
+ * Moving off the topic (or tapping elsewhere) sends her back to thinking.
+ * Circle size comes from --rx / --ry / --cy on the container.
  */
 export function AboutOrbit({ points }: { points: IconItem[] }) {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState<number | null>(null);
   const [typed, setTyped] = useState(Infinity);
   const [thinking, setThinking] = useState(false);
-  const [beam, setBeam] = useState<{ w: number; h: number; d: string; side: "l" | "r"; aim: number } | null>(null);
-  const engaged = useRef(false);
-  const shown = useRef(0);
+  const [pointing, setPointing] = useState<{ side: "l" | "r"; aim: number } | null>(null);
+  const shown = useRef<number | null>(null);
+  const leaveTimer = useRef(0);
   const box = useRef<HTMLDivElement>(null);
   const auraBox = useRef<HTMLDivElement>(null);
   const reduced = useReducedMotion();
@@ -52,35 +54,45 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
   const n = points.length;
   const small = angles(n, 230);
   const large = angles(n, 260);
-  const current = points[Math.min(active, n - 1)];
+  const current = active === null ? null : points[Math.min(active, n - 1)];
   const text = current?.description ?? "";
 
   // Pick a topic: Aura points at it, thinks for a moment, then types the summary.
   const select = (i: number) => {
+    window.clearTimeout(leaveTimer.current);
     if (i === shown.current) return;
     shown.current = i;
     setActive(i);
-    if (!reduced) {
-      setThinking(true);
-      setTyped(0);
-    }
+    setTyped(reduced ? Infinity : 0);
+    setThinking(!reduced);
   };
+  // Back to the thinking pose, with an empty head.
+  const clear = () => {
+    window.clearTimeout(leaveTimer.current);
+    shown.current = null;
+    setActive(null);
+    setThinking(false);
+  };
+  const leave = () => {
+    window.clearTimeout(leaveTimer.current);
+    leaveTimer.current = window.setTimeout(clear, LEAVE_MS);
+  };
+  useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
 
-  // Walk through the topics while the circle is on screen and nobody is pointing at or focused on it.
+  // Touch has no hover: a tapped topic stays answered until the next tap somewhere else.
   useEffect(() => {
-    if (!box.current || n < 2 || reduced) return;
-    let onScreen = false;
-    const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting));
-    io.observe(box.current);
-    const t = window.setInterval(() => {
-      if (onScreen && !engaged.current && !document.hidden) select((shown.current + 1) % n);
-    }, CYCLE_MS);
-    return () => {
-      io.disconnect();
-      window.clearInterval(t);
+    if (active === null) return;
+    const onDown = (e: PointerEvent) => {
+      const target = e.target as Element | null;
+      if (target?.closest?.("[data-topic]") && box.current?.contains(target)) return;
+      window.clearTimeout(leaveTimer.current);
+      shown.current = null;
+      setActive(null);
+      setThinking(false);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [n, reduced]);
+    document.addEventListener("pointerdown", onDown);
+    return () => document.removeEventListener("pointerdown", onDown);
+  }, [active]);
 
   // Answering: a moment of "typing…", then the summary types itself out two letters at a time.
   useEffect(() => {
@@ -94,13 +106,14 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
     return () => window.clearTimeout(t);
   }, [thinking, typed, text.length]);
 
-  // The pointing beam, from Aura's fingertip to the active topic (measured, so it follows every layout).
+  // Which arm points at the active topic, and at what angle (measured, so it follows every layout).
   useLayoutEffect(() => {
-    const draw = () => {
+    if (active === null) return;
+    const measure = () => {
       const root = box.current;
       const aura = auraBox.current;
       const icon = root?.querySelector<HTMLElement>(`[data-topic="${active}"] [data-icon]`);
-      if (!root || !aura || !icon) return setBeam(null);
+      if (!root || !aura || !icon) return setPointing(null);
       const r = root.getBoundingClientRect();
       const a = aura.getBoundingClientRect();
       const t = icon.getBoundingClientRect();
@@ -112,38 +125,32 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
       const len = Math.hypot(tx - sx0, ty - sy0) || 1;
       const ux = (tx - sx0) / len;
       const uy = (ty - sy0) / len;
-      const sx = sx0 + ux * a.width * SHOULDER.arm;
-      const sy = sy0 + uy * a.width * SHOULDER.arm;
-      const ex = tx - ux * (t.width / 2 + 8);
-      const ey = ty - uy * (t.width / 2 + 8);
       // Arm rotation: 0° hangs down, so rotation = direction − 90°; keep a little outward swing for targets straight below.
       let dir = (Math.atan2(uy, ux) * 180) / Math.PI;
       if (!right && dir < 0) dir += 360;
       const aim = right ? Math.min(dir - 90, -25) : Math.max(dir - 90, 25);
-      setBeam({ w: r.width, h: r.height, d: `M${sx.toFixed(1)} ${sy.toFixed(1)} L${ex.toFixed(1)} ${ey.toFixed(1)}`, side: right ? "r" : "l", aim });
+      setPointing({ side: right ? "r" : "l", aim });
     };
-    draw();
-    const ro = new ResizeObserver(draw);
+    measure();
+    const ro = new ResizeObserver(measure);
     if (box.current) ro.observe(box.current);
     return () => ro.disconnect();
   }, [active]);
 
-  if (!n || !current) return null;
-  const tone = `tone-${TONES[active % TONES.length]}`;
-  // Aim with the arm on the topic's side (measured with the beam; estimated until then).
-  const deg = large[active];
-  const side = beam?.side ?? (Math.cos(rad(deg)) >= 0 ? "r" : "l");
-  const aim = beam?.aim ?? (side === "r" ? Math.min(deg - 90, -25) : Math.max(deg - 90, 25));
+  if (!n) return null;
+  const tone = `tone-${TONES[(active ?? 0) % TONES.length]}`;
+  // Aim with the arm on the topic's side (measured; estimated until then). At rest: no aim, so the think pose shows.
+  const deg = active === null ? null : large[active];
+  const side = deg === null ? undefined : (pointing?.side ?? (Math.cos(rad(deg)) >= 0 ? "r" : "l"));
+  const aim = deg === null ? 0 : (pointing?.aim ?? (side === "r" ? Math.min(deg - 90, -25) : Math.max(deg - 90, 25)));
   const done = typed >= text.length;
+  // At rest she looks up and to the side with one eye narrowed, the way people do when they ponder.
+  const look = deg === null ? { x: 0.5, y: -0.8 } : { x: Number((Math.cos(rad(deg)) * 0.85).toFixed(2)), y: Number((Math.sin(rad(deg)) * 0.6).toFixed(2)) };
 
   return (
     <div
       ref={box}
       className="about-orbit relative mx-auto mt-4 aspect-[10/12.6] w-full max-w-[26rem] [--cy:59%] [--rx:41%] [--ry:32.5%] sm:aspect-[16/13] sm:max-w-none sm:[--cy:48%] sm:[--rx:33%] sm:[--ry:40.5%] lg:aspect-[16/10] lg:[--cy:52%] lg:[--rx:25%] lg:[--ry:40%]"
-      onPointerEnter={() => (engaged.current = true)}
-      onPointerLeave={() => (engaged.current = false)}
-      onFocus={() => (engaged.current = true)}
-      onBlur={() => (engaged.current = false)}
     >
       {/* Orbit rings, a soft glow and two travelling sparks. */}
       <div aria-hidden className="absolute top-[calc(var(--cy)-var(--ry))] left-[calc(50%-var(--rx))] h-[calc(2*var(--ry))] w-[calc(2*var(--rx))] rounded-[50%] border-2 border-dashed border-border-strong opacity-70" />
@@ -152,52 +159,47 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
       <span aria-hidden className="orbit-spark" />
       <span aria-hidden className="orbit-spark" />
 
-      {/* The pointing beam. */}
-      {beam ? (
-        <svg aria-hidden className={cn(tone, "pointer-events-none absolute inset-0 h-full w-full overflow-visible")} viewBox={`0 0 ${beam.w} ${beam.h}`}>
-          <path key={active} d={beam.d} className="orbit-beam" fill="none" stroke="var(--accent)" strokeWidth="2.5" strokeLinecap="round" strokeDasharray="2 7" />
-        </svg>
-      ) : null}
-
-      {/* Aura: leans and points toward the topic, then answers in a speech bubble above her head. */}
+      {/* Aura: thinking at rest; leans and points toward a topic, then answers in a speech bubble above her head. */}
       <div
         ref={auraBox}
         className="about-aura absolute top-[var(--cy)] left-1/2 w-[30%] sm:w-[22%] lg:w-[260px]"
         data-aim={side}
-        style={{ "--aim": `${aim}deg`, "--lean": `${(Math.cos(rad(deg)) * 5).toFixed(2)}deg` } as CSSProperties}
+        style={{ "--aim": `${aim}deg`, "--lean": deg === null ? "-3deg" : `${(Math.cos(rad(deg)) * 5).toFixed(2)}deg` } as CSSProperties}
       >
-        <div aria-hidden className={cn(tone, "absolute bottom-[88%] left-1/2 flex w-[15rem] -translate-x-1/2 flex-col items-center sm:w-[17rem] lg:w-[19rem]")}>
-          <div key={active} className="answer-bubble relative w-full rounded-[1.6rem] border border-border bg-surface px-5 py-4 text-center shadow-card-lg">
-            <p className="flex items-center justify-center gap-1.5 text-[11px] font-bold tracking-[0.16em] text-accent-ink uppercase">
-              <CmsIcon name={current.icon} size={14} />
-              {current.title}
-            </p>
-            <div className="mt-1.5 grid font-display text-[15px] leading-snug font-medium text-fg sm:text-[16.5px]">
-              {/* The full text reserves the bubble's size; the typed part sits on top of it. */}
-              <span className="invisible [grid-area:1/1]">{text}</span>
-              {thinking ? (
-                <span className="typing-dots flex items-center justify-center gap-1.5 [grid-area:1/1]">
-                  <i />
-                  <i />
-                  <i />
-                </span>
-              ) : (
-                <span className="[grid-area:1/1]">
-                  {text.slice(0, typed)}
-                  {!done ? <span className="answer-caret" /> : null}
-                </span>
-              )}
+        {current ? (
+          <div aria-hidden className={cn(tone, "absolute bottom-[88%] left-1/2 flex w-[15rem] -translate-x-1/2 flex-col items-center sm:w-[17rem] lg:w-[19rem]")}>
+            <div key={active} className="answer-bubble relative w-full rounded-[1.6rem] border border-border bg-surface px-5 py-4 text-center shadow-card-lg">
+              <p className="flex items-center justify-center gap-1.5 text-[11px] font-bold tracking-[0.16em] text-accent-ink uppercase">
+                <CmsIcon name={current.icon} size={14} />
+                {current.title}
+              </p>
+              <div className="mt-1.5 grid font-display text-[15px] leading-snug font-medium text-fg sm:text-[16.5px]">
+                {/* The full text reserves the bubble's size; the typed part sits on top of it. */}
+                <span className="invisible [grid-area:1/1]">{text}</span>
+                {thinking ? (
+                  <span className="typing-dots flex items-center justify-center gap-1.5 [grid-area:1/1]">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                ) : (
+                  <span className="[grid-area:1/1]">
+                    {text.slice(0, typed)}
+                    {!done ? <span className="answer-caret" /> : null}
+                  </span>
+                )}
+              </div>
             </div>
+            <span key={`a${active}`} className="rising-dot mt-2 h-4 w-4 rounded-full border border-border bg-surface shadow-card [animation-delay:180ms]" />
+            <span key={`b${active}`} className="rising-dot mt-1 ml-5 h-2.5 w-2.5 rounded-full border border-border bg-surface shadow-card [animation-delay:90ms]" />
+            <span key={`c${active}`} className="rising-dot mt-1 ml-9 h-1.5 w-1.5 rounded-full border border-border bg-surface" />
           </div>
-          <span key={`a${active}`} className="rising-dot mt-2 h-4 w-4 rounded-full border border-border bg-surface shadow-card [animation-delay:180ms]" />
-          <span key={`b${active}`} className="rising-dot mt-1 ml-5 h-2.5 w-2.5 rounded-full border border-border bg-surface shadow-card [animation-delay:90ms]" />
-          <span key={`c${active}`} className="rising-dot mt-1 ml-9 h-1.5 w-1.5 rounded-full border border-border bg-surface" />
-        </div>
+        ) : null}
         <Aura
           variant="thinker"
           size={260}
-          look={{ x: Number((Math.cos(rad(deg)) * 0.85).toFixed(2)), y: Number((Math.sin(rad(deg)) * 0.6).toFixed(2)) }}
-          overrides={{ effects: [], expression: thinking ? "focus" : done ? "happy" : "curious" }}
+          look={look}
+          overrides={{ effects: [], expression: !current ? "confused" : thinking ? "focus" : done ? "happy" : "curious" }}
           className="max-w-full"
         />
       </div>
@@ -220,7 +222,9 @@ export function AboutOrbit({ points }: { points: IconItem[] }) {
                 type="button"
                 aria-pressed={on}
                 onPointerEnter={() => select(i)}
+                onPointerLeave={(e) => e.pointerType === "mouse" && leave()}
                 onFocus={() => select(i)}
+                onBlur={leave}
                 onClick={() => select(i)}
                 className={cn(
                   "group absolute top-[-1.375rem] left-0 flex w-max -translate-x-1/2 flex-col items-center gap-1.5 rounded-2xl sm:top-[-1.75rem]",
