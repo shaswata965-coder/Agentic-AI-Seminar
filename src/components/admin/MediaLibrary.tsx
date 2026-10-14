@@ -6,12 +6,14 @@ import { useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { absoluteUrl, withBase } from "@/lib/paths";
-import { PageTitle } from "./AdminShell";
+import { can } from "@/lib/permissions";
+import { PageTitle, useMe } from "./AdminShell";
 import { api, ApiError, formatBytes, useApi } from "./api";
 import { uploadFile, type MediaItem } from "./MediaPicker";
 
 export function MediaLibrary() {
   const toast = useToast();
+  const canDelete = can(useMe(), "delete");
   const { data, loading, reload } = useApi<MediaItem[]>("/media");
   const input = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
@@ -84,9 +86,11 @@ export function MediaLibrary() {
                 >
                   <Copy size={13} aria-hidden /> Copy link
                 </button>
-                <button type="button" onClick={() => remove(m)} data-ripple="" className="grid w-9 place-items-center rounded-lg border border-border text-subtle hover:border-blush-ink hover:text-blush-ink" aria-label={`Delete ${m.filename}`}>
-                  <Trash size={14} />
-                </button>
+                {canDelete ? (
+                  <button type="button" onClick={() => remove(m)} data-ripple="" className="grid w-9 place-items-center rounded-lg border border-border text-subtle hover:border-blush-ink hover:text-blush-ink" aria-label={`Delete ${m.filename}`}>
+                    <Trash size={14} />
+                  </button>
+                ) : null}
               </div>
             </div>
           </li>

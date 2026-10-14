@@ -3,7 +3,7 @@
 This guide is for the organising team of the **Agentic AI Workshop 2026**. It explains how to keep the website up to date. No coding is needed. The same guide is inside the admin panel under **Help guide**.
 
 - **Admin panel:** `https://<your-site>/admin`. There is also an *Organiser login* link in the website footer.
-- **Who can sign in:** anyone the administrator adds under **Users**.
+- **Who can sign in:** anyone an administrator adds under **Users** or **Volunteers**.
 - **Need help?** Contact the person who hosts the website, listed at the end of this guide.
 
 ---
@@ -29,7 +29,7 @@ This guide is for the organising team of the **Agentic AI Workshop 2026**. It ex
 2. Change your password under **My account**. Use at least 10 characters.
 3. Forgotten your password? Ask an administrator to reset it under **Users**.
 
-**Roles:** *Editors* can change all content. *Administrators* can also add or remove users and delete registrations.
+**Roles:** *Editors* can change all content. *Administrators* can also add or remove users and volunteers, see the task tracker and delete registrations. *Volunteers* see only the parts of the panel an administrator gave them; their dashboard shows their responsibility, what they can work on and their recent changes.
 
 ## 3. Event details, dates and registration
 
@@ -155,6 +155,19 @@ Mentors and judges are added under **Organisers & volunteers** (section 7).
 ## 14. Users (administrators only)
 
 **Users → Add user:** name, e-mail, role (*Editor* or *Administrator*) and a starting password. Share the password safely and ask them to change it under *My account*. You can reset passwords, change roles, or **Disable** someone who no longer needs access (they can be enabled again later).
+
+## 15. Volunteers and the task tracker (administrators only)
+
+**Volunteers → Add volunteer:** name, e-mail, password (type one or press **Generate**), their **responsibility** (for example *"Speaker coordination: keep speaker profiles and the programme up to date"*) and their **permissions**:
+- Tick the areas they may open and change, grouped as in the menu: Site settings, Hackathon, each content type, Registrations, Enquiries and the Media library. Everything else is hidden from them and refused by the server.
+- **Delete items** is separate. Without it they can add, edit, hide and reorder, but not delete. Only administrators can delete registrations and enquiries.
+- Anyone who edits something with a photo or file can upload images, even without the Media library.
+
+Share the e-mail and password with them safely. **Edit** changes their details, permissions or password; changes apply straight away, even if they are signed in. **Disable** pauses their access; **Remove** deletes the account. Their entries stay in the task tracker either way.
+
+**Task tracker** lists everything volunteers do, newest first: who did it, when, where, and for edits each changed field's value **before** and **after** (for additions and deletions, what was entered or deleted). Volunteers' downloads of registration or enquiry spreadsheets and their password changes are listed too. Filter by volunteer or area, press **Mark reviewed** once you've checked an entry (click again to undo), or **Mark all as reviewed**. The dashboard shows how many changes are waiting for review. Administrators' and editors' own changes are not tracked.
+
+To list volunteers on the **website**, use *Organisers & volunteers*; that is separate from their sign-in.
 
 ---
 

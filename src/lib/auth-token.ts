@@ -1,4 +1,5 @@
 import { jwtVerify, SignJWT } from "jose";
+import type { Role } from "@/lib/permissions";
 
 /*
  * Session tokens for the admin panel: a signed (HS256) JWT stored in an
@@ -12,7 +13,7 @@ export interface SessionClaims {
   sub: string;
   email: string;
   name: string;
-  role: "admin" | "editor";
+  role: Role;
 }
 
 // Only used in development when AUTH_SECRET is not set. Never valid in production.
@@ -48,7 +49,7 @@ export async function verifySession(token?: string | null): Promise<SessionClaim
   try {
     const { payload } = await jwtVerify(token, secret, { algorithms: ["HS256"] });
     if (!payload.sub || typeof payload.email !== "string") return null;
-    return { sub: payload.sub, email: payload.email, name: String(payload.name ?? ""), role: payload.role === "admin" ? "admin" : "editor" };
+    return { sub: payload.sub, email: payload.email, name: String(payload.name ?? ""), role: payload.role === "admin" || payload.role === "volunteer" ? payload.role : "editor" };
   } catch {
     return null;
   }

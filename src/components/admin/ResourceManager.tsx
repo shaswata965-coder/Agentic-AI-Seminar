@@ -13,9 +13,10 @@ import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { emptyValue } from "@/lib/content/normalize";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
+import { can } from "@/lib/permissions";
 import type { FieldDef } from "@/lib/schema/fields";
 import { COLLECTION_MAP, type Column } from "@/lib/schema/resources";
-import { PageTitle } from "./AdminShell";
+import { PageTitle, useMe } from "./AdminShell";
 import { api, ApiError, useApi } from "./api";
 import { RecordForm } from "./RecordForm";
 import { invalidateOptions } from "./RefSelect";
@@ -46,6 +47,7 @@ function Cell({ col, item, fields }: { col: Column; item: Item; fields: FieldDef
 
 export function ResourceManager({ resourceKey }: { resourceKey: string }) {
   const def = COLLECTION_MAP[resourceKey];
+  const canDelete = can(useMe(), "delete");
   const toast = useToast();
   const { data, error, loading, reload, setData } = useApi<Item[]>(`/content/${resourceKey}`);
   const [q, setQ] = useState("");
@@ -240,9 +242,11 @@ export function ResourceManager({ resourceKey }: { resourceKey: string }) {
                       <button type="button" onClick={() => { setErrors({}); setEditing(it); }} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-surface-2 hover:text-fg" aria-label={`Edit ${title(it)}`} title="Edit">
                         <Pencil size={16} />
                       </button>
-                      <button type="button" onClick={() => setConfirm(it)} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-blush-soft hover:text-blush-ink" aria-label={`Delete ${title(it)}`} title="Delete">
-                        <Trash size={16} />
-                      </button>
+                      {canDelete ? (
+                        <button type="button" onClick={() => setConfirm(it)} data-ripple="" className="grid h-9 w-9 place-items-center rounded-lg text-subtle hover:bg-blush-soft hover:text-blush-ink" aria-label={`Delete ${title(it)}`} title="Delete">
+                          <Trash size={16} />
+                        </button>
+                      ) : null}
                     </div>
                   </td>
                 </tr>

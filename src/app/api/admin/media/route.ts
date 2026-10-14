@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import type { NextRequest } from "next/server";
 import sharp from "sharp";
 import { mediaBucket } from "@/lib/models";
+import { UPLOAD_PERMISSIONS } from "@/lib/permissions";
+import { recordActivity } from "@/lib/server/activity";
 import { requireAdmin } from "@/lib/server/admin-auth";
 import { error, json } from "@/lib/server/http";
 
@@ -15,7 +17,7 @@ const cleanName = (name: string) =>
     .slice(0, 80) || "upload";
 
 export async function GET(req: NextRequest) {
-  const user = await requireAdmin(req);
+  const user = await requireAdmin(req, { permission: UPLOAD_PERMISSIONS });
   if (user instanceof Response) return user;
   const files = await mediaBucket().find({}).sort({ uploadDate: -1 }).limit(500).toArray();
   return json({
@@ -35,7 +37,7 @@ export async function GET(req: NextRequest) {
 
 /** Upload an image (compressed to WebP, max 1920px) or a PDF/SVG into MongoDB GridFS. */
 export async function POST(req: NextRequest) {
-  const user = await requireAdmin(req);
+  const user = await requireAdmin(req, { permission: UPLOAD_PERMISSIONS });
   if (user instanceof Response) return user;
   const max = (Number(process.env.MAX_UPLOAD_MB) || 8) * 1024 * 1024;
   let form: FormData;
@@ -95,5 +97,6 @@ export async function POST(req: NextRequest) {
     upload.end(out);
   });
   const id = String(upload.id as mongoose.Types.ObjectId);
+  await recordActivity(user, { action: "uploaded", area: "media", target: filename, targetId: id });
   return json({ data: { id, url: `/api/media/${id}`, filename, contentType, size: out.length, width, height, alt } }, { status: 201 });
 }

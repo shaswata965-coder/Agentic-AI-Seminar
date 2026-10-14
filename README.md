@@ -24,7 +24,7 @@ It's a fast, accessible, mobile-first site with light and dark modes, a light pa
 - **Extras:** *Ask Aura* site search (Ctrl/⌘ + K), add-to-calendar (Google, Outlook, .ics), share buttons, SEO metadata, Open Graph images, JSON-LD event data, sitemap, robots.txt, web manifest, favicon, Google Analytics (optional).
 
 **Admin panel (`/admin`)**
-- Sign-in with administrator and editor roles.
+- Sign-in with administrator, editor and volunteer roles. Volunteers get a responsibility and only the permissions an administrator ticks, and everything they change goes to a **task tracker** where administrators see who changed what (before and after) and mark it reviewed.
 - Edit everything: event details and dates, registration status and deadlines, announcements, speakers, programme, panels, tutorials, demos, kiosks, sponsors and tiers, organisers, volunteers, mentors and judges, FAQs, venue and travel, contact and social links, branding (logos, brand colour), SEO and Analytics, and the post-event switches.
 - Media library: uploads are resized and compressed automatically and stored in MongoDB.
 - Registrations and enquiries: search, status, notes and CSV export for Excel.
@@ -179,7 +179,7 @@ With Docker, run the same commands inside the `mongo` container, e.g. `docker co
 src/
   app/
     (site)/            public pages (home, about, programme, speakers, tutorials, hackathon, venue, partners, register, organisers, gallery, talks, meet-aura)
-    admin/             admin panel (login, dashboard, content editors, settings, registrations, media, users, guide)
+    admin/             admin panel (login, dashboard, content editors, settings, registrations, media, users, volunteers, task tracker, guide)
     api/               public APIs (register, hackathon/register, enquiries, calendar, programme/pdf, media, health) and /api/admin/*
     opengraph-image.tsx, sitemap.ts, robots.ts, manifest.ts, icon.svg …
   components/
@@ -220,7 +220,7 @@ docs/                  admin guide and requirements checklist
 - [ ] Source code: this repository.
 - [ ] Hosting: server or Docker host, domain or sub-path, HTTPS certificate.
 - [ ] Secrets in the server environment, not in git: `MONGODB_URI`, `AUTH_SECRET`, SMTP credentials.
-- [ ] Admin accounts for each organiser (Admin → Users); first administrator from `ADMIN_EMAIL` / `ADMIN_PASSWORD` or `npm run create-admin`.
+- [ ] Admin accounts for each organiser (Admin → Users) and volunteer (Admin → Volunteers); first administrator from `ADMIN_EMAIL` / `ADMIN_PASSWORD` or `npm run create-admin`.
 - [ ] Update guide for organisers: [`docs/ADMIN_GUIDE.md`](docs/ADMIN_GUIDE.md) (also at `/admin/guide`).
 - [ ] Sample content removed (`npm run seed:demo -- --remove`); official logos uploaded; contact details filled in.
 - [ ] Database backups scheduled.

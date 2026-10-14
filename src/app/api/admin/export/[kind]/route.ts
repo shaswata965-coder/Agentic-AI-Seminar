@@ -1,14 +1,18 @@
 import type { NextRequest } from "next/server";
 import { Enquiry, HackathonRegistration, Registration } from "@/lib/models";
+import { recordActivity } from "@/lib/server/activity";
 import { requireAdmin } from "@/lib/server/admin-auth";
 import { toCsv } from "@/lib/server/csv";
 import { error } from "@/lib/server/http";
 
+const TITLES: Record<string, string> = { workshop: "Workshop registrations (CSV)", hackathon: "Hackathon teams (CSV)", enquiries: "Enquiries (CSV)" };
+
 /** CSV downloads: /api/admin/export/workshop | hackathon | enquiries */
 export async function GET(req: NextRequest, ctx: RouteContext<"/api/admin/export/[kind]">) {
-  const user = await requireAdmin(req);
-  if (user instanceof Response) return user;
   const { kind } = await ctx.params;
+  const area = kind === "enquiries" ? "enquiries" : "registrations";
+  const user = await requireAdmin(req, { permission: area });
+  if (user instanceof Response) return user;
   let csv: string;
   if (kind === "workshop") {
     const rows = await Registration.find({}).sort({ createdAt: 1 }).lean();
@@ -28,6 +32,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/admin/export
   } else {
     return error(404, "Unknown export.");
   }
+  await recordActivity(user, { action: "downloaded", area, target: TITLES[kind] });
   const stamp = new Date().toISOString().slice(0, 10);
   return new Response(csv, {
     headers: {

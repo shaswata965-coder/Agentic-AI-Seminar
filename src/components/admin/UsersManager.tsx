@@ -65,7 +65,7 @@ export function UsersManager() {
     <div>
       <PageTitle
         title="Users"
-        description="People who can sign in to this admin panel. Editors manage content; administrators can also manage users and delete responses."
+        description="Organisers who can sign in to this admin panel. Editors manage content; administrators can also manage users and volunteers, and delete responses. Volunteers with limited permissions are added under Volunteers."
         actions={
           <Button onClick={() => setAdding(true)} icon={<UserPlus size={17} aria-hidden />}>
             Add user

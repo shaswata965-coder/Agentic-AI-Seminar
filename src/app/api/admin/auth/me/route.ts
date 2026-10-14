@@ -3,7 +3,7 @@ import { requireAdmin } from "@/lib/server/admin-auth";
 import { json } from "@/lib/server/http";
 
 export async function GET(req: NextRequest) {
-  const user = await requireAdmin(req);
+  const user = await requireAdmin(req, { everyone: true });
   if (user instanceof Response) return user;
   return json({ data: user });
 }

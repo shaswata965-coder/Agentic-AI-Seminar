@@ -15,7 +15,7 @@ const create = z.object({
 export async function GET(req: NextRequest) {
   const user = await requireAdmin(req, { role: "admin" });
   if (user instanceof Response) return user;
-  const users = await User.find({}, { passwordHash: 0 }).sort({ createdAt: 1 }).lean();
+  const users = await User.find({ role: { $ne: "volunteer" } }, { passwordHash: 0 }).sort({ createdAt: 1 }).lean();
   return json({ data: users.map((u) => ({ id: String(u._id), email: u.email, name: u.name, role: u.role, active: u.active, lastLoginAt: u.lastLoginAt })) });
 }
 

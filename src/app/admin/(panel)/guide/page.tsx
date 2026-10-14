@@ -84,7 +84,17 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
   {
     id: "access",
     title: "Users & passwords",
-    steps: ["Administrators can add users under Users. Editors can change all content; administrators can also manage users and delete registrations.", "Change your own password under My account."],
+    steps: ["Administrators can add users under Users. Editors can change all content; administrators can also manage users and volunteers and delete registrations.", "Change your own password under My account."],
+  },
+  {
+    id: "volunteers",
+    title: "Volunteers & the task tracker",
+    steps: [
+      ["Volunteers → Add volunteer", "Name, e-mail, password (or “Generate”), their responsibility and the areas they may change. They only see those areas. “Delete items” is a separate permission; without it they can add, edit, hide and reorder but not delete."],
+      ["Changes apply at once", "Editing a volunteer's permissions, or disabling them, takes effect on their next click, even if they are signed in."],
+      ["Task tracker", "Everything volunteers do, newest first: who, when, where, and each changed field before and after. Filter by volunteer or area and mark entries as reviewed. Administrators' and editors' changes are not tracked."],
+      "To show volunteers on the website, add them under Organisers & volunteers; that is separate from their sign-in.",
+    ],
   },
 ];
 

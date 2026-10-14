@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, CalendarDays, Download, FlaskConical, Inbox, Mail, Megaphone, Mic, RefreshCw, Settings, Ticket, Trophy } from "lucide-react";
+import { ArrowRight, CalendarDays, Download, FlaskConical, Inbox, ListChecks, Mail, Megaphone, Mic, RefreshCw, Settings, Ticket, Trophy } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Aura } from "@/components/aura/Aura";
@@ -10,8 +10,9 @@ import { ATTENDEE_CATEGORY_META } from "@/lib/content/constants";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
 import { COLLECTIONS } from "@/lib/schema/resources";
-import { PageTitle, useEventName, useMe } from "./AdminShell";
+import { PageTitle, useEventName, useMe, type AdminMe } from "./AdminShell";
 import { api, useApi } from "./api";
+import { VolunteerHome } from "./VolunteerHome";
 
 interface Stats {
   workshop: number;
@@ -25,12 +26,20 @@ interface Stats {
   counts: Record<string, number>;
   mail: boolean;
   demoItems: number;
+  /** Volunteers' changes not reviewed yet (administrators only). */
+  toReview: number;
 }
 
 export function Dashboard() {
   const me = useMe();
+  const stats = useApi<Stats>(me && me.role !== "volunteer" ? "/stats" : null);
+  if (!me) return <PageTitle title="Welcome!" />;
+  if (me.role === "volunteer") return <VolunteerHome me={me} />;
+  return <StaffDashboard me={me} data={stats.data} error={stats.error} />;
+}
+
+function StaffDashboard({ me, data, error }: { me: AdminMe; data: Stats | null; error: string | null }) {
   const eventName = useEventName();
-  const { data, error } = useApi<Stats>("/stats");
   const tiles = [
     { label: "Workshop registrations", value: data?.workshop, note: data ? `+${data.workshopWeek} this week` : "", Icon: Ticket, tone: "tone-peach", href: "/admin/registrations" },
     { label: "Hackathon teams", value: data?.teams, note: "", Icon: Trophy, tone: "tone-aqua", href: "/admin/registrations?type=hackathon" },
@@ -47,8 +56,20 @@ export function Dashboard() {
 
   return (
     <div>
-      <PageTitle title={`Welcome${me?.name ? `, ${me.name.split(" ")[0]}` : ""}!`} description={`Here's what's happening with the ${eventName}.`} />
+      <PageTitle title={`Welcome${me.name ? `, ${me.name.split(" ")[0]}` : ""}!`} description={`Here's what's happening with the ${eventName}.`} />
       {error ? <p className="card mb-6 p-4 text-blush-ink">{error}</p> : null}
+      {data?.toReview ? (
+        <Link href="/admin/tracker" className="tone-lilac card mb-6 flex items-center gap-3 p-4 text-sm transition hover:-translate-y-0.5 hover:shadow-card-lg">
+          <ListChecks size={18} aria-hidden className="shrink-0 text-lilac-ink" />
+          <span className="flex-1 text-fg">
+            <strong>
+              Volunteers made {data.toReview} {data.toReview === 1 ? "change" : "changes"} waiting for your review.
+            </strong>{" "}
+            See who changed what in the task tracker.
+          </span>
+          <ArrowRight size={16} aria-hidden className="shrink-0 text-lilac-ink" />
+        </Link>
+      ) : null}
       {data?.demoItems ? (
         <div role="alert" className="tone-blush card mb-6 flex items-start gap-3 p-4 text-sm">
           <FlaskConical size={18} aria-hidden className="mt-0.5 shrink-0 text-blush-ink" />

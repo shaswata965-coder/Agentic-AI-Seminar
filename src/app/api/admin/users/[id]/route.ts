@@ -24,7 +24,7 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   const { password, ...rest } = parsed.data;
   const update: Record<string, unknown> = { ...rest };
   if (password) update.passwordHash = await hashPassword(password);
-  const u = await User.findByIdAndUpdate(id, { $set: update }, { returnDocument: "after" }).lean();
+  const u = await User.findOneAndUpdate({ _id: id, role: { $ne: "volunteer" } }, { $set: update }, { returnDocument: "after" }).lean();
   return u ? json({ ok: true }) : error(404, "Not found.");
 }
 
@@ -34,6 +34,6 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params;
   if (id === me.id) return error(400, "You can't delete your own account.");
   if (!mongoose.isValidObjectId(id)) return error(404, "Not found.");
-  const res = await User.deleteOne({ _id: id });
+  const res = await User.deleteOne({ _id: id, role: { $ne: "volunteer" } });
   return res.deletedCount ? json({ ok: true }) : error(404, "Not found.");
 }

@@ -6,7 +6,7 @@ import { json } from "@/lib/server/http";
 
 /** ?type=workshop (default) | hackathon */
 export async function GET(req: NextRequest) {
-  const user = await requireAdmin(req);
+  const user = await requireAdmin(req, { permission: "registrations" });
   if (user instanceof Response) return user;
   const type = req.nextUrl.searchParams.get("type") === "hackathon" ? "hackathon" : "workshop";
   const docs =

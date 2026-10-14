@@ -1,4 +1,6 @@
 import mongoose, { Schema, type Model, type SchemaDefinition } from "mongoose";
+import { ACTIVITY_ACTIONS, type ActivityAction, type ActivityChange } from "@/lib/activity";
+import type { Role } from "@/lib/permissions";
 import type { FieldDef } from "@/lib/schema/fields";
 import { COLLECTION_MAP, COLLECTIONS } from "@/lib/schema/resources";
 
@@ -219,22 +221,68 @@ export interface UserDoc {
   email: string;
   name: string;
   passwordHash: string;
-  role: "admin" | "editor";
+  role: Role;
+  /** Volunteers only: what they are responsible for, and what they may do (src/lib/permissions.ts). */
+  responsibility: string;
+  permissions: string[];
   active: boolean;
   lastLoginAt: Date | null;
+  createdAt?: Date;
 }
 const userSchema = new Schema<UserDoc>(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, default: "" },
     passwordHash: { type: String, required: true },
-    role: { type: String, enum: ["admin", "editor"], default: "editor" },
+    role: { type: String, enum: ["admin", "editor", "volunteer"], default: "editor" },
+    responsibility: { type: String, default: "" },
+    permissions: { type: [String], default: [] },
     active: { type: Boolean, default: true },
     lastLoginAt: { type: Date, default: null },
   },
   { timestamps: true },
 );
 export const User = (mongoose.models.User as Model<UserDoc>) ?? mongoose.model<UserDoc>("User", userSchema);
+
+/* -------------------------------------------------------------- Activity -- */
+
+/** What a volunteer did, for the task tracker. Name and e-mail are copied so entries outlive the account. */
+export interface ActivityDoc {
+  actorId: mongoose.Types.ObjectId;
+  actorName: string;
+  actorEmail: string;
+  action: ActivityAction;
+  area: string;
+  target: string;
+  targetId: string;
+  changes: ActivityChange[];
+  reviewed: boolean;
+  reviewedBy: string;
+  reviewedAt: Date | null;
+  createdAt?: Date;
+}
+const activitySchema = new Schema<ActivityDoc>(
+  {
+    actorId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    actorName: { type: String, default: "" },
+    actorEmail: { type: String, default: "" },
+    action: { type: String, enum: ACTIVITY_ACTIONS, required: true },
+    area: { type: String, required: true },
+    target: { type: String, default: "" },
+    targetId: { type: String, default: "" },
+    changes: {
+      type: [new Schema<ActivityChange>({ field: { type: String, required: true }, from: { type: String, default: "" }, to: { type: String, default: "" } }, { _id: false })],
+      default: [],
+    },
+    reviewed: { type: Boolean, default: false },
+    reviewedBy: { type: String, default: "" },
+    reviewedAt: { type: Date, default: null },
+  },
+  { timestamps: { createdAt: true, updatedAt: false } },
+);
+activitySchema.index({ actorId: 1, _id: -1 });
+activitySchema.index({ reviewed: 1, _id: -1 });
+export const Activity = (mongoose.models.Activity as Model<ActivityDoc>) ?? mongoose.model<ActivityDoc>("Activity", activitySchema);
 
 /* ----------------------------------------------------------------- Media -- */
 

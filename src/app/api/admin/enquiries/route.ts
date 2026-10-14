@@ -5,7 +5,7 @@ import { requireAdmin } from "@/lib/server/admin-auth";
 import { json } from "@/lib/server/http";
 
 export async function GET(req: NextRequest) {
-  const user = await requireAdmin(req);
+  const user = await requireAdmin(req, { permission: "enquiries" });
   if (user instanceof Response) return user;
   const docs = await Enquiry.find({}).sort({ createdAt: -1 }).limit(5000).lean();
   return json({ data: docs.map((d) => toPlain(d)) });
