@@ -11,8 +11,11 @@ import { isPreviewMessage, PREVIEW_SOURCE, type FromFrame, type LayoutIssue, typ
  * measures that section to warn about text that breaks the layout.
  */
 
-// First height of each section at each width, to tell when text makes it much taller or shorter.
+// Each section as first measured at each width: its height, to tell when text makes it much taller or
+// shorter, and the quirks it already had (cards that clamp long talk titles by design), which aren't
+// the edit's doing and so aren't reported.
 const baseline = new Map<string, number>();
+const known = new Map<string, Set<string>>();
 
 const snip = (t: string) => (t.length > 48 ? `${t.slice(0, 47)}…` : t);
 const ownText = (el: Element) => [...el.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && n.textContent?.trim());
@@ -62,12 +65,14 @@ function measure(anchor: string | null): Extract<FromFrame, { type: "report" }> 
         if (box.right > c.right + 1 || box.left < c.left - 1) issues.push({ kind: "spill", message: `“${text}” sticks out of its card.` });
       }
     }
-    const key = `${anchor}@${window.innerWidth}`;
-    const base = baseline.get(key);
-    if (base === undefined) baseline.set(key, height);
+    const base = baseline.get(`${anchor}@${window.innerWidth}`);
+    if (base === undefined) baseline.set(`${anchor}@${window.innerWidth}`, height);
     else if (height > base * 1.5 && height - base > 120) issues.push({ kind: "grown", message: `The section is ${Math.round((height / base - 1) * 100)}% taller than with the text it had when you opened it.` });
     else if (height < base * 0.6 && base - height > 120) issues.push({ kind: "shrunk", message: `The section is ${Math.round((1 - height / base) * 100)}% shorter than before: it may look empty.` });
   }
+  const key = `${anchor}@${window.innerWidth}`;
+  if (!known.has(key)) known.set(key, new Set(issues.map((i) => i.message)));
+  const before = known.get(key)!;
   const seen = new Set<string>();
   return {
     source: PREVIEW_SOURCE,
@@ -76,7 +81,7 @@ function measure(anchor: string | null): Extract<FromFrame, { type: "report" }> 
     found: Boolean(el),
     height,
     width: window.innerWidth,
-    issues: issues.filter((i) => !seen.has(i.message) && seen.add(i.message)).slice(0, 12),
+    issues: issues.filter((i) => !before.has(i.message) && !seen.has(i.message) && seen.add(i.message)).slice(0, 12),
   };
 }
 
