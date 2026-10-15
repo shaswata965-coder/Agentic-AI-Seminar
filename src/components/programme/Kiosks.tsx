@@ -4,25 +4,27 @@ import { EnquiryButton } from "@/components/forms/EnquiryButton";
 import { Img } from "@/components/ui/Img";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import type { Kiosk, SiteSettings } from "@/lib/content/types";
+import { copy } from "@/lib/copy";
 
 export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
+  const c = copy(s, "programmeKiosks");
   return (
-    <Section id="kiosks" tone="peach" labelledBy="kiosks-title" tags="label">
+    <Section id="kiosks" edit="programme.kiosks" tone={c.tone} bg={c.background} labelledBy="kiosks-title" tags="label">
       <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <div>
-          <SectionHeading id="kiosks-title" eyebrow="Industry kiosks" title="Meet the companies building agents" description={s.kioskIntro} className="mb-8 sm:mb-8" />
+          <SectionHeading id="kiosks-title" eyebrow={c.eyebrow} title={c.title} description={s.kioskIntro} className="mb-8 sm:mb-8" />
           <div className="flex flex-wrap items-center gap-3">
             <EnquiryButton
               type="exhibitor"
-              label="Exhibit with us"
-              title="Exhibit at the workshop"
-              description="Tell us about your company and what you'd like to showcase."
+              label={c.button}
+              title={c.formTitle}
+              description={c.formText}
               aura="kiosks"
               icon={<Store size={18} aria-hidden />}
             />
             {s.contactEmail ? (
               <a className="mi-link text-sm font-semibold text-accent-ink" href={`mailto:${s.contactEmail}?subject=${encodeURIComponent(`Exhibitor enquiry · ${s.eventName}`)}`}>
-                or e-mail {s.contactEmail}
+                {c.email ? `${c.email} ${s.contactEmail}` : s.contactEmail}
               </a>
             ) : null}
           </div>
@@ -38,13 +40,13 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
                     </div>
                     <div className="min-w-0">
                       <h3 className="truncate font-display text-lg font-semibold text-fg">{k.company}</h3>
-                      {k.booth ? <p className="text-xs font-semibold text-subtle">Booth {k.booth}</p> : null}
+                      {k.booth ? <p className="text-xs font-semibold text-subtle">{c.booth ? `${c.booth} ${k.booth}` : k.booth}</p> : null}
                     </div>
                   </div>
                   <p className="mt-3 text-sm text-muted">{k.description}</p>
                   {k.website ? (
                     <a href={k.website} target="_blank" rel="noopener noreferrer" className="group/visit mt-auto inline-flex items-center gap-1 self-start pt-4 text-sm font-semibold text-accent-ink">
-                      <span className="mi-underline">Visit website</span>
+                      <span className="mi-underline">{c.website}</span>
                       <ArrowUpRight size={15} aria-hidden className="transition-transform duration-300 group-hover/visit:translate-x-0.5 group-hover/visit:-translate-y-0.5" />
                     </a>
                   ) : null}
@@ -57,8 +59,8 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
               <div className="relative">
                 <Aura variant="kiosks" size={190} interactive />
               </div>
-              <p className="relative mt-2 font-display text-xl font-semibold text-fg">Exhibitor line-up coming soon</p>
-              <p className="relative mt-1 max-w-sm text-sm text-muted">Participating companies and the agentic technology they showcase will be listed here.</p>
+              <p className="relative mt-2 font-display text-xl font-semibold text-fg">{c.emptyTitle}</p>
+              {c.emptyText ? <p className="relative mt-1 max-w-sm text-sm text-muted">{c.emptyText}</p> : null}
             </div>
           )}
         </div>

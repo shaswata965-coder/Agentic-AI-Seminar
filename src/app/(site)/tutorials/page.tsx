@@ -4,6 +4,7 @@ import { TutorialsView } from "@/components/tutorials/TutorialsView";
 import { ButtonLink } from "@/components/ui/Button";
 import { TagScope } from "@/components/ui/Tag";
 import { getDemos, getSettings, getTutorials } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -16,25 +17,23 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TutorialsPage() {
-  const [tutorials, demos] = await Promise.all([getTutorials(), getDemos()]);
+  const [s, tutorials, demos] = await Promise.all([getSettings(), getTutorials(), getDemos()]);
+  const hero = copy(s, "tutorialsHero");
   return (
     <TagScope style="tab">
-      <PageHero
-        tone="mint"
-        crumb="Tutorials & Demos"
-        eyebrow="Learn by doing"
-        title="Tutorials & Demos"
-        aura="tutorials"
-        description={<p>Hands-on sessions on building and evaluating agents, plus live demos from research labs and companies. Check prerequisites before you arrive.</p>}
-      >
-        <ButtonLink href="#tutorials" variant="soft">
-          Tutorials
-        </ButtonLink>
-        <ButtonLink href="#demos" variant="outline">
-          Demos
-        </ButtonLink>
+      <PageHero edit="tutorials.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="tutorials" description={hero.description}>
+        {hero.tutorialsButton ? (
+          <ButtonLink href="#tutorials" variant="soft">
+            {hero.tutorialsButton}
+          </ButtonLink>
+        ) : null}
+        {hero.demosButton ? (
+          <ButtonLink href="#demos" variant="outline">
+            {hero.demosButton}
+          </ButtonLink>
+        ) : null}
       </PageHero>
-      <div className="tone-mint py-12 sm:py-16">
+      <div data-edit="tutorials.list" className={`tone-${s.tutorialsList.tone} py-12 sm:py-16`}>
         <div className="container-site">
           <TutorialsView tutorials={tutorials} demos={demos} />
         </div>

@@ -13,6 +13,7 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
 import { THEME_META } from "@/lib/content/constants";
 import { getFaqs, getHackathon, getPeople, getSettings } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
 import { formatDateTime } from "@/lib/format";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
@@ -37,49 +38,61 @@ export default async function HackathonPage() {
   const hackFaqs = faqs.filter((f) => f.category === "hackathon");
   const registerHref = hackathonRegistrationHref(s);
   const external = Boolean(s.hackathonUrl);
+  const hero = copy(s, "hackathonHero", { platform: s.hackathonPlatform || "the platform" });
+  const ov = copy(s, "hackathonOverview");
+  const tr = copy(s, "hackathonTracks");
+  const tl = copy(s, "hackathonTimeline");
+  const pr = copy(s, "hackathonPrizes", { prizePool: h.prizePool || "TBA" });
+  const pe = copy(s, "hackathonPeople");
+  const rs = copy(s, "hackathonResources");
+  const ru = copy(s, "hackathonRules");
+  const re = copy(s, "hackathonResults");
+  const cta = copy(s, "hackathonCta");
+  const registerLabel = external ? hero.registerOn : hero.register;
   const closedBadge = (
     <Badge tone="blush" dot>
-      Registration closed
+      {hero.closed}
     </Badge>
   );
   const statusBadge =
     s.hackathonStatus === "open" ? (
       <DeadlineGate deadline={s.hackathonDeadline} closed={closedBadge}>
         <Badge tone="mint" dot>
-          Registration open{s.hackathonDeadline ? ` · closes ${formatDateTime(s.hackathonDeadline)} IST` : ""}
+          {hero.open}
+          {s.hackathonDeadline ? ` · ${hero.closes ? `${hero.closes} ` : ""}${formatDateTime(s.hackathonDeadline)} IST` : ""}
         </Badge>
       </DeadlineGate>
     ) : s.hackathonStatus === "closed" ? (
       closedBadge
     ) : (
       <Badge tone="butter" dot>
-        Registration opens soon
+        {hero.soon}
       </Badge>
     );
 
   return (
     <TagScope style="slash">
       <JsonLd data={eventJsonLd(s, { "@type": "Event", name: h.title, description: h.tagline, url: absoluteUrl("/hackathon") })} />
-      <PageHero tone="aqua" crumb="Hackathon" eyebrow="Hackathon" title={h.title} aura="hackathon" description={<p>{h.tagline}</p>}>
+      <PageHero edit="hackathon.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={h.title} aura="hackathon" description={h.tagline}>
         <ButtonLink href={registerHref} size="lg" icon={<Trophy size={19} aria-hidden />} iconRight={external ? <ExternalLink size={16} aria-hidden /> : undefined}>
-          {external ? `Register on ${s.hackathonPlatform || "the platform"}` : "Register your team"}
+          {registerLabel}
         </ButtonLink>
         {statusBadge}
       </PageHero>
 
-      <Section tone="aqua" labelledBy="overview-title">
+      <Section edit="hackathon.overview" tone={ov.tone} bg={ov.background} labelledBy="overview-title">
         <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
           <div>
             <h2 id="overview-title" className="font-display text-3xl font-bold text-fg">
-              Overview
+              {ov.title}
             </h2>
             <RichText text={h.overview} className="mt-4 text-[17px] leading-relaxed text-muted" />
           </div>
           <dl className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             {[
-              { label: "Mode", value: h.mode, tone: "tone-azure" },
-              { label: "Team size", value: h.teamSize, tone: "tone-lilac" },
-              { label: "Prize pool", value: h.prizePool, tone: "tone-butter" },
+              { label: ov.mode, value: h.mode, tone: "tone-azure" },
+              { label: ov.teamSize, value: h.teamSize, tone: "tone-lilac" },
+              { label: ov.prizePool, value: h.prizePool, tone: "tone-butter" },
             ].map((f) => (
               <div key={f.label} className={`${f.tone} rounded-2xl bg-accent-soft p-4`}>
                 <dt className="text-xs font-bold tracking-[0.12em] text-accent-ink uppercase">{f.label}</dt>
@@ -90,7 +103,7 @@ export default async function HackathonPage() {
         </div>
         <div className="mt-10 card p-6">
           <h3 className="flex items-center gap-2 font-display text-xl font-semibold text-fg">
-            <Users size={20} aria-hidden className="text-aqua-ink" /> Eligibility
+            <Users size={20} aria-hidden className="text-aqua-ink" /> {ov.eligibility}
           </h3>
           <ul className="mt-3 grid gap-2 sm:grid-cols-3">
             {h.eligibility.map((e, i) => (
@@ -102,8 +115,8 @@ export default async function HackathonPage() {
         </div>
       </Section>
 
-      <Section tone="lilac" labelledBy="tracks-title" band>
-        <SectionHeading id="tracks-title" eyebrow="Problem tracks" title="Pick a track aligned with the workshop themes" description="Final problem statements will be announced at launch. Here are examples to get you thinking." />
+      <Section edit="hackathon.tracks" tone={tr.tone} bg={tr.background} labelledBy="tracks-title">
+        <SectionHeading id="tracks-title" eyebrow={tr.eyebrow} title={tr.title} description={tr.description} />
         <ul className="grid gap-5 lg:grid-cols-3">
           {h.tracks.map((t) => {
             const meta = THEME_META[t.theme] ?? THEME_META.general;
@@ -135,15 +148,15 @@ export default async function HackathonPage() {
         </ul>
       </Section>
 
-      <Section tone="mint" labelledBy="timeline-title">
-        <SectionHeading id="timeline-title" eyebrow="Timeline" title="From registration to the final round" description="Dates will be announced soon. The final round takes place live at the workshop." />
+      <Section edit="hackathon.timeline" tone={tl.tone} bg={tl.background} labelledBy="timeline-title">
+        <SectionHeading id="timeline-title" eyebrow={tl.eyebrow} title={tl.title} description={tl.description} />
         <HackathonTimeline items={h.timeline} />
       </Section>
 
-      <Section tone="butter" labelledBy="prizes-title" band>
+      <Section edit="hackathon.prizes" tone={pr.tone} bg={pr.background} labelledBy="prizes-title">
         <div className="grid gap-12 lg:grid-cols-2">
           <div>
-            <SectionHeading id="prizes-title" eyebrow="Prizes" title="Prizes & recognition" description={`Total prize pool: ${h.prizePool || "TBA"}`} className="mb-8 sm:mb-8" />
+            <SectionHeading id="prizes-title" eyebrow={pr.eyebrow} title={pr.title} description={pr.description} className="mb-8 sm:mb-8" />
             <ul className="grid gap-3 sm:grid-cols-2">
               {h.prizes.map((p, i) => (
                 <li key={`${p.place}-${i}`} className={`tone-${PRIZE_TONES[i % PRIZE_TONES.length]} card group flex items-start gap-4 p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`} data-reveal data-glow="">
@@ -161,7 +174,7 @@ export default async function HackathonPage() {
             </div>
           </div>
           <div>
-            <SectionHeading eyebrow="Judging" title="How projects are judged" description="Indicative criteria. Final weights will be confirmed with the rules." className="mb-8 sm:mb-8" />
+            <SectionHeading eyebrow={pr.judgingEyebrow} title={pr.judgingTitle} description={pr.judgingText} className="mb-8 sm:mb-8" />
             <ul className="grid gap-4">
               {h.judgingCriteria.map((c) => (
                 <li key={c.name} className="card p-5">
@@ -182,22 +195,22 @@ export default async function HackathonPage() {
         </div>
       </Section>
 
-      <Section tone="peach" labelledBy="mentors-title">
-        <SectionHeading id="mentors-title" eyebrow="People" title="Mentors & judges" description="Experts from academia and industry who will guide teams and evaluate projects." />
+      <Section edit="hackathon.people" tone={pe.tone} bg={pe.background} labelledBy="mentors-title">
+        <SectionHeading id="mentors-title" eyebrow={pe.eyebrow} title={pe.title} description={pe.description} />
         {mentors.length || judges.length ? (
           <div className="grid gap-12">
             {[
-              { title: "Mentors", list: mentors, tone: "mint" as const },
-              { title: "Judges", list: judges, tone: "lilac" as const },
+              { title: pe.mentors, label: pe.mentor, list: mentors, tone: "mint" as const },
+              { title: pe.judges, label: pe.judge, list: judges, tone: "lilac" as const },
             ]
               .filter((g) => g.list.length)
               .map((g) => (
-                <div key={g.title}>
+                <div key={g.tone}>
                   <h3 className="font-display text-2xl font-bold text-fg">{g.title}</h3>
                   <ul className="mt-5 grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-4">
                     {g.list.map((p) => (
                       <li key={p.id}>
-                        <PersonCard name={p.name} photo={p.photo} title={p.role} subtitle={[p.department, p.affiliation].filter(Boolean).join(", ")} label={g.title.slice(0, -1)} labelTone={g.tone} href={p.profileUrl || undefined} className={`tone-${g.tone}`} footer={p.bio ? <p className="mb-2 line-clamp-3 text-sm text-muted">{p.bio}</p> : null} />
+                        <PersonCard name={p.name} photo={p.photo} title={p.role} subtitle={[p.department, p.affiliation].filter(Boolean).join(", ")} label={g.label} labelTone={g.tone} href={p.profileUrl || undefined} className={`tone-${g.tone}`} footer={p.bio ? <p className="mb-2 line-clamp-3 text-sm text-muted">{p.bio}</p> : null} />
                       </li>
                     ))}
                   </ul>
@@ -208,15 +221,15 @@ export default async function HackathonPage() {
           <div className="card flex flex-col items-center gap-5 p-8 text-center sm:flex-row sm:text-left">
             <Aura variant="guide" size={140} />
             <div>
-              <p className="font-display text-xl font-semibold text-fg">Mentors and judges will be announced soon</p>
-              <p className="mt-1 max-w-lg text-muted">They will be listed here with the same profile cards as our speakers.</p>
+              <p className="font-display text-xl font-semibold text-fg">{pe.emptyTitle}</p>
+              {pe.emptyText ? <p className="mt-1 max-w-lg text-muted">{pe.emptyText}</p> : null}
             </div>
           </div>
         )}
       </Section>
 
-      <Section tone="azure" labelledBy="resources-title" band>
-        <SectionHeading id="resources-title" eyebrow="Resources" title="APIs, datasets & compute" description="Resources available to registered teams." />
+      <Section edit="hackathon.resources" tone={rs.tone} bg={rs.background} labelledBy="resources-title">
+        <SectionHeading id="resources-title" eyebrow={rs.eyebrow} title={rs.title} description={rs.description} />
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {h.resources.map((r, i) => {
             const Icon = RESOURCE_ICON[r.kind as keyof typeof RESOURCE_ICON] ?? BookOpen;
@@ -229,7 +242,7 @@ export default async function HackathonPage() {
                 <p className="mt-1 text-sm text-muted">{r.description}</p>
                 {r.url ? (
                   <a href={r.url} target="_blank" rel="noopener noreferrer" className="group/visit mt-auto inline-flex items-center gap-1 self-start pt-4 text-sm font-semibold text-accent-ink">
-                    <span className="mi-underline">Open</span>
+                    <span className="mi-underline">{rs.open}</span>
                     <ArrowUpRight size={15} aria-hidden className="transition-transform duration-300 group-hover/visit:translate-x-0.5 group-hover/visit:-translate-y-0.5" />
                   </a>
                 ) : null}
@@ -239,11 +252,11 @@ export default async function HackathonPage() {
         </ul>
       </Section>
 
-      <Section tone="blush" labelledBy="rules-title">
+      <Section edit="hackathon.rules" tone={ru.tone} bg={ru.background} labelledBy="rules-title">
         <div className="grid gap-8 lg:grid-cols-2">
           <div className="card p-6 sm:p-8">
             <h2 id="rules-title" className="flex items-center gap-2 font-display text-2xl font-bold text-fg">
-              <ScrollText size={22} aria-hidden className="text-blush-ink" /> Rules
+              <ScrollText size={22} aria-hidden className="text-accent-ink" /> {ru.rules}
             </h2>
             <ol className="mt-4 grid gap-3">
               {h.rules.map((r, i) => (
@@ -256,14 +269,14 @@ export default async function HackathonPage() {
           </div>
           <div className="card p-6 sm:p-8">
             <h2 className="flex items-center gap-2 font-display text-2xl font-bold text-fg">
-              <ShieldCheck size={22} aria-hidden className="text-blush-ink" /> Code of conduct
+              <ShieldCheck size={22} aria-hidden className="text-accent-ink" /> {ru.conduct}
             </h2>
             <RichText text={h.codeOfConduct} className="mt-4 text-[15px] leading-relaxed text-muted" />
           </div>
         </div>
         {hackFaqs.length ? (
           <div className="mt-14">
-            <h2 className="font-display text-3xl font-bold text-fg">Hackathon FAQ</h2>
+            <h2 className="font-display text-3xl font-bold text-fg">{ru.faq}</h2>
             <div className="mt-6">
               <FaqList faqs={hackFaqs} showAura={false} />
             </div>
@@ -272,8 +285,8 @@ export default async function HackathonPage() {
       </Section>
 
       {s.showWinners ? (
-        <Section id="results" tone="butter" labelledBy="results-title" wash>
-          <SectionHeading id="results-title" eyebrow="Results" title="Hackathon winners" description={h.resultsNote} aside={<Aura variant="trophy" size={150} interactive bubbleSide="left" />} />
+        <Section id="results" edit="hackathon.results" tone={re.tone} bg={re.background} labelledBy="results-title">
+          <SectionHeading id="results-title" eyebrow={re.eyebrow} title={re.title} description={h.resultsNote} aside={<Aura variant="trophy" size={150} interactive bubbleSide="left" />} />
           {h.winners.length ? (
             <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {h.winners.map((w, i) => (
@@ -287,7 +300,7 @@ export default async function HackathonPage() {
                   {w.description ? <p className="mt-3 text-sm text-muted">{w.description}</p> : null}
                   {w.link ? (
                     <a href={w.link} target="_blank" rel="noopener noreferrer" className="group/visit mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent-ink">
-                      <span className="mi-underline">View project</span>
+                      <span className="mi-underline">{re.project}</span>
                       <ArrowUpRight size={15} aria-hidden className="transition-transform duration-300 group-hover/visit:translate-x-0.5 group-hover/visit:-translate-y-0.5" />
                     </a>
                   ) : null}
@@ -295,21 +308,21 @@ export default async function HackathonPage() {
               ))}
             </ul>
           ) : (
-            <p className="text-muted">Results will be published here after the final round.</p>
+            <p className="text-muted">{re.empty}</p>
           )}
         </Section>
       ) : null}
 
-      <section className="tone-aqua pb-20">
+      <section data-edit="hackathon.cta" className={`tone-${cta.tone} pb-20`}>
         <div className="container-site">
           <div className="card flex flex-col items-center gap-6 p-8 text-center sm:flex-row sm:p-10 sm:text-left">
             <Aura variant="hackathon" size={150} interactive />
             <div className="flex-1">
-              <p className="font-display text-2xl font-bold text-fg sm:text-3xl">Ready to build?</p>
+              <p className="font-display text-2xl font-bold text-fg sm:text-3xl">{cta.title}</p>
               <p className="mt-2 text-muted">{h.registrationNote}</p>
             </div>
             <ButtonLink href={registerHref} size="lg">
-              {external ? `Register on ${s.hackathonPlatform || "the platform"}` : "Register your team"}
+              {registerLabel}
             </ButtonLink>
           </div>
         </div>

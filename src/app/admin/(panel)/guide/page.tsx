@@ -17,13 +17,23 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     ],
   },
   {
+    id: "pages",
+    title: "Texts & colours of every page",
+    steps: [
+      ["Site settings", "A tab for each page of the site and one for what every page shares (Site-wide). Pick a section to change its colour, background, headings, introductions, button labels and empty-state messages."],
+      ["Live preview", "The real page beside the form shows your changes as you type, on desktop or phone. Visitors only see them once you press Save changes."],
+      ["Layout check", "Each text has a counter. Too much or too little text, or a title wrapping onto many lines, text spilling out of its box or the page scrolling sideways, is flagged on the field, the tabs and in the Layout check box."],
+      "In many texts you can write `{event}`, `{dates}` or `{venue}`: they are filled in from Event details.",
+    ],
+  },
+  {
     id: "event",
     title: "Event details, dates & registration",
     steps: [
-      ["Site settings → Event details", "Name, tagline, dates (the countdown uses the start date), venue and hall."],
-      ["Site settings → Registration", "Open or close workshop and hackathon registration, set deadlines (forms close automatically once a deadline passes) and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
-      ["Site settings → Branding", "Set the brand colour, and replace the built-in IIT Delhi and ScAI logos if ever needed."],
-      ["Site settings → Contact & social", "Official e-mail, phone and social links shown in the footer and contact section."],
+      ["Site settings → Site-wide → Event details", "Name, tagline, dates (the countdown uses the start date), venue and hall."],
+      ["Site settings → Site-wide → Registration", "Open or close workshop and hackathon registration, set deadlines (forms close automatically once a deadline passes) and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
+      ["Site settings → Site-wide → Colours and Logos", "Set the brand colour and the accent colours, and replace the built-in IIT Delhi and ScAI logos if ever needed."],
+      ["Site settings → Site-wide → Contact & social", "Official e-mail, phone and social links shown in the footer and contact section."],
     ],
   },
   {
@@ -37,7 +47,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     steps: [
       ["Speakers", "Add each speaker with a photo, designation, affiliation, label (Academia / Industry / Panelist), bio, talk title and abstract. Tick “Feature on the home page” for the highlight grid."],
       ["Programme", "Add sessions with day, start/end time, type, theme and room. Link speakers, or for panels choose a moderator and panelists."],
-      ["Programme status", "Site settings → Programme. Keep “To be announced” until the schedule is ready; switch to “Draft” or “Final” to show it. The PDF download updates automatically."],
+      ["Programme status", "Site settings → Programme → Schedule. Keep “To be announced” until the schedule is ready; switch to “Draft” or “Final” to show it. The PDF download updates automatically."],
     ],
   },
   {
@@ -64,7 +74,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     steps: [
       "Hackathon → Overview, tracks, rules, timeline, prizes, judging criteria and resources.",
       "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",
-      "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Features.",
+      "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Site-wide → Features & post-event.",
     ],
   },
   {
@@ -79,7 +89,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
   {
     id: "post",
     title: "After the event",
-    steps: ["Upload photos under Photo gallery and add slides / YouTube links under Slides & recordings.", "Then switch them on in Site settings → Features & post-event."],
+    steps: ["Upload photos under Photo gallery and add slides / YouTube links under Slides & recordings.", "Then switch them on in Site settings → Site-wide → Features & post-event."],
   },
   {
     id: "access",

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { MiniAura } from "@/components/aura/MiniAura";
 import { cn } from "@/lib/cn";
 import type { Tone } from "@/lib/content/constants";
+import type { Background } from "@/lib/schema/page-copy";
 import type { TagStyle } from "./Tag";
 
 export function Section({
@@ -9,15 +10,19 @@ export function Section({
   tone = "azure",
   className,
   children,
-  wash = false,
-  band = false,
+  bg = "plain",
+  wash = bg === "wash",
+  band = bg === "band",
   labelledBy,
   tags,
+  edit,
 }: {
   id?: string;
   tone?: Tone;
   className?: string;
   children: ReactNode;
+  /** Background chosen in Site settings: plain, a tinted band or a soft glow. */
+  bg?: Background;
   /** Soft gradient wash in the section tone. */
   wash?: boolean;
   /** Tinted background band. */
@@ -25,12 +30,15 @@ export function Section({
   labelledBy?: string;
   /** Shape of the tags inside (eyebrow, badges). */
   tags?: TagStyle;
+  /** Where this section is edited in Site settings ("page.section"), for the live preview. */
+  edit?: string;
 }) {
   return (
     <section
       id={id}
       aria-labelledby={labelledBy}
       data-tags={tags}
+      data-edit={edit}
       className={cn(
         `tone-${tone} relative isolate scroll-mt-24 py-16 sm:py-24`,
         band && "bg-[color-mix(in_oklab,var(--accent-soft)_70%,var(--bg))]",

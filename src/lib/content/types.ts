@@ -7,6 +7,8 @@ import type {
   SponsorTier,
   ThemeKey,
 } from "./constants";
+import type { PageCopy } from "@/lib/schema/page-copy";
+import type { Tone } from "./constants";
 
 export interface IconItem {
   title: string;
@@ -14,7 +16,11 @@ export interface IconItem {
   description: string;
 }
 
-export interface SiteSettings {
+/** Accent colours chosen in Site settings → Site-wide → Colours; empty means the built-in shade. */
+export type Palette = Record<Tone, string>;
+
+/** Everything in Admin → Site settings, including every section's texts and colours (PageCopy). */
+export interface SiteSettings extends PageCopy {
   eventName: string;
   shortName: string;
   tagline: string;
@@ -78,6 +84,7 @@ export interface SiteSettings {
   logoScAI: string;
   eventLogo: string;
   brandColor: string;
+  palette: Palette;
   ogImage: string;
 
   showMoreSpeakers: boolean;

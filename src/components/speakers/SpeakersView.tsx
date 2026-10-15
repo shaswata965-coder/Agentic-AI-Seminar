@@ -59,7 +59,18 @@ function Links({ sp }: { sp: Speaker }) {
   );
 }
 
-export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speaker[]; sessions: SpeakerSession[]; showMore: boolean }) {
+export function SpeakersView({
+  speakers,
+  sessions,
+  showMore,
+  more,
+}: {
+  speakers: Speaker[];
+  sessions: SpeakerSession[];
+  showMore: boolean;
+  /** The “More speakers to be announced” card, from Site settings → Home → Speakers. */
+  more: { title: string; text: string };
+}) {
   const [filter, setFilter] = useState<(typeof FILTERS)[number]["id"]>("all");
   const { listRef, pillRef } = useSlidingPill(filter, '[aria-selected="true"]');
   const [q, setQ] = useState("");
@@ -176,7 +187,7 @@ export function SpeakersView({ speakers, sessions, showMore }: { speakers: Speak
         })}
         {showMore && filter === "all" && !q ? (
           <li>
-            <MoreSpeakersCard />
+            <MoreSpeakersCard title={more.title} text={more.text} />
           </li>
         ) : null}
       </ul>

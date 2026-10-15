@@ -9,7 +9,7 @@ const LOGOS = {
 
 /**
  * IIT Delhi and ScAI logos for the header. The bundled files are white on transparent, so they are
- * drawn dark in light mode. A logo uploaded in Admin → Site settings → Branding is shown as uploaded.
+ * drawn dark in light mode. A logo uploaded in Admin → Site settings → Site-wide → Logos & images is shown as uploaded.
  * `monogram` shows only the "ScAI" letters of the wordmark, for narrow headers; `decorative` drops the
  * alt text when the name is written next to the logo.
  */

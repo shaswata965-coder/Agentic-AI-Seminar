@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { SingletonEditor } from "@/components/admin/SingletonEditor";
+import { SettingsStudio } from "@/components/admin/settings/SettingsStudio";
 
 export const metadata: Metadata = { title: "Site settings" };
 
 export default function Page() {
-  return <SingletonEditor kind="settings" />;
+  return <SettingsStudio />;
 }

@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { Portal } from "@/components/ui/Portal";
 import { TagScope } from "@/components/ui/Tag";
 import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { eventDayLabel } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 
@@ -36,35 +37,30 @@ export default async function SpeakersPage() {
     moderator: x.moderator,
     dayLabel: eventDayLabel(s.startDate, x.day),
   }));
+  const hero = copy(s, "speakersHero");
+  const list = copy(s, "speakersList");
   return (
     <TagScope style="ribbon">
-      <PageHero
-        tone="lilac"
-        crumb="Speakers"
-        eyebrow="Speakers"
-        title="Speakers & panelists"
-        aura="speakers"
-        description={<p>Researchers, practitioners and founders shaping agentic AI. Tap a card to read the bio, talk title and abstract.</p>}
-      >
-        <Portal href="/programme" tone="azure" compact kicker="Programme" title="When each talk happens" text="Day-wise schedule, panels and your own agenda." art={<ScheduleArt />} className="w-full max-w-md" />
+      <PageHero edit="speakers.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="speakers" description={hero.description}>
+        <Portal href="/programme" tone="azure" compact kicker={hero.portalKicker} title={hero.portalTitle} text={hero.portalText} art={<ScheduleArt />} className="w-full max-w-md" />
       </PageHero>
-      <section className="tone-lilac py-12 sm:py-16">
+      <section data-edit="speakers.list" className={`tone-${list.tone} py-12 sm:py-16`}>
         <div className="container-site">
           {speakers.length ? (
-            <SpeakersView speakers={speakers} sessions={slim} showMore={s.showMoreSpeakers} />
+            <SpeakersView speakers={speakers} sessions={slim} showMore={s.showMoreSpeakers} more={{ title: s.homeSpeakers.moreTitle, text: s.homeSpeakers.moreText }} />
           ) : (
             <div className="card flex flex-col items-center gap-6 p-10 text-center sm:flex-row sm:text-left">
               <Aura variant="speakers" size={190} interactive />
               <div>
-                <h2 className="font-display text-3xl font-bold text-fg">More speakers to be announced</h2>
-                <p className="mt-3 max-w-xl text-muted">
-                  We&apos;re finalising keynote speakers, invited talks and panelists from academia and industry. Their profiles, talk titles and abstracts will appear here as they are confirmed.
-                </p>
-                <div className="mt-5">
-                  <ButtonLink href="/#news" variant="soft">
-                    Follow the announcements
-                  </ButtonLink>
-                </div>
+                <h2 className="font-display text-3xl font-bold text-fg">{list.emptyTitle}</h2>
+                {list.emptyText ? <p className="mt-3 max-w-xl text-muted">{list.emptyText}</p> : null}
+                {list.emptyButton ? (
+                  <div className="mt-5">
+                    <ButtonLink href="/#news" variant="soft">
+                      {list.emptyButton}
+                    </ButtonLink>
+                  </div>
+                ) : null}
               </div>
             </div>
           )}

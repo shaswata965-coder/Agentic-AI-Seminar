@@ -7,7 +7,8 @@ import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { cn } from "@/lib/cn";
-import { EXPLORE_PAGES, HOME_NAV, PRIMARY_NAV, SECTION_NAV, type NavItem } from "@/lib/nav";
+import { explorePages as explorePagesOf, homeNav, primaryNav, registrationNav, sectionNav, type NavCopy, type NavItem } from "@/lib/nav";
+import type { PageCopy } from "@/lib/schema/page-copy";
 import { InstituteLogo } from "./InstituteLogo";
 import { ThemeToggle } from "./ThemeToggle";
 
@@ -16,6 +17,9 @@ export interface SiteHeaderProps {
   logos: { iitd: string; scai: string };
   registerHref: string;
   extraNav: NavItem[];
+  /** Names from Site settings → Site-wide → Navigation and Header. */
+  nav: NavCopy;
+  text: PageCopy["siteHeader"];
 }
 
 function isActive(pathname: string, href: string) {
@@ -23,7 +27,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
+export function SiteHeader({ logos, registerHref, extraNav, nav, text }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -31,9 +35,10 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const exploreRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const explorePages = [...EXPLORE_PAGES, ...extraNav];
-  const exploreItems = [...explorePages, ...SECTION_NAV];
-  const pages = [HOME_NAV, ...PRIMARY_NAV, { href: "/register", label: "Registration" }];
+  const explorePages = [...explorePagesOf(nav), ...extraNav];
+  const homeSections = sectionNav(nav);
+  const exploreItems = [...explorePages, ...homeSections];
+  const pages = [homeNav(nav), ...primaryNav(nav), registrationNav(nav)];
   const exploreActive = explorePages.some((item) => isActive(pathname, item.href));
   // Phones: logo, then the buttons pushed right. Desktop: three columns, so the links and Register sit centred between the logos.
   const barCls = "flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:grid lg:h-[72px] lg:grid-cols-[1fr_auto_1fr] xl:px-8";
@@ -126,6 +131,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
     <header
       ref={headerRef}
       data-site-header
+      data-edit="site.header"
       className={cn(
         "sticky top-0 z-40 transition-[background-color,box-shadow,border-color] duration-300",
         scrolled ? "border-b border-border bg-[var(--header-bg)] shadow-[0_8px_30px_-20px_rgb(15_23_42/0.35)] backdrop-blur-xl" : "border-b border-transparent",
@@ -136,7 +142,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
         <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
-          {[HOME_NAV, ...PRIMARY_NAV].map((item) => {
+          {[homeNav(nav), ...primaryNav(nav)].map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <Link
@@ -168,7 +174,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
               data-ripple=""
               className={cn("inline-flex items-center gap-1 rounded-lg px-3 py-2 text-[14.5px] font-semibold transition-colors hover:bg-surface-2 hover:text-fg", exploreOpen ? "bg-surface-2 text-fg" : exploreActive ? "text-brand" : "text-muted")}
             >
-              Explore
+              {text.explore}
               <ChevronDown size={16} aria-hidden className={cn("transition-transform duration-300", exploreOpen && "rotate-180")} />
             </button>
             {exploreOpen ? (
@@ -178,12 +184,12 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
               >
                 <div className="mi-stagger grid grid-cols-[0.85fr_1.15fr] gap-2">
                   <div className="rounded-2xl bg-surface-2 p-1">
-                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">Pages</p>
+                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">{text.pagesHeading}</p>
                     {explorePages.map((item, i) => exploreLink(item, i))}
                   </div>
                   <div>
-                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">On the home page</p>
-                    <div className="grid grid-cols-2">{SECTION_NAV.map((item, i) => exploreLink(item, explorePages.length + i))}</div>
+                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">{text.sectionsHeading}</p>
+                    <div className="grid grid-cols-2">{homeSections.map((item, i) => exploreLink(item, explorePages.length + i))}</div>
                   </div>
                 </div>
               </div>
@@ -194,7 +200,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
           {/* On phones the theme switch lives in the menu, and Register shrinks to its icon. */}
           <ThemeToggle className="max-sm:hidden" />
           <ButtonLink href={registerHref} size="sm" className="max-sm:w-9 max-sm:px-0" icon={<Ticket size={16} aria-hidden />}>
-            <span className="max-sm:sr-only">Register</span>
+            <span className="max-sm:sr-only">{text.register}</span>
           </ButtonLink>
           <button
             type="button"
@@ -241,7 +247,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
             </div>
             <nav aria-label="Mobile" className="container-site grid gap-8 pt-4 pb-6">
               <div>
-                <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">Pages</p>
+                <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">{text.pagesHeading}</p>
                 <ul className="mi-stagger grid gap-1">
                   {pages.map((item, i) => (
                     <li key={item.href} style={{ "--i": i } as CSSProperties}>
@@ -261,7 +267,7 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
                 </ul>
               </div>
               <div>
-                <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">Explore</p>
+                <p className="mb-2 text-xs font-bold tracking-[0.14em] text-subtle uppercase">{text.explore}</p>
                 <ul className="mi-stagger grid grid-cols-2 gap-2">
                   {exploreItems.map((item, i) => (
                     <li key={item.href} style={{ "--i": pages.length + i } as CSSProperties}>
@@ -282,10 +288,10 @@ export function SiteHeader({ logos, registerHref, extraNav }: SiteHeaderProps) {
               </div>
               <div className="flex flex-wrap items-center gap-3">
                 <ButtonLink href={registerHref} size="lg" onClick={() => setMenuOpen(false)} icon={<Ticket size={18} aria-hidden />}>
-                  Register now
+                  {text.registerNow}
                 </ButtonLink>
                 <ButtonLink href="/hackathon" variant="outline" size="lg" onClick={() => setMenuOpen(false)}>
-                  Join the hackathon
+                  {text.joinHackathon}
                 </ButtonLink>
               </div>
             </nav>

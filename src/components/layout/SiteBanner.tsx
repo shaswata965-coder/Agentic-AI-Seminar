@@ -1,7 +1,8 @@
 import { ArrowRight, Megaphone } from "lucide-react";
 import Link from "next/link";
+import type { Tone } from "@/lib/content/constants";
 
-export function SiteBanner({ text, link }: { text: string; link?: string }) {
+export function SiteBanner({ text, link, tone = "lilac" }: { text: string; link?: string; tone?: Tone }) {
   const inner = (
     <span className="inline-flex items-center gap-2">
       <Megaphone size={15} aria-hidden className="origin-bottom-left group-hover:animate-[mi-wiggle_0.6s_ease-in-out]" />
@@ -10,7 +11,7 @@ export function SiteBanner({ text, link }: { text: string; link?: string }) {
     </span>
   );
   return (
-    <div className="tone-lilac bg-accent-soft text-center text-sm font-semibold text-accent-ink">
+    <div data-edit="site.banner" className={`tone-${tone} bg-accent-soft text-center text-sm font-semibold text-accent-ink`}>
       <div className="container-site py-2">
         {link ? (
           <Link href={link} className="group mi-link">

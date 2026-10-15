@@ -17,12 +17,12 @@ export default async function HomePage() {
       <JsonLd data={eventJsonLd(s)} />
       <Hero s={s} />
       <Highlights s={s} />
-      <Announcements items={announcements} />
+      <Announcements s={s} items={announcements} />
       <Themes s={s} />
       <About s={s} />
       <SpeakersPreview s={s} speakers={speakers} />
       <Venue s={s} />
-      <Partners sponsors={sponsors} />
+      <Partners s={s} sponsors={sponsors} />
       <FaqContact s={s} faqs={faqs} />
     </>
   );

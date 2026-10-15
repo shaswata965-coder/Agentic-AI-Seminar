@@ -6,6 +6,8 @@ import type { AuraVariant } from "@/components/aura/types";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
+import { getSettings } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
 
 export const metadata: Metadata = {
@@ -23,28 +25,21 @@ const WHERE: Partial<Record<AuraVariant, string>> = {
   contact: "Contact form", notFound: "Page not found", sleep: "Footer", gallery: "Photo gallery", recordings: "Recordings", admin: "Admin panel", error: "Error page",
 };
 
-export default function MeetAuraPage() {
+export default async function MeetAuraPage() {
+  const s = await getSettings();
   const variants = (Object.keys(AURA_PRESETS) as AuraVariant[]).filter((v) => WHERE[v]);
+  const hero = copy(s, "auraHero");
+  const pg = copy(s, "auraPlayground");
+  const lk = copy(s, "auraLooks", { count: variants.length });
   return (
     <TagScope style="corner">
-      <PageHero
-        tone="aqua"
-        crumb="Meet Aura"
-        eyebrow="Our mascot"
-        title="Meet Aura"
-        aura="hero"
-        description={
-          <p>
-            Aura is the workshop&apos;s agentic AI guide: a rounded, hovering robot with a floating head and glowing eyes. Like a real agent, she adapts to her task, so you&apos;ll find her in a different role in every section of the site. Click her for tips, or press Ctrl/⌘ + K to ask her anything.
-          </p>
-        }
-      />
-      <Section tone="azure" labelledBy="playground-title">
-        <SectionHeading id="playground-title" eyebrow="Playground" title="Mix and match" description="Try Aura's expressions, poses, props and effects." />
+      <PageHero edit="meetAura.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="hero" description={hero.description} />
+      <Section edit="meetAura.playground" tone={pg.tone} bg={pg.background} labelledBy="playground-title">
+        <SectionHeading id="playground-title" eyebrow={pg.eyebrow} title={pg.title} description={pg.description} />
         <AuraPlayground />
       </Section>
-      <Section tone="lilac" labelledBy="looks-title" band>
-        <SectionHeading id="looks-title" eyebrow="Around the site" title={`${variants.length} looks, one guide`} description="Every page and section has its own version of Aura." />
+      <Section edit="meetAura.looks" tone={lk.tone} bg={lk.background} labelledBy="looks-title">
+        <SectionHeading id="looks-title" eyebrow={lk.eyebrow} title={lk.title} description={lk.description} />
         <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {variants.map((v) => (
             <li key={v} data-glow="" className="card flex flex-col items-center p-4 text-center transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">

@@ -14,6 +14,7 @@ import { TagScope } from "@/components/ui/Tag";
 import { mapLinks, routeUrl } from "@/components/venue/links";
 import { MapEmbed } from "@/components/venue/MapEmbed";
 import { getSettings } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -37,24 +38,21 @@ const KIND: Record<string, string> = { campus: "On campus", guesthouse: "Guest h
 export default async function VenuePage() {
   const s = await getSettings();
   const { query, open, directions } = mapLinks(s);
+  const hero = copy(s, "venueHero");
+  const pl = copy(s, "venuePlace");
+  const ro = copy(s, "venueRoutes");
+  const st = copy(s, "venueStay");
   return (
     <TagScope style="tab">
-      <PageHero
-        tone="mint"
-        crumb="Venue & travel"
-        eyebrow="Venue & travel"
-        title="Your guide to getting to IIT Delhi"
-        aura="venue"
-        description={<p>Directions from the airport, the railway stations and the metro, what to bring for campus entry, where to stay and a few local tips.</p>}
-      >
+      <PageHero edit="venue.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="venue" description={hero.description}>
         <ButtonLink href={directions} icon={<Navigation size={17} aria-hidden />}>
-          Directions
+          {hero.directions}
         </ButtonLink>
-        <Portal href="/#venue" tone="mint" compact kicker="Route map" title="Follow your route to campus" art={<RouteArt />} className="w-full max-w-sm" />
+        <Portal href="/#venue" tone={hero.tone} compact kicker={hero.portalKicker} title={hero.portalTitle} art={<RouteArt />} className="w-full max-w-sm" />
       </PageHero>
 
-      <Section tone="mint" labelledBy="venue-place-title">
-        <SectionHeading id="venue-place-title" eyebrow="The venue" title={s.venueName} className="mb-8 sm:mb-10" />
+      <Section edit="venue.place" tone={pl.tone} bg={pl.background} labelledBy="venue-place-title">
+        <SectionHeading id="venue-place-title" eyebrow={pl.eyebrow} title={s.venueName} className="mb-8 sm:mb-10" />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_0.85fr]">
           <div className="card flex min-w-0 flex-col overflow-hidden" data-reveal>
             <div className="aspect-[4/3] w-full min-w-0 flex-1 bg-surface-2 sm:aspect-[16/9] lg:aspect-auto lg:min-h-[420px]">
@@ -62,22 +60,22 @@ export default async function VenuePage() {
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 p-4">
               <p className="flex items-start gap-2 text-sm text-muted">
-                <MapPin size={17} aria-hidden className="mt-0.5 shrink-0 text-mint-ink" />
+                <MapPin size={17} aria-hidden className="mt-0.5 shrink-0 text-accent-ink" />
                 {s.venueAddress}
               </p>
               <div className="flex gap-2">
                 <ButtonLink href={open} variant="outline" size="sm" icon={<ExternalLink size={15} aria-hidden />}>
-                  Open map
+                  {pl.openMap}
                 </ButtonLink>
                 <ButtonLink href={directions} size="sm" icon={<Navigation size={15} aria-hidden />}>
-                  Directions
+                  {pl.directions}
                 </ButtonLink>
               </div>
             </div>
           </div>
 
           <div className="card h-fit p-6" data-reveal>
-            <p className="text-xs font-bold tracking-[0.14em] text-subtle uppercase">Venue</p>
+            <p className="text-xs font-bold tracking-[0.14em] text-subtle uppercase">{pl.venue}</p>
             <p className="mt-2 font-display text-xl font-semibold text-fg">{s.venueName}</p>
             <p className="mt-1 flex items-center gap-2 text-sm text-muted">
               <Building size={16} aria-hidden className="text-subtle" />
@@ -85,16 +83,16 @@ export default async function VenuePage() {
                 s.venueHall
               ) : (
                 <span>
-                  Hall / building:{" "}
+                  {pl.hall}{" "}
                   <Badge tone="butter" size="xs">
-                    to be announced
+                    {pl.hallTba}
                   </Badge>
                 </span>
               )}
             </p>
             <div className="mt-5 rounded-2xl bg-accent-soft p-4">
               <p className="flex items-center gap-2 text-sm font-bold text-accent-ink">
-                <ShieldCheck size={17} aria-hidden /> Campus entry
+                <ShieldCheck size={17} aria-hidden /> {pl.entry}
               </p>
               <RichText text={s.campusEntry} className="mt-2 text-sm text-fg" />
             </div>
@@ -103,18 +101,23 @@ export default async function VenuePage() {
       </Section>
 
       {s.directions.length ? (
-        <Section tone="azure" band labelledBy="getting-here-title">
+        <Section edit="venue.routes" tone={ro.tone} bg={ro.background} labelledBy="getting-here-title">
           <SectionHeading
             id="getting-here-title"
-            eyebrow="Getting here"
-            title="By air, train, metro or road"
+            eyebrow={ro.eyebrow}
+            title={ro.title}
             description={
               <p>
-                Travel times are indicative. Check live traffic and the DMRC journey planner, or follow each route on the{" "}
-                <Link href="/#venue" className="mi-underline font-semibold text-accent-ink">
-                  interactive map
-                </Link>
-                .
+                {ro.description}
+                {ro.mapLink ? (
+                  <>
+                    {" "}
+                    <Link href="/#venue" className="mi-underline font-semibold text-accent-ink">
+                      {ro.mapLink}
+                    </Link>
+                    .
+                  </>
+                ) : null}
               </p>
             }
             className="mb-8 sm:mb-10"
@@ -136,7 +139,7 @@ export default async function VenuePage() {
                   <p className="mt-4 flex-1 text-[15px] leading-relaxed text-muted">{d.details}</p>
                   <a href={routeUrl(query, d.mode)} target="_blank" rel="noopener noreferrer" className="group/plan mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-accent-ink">
                     <Navigation size={15} aria-hidden className="transition-transform duration-300 group-hover/plan:-translate-y-0.5 group-hover/plan:translate-x-0.5" />
-                    <span className="mi-underline">Plan this route in Google Maps</span>
+                    <span className="mi-underline">{ro.plan}</span>
                   </a>
                 </li>
               );
@@ -145,12 +148,12 @@ export default async function VenuePage() {
         </Section>
       ) : null}
 
-      <Section tone="peach" labelledBy="stay-title">
+      <Section edit="venue.stay" tone={st.tone} bg={st.background} labelledBy="stay-title">
         <SectionHeading
           id="stay-title"
-          eyebrow="Where to stay"
-          title="Nearby accommodation"
-          description="Guest houses, hotels and neighbourhoods within easy reach of campus."
+          eyebrow={st.eyebrow}
+          title={st.title}
+          description={st.description}
           className="mb-8 sm:mb-10"
         />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_0.6fr]">
@@ -172,7 +175,7 @@ export default async function VenuePage() {
                 {a.note ? <p className="mt-2 text-sm text-muted">{a.note}</p> : null}
                 {a.url ? (
                   <a href={a.url} target="_blank" rel="noopener noreferrer" className="group/more mt-3 inline-flex items-center gap-1 text-sm font-semibold text-accent-ink">
-                    <span className="mi-underline">Details</span>
+                    <span className="mi-underline">{st.details}</span>
                     <ExternalLink size={14} aria-hidden className="transition-transform duration-300 group-hover/more:translate-x-0.5 group-hover/more:-translate-y-0.5" />
                   </a>
                 ) : null}
@@ -180,15 +183,15 @@ export default async function VenuePage() {
             ))}
           </ul>
           {s.localInfo.length ? (
-            <div className="tone-butter card h-fit p-6" data-reveal>
+            <div className={`tone-${st.tipsTone} card h-fit p-6`} data-reveal>
               <div className="flex items-center gap-3">
                 <Aura variant="travel" size={70} lite />
-                <h3 className="font-display text-xl font-bold text-fg">Local tips</h3>
+                <h3 className="font-display text-xl font-bold text-fg">{st.tips}</h3>
               </div>
               <ul className="mt-4 space-y-3">
                 {s.localInfo.map((tip, i) => (
                   <li key={i} className="flex gap-2.5 text-sm text-muted">
-                    <Lightbulb size={17} aria-hidden className="mt-0.5 shrink-0 text-butter-ink" />
+                    <Lightbulb size={17} aria-hidden className="mt-0.5 shrink-0 text-accent-ink" />
                     {tip}
                   </li>
                 ))}
@@ -197,7 +200,7 @@ export default async function VenuePage() {
           ) : null}
         </div>
         <div className="mt-10 flex">
-          <Portal href="/#faq" tone="blush" kicker="Travel questions?" title="See the FAQ" text="Answers on registration, travel, the hackathon and more." art={<FaqArt />} className="w-full max-w-xl" />
+          <Portal href="/#faq" tone="blush" kicker={st.portalKicker} title={st.portalTitle} text={st.portalText} art={<FaqArt />} className="w-full max-w-xl" />
         </div>
       </Section>
     </TagScope>

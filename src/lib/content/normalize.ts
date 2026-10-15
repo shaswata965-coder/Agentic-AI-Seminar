@@ -41,12 +41,18 @@ export function fillDefaults<T>(fields: FieldDef[], obj: Record<string, unknown>
   return out as T;
 }
 
-/** Shallow merge of stored singleton data over defaults (ignoring null/undefined). */
+const isPlainObject = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
+
+/**
+ * Merge stored singleton data over defaults (ignoring null/undefined). Objects such as a
+ * section's texts are merged key by key, so texts added to the site later keep their defaults.
+ */
 export function mergeDefaults<T extends object>(defaults: T, stored: unknown): T {
   const out = { ...defaults } as Record<string, unknown>;
   if (stored && typeof stored === "object") {
     for (const [k, v] of Object.entries(stored as Record<string, unknown>)) {
-      if (v !== undefined && v !== null && k in out) out[k] = v;
+      if (v === undefined || v === null || !(k in out)) continue;
+      out[k] = isPlainObject(out[k]) && isPlainObject(v) ? mergeDefaults(out[k], v) : v;
     }
   }
   return out as T;

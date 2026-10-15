@@ -1,3 +1,4 @@
+import { PAGE_COPY_DEFAULTS } from "@/lib/schema/page-copy";
 import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
 
 /*
@@ -7,6 +8,7 @@ import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
  */
 
 export const DEFAULT_SETTINGS: SiteSettings = {
+  ...PAGE_COPY_DEFAULTS,
   eventName: "Agentic AI Workshop 2026",
   shortName: "AAIW 2026",
   tagline: "Where autonomous AI agents meet healthcare, science and entrepreneurship.",
@@ -174,6 +176,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   logoScAI: "",
   eventLogo: "",
   brandColor: "",
+  palette: { azure: "", lilac: "", mint: "", peach: "", blush: "", butter: "", aqua: "" },
   ogImage: "",
 
   showMoreSpeakers: true,

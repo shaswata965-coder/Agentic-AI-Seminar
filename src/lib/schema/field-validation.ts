@@ -102,3 +102,27 @@ export function objectSchema(fields: FieldDef[]) {
   for (const f of fields) shape[f.name] = fieldSchema(f);
   return z.object(shape);
 }
+
+/** The same field without required or format checks, so a preview can show work in progress. */
+function loosen(f: FieldDef): FieldDef {
+  switch (f.type) {
+    case "url":
+    case "email":
+    case "image":
+    case "file":
+    case "date":
+    case "datetime":
+    case "time":
+      return { name: f.name, label: f.label, type: "text", maxLength: 2000 };
+    case "objectList":
+    case "group":
+      return { ...f, required: false, fields: f.fields.map(loosen) };
+    default:
+      return { ...f, required: false };
+  }
+}
+
+/** Validation for previews: shapes, types and length caps only. */
+export function previewSchema(fields: FieldDef[]) {
+  return objectSchema(fields.map(loosen));
+}

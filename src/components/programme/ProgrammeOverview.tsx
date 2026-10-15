@@ -5,17 +5,18 @@ import { Badge } from "@/components/ui/Badge";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { SESSION_TYPE_META, THEME_META, type SessionType } from "@/lib/content/constants";
 import type { Session, SiteSettings } from "@/lib/content/types";
-import { eventDays, venueLine } from "@/lib/event";
+import { copy, plural } from "@/lib/copy";
+import { eventDays } from "@/lib/event";
 import { eventDayLabel, formatDate, timeRange } from "@/lib/format";
 
-/** What each session format is, and where to read more about it. */
-const FORMATS: { type: SessionType; text: string; href?: string }[] = [
-  { type: "keynote", text: "Big-picture talks from leading voices in agentic AI." },
-  { type: "talk", text: "Research and industry talks on agents at work.", href: "/speakers" },
-  { type: "panel", text: "Academia and industry debating where agents are heading.", href: "/speakers#panels" },
-  { type: "tutorial", text: "Hands-on sessions where you build and run agents yourself.", href: "/tutorials" },
-  { type: "demo", text: "Live agents shown working on real problems.", href: "/tutorials#demos" },
-  { type: "hackathon", text: "The hackathon's final round, live at the workshop.", href: "#hackathon" },
+/** The session formats explained on the page, and where to read more about each. */
+const FORMATS: { type: SessionType & ("keynote" | "talk" | "panel" | "tutorial" | "demo" | "hackathon"); href?: string }[] = [
+  { type: "keynote" },
+  { type: "talk", href: "/speakers" },
+  { type: "panel", href: "/speakers#panels" },
+  { type: "tutorial", href: "/tutorials" },
+  { type: "demo", href: "/tutorials#demos" },
+  { type: "hackathon", href: "#hackathon" },
 ];
 
 const hhmm = (d: Date) => formatDate(d.toISOString(), { hour: "2-digit", minute: "2-digit", hour12: false });
@@ -37,15 +38,15 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
     };
   });
   const count = (type: SessionType) => talks.filter((x) => x.type === type).length;
-  const dayWord = days.length === 1 ? "day" : "days";
+  const c = copy(s, "programmeOverview", { days: plural(days.length, "day"), sessions: plural(talks.length, "session") });
 
   return (
-    <Section id="overview" tone="azure" labelledBy="overview-title">
+    <Section id="overview" edit="programme.overview" tone={c.tone} bg={c.background} labelledBy="overview-title">
       <SectionHeading
         id="overview-title"
-        eyebrow="At a glance"
-        title={talks.length ? `${talks.length} sessions over ${days.length} ${dayWord}` : `${days.length} ${dayWord} of talks, panels, tutorials and demos`}
-        description={<p>The workshop runs at {venueLine(s)}. All times are IST.</p>}
+        eyebrow={c.eyebrow}
+        title={talks.length ? c.titleWithSessions : c.title}
+        description={c.description ? <p>{c.description}</p> : undefined}
         className="mb-8 sm:mb-10"
       />
 
@@ -56,14 +57,14 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
               <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-1.5 bg-[var(--accent)]" />
               <p className="font-display text-5xl leading-none font-extrabold text-accent-ink tabular sm:text-6xl">{String(d.day).padStart(2, "0")}</p>
               <div className="min-w-0">
-                <p className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">Day {d.day}</p>
+                <p className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">{c.day ? `${c.day} ${d.day}` : d.day}</p>
                 <h3 className="mt-1 font-display text-xl font-semibold text-fg">{d.label}</h3>
                 <p className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted">
                   <span className="inline-flex items-center gap-1.5 tabular">
                     <Clock size={14} aria-hidden className="text-accent-ink" />
                     {d.hours} IST
                   </span>
-                  <span>{d.count ? `${d.count} session${d.count === 1 ? "" : "s"}` : "Sessions to be announced"}</span>
+                  <span>{d.count ? plural(d.count, "session") : c.noSessions}</span>
                 </p>
                 {d.types.length ? (
                   <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -82,7 +83,7 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
         </ol>
 
         <div>
-          <h3 className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">Session formats</h3>
+          <h3 className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">{c.formats}</h3>
           <ul className="mt-3 divide-y divide-border overflow-hidden rounded-3xl border border-border bg-surface">
             {FORMATS.map((f) => {
               const meta = SESSION_TYPE_META[f.type];
@@ -94,7 +95,7 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
                       {meta.label}
                     </Badge>
                   </span>
-                  <span className="min-w-0 flex-1 text-sm text-muted">{f.text}</span>
+                  <span className="min-w-0 flex-1 text-sm text-muted">{c[f.type]}</span>
                   {n ? <span className="shrink-0 font-display text-lg font-bold text-fg tabular">{n}</span> : null}
                   {f.href ? <ArrowRight size={16} aria-hidden className="shrink-0 text-subtle transition-transform duration-300 group-hover:translate-x-1 group-hover:text-accent-ink" /> : <span aria-hidden className="w-4 shrink-0" />}
                 </>
@@ -118,7 +119,7 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
 
       {s.themes.length ? (
         <div className="mt-12">
-          <h3 className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">Themes</h3>
+          <h3 className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">{c.themes}</h3>
           <ul className="mt-3 grid gap-4 md:grid-cols-3">
             {s.themes.map((t, i) => {
               const meta = THEME_META[t.key] ?? THEME_META.general;
@@ -128,7 +129,7 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
                   <Aura variant={meta.aura} size={64} lite />
                   <div className="min-w-0">
                     <p className="font-display font-semibold text-fg">{t.title}</p>
-                    <p className="mt-0.5 text-sm text-muted">{n ? `${n} session${n === 1 ? "" : "s"}` : "Sessions to be announced"}</p>
+                    <p className="mt-0.5 text-sm text-muted">{n ? plural(n, "session") : c.noSessions}</p>
                   </div>
                 </li>
               );

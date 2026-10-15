@@ -7,6 +7,7 @@ import { ButtonLink } from "@/components/ui/Button";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { TagScope } from "@/components/ui/Tag";
 import { getSettings, getTalks } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { eventDayLabel } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 
@@ -15,10 +16,11 @@ export const metadata: Metadata = { title: "Slides & recordings", alternates: { 
 export default async function TalksPage() {
   const [s, talks] = await Promise.all([getSettings(), getTalks()]);
   if (!s.showTalks) notFound();
+  const c = copy(s, "talksHero");
   return (
     <TagScope style="bracket">
-      <PageHero tone="lilac" crumb="Slides & recordings" eyebrow="Post-event" title="Talk slides & recordings" aura="recordings" description={<p>Catch up on the talks from the {s.eventName}.</p>} />
-      <section className="tone-lilac py-12 sm:py-16">
+      <PageHero edit="talks.hero" home={s.siteNav.home} tone={c.tone} crumb={c.crumb} eyebrow={c.eyebrow} title={c.title} aura="recordings" description={c.description} />
+      <section data-edit="talks.hero" className={`tone-${c.tone} py-12 sm:py-16`}>
         <div className="container-site">
           {talks.length ? (
             <ul className="grid gap-6 md:grid-cols-2">
@@ -37,7 +39,7 @@ export default async function TalksPage() {
                     {t.slides ? (
                       <div className="mt-auto pt-4">
                         <ButtonLink href={t.slides} variant="outline" size="sm" icon={<FileText size={16} aria-hidden />} {...(t.slides.startsWith("/") ? { download: "" } : {})}>
-                          Slides
+                          {c.slides}
                         </ButtonLink>
                       </div>
                     ) : null}
@@ -48,7 +50,7 @@ export default async function TalksPage() {
           ) : (
             <div className="card flex flex-col items-center p-10 text-center">
               <Aura variant="recordings" size={150} />
-              <p className="mt-3 font-display text-xl font-semibold text-fg">Recordings will be published soon.</p>
+              <p className="mt-3 font-display text-xl font-semibold text-fg">{c.empty}</p>
             </div>
           )}
         </div>

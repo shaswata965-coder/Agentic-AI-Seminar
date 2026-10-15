@@ -24,7 +24,7 @@
   --muted: #475569;
   --subtle: #5a6577;
 
-  /* Brand (IIT Delhi / ScAI colours can be set from Admin → Settings → Branding) */
+  /* Brand (IIT Delhi / ScAI colours can be set from Admin → Site settings → Site-wide → Colours) */
   --brand: #3b5bdb;
   --brand-strong: #2a44b8;
   --brand-fg: #ffffff;
@@ -703,4 +703,10 @@ dialog::backdrop { background: rgb(10 15 30 / 0.45); }
   @media (prefers-reduced-motion: no-preference) {
     .grow-bar { animation: grow-x linear both; animation-timeline: view(); animation-range: entry 20% cover 45%; }
   }
+}
+
+/* Live preview in Admin → Site settings: the section being edited. */
+[data-preview] [data-edit-focus] {
+  outline: 3px dashed var(--brand);
+  outline-offset: -6px;
 }

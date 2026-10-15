@@ -6,7 +6,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Brief | Where |
 | --- | --- |
-| Event name (final name/logo to be confirmed) | Admin → Site settings → Event details; event logo under Branding |
+| Event name (final name/logo to be confirmed) | Admin → Site settings → Site-wide → Event details; event logo under Logos & images |
 | Organised by IIT Delhi and ScAI, IIT Delhi | Hero, footer, About, JSON-LD organiser data |
 | Tue 15 – Wed 16 December 2026 | Hero, countdown, calendar files, programme day tabs (dates come from the start/end settings) |
 | Venue IIT Delhi, Hauz Khas (hall TBA) | Hero, the home route map and `/venue`; the hall shows "to be announced" until it is set |
@@ -25,7 +25,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Tutorials & Demos | Page `/tutorials` |
 | Industry Kiosks | Section `/programme#kiosks` |
 | Hackathon | Page `/hackathon` (+ `/hackathon/register`; teaser on home) |
-| Registration | Page `/register`, or an external form link (Admin → Site settings → Registration) |
+| Registration | Page `/register`, or an external form link (Admin → Site settings → Site-wide → Registration) |
 | Organisers | Page `/organisers` |
 | Venue & Travel | Page `/venue`, with the interactive route map at `/#venue` |
 | Partners / Sponsors | Page `/partners` (logo strip on home at `/#partners`) |
@@ -90,7 +90,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Workshop and hackathon registration; deadlines shown clearly; confirmation e-mail | Built-in forms (or external links), deadline countdowns, automatic closing after the deadline, confirmation e-mails with registration ID and calendar invite (needs SMTP), CSV export |
 | IIT Delhi sub-domain or path, with HTTPS | Supports a sub-domain or a sub-path (`NEXT_PUBLIC_BASE_PATH`); Nginx + HTTPS instructions in the README |
 | Countdown, add to calendar, share buttons, SEO meta and Open Graph image, Google Analytics, favicon | ✅ All included; GA is enabled by entering an ID in the admin |
-| Post-event: photo gallery, slides / recordings, hackathon winners (hidden until enabled) | `/gallery`, `/talks` and winners, each behind a switch in Admin → Site settings → Features & post-event |
+| Post-event: photo gallery, slides / recordings, hackathon winners (hidden until enabled) | `/gallery`, `/talks` and winners, each behind a switch in Admin → Site settings → Site-wide → Features & post-event |
 | Handover: source code / admin access, short update guide, credentials | This repository; `docs/ADMIN_GUIDE.md` and `/admin/guide`; README handover checklist (credentials stay in the server environment) |
 
 ## 8. Content still to come from the organisers
@@ -99,14 +99,14 @@ Each pending item has a placeholder and an admin screen ready for it:
 
 | Item | Where to add it |
 | --- | --- |
-| Official logo, tagline, colour palette (IITD / ScAI logos are built in; replace them only if needed) | Site settings → Branding / Event details |
+| Official logo, tagline, colour palette (IITD / ScAI logos are built in; replace them only if needed) | Site settings → Site-wide → Colours, Logos & images, Event details |
 | Speakers and panelists with photos, bios, talk titles | Speakers |
-| Detailed schedule, venue hall names | Programme; Site settings → Event details (hall) |
+| Detailed schedule, venue hall names | Programme; Site settings → Site-wide → Event details (hall) |
 | Tutorial, demo and kiosk details | Tutorials, Demos, Industry kiosks |
-| Hackathon tracks, dates, prizes, platform | Hackathon; Site settings → Registration (platform link) |
-| Registration links, fees, deadlines | Site settings → Registration |
+| Hackathon tracks, dates, prizes, platform | Hackathon; Site settings → Site-wide → Registration (platform link) |
+| Registration links, fees, deadlines | Site settings → Site-wide → Registration; Registration → Fees |
 | Organiser photos and profile links; volunteer list | Organisers & volunteers |
-| Sponsors / partners and contact e-mail | Partners & sponsors; Site settings → Contact & social |
+| Sponsors / partners and contact e-mail | Partners & sponsors; Site settings → Site-wide → Contact & social |
 
 ## How it was checked
 

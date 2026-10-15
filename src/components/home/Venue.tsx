@@ -8,17 +8,19 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { VenueMap } from "@/components/venue/VenueMap";
 import { mapLinks } from "@/components/venue/links";
 import type { SiteSettings } from "@/lib/content/types";
+import { copy } from "@/lib/copy";
 
 /** Home page Venue & travel: the interactive route map. Campus entry, stays and local tips live on /venue. */
 export function Venue({ s }: { s: SiteSettings }) {
   const { query, open } = mapLinks(s);
+  const c = copy(s, "homeVenue");
   return (
-    <Section id="venue" tone="mint" labelledBy="venue-title" band tags="tab">
+    <Section id="venue" edit="home.venue" tone={c.tone} bg={c.background} labelledBy="venue-title" tags="tab">
       <SectionHeading
         id="venue-title"
-        eyebrow="Venue & travel"
-        title="Getting to IIT Delhi"
-        description="Pick how you're arriving and follow the route to campus."
+        eyebrow={c.eyebrow}
+        title={c.title}
+        description={c.description}
         aside={<Aura variant="venue" size={130} interactive bubbleSide="left" className="max-md:hidden" />}
       />
 
@@ -37,21 +39,21 @@ export function Venue({ s }: { s: SiteSettings }) {
                 <p className="mt-0.5 text-sm text-muted">{s.venueAddress}</p>
                 {!s.venueHall ? (
                   <Badge tone="butter" size="xs" className="mt-2">
-                    Hall to be announced
+                    {c.hallTba}
                   </Badge>
                 ) : null}
               </div>
             </div>
             <ButtonLink href={open} variant="outline" size="sm" className="shrink-0 self-start sm:self-center" icon={<ExternalLink size={15} aria-hidden />}>
-              Google Maps
+              {c.maps}
             </ButtonLink>
           </div>
           <Portal
             href="/venue"
-            tone="mint"
-            kicker="Travel guide"
-            title="Everything for the trip"
-            text="Campus entry, every route in detail, places to stay and local tips."
+            tone={c.tone}
+            kicker={c.portalKicker}
+            title={c.portalTitle}
+            text={c.portalText}
             art={<RouteArt />}
           />
         </div>

@@ -1,5 +1,6 @@
 import { AuraAssistant } from "@/components/aura/AuraAssistant";
 import { BackToTop } from "@/components/effects/BackToTop";
+import { PreviewBridge } from "@/components/layout/PreviewBridge";
 import { SiteBanner } from "@/components/layout/SiteBanner";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -21,8 +22,8 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       >
         Skip to content
       </a>
-      {s.bannerText ? <SiteBanner text={s.bannerText} link={s.bannerLink} /> : null}
-      <SiteHeader logos={{ iitd: s.logoIITD, scai: s.logoScAI }} registerHref={registrationHref(s)} extraNav={postEventNav(s)} />
+      {s.bannerText ? <SiteBanner text={s.bannerText} link={s.bannerLink} tone={s.siteBanner.tone} /> : null}
+      <SiteHeader logos={{ iitd: s.logoIITD, scai: s.logoScAI }} registerHref={registrationHref(s)} extraNav={postEventNav(s, s.siteNav)} nav={s.siteNav} text={s.siteHeader} />
       <main id="main" tabIndex={-1} className="outline-none">
         {children}
       </main>
@@ -40,6 +41,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
         />
       ) : null}
       <BackToTop />
+      <PreviewBridge />
     </ToastProvider>
   );
 }

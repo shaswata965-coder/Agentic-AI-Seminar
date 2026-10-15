@@ -4,6 +4,7 @@ import { Aura } from "@/components/aura/Aura";
 import { NetworkCanvas } from "@/components/effects/NetworkCanvas";
 import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import type { SiteSettings } from "@/lib/content/types";
+import { copy } from "@/lib/copy";
 import { splitEventName, venueLine } from "@/lib/event";
 import { formatDate, formatDateRange } from "@/lib/format";
 import { Countdown } from "./Countdown";
@@ -30,24 +31,25 @@ function StatusDot({ live = false }: { live?: boolean }) {
   );
 }
 
-/** Workshop registration as set in Admin → Site settings → Registration, closing by itself at the deadline. */
+/** Workshop registration as set in Admin → Site settings → Site-wide → Registration, closing by itself at the deadline. */
 function RegistrationFact({ s }: { s: SiteSettings }) {
+  const c = copy(s, "homeHero");
   const icon = <Ticket size={14} aria-hidden />;
   const closed = (
-    <Fact label="Registration" icon={icon} tone="tone-blush">
+    <Fact label={c.registration} icon={icon} tone="tone-blush">
       <span className="inline-flex items-center gap-2">
         <StatusDot />
-        Closed
+        {c.closed}
       </span>
     </Fact>
   );
   if (s.workshopStatus === "closed") return closed;
   if (s.workshopStatus !== "open") {
     return (
-      <Fact label="Registration" icon={icon} tone="tone-butter">
+      <Fact label={c.registration} icon={icon} tone="tone-butter">
         <span className="inline-flex items-center gap-2">
           <StatusDot />
-          Opening soon
+          {c.soon}
         </span>
       </Fact>
     );
@@ -55,11 +57,11 @@ function RegistrationFact({ s }: { s: SiteSettings }) {
   const until = s.workshopDeadline ? formatDate(s.workshopDeadline, { day: "numeric", month: "short" }) : "";
   return (
     <DeadlineGate deadline={s.workshopDeadline} closed={closed}>
-      <Fact label="Registration" icon={icon} tone="tone-mint">
+      <Fact label={c.registration} icon={icon} tone="tone-mint">
         <span className="inline-flex items-center gap-2">
           <StatusDot live />
-          Open
-          {until ? <span className="font-sans text-sm font-medium text-muted">until {until}</span> : null}
+          {c.open}
+          {until ? <span className="font-sans text-sm font-medium text-muted">{c.until ? `${c.until} ${until}` : until}</span> : null}
         </span>
       </Fact>
     </DeadlineGate>
@@ -67,12 +69,13 @@ function RegistrationFact({ s }: { s: SiteSettings }) {
 }
 
 export function Hero({ s }: { s: SiteSettings }) {
+  const c = copy(s, "homeHero");
   // "Agentic AI Workshop 2026" → highlighted "Agentic AI", then "Workshop", then a muted "2026".
   const { title, year } = splitEventName(s.eventName);
   const lead = title.split(/\s+/);
   const last = lead.pop();
   return (
-    <section className="relative isolate overflow-hidden" aria-labelledby="hero-title">
+    <section data-edit="home.hero" className="relative isolate overflow-hidden" aria-labelledby="hero-title">
       {/* Background: pastel mesh, dotted grid and the live agent network, which keeps clear of every [data-graph-avoid] text block. */}
       <div aria-hidden className="absolute inset-0 -z-20 bg-[radial-gradient(70%_60%_at_15%_10%,color-mix(in_oklab,var(--azure)_38%,transparent),transparent_70%),radial-gradient(50%_55%_at_85%_20%,color-mix(in_oklab,var(--lilac)_34%,transparent),transparent_70%),radial-gradient(45%_50%_at_60%_95%,color-mix(in_oklab,var(--mint)_26%,transparent),transparent_70%)] dark:opacity-50" />
       <div aria-hidden className="bg-dots absolute inset-0 -z-20 [mask-image:radial-gradient(80%_70%_at_50%_40%,black,transparent)]" />
@@ -103,10 +106,10 @@ export function Hero({ s }: { s: SiteSettings }) {
           </div>
 
           <dl className="flex flex-wrap gap-x-10 gap-y-5">
-            <Fact label="When" icon={<CalendarDays size={14} aria-hidden />} tone="tone-azure">
+            <Fact label={c.when} icon={<CalendarDays size={14} aria-hidden />} tone="tone-azure">
               <time dateTime={s.startDate}>{formatDateRange(s.startDate, s.endDate)}</time>
             </Fact>
-            <Fact label="Where" icon={<MapPin size={14} aria-hidden />} tone="tone-lilac">
+            <Fact label={c.where} icon={<MapPin size={14} aria-hidden />} tone="tone-lilac">
               {venueLine(s)}
             </Fact>
             <RegistrationFact s={s} />
@@ -126,7 +129,7 @@ export function Hero({ s }: { s: SiteSettings }) {
             <div className="flex items-center gap-3 md:w-[17.5rem] md:shrink-0 md:border-r md:border-border md:pr-6">
               <Aura variant="countdown" size={68} lite />
               <div>
-                <p className="text-[11px] font-bold tracking-[0.2em] text-subtle uppercase">Starts</p>
+                <p className="text-[11px] font-bold tracking-[0.2em] text-subtle uppercase">{c.countdown}</p>
                 <p className="mt-1 font-display text-lg leading-snug font-semibold text-fg">{formatDate(s.startDate, { day: "numeric", month: "long", year: "numeric" })}</p>
                 <p className="text-sm text-muted">{formatDate(s.startDate, { hour: "2-digit", minute: "2-digit", hour12: false })} IST</p>
               </div>

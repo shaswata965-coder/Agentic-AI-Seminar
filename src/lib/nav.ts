@@ -1,38 +1,45 @@
+import type { PageCopy } from "@/lib/schema/page-copy";
+
 export interface NavItem {
   href: string;
   label: string;
   description?: string;
 }
 
+/** Names from Site settings → Site-wide → Navigation. */
+export type NavCopy = PageCopy["siteNav"];
+
+export const homeNav = (n: NavCopy): NavItem => ({ href: "/", label: n.home });
+
 /** Dedicated pages shown as links in the navigation bar (after Home). */
-export const PRIMARY_NAV: NavItem[] = [
-  { href: "/about", label: "About" },
-  { href: "/programme", label: "Programme" },
-  { href: "/speakers", label: "Speakers" },
+export const primaryNav = (n: NavCopy): NavItem[] => [
+  { href: "/about", label: n.about },
+  { href: "/programme", label: n.programme },
+  { href: "/speakers", label: n.speakers },
 ];
 
-export const HOME_NAV: NavItem = { href: "/", label: "Home" };
+export const registrationNav = (n: NavCopy): NavItem => ({ href: "/register", label: n.registration });
 
 /** Dedicated pages listed under Explore, next to the home page sections. */
-export const EXPLORE_PAGES: NavItem[] = [
-  { href: "/tutorials", label: "Tutorials & Demos", description: "Hands-on sessions and live agent demos" },
-  { href: "/hackathon", label: "Hackathon", description: "Tracks, rules, prizes and team registration" },
-  { href: "/venue", label: "Venue & travel", description: "Directions, campus entry, stays and local tips" },
-  { href: "/partners", label: "Partners & sponsors", description: "Our partners, sponsorship tiers and how to join them" },
-  { href: "/organisers", label: "Organisers", description: "Faculty, student organisers and volunteers" },
+export const explorePages = (n: NavCopy): NavItem[] => [
+  { href: "/tutorials", label: n.tutorials, description: n.tutorialsText },
+  { href: "/hackathon", label: n.hackathon, description: n.hackathonText },
+  { href: "/venue", label: n.venue, description: n.venueText },
+  { href: "/partners", label: n.partners, description: n.partnersText },
+  { href: "/organisers", label: n.organisers, description: n.organisersText },
 ];
 
 /** Sections of the single-scroll home page. */
-export const SECTION_NAV: NavItem[] = [
-  { href: "/#themes", label: "Themes", description: "Healthcare, scientific discovery and entrepreneurship" },
-  { href: "/#venue", label: "Route map", description: "Follow the route to campus on the map" },
-  { href: "/#faq", label: "FAQ", description: "Registration, travel, the hackathon and more" },
-  { href: "/#contact", label: "Contact", description: "E-mail, social links and the contact form" },
+export const sectionNav = (n: NavCopy): NavItem[] => [
+  { href: "/#themes", label: n.themes, description: n.themesText },
+  { href: "/#venue", label: n.routeMap, description: n.routeMapText },
+  { href: "/#faq", label: n.faq, description: n.faqText },
+  { href: "/#contact", label: n.contact, description: n.contactText },
 ];
 
-export function postEventNav(flags: { showGallery: boolean; showTalks: boolean }): NavItem[] {
+export function postEventNav(flags: { showGallery: boolean; showTalks: boolean }, n: NavCopy): NavItem[] {
   return [
-    ...(flags.showGallery ? [{ href: "/gallery", label: "Photo gallery", description: "Moments from the workshop" }] : []),
-    ...(flags.showTalks ? [{ href: "/talks", label: "Slides & recordings", description: "Catch up on the talks" }] : []),
+    ...(flags.showGallery ? [{ href: "/gallery", label: n.gallery, description: n.galleryText }] : []),
+    ...(flags.showTalks ? [{ href: "/talks", label: n.talks, description: n.talksText }] : []),
   ];
 }

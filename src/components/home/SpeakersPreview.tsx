@@ -7,13 +7,14 @@ import { Portal } from "@/components/ui/Portal";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { SPEAKER_CATEGORY_META } from "@/lib/content/constants";
 import type { SiteSettings, Speaker } from "@/lib/content/types";
+import { copy, plural } from "@/lib/copy";
 
-export function MoreSpeakersCard({ className }: { className?: string }) {
+export function MoreSpeakersCard({ className, title, text }: { className?: string; title: string; text: string }) {
   return (
     <div className={`tone-lilac flex h-full min-h-[18rem] flex-col items-center justify-center rounded-3xl border-2 border-dashed border-[color-mix(in_oklab,var(--accent)_60%,transparent)] bg-accent-soft/60 p-6 text-center ${className ?? ""}`}>
       <Aura variant="speakers" size={120} lite />
-      <p className="mt-3 font-display text-lg font-semibold text-fg">More speakers to be announced</p>
-      <p className="mt-1 text-sm text-muted">New names are added as they confirm. Stay tuned!</p>
+      <p className="mt-3 font-display text-lg font-semibold text-fg">{title}</p>
+      {text ? <p className="mt-1 text-sm text-muted">{text}</p> : null}
     </div>
   );
 }
@@ -22,13 +23,14 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
   const limit = Math.max(0, s.featuredSpeakers || 8);
   const featured = speakers.filter((sp) => sp.featured);
   const list = (featured.length ? featured : speakers).slice(0, limit);
+  const c = copy(s, "homeSpeakers", { count: plural(speakers.length, "speaker") });
   return (
-    <Section tone="lilac" labelledBy="speakers-preview-title" wash tags="ribbon">
+    <Section edit="home.speakers" tone={c.tone} bg={c.background} labelledBy="speakers-preview-title" tags="ribbon">
       <SectionHeading
         id="speakers-preview-title"
-        eyebrow="Speakers"
-        title="Voices from academia and industry"
-        description="Invited talks and panel discussions from researchers, practitioners and founders building agentic AI."
+        eyebrow={c.eyebrow}
+        title={c.title}
+        description={c.description}
       />
       {list.length ? (
         <ul className="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-4">
@@ -59,7 +61,7 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
           })}
           {s.showMoreSpeakers ? (
             <li>
-              <MoreSpeakersCard />
+              <MoreSpeakersCard title={c.moreTitle} text={c.moreText} />
             </li>
           ) : null}
         </ul>
@@ -67,25 +69,25 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
         <div className="card flex flex-col items-center gap-6 p-8 text-center sm:flex-row sm:text-left">
           <Aura variant="speakers" size={170} interactive />
           <div>
-            <p className="font-display text-2xl font-bold text-fg">Speakers will be announced soon</p>
-            <p className="mt-2 max-w-xl text-muted">
-              We are finalising an exciting line-up of keynote speakers, invited talks and panelists from academia and industry. Follow the announcements for updates.
-            </p>
-            <div className="mt-5">
-              <ButtonLink href="/#news" variant="soft">
-                See announcements
-              </ButtonLink>
-            </div>
+            <p className="font-display text-2xl font-bold text-fg">{c.emptyTitle}</p>
+            {c.emptyText ? <p className="mt-2 max-w-xl text-muted">{c.emptyText}</p> : null}
+            {c.emptyButton ? (
+              <div className="mt-5">
+                <ButtonLink href="/#news" variant="soft">
+                  {c.emptyButton}
+                </ButtonLink>
+              </div>
+            ) : null}
           </div>
         </div>
       )}
       <div className="mt-10 flex justify-center sm:mt-12">
         <Portal
           href="/speakers"
-          tone="lilac"
-          kicker="Speakers"
-          title={speakers.length ? `Meet all ${speakers.length} ${speakers.length === 1 ? "speaker" : "speakers"}` : "Speaker profiles"}
-          text={speakers.length ? "Keynotes, invited talks and panelists, with their bios, talk titles and abstracts." : "Profiles, talk titles and abstracts appear here as speakers confirm."}
+          tone={c.tone}
+          kicker={c.portalKicker}
+          title={speakers.length ? c.portalTitle : c.portalEmptyTitle}
+          text={speakers.length ? c.portalText : c.portalEmptyText}
           art={<FacesArt people={speakers.slice(0, 3)} total={speakers.length} />}
           className="w-full max-w-xl"
         />

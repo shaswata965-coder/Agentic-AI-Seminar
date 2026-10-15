@@ -1,4 +1,5 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { draftMode } from "next/headers";
 import { connectDb, isDbConfigured, once } from "@/lib/db";
 import { getCollectionModel, Singleton } from "@/lib/models";
 import { COLLECTION_MAP } from "@/lib/schema/resources";
@@ -32,10 +33,23 @@ async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
   }
 }
 
+/** Unsaved Site settings shown by the live preview in the admin (see /api/admin/preview). */
+export const SETTINGS_DRAFT_KEY = "settings-draft";
+const DRAFT_MAX_AGE = 2 * 60 * 60_000;
+
 export async function getSettings(): Promise<SiteSettings> {
   "use cache";
   cacheTag("settings", CONTENT_TAG);
-  const res = await load(() => Singleton.findOne({ key: "settings" }).lean());
+  // In Draft Mode (only the admin's preview turns it on) this runs on every request, uncached,
+  // and shows the draft being edited instead of the saved settings.
+  const { isEnabled: preview } = await draftMode();
+  const res = await load(async () => {
+    if (preview) {
+      const draft = await Singleton.findOne({ key: SETTINGS_DRAFT_KEY }).lean();
+      if (draft?.updatedAt && Date.now() - new Date(draft.updatedAt).getTime() < DRAFT_MAX_AGE) return draft;
+    }
+    return Singleton.findOne({ key: "settings" }).lean();
+  });
   if (!res.ok) {
     cacheLife("fallback");
     return DEFAULT_SETTINGS;

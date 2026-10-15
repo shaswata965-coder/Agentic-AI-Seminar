@@ -18,6 +18,8 @@ import {
   THEME_KEYS,
   THEME_META,
 } from "@/lib/content/constants";
+import type { Tone } from "@/lib/content/constants";
+import { copyFields, type CopyKey } from "./page-copy";
 import {
   bool,
   color,
@@ -170,7 +172,7 @@ export const COLLECTIONS: CollectionDef[] = [
     model: "Session",
     label: "Programme",
     singular: "Session",
-    description: "Day-wise schedule. Set the programme status (TBA / draft / final) in Settings → Programme.",
+    description: "Day-wise schedule. Set the programme status (TBA / draft / final) in Site settings → Programme → Schedule.",
     icon: "calendar",
     group: "Programme",
     titleKey: "title",
@@ -312,7 +314,7 @@ export const COLLECTIONS: CollectionDef[] = [
     model: "Sponsor",
     label: "Partners & sponsors",
     singular: "Partner",
-    description: "Logos loop on the home page and are grouped by tier on the Partners & sponsors page. Sponsorship tiers and the enquiry text live in Settings → Partners & kiosks.",
+    description: "Logos loop on the home page and are grouped by tier on the Partners & sponsors page. Sponsorship tiers and the enquiry text live in Site settings → Partners.",
     icon: "handshake",
     group: "Content",
     titleKey: "name",
@@ -400,7 +402,7 @@ export const COLLECTIONS: CollectionDef[] = [
     model: "GalleryItem",
     label: "Photo gallery",
     singular: "Photo",
-    description: "Post-event photos. Turn the gallery on in Settings → Features when ready.",
+    description: "Post-event photos. Turn the gallery on in Site settings → Site-wide → Features & post-event when ready.",
     icon: "image",
     group: "Post-event",
     titleKey: "caption",
@@ -428,7 +430,7 @@ export const COLLECTIONS: CollectionDef[] = [
     model: "Talk",
     label: "Slides & recordings",
     singular: "Recording",
-    description: "Post-event talk slides and recordings. Turn this section on in Settings → Features.",
+    description: "Post-event talk slides and recordings. Turn this section on in Site settings → Site-wide → Features & post-event.",
     icon: "video",
     group: "Post-event",
     titleKey: "title",
@@ -483,117 +485,311 @@ export interface SingletonDef {
   sections: FieldSection[];
 }
 
-export const SETTINGS_DEF: SingletonDef = {
-  key: "settings",
-  label: "Site settings",
-  description: "Event details, registration, venue, branding and feature switches.",
-  tags: ["settings"],
-  sections: [
-    {
-      key: "general",
-      title: "Event details",
-      fields: [
-        text("eventName", "Event name", { required: true, width: "half", help: "Used in the logo, page titles, e-mails and calendar invites. A year at the end (e.g. 2026) appears under the logo." }),
-        text("shortName", "Short name", { width: "half", help: "Used where space is tight: the admin panel and the name of the site when installed as an app." }),
-        text("tagline", "Tagline"),
-        textarea("description", "Short description", { help: "Used for search engines and social media previews.", maxLength: 300 }),
-        text("organisedBy", "Organised by"),
-        datetime("startDate", "Starts", { required: true, width: "half", help: "Indian Standard Time. The countdown counts down to this." }),
-        datetime("endDate", "Ends", { required: true, width: "half" }),
-        text("venueName", "Venue", { width: "half" }),
-        text("venueHall", "Hall / building", { width: "half", help: "Leave blank to show “to be announced”." }),
-        textarea("venueAddress", "Full address", { rows: 2 }),
-      ],
-    },
-    {
-      key: "registration",
-      title: "Registration",
-      description: "Use the built-in forms, or paste a link to an external form (Google Forms, Unstop, Devfolio…).",
-      fields: [
-        select("workshopStatus", "Workshop registration", [
-          { value: "soon", label: "Opening soon" },
-          { value: "open", label: "Open" },
-          { value: "closed", label: "Closed" },
-        ], { width: "half", help: "Also shown under the title on the home page." }),
-        datetime("workshopDeadline", "Workshop registration deadline", { width: "half" }),
-        url("workshopUrl", "External workshop form (optional)", { help: "Leave blank to use the built-in registration form." }),
-        objects("fees", "Fees", "Fee", [
-          text("category", "Category", { required: true, width: "half", placeholder: "Students" }),
-          text("amount", "Amount", { width: "half", placeholder: "To be announced" }),
-          text("note", "Note"),
-        ]),
-        textarea("feeNote", "Fee note", { placeholder: "Fee details will be announced soon." }),
-        textarea("confirmationNote", "Extra text for the confirmation e-mail"),
-        select("hackathonStatus", "Hackathon registration", [
-          { value: "soon", label: "Opening soon" },
-          { value: "open", label: "Open" },
-          { value: "closed", label: "Closed" },
-        ], { width: "half" }),
-        datetime("hackathonDeadline", "Hackathon registration deadline", { width: "half" }),
-        url("hackathonUrl", "External hackathon platform link (optional)", { width: "half", help: "e.g. Unstop or Devfolio. Leave blank for the built-in form." }),
-        text("hackathonPlatform", "Platform name", { width: "half", placeholder: "Unstop" }),
-      ],
-    },
-    {
-      key: "home",
-      title: "Home page",
-      fields: [
-        objects("highlights", "Highlight strip", "Highlight", [
+/** One section of a Site settings page tab: the section's texts and colours (copy) and any other settings shown on it. */
+export interface SettingsSection extends FieldSection {
+  copy?: CopyKey;
+  /** The section on the site (its data-edit attribute), for the preview. */
+  anchor?: string;
+  /** The page to preview, when it isn't the tab's own page. */
+  path?: string;
+}
+
+/** A tab of Site settings: one page of the site, or the parts shared by every page. */
+export interface SettingsPage {
+  key: string;
+  title: string;
+  path: string;
+  description?: string;
+  sections: SettingsSection[];
+}
+
+const statusOptions = [
+  { value: "soon", label: "Opening soon" },
+  { value: "open", label: "Open" },
+  { value: "closed", label: "Closed" },
+];
+
+/** Built-in shades of the accent colours (light mode), shown as hints. */
+export const PALETTE_DEFAULTS: Record<Tone, string> = { azure: "#8cc8ff", lilac: "#c3b1ff", mint: "#8fe0c0", peach: "#ffbf99", blush: "#ffa9c1", butter: "#ffdc73", aqua: "#67e3f9" };
+
+const section = (key: string, title: string, copy: CopyKey | undefined, fields: FieldDef[] = [], extra: Partial<SettingsSection> = {}): SettingsSection => ({ key, title, copy, fields, ...extra });
+
+export const SETTINGS_PAGES: SettingsPage[] = [
+  {
+    key: "site",
+    title: "Site-wide",
+    path: "/",
+    description: "Event details, registration, colours and the parts every page shares: navigation, header, footer and banner.",
+    sections: [
+      section(
+        "event",
+        "Event details",
+        undefined,
+        [
+          text("eventName", "Event name", { required: true, width: "half", help: "Used in the logo, page titles, e-mails and calendar invites. A year at the end (e.g. 2026) appears under the logo." }),
+          text("shortName", "Short name", { width: "half", help: "Used where space is tight: the admin panel and the name of the site when installed as an app." }),
+          text("tagline", "Tagline"),
+          textarea("description", "Short description", { help: "Used for search engines and social media previews.", maxLength: 300 }),
+          text("organisedBy", "Organised by"),
+          datetime("startDate", "Starts", { required: true, width: "half", help: "Indian Standard Time. The countdown counts down to this." }),
+          datetime("endDate", "Ends", { required: true, width: "half" }),
+          text("venueName", "Venue", { width: "half" }),
+          text("venueHall", "Hall / building", { width: "half", help: "Leave blank to show “to be announced”." }),
+          textarea("venueAddress", "Full address", { rows: 2 }),
+        ],
+        { anchor: "home.hero" },
+      ),
+      section(
+        "registration",
+        "Registration",
+        undefined,
+        [
+          select("workshopStatus", "Workshop registration", statusOptions, { width: "half", help: "Also shown under the title on the home page." }),
+          datetime("workshopDeadline", "Workshop registration deadline", { width: "half" }),
+          url("workshopUrl", "External workshop form (optional)", { help: "Leave blank to use the built-in registration form." }),
+          textarea("confirmationNote", "Extra text for the confirmation e-mail"),
+          select("hackathonStatus", "Hackathon registration", statusOptions, { width: "half" }),
+          datetime("hackathonDeadline", "Hackathon registration deadline", { width: "half" }),
+          url("hackathonUrl", "External hackathon platform link (optional)", { width: "half", help: "e.g. Unstop or Devfolio. Leave blank for the built-in form." }),
+          text("hackathonPlatform", "Platform name", { width: "half", placeholder: "Unstop" }),
+        ],
+        { description: "Use the built-in forms, or paste a link to an external form (Google Forms, Unstop, Devfolio…).", path: "/register", anchor: "register.hero" },
+      ),
+      section(
+        "colours",
+        "Colours",
+        undefined,
+        [
+          color("brandColor", "Brand colour", { width: "half", help: "Buttons, links and highlights. Hex colour, e.g. #3b5bdb. Leave blank for the default." }),
+          {
+            name: "palette",
+            label: "Accent colours",
+            type: "group",
+            help: "Each section picks one of these. Leave blank for the built-in shade; lighter and darker tints and dark mode follow automatically.",
+            fields: (Object.keys(PALETTE_DEFAULTS) as Tone[]).map((t) => color(t, `${t[0].toUpperCase()}${t.slice(1)}`, { width: "third", placeholder: PALETTE_DEFAULTS[t] })),
+          },
+        ],
+        { description: "The site's colours. Each section's own colour is chosen in its page tab." },
+      ),
+      section(
+        "logos",
+        "Logos & images",
+        undefined,
+        [
+          image("logoIITD", "IIT Delhi logo", { width: "half", help: "Left corner of the navigation bar. Leave blank for the built-in emblem." }),
+          image("logoScAI", "ScAI logo", { width: "half", help: "Right corner of the navigation bar. Leave blank for the built-in logo." }),
+          image("eventLogo", "Event logo", { width: "half" }),
+          image("ogImage", "Social preview image (optional)", { help: "1200×630 px. Leave blank to use the generated preview." }),
+        ],
+        { description: "The IIT Delhi and ScAI logos are built in. Upload one here only to replace it.", anchor: "site.header" },
+      ),
+      section("nav", "Navigation", "siteNav", [], { description: "Names of the pages and home sections in the navigation bar, its Explore menu and the footer.", anchor: "site.header" }),
+      section("header", "Header", "siteHeader", [], { anchor: "site.header" }),
+      section("footer", "Footer", "siteFooter", [], { anchor: "site.footer" }),
+      section(
+        "banner",
+        "Banner",
+        "siteBanner",
+        [text("bannerText", "Site-wide banner (optional)", { help: "A short notice shown at the very top of every page." }), url("bannerLink", "Banner link (optional)")],
+        { anchor: "site.banner" },
+      ),
+      section(
+        "contact",
+        "Contact & social",
+        undefined,
+        [
+          email("contactEmail", "Official e-mail", { width: "half" }),
+          text("contactPhone", "Phone (optional)", { width: "half" }),
+          email("notifyEmail", "Send form notifications to", { width: "half", help: "New hackathon teams and enquiries are e-mailed here (needs SMTP). Workshop registrations are listed under Registrations." }),
+          url("website", "Website", { width: "half" }),
+          url("linkedin", "LinkedIn", { width: "half" }),
+          url("x", "X / Twitter", { width: "half" }),
+          url("instagram", "Instagram", { width: "half" }),
+          url("youtube", "YouTube", { width: "half" }),
+        ],
+        { anchor: "site.footer" },
+      ),
+      section("features", "Features & post-event", undefined, [
+        bool("showAssistant", "Show the “Ask Aura” helper button"),
+        bool("showGallery", "Post-event: show the photo gallery"),
+        bool("showTalks", "Post-event: show talk slides & recordings"),
+        bool("showWinners", "Post-event: show hackathon winners"),
+      ]),
+      section("seo", "SEO & analytics", undefined, [
+        text("gaId", "Google Analytics measurement ID", { placeholder: "G-XXXXXXXXXX", width: "half" }),
+        list("keywords", "Search keywords", { itemLabel: "Keyword" }),
+      ]),
+    ],
+  },
+  {
+    key: "home",
+    title: "Home",
+    path: "/",
+    sections: [
+      section("hero", "Hero", "homeHero", [bool("showCountdown", "Show the countdown timer")], {
+        description: "The event name, tagline, dates and venue come from Site-wide → Event details.",
+      }),
+      section("highlights", "Highlight strip", "homeHighlights", [
+        objects("highlights", "Highlights", "Highlight", [
           text("label", "Label", { required: true, width: "third" }),
           text("value", "Value", { width: "third", placeholder: "TBA" }),
           select("icon", "Icon", iconOptions, { width: "third" }),
         ], { maxItems: 6 }),
-        bool("showCountdown", "Show the countdown timer"),
-        num("featuredSpeakers", "Featured speakers on the home page", { min: 0, max: 12, width: "half" }),
-      ],
-    },
-    {
-      key: "about",
-      title: "About & themes",
-      fields: [
-        objects("aboutPoints", "Home page: topics around Aura", "Topic", [
-          text("title", "Topic (two or three words)", { required: true, width: "half", maxLength: 24 }),
-          select("icon", "Icon", iconOptions, { width: "half" }),
-          textarea("description", "Summary (shown in Aura's speech bubble)", { rows: 2, maxLength: 150, help: "You can write {dates}, {venue} or {event}; they are filled in from these settings." }),
-        ], { maxItems: 8, help: "Up to 8 topics around Aura in the About section of the home page, each summarising part of the About page. Aura waits in a thinking pose; hovering or tapping a topic makes her point at it and answer with its summary. The full text below appears on the About page." }),
-        richtext("motivation", "Workshop motivation", { help: "Shown on the About page." }),
-        richtext("agenticAI", "What is agentic AI?", { help: "Shown on the About page." }),
-        objects("audience", "Who should attend", "Audience", [
-          text("title", "Title", { required: true, width: "half" }),
-          select("icon", "Icon", iconOptions, { width: "half" }),
-          textarea("description", "Description", { rows: 2 }),
-        ]),
-        objects("activities", "Activities", "Activity", [
-          text("title", "Title", { required: true, width: "half" }),
-          select("icon", "Icon", iconOptions, { width: "half" }),
-          textarea("description", "Description", { rows: 2 }),
-        ]),
+      ]),
+      section("news", "Announcements", "homeNews", [], { description: "The announcements themselves are added under Announcements." }),
+      section("themes", "Themes", "homeThemes", [
         objects("themes", "Themes", "Theme", [
           select("key", "Theme", themeOptions.filter((t) => t.value !== "general"), { required: true, width: "half" }),
           text("title", "Title", { required: true, width: "half" }),
           textarea("description", "Description (2–3 lines)", { rows: 3 }),
         ], { titleKey: "title", maxItems: 3 }),
-      ],
-    },
-    {
-      key: "programme",
-      title: "Programme",
-      fields: [
+      ]),
+      section("about", "About", "homeAbout", [
+        objects("aboutPoints", "Topics around Aura", "Topic", [
+          text("title", "Topic (two or three words)", { required: true, width: "half", maxLength: 24 }),
+          select("icon", "Icon", iconOptions, { width: "half" }),
+          textarea("description", "Summary (shown in Aura's speech bubble)", { rows: 2, maxLength: 150, help: "You can write {dates}, {venue} or {event}; they are filled in from these settings." }),
+        ], { maxItems: 8, help: "Up to 8 topics around Aura, each summarising part of the About page. Aura waits in a thinking pose; hovering or tapping a topic makes her point at it and answer with its summary." }),
+      ]),
+      section("speakers", "Speakers", "homeSpeakers", [
+        num("featuredSpeakers", "Featured speakers on the home page", { min: 0, max: 12, width: "half" }),
+        bool("showMoreSpeakers", "Show the “More speakers to be announced” card"),
+      ], { description: "Speakers are added under Speakers; tick “Feature on the home page” to show them here." }),
+      section("venue", "Venue & travel", "homeVenue", [], { description: "The routes on the map are edited in the Venue tab → Getting here." }),
+      section("partners", "Partners", "homePartners", [], { description: "The logos come from Partners & sponsors." }),
+      section("faq", "FAQ & contact", "homeFaq", [], { description: "Questions are added under FAQs; the e-mail and phone under Site-wide → Contact & social." }),
+    ],
+  },
+  {
+    key: "about",
+    title: "About",
+    path: "/about",
+    sections: [
+      section("hero", "Hero", "aboutHero"),
+      section("motivation", "Motivation", "aboutMotivation", [richtext("motivation", "Workshop motivation"), richtext("agenticAI", "What is agentic AI?")]),
+      section("audience", "Who should attend", "aboutAudience", [
+        objects("audience", "Audiences", "Audience", [
+          text("title", "Title", { required: true, width: "half" }),
+          select("icon", "Icon", iconOptions, { width: "half" }),
+          textarea("description", "Description", { rows: 2 }),
+        ], { help: "Also listed on the Partners page under “Who you'll meet”." }),
+      ]),
+      section("activities", "Activities", "aboutActivities", [
+        objects("activities", "Activities", "Activity", [
+          text("title", "Title", { required: true, width: "half" }),
+          select("icon", "Icon", iconOptions, { width: "half" }),
+          textarea("description", "Description", { rows: 2 }),
+        ]),
+      ]),
+    ],
+  },
+  {
+    key: "programme",
+    title: "Programme",
+    path: "/programme",
+    sections: [
+      section("hero", "Hero", "programmeHero", [file("schedulePdf", "Schedule PDF (optional)", { accept: "application/pdf", help: "Upload to replace the automatically generated PDF." })]),
+      section("overview", "At a glance", "programmeOverview"),
+      section("schedule", "Schedule", "programmeSchedule", [
         select("programmeStatus", "Programme status", [
           { value: "tba", label: "To be announced (show placeholder)" },
           { value: "draft", label: "Draft (show sessions marked “subject to change”)" },
           { value: "final", label: "Final" },
         ]),
         textarea("programmeNote", "Note above the schedule"),
-        file("schedulePdf", "Schedule PDF (optional)", { accept: "application/pdf", help: "Upload to replace the automatically generated PDF." }),
-      ],
-    },
-    {
-      key: "venue",
-      title: "Venue & travel",
-      fields: [
+      ], { description: "Sessions are added under Programme." }),
+      section("kiosks", "Industry kiosks", "programmeKiosks", [textarea("kioskIntro", "Introduction")], { description: "Kiosks are added under Industry kiosks." }),
+      section("hackathon", "Hackathon", "programmeHackathon", [], { description: "The title, tagline, tracks and dates come from the Hackathon page in the menu." }),
+      section("plan", "Plan your visit", "programmePlan"),
+    ],
+  },
+  {
+    key: "speakers",
+    title: "Speakers",
+    path: "/speakers",
+    sections: [section("hero", "Hero", "speakersHero"), section("list", "Speaker list", "speakersList", [], { description: "Speakers are added under Speakers. The “More speakers to be announced” card is edited under Home → Speakers; the texts here show while there are no speakers yet." })],
+  },
+  {
+    key: "tutorials",
+    title: "Tutorials",
+    path: "/tutorials",
+    sections: [section("hero", "Hero", "tutorialsHero"), section("list", "Tutorials & demos", "tutorialsList", [], { description: "Tutorials and demos are added under Tutorials and Demos." })],
+  },
+  {
+    key: "hackathon",
+    title: "Hackathon",
+    path: "/hackathon",
+    description: "Headings, labels and colours of the Hackathon page. Its title, tracks, rules, timeline, prizes and results are edited under Hackathon in the menu.",
+    sections: [
+      section("hero", "Hero", "hackathonHero"),
+      section("overview", "Overview", "hackathonOverview"),
+      section("tracks", "Problem tracks", "hackathonTracks"),
+      section("timeline", "Timeline", "hackathonTimeline"),
+      section("prizes", "Prizes & judging", "hackathonPrizes"),
+      section("people", "Mentors & judges", "hackathonPeople", [], { description: "Mentors and judges are added under Organisers & volunteers." }),
+      section("resources", "Resources", "hackathonResources"),
+      section("rules", "Rules & FAQ", "hackathonRules"),
+      section("results", "Results", "hackathonResults", [], { description: "Shown once “Post-event: show hackathon winners” is on (Site-wide → Features)." }),
+      section("cta", "Closing call to action", "hackathonCta"),
+    ],
+  },
+  {
+    key: "hackathonRegister",
+    title: "Hackathon registration",
+    path: "/hackathon/register",
+    sections: [section("hero", "Hero", "hackathonRegisterHero"), section("form", "Form & status", "hackathonRegisterForm")],
+  },
+  {
+    key: "register",
+    title: "Registration",
+    path: "/register",
+    sections: [
+      section("hero", "Hero", "registerHero"),
+      section("form", "Form & status", "registerForm", [], { description: "Whether registration is open, and an external form link, are set under Site-wide → Registration." }),
+      section("fees", "Fees", "registerFees", [
+        objects("fees", "Fees", "Fee", [
+          text("category", "Category", { required: true, width: "half", placeholder: "Students" }),
+          text("amount", "Amount", { width: "half", placeholder: "To be announced" }),
+          text("note", "Note"),
+        ]),
+        textarea("feeNote", "Fee note", { placeholder: "Fee details will be announced soon." }),
+      ]),
+      section("deadlines", "Deadlines", "registerDeadlines"),
+    ],
+  },
+  {
+    key: "partners",
+    title: "Partners",
+    path: "/partners",
+    sections: [
+      section("hero", "Hero", "partnersHero", [
+        textarea("sponsorshipIntro", "Introduction"),
+        file("sponsorBrochure", "Sponsorship brochure (PDF)", { accept: "application/pdf" }),
+      ]),
+      section("list", "Our partners", "partnersList", [], { description: "Partners are added under Partners & sponsors." }),
+      section("reach", "Who you'll meet", "partnersReach", [], { description: "The list comes from About → Who should attend." }),
+      section("ways", "Ways to take part", "partnersWays"),
+      section("tiers", "Sponsorship tiers", "partnersTiers", [
+        objects("sponsorTiers", "Sponsorship tiers", "Tier", [
+          text("name", "Tier name", { required: true, width: "half" }),
+          text("price", "Contribution", { width: "half", placeholder: "On request" }),
+          list("perks", "Benefits", { itemLabel: "Benefit" }),
+        ]),
+      ]),
+    ],
+  },
+  {
+    key: "venue",
+    title: "Venue",
+    path: "/venue",
+    sections: [
+      section("hero", "Hero", "venueHero"),
+      section("place", "The venue", "venuePlace", [
         text("mapQuery", "Map location", { help: "Search text for the embedded Google Map, e.g. a building name." }),
         url("mapEmbedUrl", "Custom map embed URL (optional)", { help: "Paste the src of a Google Maps “Embed a map” iframe." }),
+        richtext("campusEntry", "Campus entry information"),
+      ], { description: "The venue's name and address are under Site-wide → Event details." }),
+      section("routes", "Getting here", "venueRoutes", [
         objects("directions", "Directions", "Route", [
           select("mode", "Mode", [
             { value: "air", label: "By air" },
@@ -603,8 +799,9 @@ export const SETTINGS_DEF: SingletonDef = {
           ], { width: "half" }),
           text("title", "Title", { required: true, width: "half" }),
           textarea("details", "Details", { rows: 3 }),
-        ]),
-        richtext("campusEntry", "Campus entry information"),
+        ], { help: "Also drawn on the route map on the home page." }),
+      ]),
+      section("stay", "Where to stay", "venueStay", [
         objects("accommodation", "Nearby accommodation", "Option", [
           text("name", "Name", { required: true, width: "half" }),
           select("kind", "Type", [
@@ -618,70 +815,57 @@ export const SETTINGS_DEF: SingletonDef = {
           textarea("note", "Note", { rows: 2 }),
         ]),
         list("localInfo", "Local tips", { itemLabel: "Tip" }),
-      ],
-    },
-    {
-      key: "partners",
-      title: "Partners & kiosks",
-      fields: [
-        textarea("sponsorshipIntro", "Sponsorship introduction", { help: "Opens the Partners & sponsors page." }),
-        objects("sponsorTiers", "Sponsorship tiers", "Tier", [
-          text("name", "Tier name", { required: true, width: "half" }),
-          text("price", "Contribution", { width: "half", placeholder: "On request" }),
-          list("perks", "Benefits", { itemLabel: "Benefit" }),
-        ]),
-        file("sponsorBrochure", "Sponsorship brochure (PDF)", { accept: "application/pdf" }),
-        textarea("kioskIntro", "Industry kiosks introduction", { help: "Shown in the Industry kiosks part of the Programme page." }),
-      ],
-    },
-    {
-      key: "contact",
-      title: "Contact & social",
-      fields: [
-        email("contactEmail", "Official e-mail", { width: "half" }),
-        text("contactPhone", "Phone (optional)", { width: "half" }),
-        email("notifyEmail", "Send form notifications to", { width: "half", help: "New hackathon teams and enquiries are e-mailed here (needs SMTP). Workshop registrations are listed under Registrations." }),
-        url("website", "Website", { width: "half" }),
-        url("linkedin", "LinkedIn", { width: "half" }),
-        url("x", "X / Twitter", { width: "half" }),
-        url("instagram", "Instagram", { width: "half" }),
-        url("youtube", "YouTube", { width: "half" }),
-      ],
-    },
-    {
-      key: "branding",
-      title: "Branding",
-      description: "The IIT Delhi and ScAI logos are built in. Upload one here only to replace it.",
-      fields: [
-        image("logoIITD", "IIT Delhi logo", { width: "half", help: "Left corner of the navigation bar. Leave blank for the built-in emblem." }),
-        image("logoScAI", "ScAI logo", { width: "half", help: "Right corner of the navigation bar. Leave blank for the built-in logo." }),
-        image("eventLogo", "Event logo", { width: "half" }),
-        color("brandColor", "Brand colour", { width: "half", help: "Hex colour, e.g. #3b5bdb. Leave blank for the default." }),
-        image("ogImage", "Social preview image (optional)", { help: "1200×630 px. Leave blank to use the generated preview." }),
-      ],
-    },
-    {
-      key: "features",
-      title: "Features & post-event",
-      fields: [
-        bool("showMoreSpeakers", "Show the “More speakers to be announced” card"),
-        bool("showAssistant", "Show the “Ask Aura” helper button"),
-        bool("showGallery", "Post-event: show the photo gallery"),
-        bool("showTalks", "Post-event: show talk slides & recordings"),
-        bool("showWinners", "Post-event: show hackathon winners"),
-        text("bannerText", "Site-wide banner (optional)", { help: "A short notice shown at the very top of every page." }),
-        url("bannerLink", "Banner link (optional)"),
-      ],
-    },
-    {
-      key: "seo",
-      title: "SEO & analytics",
-      fields: [
-        text("gaId", "Google Analytics measurement ID", { placeholder: "G-XXXXXXXXXX", width: "half" }),
-        list("keywords", "Search keywords", { itemLabel: "Keyword" }),
-      ],
-    },
-  ],
+      ]),
+    ],
+  },
+  {
+    key: "organisers",
+    title: "Organisers",
+    path: "/organisers",
+    description: "People are added under Organisers & volunteers.",
+    sections: [
+      section("hero", "Hero", "organisersHero"),
+      section("faculty", "Faculty organisers", "organisersFaculty"),
+      section("students", "Student organisers", "organisersStudents"),
+      section("volunteers", "Volunteers", "organisersVolunteers"),
+    ],
+  },
+  {
+    key: "gallery",
+    title: "Photo gallery",
+    path: "/gallery",
+    description: "Shown once “Post-event: show the photo gallery” is on (Site-wide → Features). Photos are added under Photo gallery.",
+    sections: [section("hero", "Page", "galleryHero")],
+  },
+  {
+    key: "talks",
+    title: "Slides & recordings",
+    path: "/talks",
+    description: "Shown once “Post-event: show talk slides & recordings” is on (Site-wide → Features). Talks are added under Slides & recordings.",
+    sections: [section("hero", "Page", "talksHero")],
+  },
+  {
+    key: "meetAura",
+    title: "Meet Aura",
+    path: "/meet-aura",
+    sections: [section("hero", "Hero", "auraHero"), section("playground", "Playground", "auraPlayground"), section("looks", "Around the site", "auraLooks")],
+  },
+];
+
+// Each section previews itself at `[data-edit="<page>.<section>"]` unless it names another place.
+for (const p of SETTINGS_PAGES) for (const s of p.sections) s.anchor ??= `${p.key}.${s.key}`;
+
+/** A section's form fields: its texts and colours (stored under the copy key), then its other settings. */
+export function settingsSectionFields(p: SettingsPage, s: SettingsSection): FieldDef[] {
+  return [...(s.copy ? [{ name: s.copy, label: `${p.title}: ${s.title}`, type: "group" as const, fields: copyFields(s.copy) }] : []), ...s.fields];
+}
+
+export const SETTINGS_DEF: SingletonDef = {
+  key: "settings",
+  label: "Site settings",
+  description: "Every page of the site, section by section: texts, colours and settings, with a live preview.",
+  tags: ["settings"],
+  sections: SETTINGS_PAGES.flatMap((p) => p.sections.map((s) => ({ key: `${p.key}.${s.key}`, title: `${p.title} › ${s.title}`, fields: settingsSectionFields(p, s) }))),
 };
 
 export const HACKATHON_DEF: SingletonDef = {
@@ -770,7 +954,7 @@ export const HACKATHON_DEF: SingletonDef = {
     {
       key: "results",
       title: "Results",
-      description: "Shown only after you enable “Post-event: show hackathon winners” in Settings → Features.",
+      description: "Shown only after you enable “Post-event: show hackathon winners” in Site settings → Site-wide → Features & post-event.",
       fields: [
         textarea("resultsNote", "Results introduction"),
         objects("winners", "Winners", "Winner", [

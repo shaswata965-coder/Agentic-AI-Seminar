@@ -6,8 +6,9 @@ import { ShareButtons } from "@/components/share/ShareButtons";
 import { InstagramIcon, LinkedInIcon, XIcon, YouTubeIcon } from "@/components/ui/BrandIcons";
 import type { SiteSettings } from "@/lib/content/types";
 import { brandName, eventCalendarLinks, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
+import { copy } from "@/lib/copy";
 import { formatDateRange } from "@/lib/format";
-import { EXPLORE_PAGES, PRIMARY_NAV, SECTION_NAV, postEventNav } from "@/lib/nav";
+import { explorePages, homeNav, postEventNav, primaryNav, registrationNav, sectionNav } from "@/lib/nav";
 import { absoluteUrl } from "@/lib/paths";
 import { BrandMark } from "./BrandMark";
 
@@ -44,15 +45,17 @@ export function SocialLinks({ s, className }: { s: SiteSettings; className?: str
 export function SiteFooter({ s }: { s: SiteSettings }) {
   // mi-underline draws the underline in and handles the colour transition too.
   const linkCls = "mi-underline text-[15px] text-muted hover:text-fg";
+  const c = copy(s, "siteFooter");
+  const nav = s.siteNav;
   const involve = [
-    { href: registrationHref(s), label: "Register for the workshop" },
-    { href: hackathonRegistrationHref(s), label: "Join the hackathon" },
-    { href: "/programme#kiosks", label: "Exhibit with us" },
-    { href: "/partners#become-a-partner", label: "Become a partner" },
-    { href: "/#contact", label: "Contact the organisers" },
+    { href: registrationHref(s), label: c.register },
+    { href: hackathonRegistrationHref(s), label: c.hackathon },
+    { href: "/programme#kiosks", label: c.exhibit },
+    { href: "/partners#become-a-partner", label: c.partner },
+    { href: "/#contact", label: c.contact },
   ];
   return (
-    <footer data-site-footer className="relative mt-10 overflow-hidden border-t border-border bg-bg-soft">
+    <footer data-site-footer data-edit="site.footer" className="relative mt-10 overflow-hidden border-t border-border bg-bg-soft">
       <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
       <div className="container-site relative grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>
@@ -91,14 +94,9 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
           <SocialLinks s={s} className="mt-5 flex gap-2" />
         </div>
         <nav aria-label="Pages">
-          <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">Pages</h2>
+          <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">{c.pagesHeading}</h2>
           <ul className="mt-4 space-y-2.5">
-            <li>
-              <Link className={linkCls} href="/">
-                Home
-              </Link>
-            </li>
-            {[...PRIMARY_NAV, ...EXPLORE_PAGES, { href: "/register", label: "Registration" }].map((i) => (
+            {[homeNav(nav), ...primaryNav(nav), ...explorePages(nav), registrationNav(nav)].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}
@@ -108,9 +106,9 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
           </ul>
         </nav>
         <nav aria-label="Explore">
-          <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">Explore</h2>
+          <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">{c.exploreHeading}</h2>
           <ul className="mt-4 space-y-2.5">
-            {[...SECTION_NAV, ...postEventNav(s), { href: "/meet-aura", label: "Meet Aura" }].map((i) => (
+            {[...sectionNav(nav), ...postEventNav(s, nav), { href: "/meet-aura", label: nav.meetAura }].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}
@@ -120,7 +118,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
           </ul>
         </nav>
         <div>
-          <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">Get involved</h2>
+          <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">{c.involveHeading}</h2>
           <ul className="mt-4 space-y-2.5">
             {involve.map((i) => (
               <li key={i.label}>
@@ -137,15 +135,13 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
       </div>
       <div className="relative border-t border-border">
         <div className="container-site flex flex-col gap-3 py-6 text-sm text-subtle sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            © 2026 {s.organisedBy.includes("IIT Delhi") ? "IIT Delhi · Yardi School of Artificial Intelligence" : s.organisedBy}. All rights reserved.
-          </p>
+          <p>{c.copyright}</p>
           <p className="flex flex-wrap gap-x-4 gap-y-1">
             <Link className="mi-underline hover:text-fg" href="/meet-aura">
-              Meet Aura, our mascot
+              {c.meetAura}
             </Link>
             <Link className="mi-underline hover:text-fg" href="/admin" prefetch={false}>
-              Organiser login
+              {c.login}
             </Link>
           </p>
         </div>

@@ -11,6 +11,7 @@ import { RichText } from "@/components/ui/RichText";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
 import { getSettings } from "@/lib/content/queries";
+import { copy } from "@/lib/copy";
 import { eventCalendarLinks } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
@@ -38,26 +39,30 @@ function activityHref(title: string) {
 
 export default async function AboutPage() {
   const s = await getSettings();
+  const hero = copy(s, "aboutHero");
+  const m = copy(s, "aboutMotivation");
+  const au = copy(s, "aboutAudience");
+  const ac = copy(s, "aboutActivities");
   return (
     <TagScope style="underline">
-      <PageHero tone="mint" crumb="About" eyebrow="About the workshop" title="Why agentic AI, and why now?" aura="guide" description={<p>{s.tagline}</p>}>
+      <PageHero edit="about.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="guide" description={hero.description}>
         <AddToCalendar links={eventCalendarLinks(s)} variant="outline" size="sm" />
         <ShareButtons url={absoluteUrl("/")} text={`${s.eventName} at IIT Delhi, ${formatDateRange(s.startDate, s.endDate)}`} />
       </PageHero>
 
-      <Section tone="mint" labelledBy="motivation-title">
+      <Section edit="about.motivation" tone={m.tone} bg={m.background} labelledBy="motivation-title">
         <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
           <div>
             <h2 id="motivation-title" className="sr-only">
-              Why this workshop
+              {m.title}
             </h2>
             <RichText text={s.motivation} className="text-[17px] leading-relaxed text-muted" />
-            <div className="tone-lilac card mt-8 p-6" data-reveal>
+            <div className={`tone-${m.agenticTone} card mt-8 p-6`} data-reveal>
               <h3 className="flex items-center gap-2 font-display text-xl font-semibold text-fg">
                 <span className="grid h-8 w-8 place-items-center rounded-xl bg-accent-soft text-accent-ink">
                   <CmsIcon name="sparkles" size={18} />
                 </span>
-                What is agentic AI?
+                {m.agenticTitle}
               </h3>
               <RichText text={s.agenticAI} className="mt-3 text-[15.5px] leading-relaxed text-muted" />
             </div>
@@ -68,8 +73,8 @@ export default async function AboutPage() {
         </div>
       </Section>
 
-      <Section tone="lilac" band labelledBy="audience-title">
-        <SectionHeading id="audience-title" eyebrow="Audience" title="Who should attend" className="mb-8 sm:mb-10" />
+      <Section edit="about.audience" tone={au.tone} bg={au.background} labelledBy="audience-title">
+        <SectionHeading id="audience-title" eyebrow={au.eyebrow} title={au.title} className="mb-8 sm:mb-10" />
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {s.audience.map((a, i) => (
             <li key={a.title} data-reveal data-glow="" style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties} className={`tone-${TONES[i % 6]} card group p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
@@ -83,8 +88,8 @@ export default async function AboutPage() {
         </ul>
       </Section>
 
-      <Section tone="peach" labelledBy="activities-title">
-        <SectionHeading id="activities-title" eyebrow="Programme" title="What happens over the two days" className="mb-8 sm:mb-10" />
+      <Section edit="about.activities" tone={ac.tone} bg={ac.background} labelledBy="activities-title">
+        <SectionHeading id="activities-title" eyebrow={ac.eyebrow} title={ac.title} className="mb-8 sm:mb-10" />
         <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {s.activities.map((a, i) => (
             <li key={a.title} data-reveal style={{ "--reveal-delay": `${i * 60}ms` } as CSSProperties}>

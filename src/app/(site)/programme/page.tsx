@@ -15,7 +15,8 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
 import { getHackathon, getKiosks, getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
-import { eventCalendarLinks, eventDays, registrationHref, venueLine } from "@/lib/event";
+import { copy } from "@/lib/copy";
+import { eventCalendarLinks, eventDays, registrationHref } from "@/lib/event";
 import { eventDayDate, eventDayLabel, formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 
@@ -28,18 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const JUMPS = [
-  { href: "#overview", label: "At a glance" },
-  { href: "#schedule", label: "Schedule" },
-  { href: "#kiosks", label: "Industry kiosks" },
-  { href: "#hackathon", label: "Hackathon" },
-  { href: "#plan", label: "Plan your visit" },
-];
-
 function registrationText(s: SiteSettings) {
-  if (s.workshopStatus === "open") return "Registration is open. Save your seat.";
-  if (s.workshopStatus === "closed") return "Registration has closed.";
-  return "Registration opens soon.";
+  const c = copy(s, "programmePlan");
+  if (s.workshopStatus === "open") return c.registrationOpen;
+  if (s.workshopStatus === "closed") return c.registrationClosed;
+  return c.registrationSoon;
 }
 
 export default async function ProgrammePage() {
@@ -52,30 +46,30 @@ export default async function ProgrammePage() {
   });
   const mini: Record<string, MiniSpeaker> = Object.fromEntries(speakers.map((sp) => [sp.id, { id: sp.id, name: sp.name, slug: sp.slug, affiliation: sp.affiliation }]));
   const pdfHref = s.schedulePdf || "/api/programme/pdf";
+  const hero = copy(s, "programmeHero");
+  const sc = copy(s, "programmeSchedule");
+  const pl = copy(s, "programmePlan");
+  // The bar under the hero jumps to each section, named by its label.
+  const jumps = [
+    { href: "#overview", label: s.programmeOverview.eyebrow },
+    { href: "#schedule", label: sc.eyebrow },
+    { href: "#kiosks", label: s.programmeKiosks.eyebrow },
+    { href: "#hackathon", label: s.programmeHackathon.eyebrow },
+    { href: "#plan", label: pl.eyebrow },
+  ].filter((j) => j.label);
   const plan: { href: string; title: string; text: string; icon: ReactNode; tone: string }[] = [
-    { href: "/venue", title: "Venue & travel", text: `${venueLine(s)}. Maps, directions and places to stay.`, icon: <MapPin size={21} aria-hidden />, tone: "tone-mint" },
-    { href: registrationHref(s), title: "Registration", text: registrationText(s), icon: <Ticket size={21} aria-hidden />, tone: "tone-butter" },
-    { href: "/tutorials", title: "Tutorials & demos", text: "Levels, prerequisites and materials for the hands-on sessions.", icon: <GraduationCap size={21} aria-hidden />, tone: "tone-lilac" },
-    { href: "/speakers", title: "Speakers", text: "Who is speaking, their talks and the panels.", icon: <Mic size={21} aria-hidden />, tone: "tone-peach" },
+    { href: "/venue", title: pl.venueTitle, text: pl.venueText, icon: <MapPin size={21} aria-hidden />, tone: "tone-mint" },
+    { href: registrationHref(s), title: pl.registrationTitle, text: registrationText(s), icon: <Ticket size={21} aria-hidden />, tone: "tone-butter" },
+    { href: "/tutorials", title: pl.tutorialsTitle, text: pl.tutorialsText, icon: <GraduationCap size={21} aria-hidden />, tone: "tone-lilac" },
+    { href: "/speakers", title: pl.speakersTitle, text: pl.speakersText, icon: <Mic size={21} aria-hidden />, tone: "tone-peach" },
   ];
 
   return (
     <TagScope style="bracket">
-      <PageHero
-        tone="azure"
-        crumb="Programme"
-        eyebrow="Programme"
-        title="Programme"
-        aura="programme"
-        description={
-          <p>
-            {formatDateRange(s.startDate, s.endDate)} at {s.venueName}. Keynotes, talks, panels, hands-on tutorials and live demos, with industry kiosks and the hackathon final alongside.
-          </p>
-        }
-      >
+      <PageHero edit="programme.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="programme" description={hero.description}>
         {!tba ? (
           <ButtonLink href={pdfHref} download icon={<Download size={18} aria-hidden />}>
-            Download PDF
+            {hero.pdf}
           </ButtonLink>
         ) : null}
         <AddToCalendar links={eventCalendarLinks(s)} />
@@ -83,7 +77,7 @@ export default async function ProgrammePage() {
 
       <nav aria-label="On this page" className="border-b border-border bg-bg-soft">
         <ol className="container-site flex gap-1 overflow-x-auto py-2 [scrollbar-width:none]">
-          {JUMPS.map((j, i) => (
+          {jumps.map((j, i) => (
             <li key={j.href} className="shrink-0">
               <a href={j.href} className="group flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold text-muted transition-colors hover:bg-surface hover:text-fg">
                 <span className="font-mono text-[11px] text-subtle transition-colors group-hover:text-brand">{String(i + 1).padStart(2, "0")}</span>
@@ -96,8 +90,8 @@ export default async function ProgrammePage() {
 
       <ProgrammeOverview s={s} sessions={sessions} tba={tba} />
 
-      <Section id="schedule" tone="azure" band labelledBy="schedule-title">
-        <SectionHeading id="schedule-title" eyebrow="Schedule" title="Day by day" className="mb-6 sm:mb-8" />
+      <Section id="schedule" edit="programme.schedule" tone={sc.tone} bg={sc.background} labelledBy="schedule-title">
+        <SectionHeading id="schedule-title" eyebrow={sc.eyebrow} title={sc.title} className="mb-6 sm:mb-8" />
         {tba ? (
           <ScheduleTba s={s} />
         ) : (
@@ -105,19 +99,21 @@ export default async function ProgrammePage() {
             <div className="mb-6 flex flex-wrap items-center gap-3">
               {s.programmeStatus === "draft" ? (
                 <Badge tone="butter" dot>
-                  Draft: subject to change
+                  {sc.draft}
                 </Badge>
               ) : (
                 <Badge tone="mint" dot>
-                  Final schedule
+                  {sc.final}
                 </Badge>
               )}
               {s.programmeNote ? <p className="text-sm text-muted">{s.programmeNote}</p> : null}
-              <span className="ml-auto hidden items-center gap-1.5 text-xs text-subtle sm:inline-flex">
-                <Printer size={14} aria-hidden /> Tip: you can also print this page.
-              </span>
+              {sc.printTip ? (
+                <span className="ml-auto hidden items-center gap-1.5 text-xs text-subtle sm:inline-flex">
+                  <Printer size={14} aria-hidden /> {sc.printTip}
+                </span>
+              ) : null}
             </div>
-            <p className="mb-6 max-w-2xl text-sm text-muted">Filter by theme or session type, star sessions to build your own agenda and add them to your calendar.</p>
+            {sc.filterHint ? <p className="mb-6 max-w-2xl text-sm text-muted">{sc.filterHint}</p> : null}
             <ProgrammeView sessions={withTimes} speakers={mini} days={days} />
           </>
         )}
@@ -127,8 +123,8 @@ export default async function ProgrammePage() {
 
       <HackathonSpotlight s={s} h={h} sessions={tba ? [] : sessions} />
 
-      <Section id="plan" tone="mint" band labelledBy="plan-title">
-        <SectionHeading id="plan-title" eyebrow="Plan your visit" title="Before you come" className="mb-8 sm:mb-10" />
+      <Section id="plan" edit="programme.plan" tone={pl.tone} bg={pl.background} labelledBy="plan-title">
+        <SectionHeading id="plan-title" eyebrow={pl.eyebrow} title={pl.title} className="mb-8 sm:mb-10" />
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {plan.map((p, i) => (
             <li key={p.title} data-reveal style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties}>

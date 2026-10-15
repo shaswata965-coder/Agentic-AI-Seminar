@@ -6,20 +6,22 @@ import { Portal } from "@/components/ui/Portal";
 import { Eyebrow } from "@/components/ui/Section";
 import { THEME_META } from "@/lib/content/constants";
 import type { HackathonInfo, Session, SiteSettings } from "@/lib/content/types";
+import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
 import { eventDayLabel, timeRange } from "@/lib/format";
 
 /** The hackathon on the programme page: the pitch, its tracks and facts, when it sits in the schedule and its key dates. */
 export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: HackathonInfo; sessions: Session[] }) {
+  const c = copy(s, "programmeHackathon");
   const facts = [
-    { Icon: Users, label: "Team size", value: h.teamSize },
-    { Icon: Clock, label: "Mode", value: h.mode },
-    { Icon: Trophy, label: "Prize pool", value: h.prizePool },
+    { Icon: Users, label: c.teamSize, value: h.teamSize },
+    { Icon: Clock, label: c.mode, value: h.mode },
+    { Icon: Trophy, label: c.prizePool, value: h.prizePool },
   ];
   const slots = sessions.filter((x) => x.type === "hackathon");
   const dates = h.timeline.slice(0, 4);
   return (
-    <section id="hackathon" aria-labelledby="hackathon-title" data-tags="slash" className="tone-aqua scroll-mt-24 py-16 sm:py-24">
+    <section id="hackathon" data-edit="programme.hackathon" aria-labelledby="hackathon-title" data-tags="slash" className={`tone-${c.tone} scroll-mt-24 py-16 sm:py-24`}>
       <div className="container-site">
         <div className="relative overflow-hidden rounded-[2rem] border border-border bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft)_55%,var(--blush-soft))] p-6 shadow-card-lg sm:p-12">
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent)]" />
@@ -28,7 +30,7 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
               <Aura variant="hackathon" size={280} interactive className="max-w-[70vw]" />
             </div>
             <div className="order-1 lg:order-2">
-              <Eyebrow>Hackathon</Eyebrow>
+              {c.eyebrow ? <Eyebrow>{c.eyebrow}</Eyebrow> : null}
               <h2 id="hackathon-title" className="mt-4 font-display text-3xl font-bold text-fg sm:text-[2.75rem] sm:leading-[1.1]">
                 {h.title}
               </h2>
@@ -55,9 +57,9 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
               </dl>
               <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
                 <ButtonLink href={hackathonRegistrationHref(s)} size="lg" className="self-start sm:self-center">
-                  Register your team
+                  {c.button}
                 </ButtonLink>
-                <Portal href="/hackathon" tone="aqua" compact kicker="Hackathon" title="Rules, prizes and judging" art={<TrophyArt />} className="sm:max-w-sm sm:flex-1" />
+                <Portal href="/hackathon" tone={c.tone} compact kicker={c.eyebrow} title={c.portalTitle} art={<TrophyArt />} className="sm:max-w-sm sm:flex-1" />
               </div>
             </div>
           </div>
@@ -68,7 +70,7 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
             {slots.length ? (
               <div className="card p-6">
                 <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-fg">
-                  <CalendarClock size={19} aria-hidden className="text-accent-ink" /> At the workshop
+                  <CalendarClock size={19} aria-hidden className="text-accent-ink" /> {c.slots}
                 </h3>
                 <ul className="mt-3 grid gap-2">
                   {slots.map((x) => (
@@ -87,12 +89,12 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
             {dates.length ? (
               <div className="card p-6">
                 <h3 className="flex items-center gap-2 font-display text-lg font-semibold text-fg">
-                  <Trophy size={19} aria-hidden className="text-accent-ink" /> Key dates
+                  <Trophy size={19} aria-hidden className="text-accent-ink" /> {c.dates}
                 </h3>
                 <ol className={`mt-3 grid gap-2 sm:grid-cols-2 ${slots.length ? "" : "lg:grid-cols-4"}`}>
                   {dates.map((m, i) => (
                     <li key={`${m.label}-${i}`} className="rounded-xl bg-surface-2 px-3 py-2.5">
-                      <p className="font-mono text-xs font-bold text-accent-ink">{m.dateLabel || "Date TBA"}</p>
+                      <p className="font-mono text-xs font-bold text-accent-ink">{m.dateLabel || c.dateTba}</p>
                       <p className="mt-0.5 font-semibold text-fg">{m.label}</p>
                     </li>
                   ))}
