@@ -3,7 +3,7 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { isDuplicateKeyError } from "@/lib/db";
 import { User } from "@/lib/models";
-import { hashPassword, requireAdmin } from "@/lib/server/admin-auth";
+import { endSessions, hashPassword, requireAdmin, signsOut } from "@/lib/server/admin-auth";
 import { error, json, readJson, zodFieldErrors } from "@/lib/server/http";
 import { volunteerFields } from "@/lib/server/volunteers";
 
@@ -17,7 +17,7 @@ const patch = z.object({
   password: volunteerFields.password.optional(),
 });
 
-/** Change a volunteer's details, permissions or password, or disable them. Takes effect on their next request. */
+/** Change a volunteer's details, permissions or password, or disable them. Takes effect on their next request; a new password or disabling signs them out. */
 export async function PATCH(req: NextRequest, ctx: Ctx) {
   const me = await requireAdmin(req, { role: "admin" });
   if (me instanceof Response) return me;
@@ -30,7 +30,9 @@ export async function PATCH(req: NextRequest, ctx: Ctx) {
   if (password) update.passwordHash = await hashPassword(password);
   try {
     const u = await User.findOneAndUpdate({ _id: id, role: "volunteer" }, { $set: update }, { returnDocument: "after" }).lean();
-    return u ? json({ ok: true }) : error(404, "Not found.");
+    if (!u) return error(404, "Not found.");
+    if (signsOut(update)) await endSessions(id);
+    return json({ ok: true });
   } catch (err) {
     if (isDuplicateKeyError(err)) return error(409, "Someone with this e-mail can already sign in.", { fieldErrors: { email: "Already in use" } });
     throw err;
@@ -44,5 +46,7 @@ export async function DELETE(req: NextRequest, ctx: Ctx) {
   const { id } = await ctx.params;
   if (!mongoose.isValidObjectId(id)) return error(404, "Not found.");
   const res = await User.deleteOne({ _id: id, role: "volunteer" });
-  return res.deletedCount ? json({ ok: true }) : error(404, "Not found.");
+  if (!res.deletedCount) return error(404, "Not found.");
+  await endSessions(id);
+  return json({ ok: true });
 }

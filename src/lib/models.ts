@@ -244,6 +244,36 @@ const userSchema = new Schema<UserDoc>(
 );
 export const User = (mongoose.models.User as Model<UserDoc>) ?? mongoose.model<UserDoc>("User", userSchema);
 
+/* -------------------------------------------------------------- Sessions -- */
+
+/**
+ * A signed-in browser. The session cookie (a signed JWT) names one of these by
+ * its random id: signing out deletes it, and a password change, a disabled or
+ * deleted account deletes the account's others, so a copied cookie stops
+ * working at once. Expired ones are removed by MongoDB (TTL index).
+ */
+export interface SessionDoc {
+  _id: string;
+  userId: mongoose.Types.ObjectId;
+  userAgent: string;
+  lastSeenAt: Date;
+  expiresAt: Date;
+  createdAt?: Date;
+}
+const sessionSchema = new Schema<SessionDoc>(
+  {
+    _id: { type: String, required: true },
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    userAgent: { type: String, default: "" },
+    lastSeenAt: { type: Date, default: () => new Date() },
+    expiresAt: { type: Date, required: true },
+  },
+  // Not "Session"/"sessions": that is the programme's sessions (talks).
+  { timestamps: { createdAt: true, updatedAt: false }, collection: "admin_sessions" },
+);
+sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+export const AdminSession = (mongoose.models.AdminSession as Model<SessionDoc>) ?? mongoose.model<SessionDoc>("AdminSession", sessionSchema);
+
 /* -------------------------------------------------------------- Activity -- */
 
 /** What a volunteer did, for the task tracker. Name and e-mail are copied so entries outlive the account. */

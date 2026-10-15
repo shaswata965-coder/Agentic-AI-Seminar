@@ -1,7 +1,7 @@
 "use client";
 
 import { CircleCheck, ExternalLink, Info, Save, TriangleAlert } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
@@ -10,9 +10,10 @@ import type { SiteSettings } from "@/lib/content/types";
 import { siteVars } from "@/lib/copy";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
+import { settingsPagesFor } from "@/lib/permissions";
 import { PAGE_COPY, type CopyField, type CopyKey } from "@/lib/schema/page-copy";
 import { SETTINGS_PAGES, type SettingsPage, type SettingsSection } from "@/lib/schema/resources";
-import { PageTitle } from "../AdminShell";
+import { PageTitle, useMe } from "../AdminShell";
 import { api, ApiError, useApi } from "../api";
 import { RecordForm } from "../RecordForm";
 import { CopyForm, copyIssues } from "./CopyForm";
@@ -32,15 +33,34 @@ function sectionOf(key: string): { page: SettingsPage; section: SettingsSection 
 /**
  * Admin → Site settings: a tab per page of the site (plus Site-wide), each
  * page's sections with their texts, colours and settings, and the real page
- * beside them showing unsaved changes as they are typed.
+ * beside them showing unsaved changes as they are typed. Volunteers see only
+ * the pages they were given (the API holds them to those too).
+ * ?page=<key> opens a page's tab.
  */
 export function SettingsStudio() {
+  const me = useMe();
+  const pages = useMemo(() => settingsPagesFor(me), [me]);
+  const asked = useSearchParams().get("page");
+  if (!me) return <div className="card p-10 text-center text-muted">Loading…</div>;
+  if (!pages.length) return null; // the page gate explains
+  const start = pages.find((p) => p.key === asked) ?? pages.find((p) => p.key === "home") ?? pages[0];
+  return <Studio key={me.id} pages={pages} start={start} />;
+}
+
+function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }) {
   const toast = useToast();
   const router = useRouter();
   const { data, error, loading, setData } = useApi<{ data: Values; updatedAt: string | null }>("/singleton/settings");
   const [draft, setDraft] = useState<Values | null>(null);
-  const [pageKey, setPageKey] = useState(SETTINGS_PAGES[1].key);
-  const [sectionKey, setSectionKey] = useState(SETTINGS_PAGES[1].sections[0].key);
+  const [pageKey, setPageKey] = useState(start.key);
+  const [sectionKey, setSectionKey] = useState(start.sections[0].key);
+  // A link to another page's tab (?page=) while this one is open.
+  const [opened, setOpened] = useState(start.key);
+  if (opened !== start.key) {
+    setOpened(start.key);
+    setPageKey(start.key);
+    setSectionKey(start.sections[0].key);
+  }
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [revision, setRevision] = useState(0);
@@ -50,7 +70,7 @@ export function SettingsStudio() {
 
   const value = draft ?? data?.data ?? null;
   const dirty = draft !== null;
-  const page = SETTINGS_PAGES.find((p) => p.key === pageKey) ?? SETTINGS_PAGES[0];
+  const page = pages.find((p) => p.key === pageKey) ?? pages[0];
   const section = page.sections.find((s) => s.key === sectionKey) ?? page.sections[0];
   const vars = useMemo(() => (value ? siteVars(value as unknown as SiteSettings) : {}), [value]);
 
@@ -144,14 +164,14 @@ export function SettingsStudio() {
   const flagged = useMemo(() => {
     const out = new Set<string>();
     if (!value) return out;
-    for (const p of SETTINGS_PAGES)
+    for (const p of pages)
       for (const s of p.sections)
         if (s.copy && copyIssues(s.copy, value[s.copy] as Record<string, string>, vars).some((x) => x.issue.level === "warn")) {
           out.add(p.key);
           out.add(`${p.key}.${s.key}`);
         }
     return out;
-  }, [value, vars]);
+  }, [value, vars, pages]);
 
   const sectionErrors = (prefix: string) => Object.fromEntries(Object.entries(errors).filter(([k]) => k.startsWith(`${prefix}.`)).map(([k, v]) => [k.slice(prefix.length + 1), v]));
   const lengthNotes = section.copy && value ? copyIssues(section.copy, value[section.copy] as Record<string, string>, vars).filter((x) => x.issue.level === "warn") : [];
@@ -177,7 +197,7 @@ export function SettingsStudio() {
         <>
           <nav aria-label="Pages" className="-mx-1 mb-4 overflow-x-auto px-1 pb-1">
             <ul className="flex gap-1.5">
-              {SETTINGS_PAGES.map((p) => (
+              {pages.map((p) => (
                 <li key={p.key}>
                   <button
                     type="button"

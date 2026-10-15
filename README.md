@@ -92,6 +92,7 @@ All settings are environment variables; [`.env.example`](.env.example) documents
 | `AUTH_SECRET` | yes (prod) | 32+ random characters for signing admin sessions (`openssl rand -base64 48`). Without it the admin panel refuses sign-ins in production |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | | First administrator, created on the first sign-in to an empty database (password: 10+ characters) |
 | `COOKIE_SECURE` | | `false` only to test a production build over plain HTTP. Not needed on localhost |
+| `CLIENT_IP_HEADER` | | Header holding the visitor's IP address, if your proxy sets one it overwrites (e.g. `x-real-ip`, `cf-connecting-ip`). By default the last `X-Forwarded-For` entry is used. Used for rate limits |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` | | Outgoing mail for confirmations and organiser notifications. Without them, forms still work but no e-mail is sent |
 | `MAIL_FROM` | | Sender, e.g. `"Agentic AI Workshop 2026 <no-reply@iitd.ac.in>"` |
 | `NOTIFY_EMAIL` | | Where organiser notifications go: new hackathon teams and enquiries (overridable in Admin → Site settings → Site-wide → Contact & social) |
@@ -115,7 +116,7 @@ docker compose run --rm tools seed                                   # optional:
 docker compose run --rm tools create-admin -- --email you@iitd.ac.in --password 'a-long-password'
 ```
 
-The site listens on port 3000 (`PORT` in `.env` changes it). MongoDB data persists in the `mongo-data` volume. To update, run `git pull && docker compose up -d --build`.
+The site listens on port 3000 of this machine only (`PORT` in `.env` changes the port), for the reverse proxy below; set `BIND=0.0.0.0` to publish it on every interface. MongoDB data persists in the `mongo-data` volume. To update, run `git pull && docker compose up -d --build`.
 
 The image is built without database access, so its pages start with the default content and switch to what is in MongoDB within about a minute of starting. Press **Refresh website** on the admin dashboard to switch them at once.
 
@@ -127,7 +128,7 @@ npm ci
 cp .env.example .env.local        # production values; NODE_ENV is set by `npm start`
 npm run build
 npm install -g pm2
-pm2 start npm --name aaiw -- start          # port 3000; use `-- start -- -p 4000` for another port
+pm2 start npm --name aaiw -- start -- -H 127.0.0.1   # port 3000, for the reverse proxy only; add `-p 4000` for another port
 pm2 save && pm2 startup                     # restart on reboot
 ```
 
@@ -214,7 +215,7 @@ docs/                  admin guide and requirements checklist
 
 - Semantic HTML, a skip link, visible focus styles, labelled form fields with inline errors, keyboard-friendly dialogs and tabs, and colour contrast checked in both themes. Animations respect *reduced motion* and are lighter on small screens.
 - Pages are pre-rendered and cached, fonts are self-hosted, images are compressed WebP, heavy widgets (map, videos) load only when clicked or scrolled into view, and there are no large client libraries.
-- Admin sessions use signed HTTP-only cookies. Passwords are hashed with bcrypt. Sign-in and form submissions are rate-limited, and state-changing requests must come from the same site. All input is validated on the server. Uploaded SVGs are served with a sandboxing content security policy, and CSV exports are protected against spreadsheet formula injection.
+- Admin sessions are signed JWTs (HS256, `AUTH_SECRET`) in HTTP-only, SameSite cookies, each tied to a session stored in the database: signing out, a password change or a disabled account ends them at once. Passwords are stored only as bcrypt hashes (cost 12). Sign-in is rate-limited by failed attempts (without letting anyone lock an account), takes the same time whether or not an account exists, and state-changing requests must come from the site's own pages. Every field of every form is type- and length-checked on the server and cleaned of control characters; links must be http(s), mailto, tel or a path on the site. Pages send a Content-Security-Policy, HSTS and the usual hardening headers; uploaded SVGs are checked for scripts, downloaded rather than shown when opened directly, and sandboxed; CSV exports are protected against formula injection. Details and test results: [docs/SECURITY_REPORT.md](docs/SECURITY_REPORT.md).
 
 ## Handover checklist
 

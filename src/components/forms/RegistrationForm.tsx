@@ -27,7 +27,7 @@ export function RegistrationForm({ calendar, shareUrl, eventName }: { calendar: 
   const [values, setValues] = useState<Values>({ country: "India", interests: [], tutorials: false, hackathonInterest: false, consent: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
-  const [done, setDone] = useState<{ regId: string; email: string; emailSent: boolean } | null>(null);
+  const [done, setDone] = useState<{ regId: string | null; email: string; emailSent: boolean } | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   const set = (k: string, v: string | boolean | string[]) => setValues((s) => ({ ...s, [k]: v }));
@@ -58,7 +58,7 @@ export function RegistrationForm({ calendar, shareUrl, eventName }: { calendar: 
     if (!validate(step)) return;
     const honeypot = (e.currentTarget.elements.namedItem("website") as HTMLInputElement | null)?.value ?? "";
     setPending(true);
-    const res = await postJson<{ regId: string; emailSent: boolean }>("/api/register", { ...values, website: honeypot });
+    const res = await postJson<{ regId: string | null; emailSent: boolean }>("/api/register", { ...values, website: honeypot });
     setPending(false);
     if (!res.ok || !res.data) {
       setErrors(res.fieldErrors ?? {});
@@ -78,12 +78,18 @@ export function RegistrationForm({ calendar, shareUrl, eventName }: { calendar: 
         <div className="relative flex flex-col items-center">
           <Aura variant="success" size={200} />
           <h2 className="mt-2 font-display text-3xl font-bold text-fg">You&apos;re registered!</h2>
-          <p className="mt-3 max-w-md text-muted">
-            Your registration ID is
-          </p>
-          <p className="mt-2 rounded-2xl bg-surface-2 px-5 py-3 font-display text-2xl font-bold tracking-wider text-brand tabular">{done.regId}</p>
+          {done.regId ? (
+            <>
+              <p className="mt-3 max-w-md text-muted">Your registration ID is</p>
+              <p className="mt-2 rounded-2xl bg-surface-2 px-5 py-3 font-display text-2xl font-bold tracking-wider text-brand tabular">{done.regId}</p>
+            </>
+          ) : null}
           <p className="mt-4 max-w-md text-sm text-muted">
-            {done.emailSent ? (
+            {!done.regId ? (
+              <>
+                Your registration ID and details are on their way to <strong className="text-fg">{done.email}</strong>. If this address was already registered, your earlier registration stands and we&apos;ve sent its confirmation again.
+              </>
+            ) : done.emailSent ? (
               <>
                 A confirmation e-mail is on its way to <strong className="text-fg">{done.email}</strong>.
               </>

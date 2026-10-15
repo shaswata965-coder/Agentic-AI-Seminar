@@ -1,9 +1,9 @@
 import { after, type NextRequest } from "next/server";
-import { getSettings } from "@/lib/content/queries";
+import { getSavedSettings } from "@/lib/content/queries";
 import { connectDb } from "@/lib/db";
 import { Enquiry } from "@/lib/models";
 import { enquiryAckEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
-import { clientIp, error, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { clientIp, error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
 import { sendMail } from "@/lib/server/mail";
 import { rateLimit } from "@/lib/server/rate-limit";
 import { enquirySchema } from "@/lib/server/validation";
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   if (!limit.ok) return error(429, "You've sent several messages already. Please wait a few minutes.", { retryAfter: limit.retryAfter });
 
   const body = await readJson(req);
-  if (!body || typeof body !== "object") return error(400, "Invalid request.");
+  if (!isRecord(body)) return error(400, "Invalid request.");
   if ((body as { website?: string }).website) return json({ message: "Thanks!" }, { status: 201 });
 
   const parsed = enquirySchema.safeParse(body);
@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
     return error(503, "We couldn't send your message right now. Please try again shortly.");
   }
 
-  const s = await getSettings();
+  const s = await getSavedSettings();
   after(async () => {
-    await sendMail(enquiryAckEmail(s, d));
+    await sendMail(enquiryAckEmail(s, { email: d.email, type: d.type }));
     const to = notifyAddress(s);
     if (to) {
       await sendMail(

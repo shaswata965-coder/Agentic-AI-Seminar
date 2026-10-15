@@ -10,7 +10,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useUrlParam } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
 import type { ActivityEntry, ActivityPage } from "@/lib/activity";
-import { AREAS } from "@/lib/permissions";
+import { ACTIVITY_AREAS } from "@/lib/permissions";
 import { ActivityItem } from "./ActivityList";
 import { PageTitle, useMe } from "./AdminShell";
 import { api, useApi } from "./api";
@@ -108,7 +108,7 @@ export function ActivityTracker() {
         </select>
         <select value={area} onChange={(e) => setArea(e.target.value)} className={selectClass} aria-label="Filter by area">
           <option value="">All areas</option>
-          {AREAS.map((a) => (
+          {ACTIVITY_AREAS.map((a) => (
             <option key={a.key} value={a.key}>
               {a.label}
             </option>

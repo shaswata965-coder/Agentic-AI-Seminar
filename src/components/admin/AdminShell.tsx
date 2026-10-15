@@ -36,7 +36,7 @@ import { AuraHead } from "@/components/aura/AuraHead";
 import { ThemeToggle } from "@/components/layout/ThemeToggle";
 import { cn } from "@/lib/cn";
 import { withBase } from "@/lib/paths";
-import { can, contentPermission, type Permission, type Role } from "@/lib/permissions";
+import { can, contentPermission, SETTINGS_PERMISSIONS, type Permission, type Role } from "@/lib/permissions";
 import { api, useApi } from "./api";
 
 export interface AdminMe {
@@ -61,8 +61,8 @@ interface Item {
   label: string;
   Icon: LucideIcon;
   adminOnly?: boolean;
-  /** What a volunteer needs to see this item. Items without one are for everyone. */
-  permission?: Permission;
+  /** What a volunteer needs to see this item (any one of these). Items without one are for everyone. */
+  permission?: Permission | readonly Permission[];
 }
 const content = (key: string, label: string, Icon: LucideIcon): Item => ({ href: `/admin/content/${key}`, label, Icon, permission: contentPermission(key) });
 const NAV: { title: string; items: Item[] }[] = [
@@ -70,7 +70,7 @@ const NAV: { title: string; items: Item[] }[] = [
   {
     title: "Event",
     items: [
-      { href: "/admin/settings", label: "Site settings", Icon: Settings, permission: "settings" },
+      { href: "/admin/settings", label: "Site settings", Icon: Settings, permission: SETTINGS_PERMISSIONS },
       { href: "/admin/hackathon", label: "Hackathon", Icon: Trophy, permission: "hackathon" },
       content("announcements", "Announcements", Megaphone),
     ],

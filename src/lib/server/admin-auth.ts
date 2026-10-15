@@ -1,13 +1,23 @@
 import "server-only";
+import { randomBytes } from "node:crypto";
+import mongoose from "mongoose";
 import type { NextRequest } from "next/server";
-import { AUTH_COOKIE, SESSION_DAYS, verifySession } from "@/lib/auth-token";
+import { z } from "zod";
+import { AUTH_COOKIE, SESSION_DAYS, signSession, verifySession } from "@/lib/auth-token";
 import { connectDb } from "@/lib/db";
-import { User } from "@/lib/models";
+import { AdminSession, User, type UserDoc } from "@/lib/models";
+import { passwordProblem } from "@/lib/password";
 import { BASE_PATH } from "@/lib/paths";
-import { isPermission, type Permission, type Role } from "@/lib/permissions";
+import { normalizePermissions, type Permission, type Role } from "@/lib/permissions";
 import { error, isSameOrigin } from "./http";
 
 export { hashPassword, PASSWORD_MIN, verifyPassword } from "@/lib/password";
+
+/** A new password, as every form that sets one checks it. */
+export const newPassword = z.string().superRefine((p, ctx) => {
+  const problem = passwordProblem(p);
+  if (problem) ctx.addIssue({ code: "custom", message: problem });
+});
 
 export interface AdminUser {
   id: string;
@@ -17,15 +27,28 @@ export interface AdminUser {
   /** Volunteers only (empty for everyone else). */
   responsibility: string;
   permissions: Permission[];
+  /** The session this request was made in. */
+  sessionId: string;
 }
 
-/** The signed-in admin for this request (re-checked against the database). */
+// lastSeenAt is written at most this often, not on every request.
+const TOUCH_MS = 10 * 60_000;
+// The oldest sessions beyond this many per account are ended at sign-in.
+const MAX_SESSIONS = 10;
+
+/**
+ * The signed-in admin for this request. The token's signature and expiry are
+ * checked, then its session and account are looked up: a session that was
+ * ended, or an account that was disabled or deleted, is signed out.
+ */
 export async function getAdmin(req: NextRequest): Promise<AdminUser | null> {
   const claims = await verifySession(req.cookies.get(AUTH_COOKIE)?.value);
-  if (!claims) return null;
+  if (!claims || !mongoose.isValidObjectId(claims.sub)) return null;
   await connectDb();
-  const u = await User.findById(claims.sub).lean();
+  const [session, u] = await Promise.all([AdminSession.findById(String(claims.sid)).lean(), User.findById(claims.sub).lean()]);
+  if (!session || String(session.userId) !== claims.sub || session.expiresAt.getTime() <= Date.now()) return null;
   if (!u || !u.active) return null;
+  if (Date.now() - session.lastSeenAt.getTime() > TOUCH_MS) void AdminSession.updateOne({ _id: session._id }, { $set: { lastSeenAt: new Date() } }).catch(() => {});
   const volunteer = u.role === "volunteer";
   return {
     id: String(u._id),
@@ -33,9 +56,29 @@ export async function getAdmin(req: NextRequest): Promise<AdminUser | null> {
     name: u.name,
     role: u.role,
     responsibility: volunteer ? (u.responsibility ?? "") : "",
-    permissions: volunteer ? (u.permissions ?? []).filter(isPermission) : [],
+    permissions: volunteer ? normalizePermissions(u.permissions) : [],
+    sessionId: session._id,
   };
 }
+
+/** Start a session for an account that has just signed in, and return its token for the cookie. */
+export async function startSession(u: { _id: unknown; email: string; name: string; role: Role }, req: NextRequest): Promise<string> {
+  const sid = randomBytes(32).toString("base64url");
+  const userId = String(u._id);
+  await AdminSession.create({ _id: sid, userId, userAgent: (req.headers.get("user-agent") ?? "").slice(0, 200), expiresAt: new Date(Date.now() + SESSION_DAYS * 86_400_000) });
+  const old = await AdminSession.find({ userId }, { _id: 1 }).sort({ createdAt: -1 }).skip(MAX_SESSIONS).lean();
+  if (old.length) await AdminSession.deleteMany({ _id: { $in: old.map((s) => s._id) } });
+  return signSession({ sub: userId, sid, email: u.email, name: u.name, role: u.role });
+}
+
+/** Sign an account out everywhere (or everywhere but one session): after a password change, or when it is disabled or deleted. */
+export async function endSessions(userId: string, except?: string) {
+  await connectDb();
+  await AdminSession.deleteMany({ userId, ...(except ? { _id: { $ne: except } } : {}) });
+}
+
+/** Whether a change to an account must sign it out everywhere. */
+export const signsOut = (update: Partial<Pick<UserDoc, "passwordHash" | "active">>) => Boolean(update.passwordHash) || update.active === false;
 
 interface Access {
   /** Administrators only. */

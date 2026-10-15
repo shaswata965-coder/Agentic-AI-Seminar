@@ -7,8 +7,8 @@
  * The password is asked for without echoing it. On servers without an
  * interactive terminal, pass --password (it may end up in shell history).
  */
-import { User } from "@/lib/models";
-import { hashPassword, PASSWORD_MIN } from "@/lib/password";
+import { AdminSession, User } from "@/lib/models";
+import { hashPassword, PASSWORD_MIN, passwordProblem } from "@/lib/password";
 import { cliArgs, connect, fail, promptHidden, run } from "./lib/cli";
 
 const USAGE = `Usage: npm run create-admin -- --email <address> [--name "Full name"] [--role admin|editor] [--password <password>]
@@ -35,8 +35,8 @@ run(async () => {
     password = await promptHidden(`New password for ${email} (min ${PASSWORD_MIN} characters): `);
     if (password.length >= PASSWORD_MIN && (await promptHidden("Repeat the password: ")) !== password) fail("The passwords did not match.");
   }
-  if (password.length < PASSWORD_MIN) fail(`The password must be at least ${PASSWORD_MIN} characters.`);
-  if (password.length > 200) fail("The password is too long (max 200 characters).");
+  const problem = passwordProblem(password);
+  if (problem) fail(`That password can't be used: ${problem}`);
 
   await connect();
   const passwordHash = await hashPassword(password);
@@ -47,6 +47,7 @@ run(async () => {
     if (args.name) existing.name = args.name;
     if (args.role) existing.role = role;
     await existing.save();
+    await AdminSession.deleteMany({ userId: existing._id }); // signed out everywhere with the old password
     console.log(`✔ Updated ${existing.role} ${email}: password reset and account active.`);
   } else {
     await User.create({ email, name: args.name || (role === "admin" ? "Administrator" : "Editor"), passwordHash, role });

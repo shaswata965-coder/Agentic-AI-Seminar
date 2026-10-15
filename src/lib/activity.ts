@@ -1,4 +1,4 @@
-import { AREAS } from "@/lib/permissions";
+import { ACTIVITY_AREAS } from "@/lib/permissions";
 
 /*
  * The task tracker: what volunteers did in the admin panel. Entries are written
@@ -44,6 +44,6 @@ export interface ActivityPage {
 
 /** Where a change was made: the area's label and admin page ("account" is a user's own account). */
 export function areaOf(area: string): { label: string; href: string } {
-  const def = AREAS.find((a) => a.key === area);
+  const def = ACTIVITY_AREAS.find((a) => a.key === area);
   return def ? { label: def.label, href: def.href } : { label: area === "account" ? "Account" : area, href: "" };
 }

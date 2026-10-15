@@ -43,6 +43,21 @@ export async function getSettings(): Promise<SiteSettings> {
   // In Draft Mode (only the admin's preview turns it on) this runs on every request, uncached,
   // and shows the draft being edited instead of the saved settings.
   const { isEnabled: preview } = await draftMode();
+  return readSettings(preview);
+}
+
+/**
+ * The saved settings, never the preview draft: for the API routes that act on
+ * them (registration status and deadlines, where notifications go), so a
+ * browser in Draft Mode can't make them act on unsaved changes.
+ */
+export async function getSavedSettings(): Promise<SiteSettings> {
+  "use cache";
+  cacheTag("settings", CONTENT_TAG);
+  return readSettings(false);
+}
+
+async function readSettings(preview: boolean): Promise<SiteSettings> {
   const res = await load(async () => {
     if (preview) {
       const draft = await Singleton.findOne({ key: SETTINGS_DRAFT_KEY }).lean();

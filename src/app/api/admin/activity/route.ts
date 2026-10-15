@@ -42,8 +42,8 @@ const review = z.object({
   reviewed: z.boolean(),
   /** Entries to mark. Without ids, every unreviewed entry matching the filters is marked. */
   ids: z.array(z.string().refine(isId)).max(500).optional(),
-  volunteer: z.string().optional(),
-  area: z.string().optional(),
+  volunteer: z.string().max(24).optional(),
+  area: z.string().max(64).optional(),
 });
 
 /** Mark entries as reviewed (or not). Administrators only. */

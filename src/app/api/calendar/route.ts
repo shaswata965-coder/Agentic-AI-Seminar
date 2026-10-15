@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { stripMarkdown } from "@/components/ui/RichText";
 import { buildIcs } from "@/lib/calendar";
-import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
+import { getSavedSettings, getSessions, getSpeakers } from "@/lib/content/queries";
 import { venueLine } from "@/lib/event";
 import { eventDayDate, istDateTime } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
@@ -20,7 +20,7 @@ function ics(body: string, filename: string) {
 /** /api/calendar → both workshop days; /api/calendar?session=<id> → one session. */
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get("session");
-  const s = await getSettings();
+  const s = await getSavedSettings();
   if (!id) return ics(workshopIcs(s), "agentic-ai-workshop-2026.ics");
 
   const [sessions, speakers] = await Promise.all([getSessions(), getSpeakers()]);

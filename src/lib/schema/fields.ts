@@ -25,6 +25,8 @@ export interface TextField extends Base {
   type: "text" | "textarea" | "richtext" | "email" | "url" | "tel" | "color";
   maxLength?: number;
   rows?: number;
+  /** Validation only: a link still being typed (previews), so only a dangerous scheme is refused. */
+  draftLink?: boolean;
 }
 export interface NumberField extends Base {
   type: "number";

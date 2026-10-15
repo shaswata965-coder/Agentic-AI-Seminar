@@ -92,6 +92,8 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Countdown, add to calendar, share buttons, SEO meta and Open Graph image, Google Analytics, favicon | ✅ All included; GA is enabled by entering an ID in the admin |
 | Post-event: photo gallery, slides / recordings, hackathon winners (hidden until enabled) | `/gallery`, `/talks` and winners, each behind a switch in Admin → Site settings → Site-wide → Features & post-event |
 | Handover: source code / admin access, short update guide, credentials | This repository; `docs/ADMIN_GUIDE.md` and `/admin/guide`; README handover checklist (credentials stay in the server environment) |
+| Volunteers with chosen permissions; their changes reviewable | Admin → Volunteers: one permission per area, and per page for Site settings, enforced by the server; every change in the task tracker |
+| Security | Validated, length-capped input on every form; signed JWT sessions checked against the database; bcrypt passwords; CSP and hardening headers. Review and 246 attack checks: `docs/SECURITY_REPORT.md` |
 
 ## 8. Content still to come from the organisers
 

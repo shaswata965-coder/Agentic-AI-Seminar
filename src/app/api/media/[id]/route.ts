@@ -29,10 +29,13 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/media/[id]">
     "Cache-Control": "public, max-age=31536000, immutable",
     ETag: etag,
     "X-Content-Type-Options": "nosniff",
-    "Content-Disposition": `inline; filename="${encodeURIComponent(file.filename)}"`,
+    // An SVG opened directly is downloaded, not shown, so nothing in it can run on this site (pages show
+    // it with <img>, where scripts never run). Every file is also served sandboxed (next.config.ts).
+    "Content-Disposition": `${type.includes("svg") ? "attachment" : "inline"}; filename="${encodeURIComponent(file.filename)}"`,
+    // Nothing in a file may run. Only PDFs can't be locked down: browsers then refuse to show them (their
+    // viewers run PDF scripts in a sandbox of their own).
+    "Content-Security-Policy": type === "application/pdf" ? "frame-ancestors 'self'" : "default-src 'none'; style-src 'unsafe-inline'; frame-ancestors 'self'; sandbox",
   };
-  // SVGs can contain scripts: sandbox them when opened directly.
-  if (type.includes("svg")) headers["Content-Security-Policy"] = "default-src 'none'; style-src 'unsafe-inline'; sandbox";
   const stream = Readable.toWeb(bucket.openDownloadStream(_id)) as ReadableStream<Uint8Array>;
   return new Response(stream, { headers });
 }

@@ -51,7 +51,7 @@ export function mergeDefaults<T extends object>(defaults: T, stored: unknown): T
   const out = { ...defaults } as Record<string, unknown>;
   if (stored && typeof stored === "object") {
     for (const [k, v] of Object.entries(stored as Record<string, unknown>)) {
-      if (v === undefined || v === null || !(k in out)) continue;
+      if (v === undefined || v === null || !Object.hasOwn(out, k)) continue;
       out[k] = isPlainObject(out[k]) && isPlainObject(v) ? mergeDefaults(out[k], v) : v;
     }
   }

@@ -72,6 +72,7 @@ The organising team`;
     text,
     replyTo: s.contactEmail || undefined,
     attachments: [{ filename: "agentic-ai-workshop-2026.ics", content: workshopIcs(s), contentType: "text/calendar; charset=utf-8; method=PUBLISH" }],
+    visitor: true,
   };
 }
 
@@ -99,20 +100,26 @@ The organising team`;
   // Every member gets a copy, so the whole team has the team ID.
   const lead = t.leaderEmail.toLowerCase();
   const cc = [...new Set(t.members.map((m) => m.email.trim().toLowerCase()).filter((e) => e && e !== lead))];
-  return { to: t.leaderEmail, cc, subject: `Team registered: ${t.teamName} (${t.regId})`, html: layout(s, "Your team is registered", body), text, replyTo: s.contactEmail || undefined };
+  return { to: t.leaderEmail, cc, subject: `Team registered: ${t.teamName} (${t.regId})`, html: layout(s, "Your team is registered", body), text, replyTo: s.contactEmail || undefined, visitor: true };
 }
 
 const ENQUIRY_LABEL = { contact: "message", exhibitor: "exhibitor enquiry", sponsor: "sponsorship enquiry" } as const;
 
-export function enquiryAckEmail(s: SiteSettings, e: { name: string; email: string; type: keyof typeof ENQUIRY_LABEL; message: string }): MailInput {
+/**
+ * The acknowledgement goes to whatever address was typed into the form, so it
+ * repeats nothing the visitor wrote: it can't be used to send someone else a
+ * message from the event's address.
+ */
+export function enquiryAckEmail(s: SiteSettings, e: { email: string; type: keyof typeof ENQUIRY_LABEL }): MailInput {
   const label = ENQUIRY_LABEL[e.type];
-  const body = `<p>Hi ${esc(e.name)},</p><p>Thanks for your ${label}. The organising team has received it and will get back to you soon.</p>${box(`<p style="margin:0;white-space:pre-wrap">${esc(e.message)}</p>`)}<p>The organising team</p>`;
+  const body = `<p>Hello,</p><p>Thanks for your ${label}. The organising team has received it and will get back to you soon.</p><p>If you didn't send it, you can ignore this e-mail.</p><p>The organising team</p>`;
   return {
     to: e.email,
     subject: `We received your ${label} · ${s.eventName}`,
     html: layout(s, "Thanks for getting in touch", body),
-    text: `Hi ${e.name},\n\nThanks for your ${label}. The organising team will get back to you soon.\n\nYour message:\n${e.message}\n\nThe organising team`,
+    text: `Hello,\n\nThanks for your ${label}. The organising team will get back to you soon.\n\nIf you didn't send it, you can ignore this e-mail.\n\nThe organising team`,
     replyTo: s.contactEmail || undefined,
+    visitor: true,
   };
 }
 

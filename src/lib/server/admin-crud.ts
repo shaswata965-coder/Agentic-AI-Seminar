@@ -105,7 +105,7 @@ const SINGLETON_DEFAULTS = { settings: DEFAULT_SETTINGS, hackathon: DEFAULT_HACK
 export type SingletonKey = keyof typeof SINGLETONS;
 
 export function isSingletonKey(key: string): key is SingletonKey {
-  return key in SINGLETONS;
+  return Object.hasOwn(SINGLETONS, key);
 }
 
 export async function getSingleton(key: SingletonKey) {

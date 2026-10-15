@@ -34,8 +34,10 @@ services:
   web:
     build: *build
     restart: unless-stopped
+    # Only reachable from this machine, for the reverse proxy: clients that bypassed it could fake their
+    # IP address (used for rate limits). Set BIND=0.0.0.0 to publish it on every interface.
     ports:
-      - "${PORT:-3000}:3000"
+      - "${BIND:-127.0.0.1}:${PORT:-3000}:3000"
     environment:
       MONGODB_URI: mongodb://mongo:27017/aaiw
       AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env (32+ random characters)}

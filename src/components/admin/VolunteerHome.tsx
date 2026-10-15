@@ -4,7 +4,7 @@ import { ArrowRight, Eye } from "lucide-react";
 import Link from "next/link";
 import { Aura } from "@/components/aura/Aura";
 import type { ActivityPage } from "@/lib/activity";
-import { AREAS } from "@/lib/permissions";
+import { areasOf } from "@/lib/permissions";
 import { ActivityItem } from "./ActivityList";
 import { PageTitle, type AdminMe } from "./AdminShell";
 import { useApi } from "./api";
@@ -12,7 +12,7 @@ import { useApi } from "./api";
 /** The dashboard for volunteers: their responsibility, the areas they can work on and their recent changes. */
 export function VolunteerHome({ me }: { me: AdminMe }) {
   const { data, error } = useApi<ActivityPage>("/activity");
-  const areas = AREAS.filter((a) => me.permissions.includes(a.key));
+  const areas = areasOf(me.permissions);
   const canDelete = me.permissions.includes("delete");
 
   return (

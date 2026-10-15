@@ -7,8 +7,10 @@ import { cn } from "@/lib/cn";
  * [links](https://…). Rendered as React elements, never as raw HTML.
  */
 
-const INLINE = /(\*\*[^*]+\*\*|\*[^*\s][^*]*\*|`[^`]+`|\[[^\]]+\]\([^)\s]+\))/g;
-const SAFE_HREF = /^(https?:\/\/|mailto:|tel:|\/|#)/i;
+// Each part has a length limit, so text such as thousands of "[" can't make matching slow (quadratic).
+const INLINE = /(\*\*[^*\n]{1,500}\*\*|\*[^*\s][^*\n]{0,500}\*|`[^`\n]{1,500}`|\[[^\]\n]{1,300}\]\([^)\s]{1,2000}\))/g;
+// Paths on the site, but not //other-host (or /\other-host, which browsers read the same way).
+const SAFE_HREF = /^(https?:\/\/|mailto:|tel:|\/(?![/\\])|#)/i;
 
 function inline(text: string, keyBase: string): ReactNode[] {
   const out: ReactNode[] = [];
@@ -80,9 +82,9 @@ export function RichText({ text, className }: { text?: string | null; className?
 /** Plain-text version (for meta descriptions, PDFs, e-mails). */
 export function stripMarkdown(text: string) {
   return text
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
-    .replace(/\*\*([^*]+)\*\*/g, "$1")
-    .replace(/\*([^*]+)\*/g, "$1")
-    .replace(/`([^`]+)`/g, "$1")
+    .replace(/\[([^\]\n]{1,300})\]\([^)\s]{1,2000}\)/g, "$1")
+    .replace(/\*\*([^*\n]{1,500})\*\*/g, "$1")
+    .replace(/\*([^*\n]{1,500})\*/g, "$1")
+    .replace(/`([^`\n]{1,500})`/g, "$1")
     .replace(/^\s*[-*•]\s+/gm, "• ");
 }

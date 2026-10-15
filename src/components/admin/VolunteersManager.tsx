@@ -11,7 +11,7 @@ import { Modal } from "@/components/ui/Modal";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { formatDateTime } from "@/lib/format";
-import { AREAS, DELETE_PERMISSION, PERMISSION_GROUPS } from "@/lib/permissions";
+import { areasOf, DELETE_PERMISSION, PERMISSION_GROUPS } from "@/lib/permissions";
 import { PageTitle } from "./AdminShell";
 import { api, ApiError, useApi } from "./api";
 
@@ -46,7 +46,7 @@ function generatePassword(length = 14) {
 }
 
 function Access({ permissions }: { permissions: string[] }) {
-  const areas = AREAS.filter((a) => permissions.includes(a.key));
+  const areas = areasOf(permissions);
   if (!areas.length) return <span className="text-subtle">No access yet</span>;
   const shown = areas.slice(0, 3);
   return (
@@ -84,7 +84,10 @@ function PermissionPicker({ value, onChange, error }: { value: string[]; onChang
         return (
           <div key={g.title}>
             <div className="flex items-center justify-between gap-2">
-              <p className="text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">{g.title}</p>
+              <p className="text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">
+                {g.title}
+                {g.hint ? <span className="ml-2 font-normal tracking-normal normal-case">{g.hint}</span> : null}
+              </p>
               <button
                 type="button"
                 onClick={() => onChange(all ? value.filter((k) => !g.items.some((p) => p.key === k)) : [...new Set([...value, ...g.items.map((p) => p.key)])])}

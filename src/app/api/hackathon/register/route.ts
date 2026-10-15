@@ -1,11 +1,11 @@
 import { after, type NextRequest } from "next/server";
 import { THEME_META } from "@/lib/content/constants";
-import { getHackathon, getSettings } from "@/lib/content/queries";
+import { getHackathon, getSavedSettings } from "@/lib/content/queries";
 import { connectDb, isDuplicateKeyError } from "@/lib/db";
 import { deadlinePassed } from "@/lib/event";
 import { HackathonRegistration } from "@/lib/models";
 import { hackathonEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
-import { clientIp, error, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { clientIp, error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
 import { makeRegId } from "@/lib/server/ids";
 import { mailConfigured, sendMail } from "@/lib/server/mail";
 import { rateLimit } from "@/lib/server/rate-limit";
@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
   if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
 
   const body = await readJson(req);
-  if (!body || typeof body !== "object") return error(400, "Invalid request.");
+  if (!isRecord(body)) return error(400, "Invalid request.");
   if ((body as { website?: string }).website) return json({ data: { regId: "HACK26-THANKS", emailSent: false } }, { status: 201 });
 
-  const [s, h] = await Promise.all([getSettings(), getHackathon()]);
+  const [s, h] = await Promise.all([getSavedSettings(), getHackathon()]);
   if (s.hackathonUrl) return error(409, `Hackathon registration happens on ${s.hackathonPlatform || "the external platform"}.`);
   if (s.hackathonStatus !== "open") return error(403, s.hackathonStatus === "closed" ? "Hackathon registration is closed." : "Hackathon registration has not opened yet.");
   if (deadlinePassed(s.hackathonDeadline)) return error(403, "Hackathon registration is closed: the deadline has passed.");
@@ -34,6 +34,9 @@ export async function POST(req: NextRequest) {
     return error(422, "Please check the highlighted fields.", { fieldErrors: Object.fromEntries(Object.entries(fe).map(([k, v]) => [k.replace(/^members\.(\d+)/, "members.$1"), v])) });
   }
   const d = parsed.data;
+  if (d.track && d.track !== "undecided" && !h.tracks.some((t) => t.theme === d.track) && !Object.hasOwn(THEME_META, d.track)) {
+    return error(422, "Please check the highlighted fields.", { fieldErrors: { track: "Please choose one of the tracks." } });
+  }
   const key = teamKey(d.teamName);
   if (key.length < 2) return error(422, "Please choose a team name with letters or numbers.", { fieldErrors: { teamName: "Invalid team name" } });
 
@@ -44,13 +47,11 @@ export async function POST(req: NextRequest) {
   }
 
   const emails = d.members.map((m) => m.email);
-  const clash = await HackathonRegistration.findOne({ "members.email": { $in: emails }, status: { $ne: "withdrawn" } }, { members: 1 }).lean();
-  if (clash) {
-    const taken = clash.members.find((m) => emails.includes(m.email))?.email ?? "";
-    return error(409, `${taken} is already part of a registered team. Each participant can be in only one team.`);
-  }
+  // Each participant can be in only one team. The answer doesn't say which address or which team, so it reveals as little as the rule allows.
+  const clash = await HackathonRegistration.exists({ "members.email": { $in: emails }, status: { $ne: "withdrawn" } });
+  if (clash) return error(409, "Someone in this team is already part of a registered team. Each participant can be in only one team: check the e-mail addresses, or contact the organisers.");
 
-  const trackLabel = h.tracks.find((t) => t.theme === d.track)?.title ?? (d.track === "undecided" ? "Undecided" : THEME_META[d.track as keyof typeof THEME_META]?.short ?? d.track);
+  const trackLabel = h.tracks.find((t) => t.theme === d.track)?.title ?? (d.track === "undecided" ? "Undecided" : (Object.hasOwn(THEME_META, d.track) ? THEME_META[d.track as keyof typeof THEME_META].short : d.track));
 
   for (let attempt = 0; attempt < 5; attempt++) {
     const regId = makeRegId("HACK26");

@@ -456,7 +456,8 @@ export const COLLECTIONS: CollectionDef[] = [
   },
 ];
 
-export const COLLECTION_MAP: Record<string, CollectionDef> = Object.fromEntries(COLLECTIONS.map((c) => [c.key, c]));
+// No prototype: a key from a URL such as "constructor" or "__proto__" must not find anything.
+export const COLLECTION_MAP: Record<string, CollectionDef> = Object.freeze(Object.assign(Object.create(null) as Record<string, CollectionDef>, Object.fromEntries(COLLECTIONS.map((c) => [c.key, c]))));
 
 /* -------------------------------------------------------------- Singletons -- */
 

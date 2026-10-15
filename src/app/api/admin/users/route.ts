@@ -2,14 +2,14 @@ import type { NextRequest } from "next/server";
 import { z } from "zod";
 import { isDuplicateKeyError } from "@/lib/db";
 import { User } from "@/lib/models";
-import { hashPassword, PASSWORD_MIN, requireAdmin } from "@/lib/server/admin-auth";
+import { hashPassword, newPassword, requireAdmin } from "@/lib/server/admin-auth";
 import { error, json, readJson, zodFieldErrors } from "@/lib/server/http";
 
 const create = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid e-mail address."),
+  email: z.string().trim().toLowerCase().max(254).email("Enter a valid e-mail address."),
   name: z.string().trim().max(120).default(""),
   role: z.enum(["admin", "editor"]).default("editor"),
-  password: z.string().min(PASSWORD_MIN, `Use at least ${PASSWORD_MIN} characters.`).max(200),
+  password: newPassword,
 });
 
 export async function GET(req: NextRequest) {
