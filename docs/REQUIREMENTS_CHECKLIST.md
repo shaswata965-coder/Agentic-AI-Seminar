@@ -39,7 +39,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
 | | Hackathon announcement on home | ✅ Title, tagline, tracks, team size, mode and prize pool, with *Register your team* and *Hackathon details* (`/hackathon`) buttons |
-| | Loading screen (added on request) | ✅ Launch intro: Aura tries to take off while small Auras work on her ship, lifts off once the page has loaded, and the smoke clears to the page. Once per visit, skippable, off with reduced motion, switchable in Site settings → Home |
+| | Loading screen (added on request) | ✅ Caches the main pages' scripts, styles, fonts and images (Cache Storage, served by a service worker) while Aura tries to take off and small Auras work on her ship inside a progress ring; once all is cached she lifts off and the smoke clears to the page. Shown on the first visit and after updates; caching without the screen for reduced motion; switchable in Site settings → Home |
 | Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the matching hackathon track |
 | Programme | Tabs by day; each session shows time, title, type tag (Keynote / Talk / Panel / Tutorial / Demo / Hackathon / Break), theme tag, speaker(s), room | ✅ Plus "Other" type, search, *My agenda* (starred sessions), "now / up next" during the event |
 | | Filter by theme / type | ✅ Filters are kept in the URL, so filtered views can be shared |

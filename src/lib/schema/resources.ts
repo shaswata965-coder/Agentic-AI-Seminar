@@ -627,9 +627,9 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     title: "Home",
     path: "/",
     sections: [
-      section("intro", "Launch intro", "homeIntro", [bool("showIntro", "Play the launch intro when someone opens the home page")], {
+      section("loader", "Loading screen", "homeLoader", [bool("showLoader", "Show the loading screen while the site's files are cached")], {
         description:
-          "While the page loads, Aura tries to take off as small Auras work on her ship; then she lifts off and the smoke clears to show the page. It plays once per visit, never for visitors who ask for reduced motion, and not in this preview: open the home page in a private window to watch it.",
+          "The first time someone opens the home page (and after the site is updated), the pages, scripts, styles and images are fetched and cached behind a loading screen, so the rest of the visit is quick. Aura tries to take off as small Auras work on her ship and the ring around them fills; once everything is cached she lifts off and the smoke clears to show the page. Visitors who ask for reduced motion get the caching without the screen. It isn't shown in this preview: open the home page in a private window to see it.",
       }),
       section("hero", "Hero", "homeHero", [bool("showCountdown", "Show the countdown timer")], {
         description: "The event name, tagline, dates and venue come from Site-wide → Event details.",

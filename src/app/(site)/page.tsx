@@ -8,16 +8,22 @@ import { Partners } from "@/components/home/Partners";
 import { SpeakersPreview } from "@/components/home/SpeakersPreview";
 import { Themes } from "@/components/home/Themes";
 import { Venue } from "@/components/home/Venue";
-import { LaunchIntro } from "@/components/launch/LaunchIntro";
+import { LoadingScreen } from "@/components/loading/LoadingScreen";
 import { getAnnouncements, getFaqs, getHackathon, getSettings, getSpeakers, getSponsors } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
+import { hackathonRegistrationHref } from "@/lib/event";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
+import { explorePages, postEventNav, primaryNav, registrationNav } from "@/lib/nav";
 
 export default async function HomePage() {
   const [s, h, announcements, speakers, sponsors, faqs] = await Promise.all([getSettings(), getHackathon(), getAnnouncements(), getSpeakers(), getSponsors(), getFaqs()]);
+  // The pages the loading screen caches the files of, and prefetches.
+  const routes = [...primaryNav(s.siteNav), registrationNav(s.siteNav), ...explorePages(s.siteNav), ...postEventNav(s, s.siteNav), { href: hackathonRegistrationHref(s) }]
+    .map((n) => n.href)
+    .filter((href) => href.startsWith("/"));
   return (
     <>
-      {s.showIntro ? <LaunchIntro eventName={s.eventName} text={copy(s, "homeIntro")} /> : null}
+      {s.showLoader ? <LoadingScreen eventName={s.eventName} routes={routes} text={copy(s, "homeLoader")} /> : null}
       <JsonLd data={eventJsonLd(s)} />
       <Hero s={s} />
       <Highlights s={s} />

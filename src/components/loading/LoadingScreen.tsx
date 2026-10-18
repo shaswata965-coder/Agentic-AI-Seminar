@@ -1,36 +1,37 @@
 "use client";
 
 import "@/components/aura/aura.css";
-import "./launch.css";
+import "./loading.css";
+import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { AuraArt } from "@/components/aura/AuraArt";
 import { AURA_EYES } from "@/components/aura/presets";
-import { buttonClasses } from "@/components/ui/Button";
 import type { PageCopy } from "@/lib/schema/page-copy";
-import { LAUNCH_KEY } from "./flag";
+import { ASSETS_KEY } from "./flag";
+import { warmAssets, warmup } from "./warm";
 
 /*
- * The home page's launch intro. While the page loads, Aura sits on her booster trying to take off
- * (it sputters, hops and drops back) while small Auras in hard hats work on the ship: one tightens
- * bolts from the gantry, one welds a fin, one polishes her visor, one flies in parts, one runs the
- * fuel and one ticks off the checklist. Once the page has loaded she lifts off, the smoke fills the
- * screen, and as it clears the landing page is there, with the hero's Aura flying down into place.
+ * The home page's loading screen. While the site's files are fetched and cached (warm.ts), Aura sits
+ * on her booster trying to take off (it sputters, hops and drops back) while small Auras in hard hats
+ * work on the ship: one tightens bolts from the gantry, one welds a fin, one polishes her visor, one
+ * flies in parts, one opens the fuel valve and one ticks off a checklist. The ring around them fills
+ * with the real progress. Once everything is cached she lifts off, the smoke fills the screen, and as
+ * it clears the page is there, with the hero's Aura flying down into place. The main pages are also
+ * prefetched, so moving between them is instant.
  *
- * flag.ts decides whether it plays before the first paint; launch.css draws every phase from
- * .launch[data-phase]: work → lift → clear, or skip.
+ * flag.ts decides before the first paint whether it shows ("run"), caches without showing ("quiet") or
+ * does nothing (this browser has the files already); loading.css draws each phase from
+ * .launch[data-phase]: work → lift → clear.
  */
 
-type Phase = "work" | "lift" | "clear" | "skip" | "gone";
+type Phase = "work" | "lift" | "clear" | "gone";
 
-/* Timings in ms; launch.css is written to match. */
-const MIN_WORK = 3000; // Aura keeps trying at least this long after the page started loading…
-const MAX_WORK = 8000; // …and lifts off by now even if it is still loading.
+/* Timings in ms; loading.css is written to match. */
+const MAX_WAIT = 10000; // lift off by now (from when the page started loading), even if caching goes on behind
+const RING = 700; // time for the ring to catch up with the last step
 const ATTEMPT = 2200; // one take-off attempt (launch-attempt)
 const LIFT = 2600; // lift-off, until the smoke covers the screen
 const CLEAR = 1700; // the smoke clearing
-const SKIP = 450;
-const STEP = 1100; // each line of the checklist
-const FAILSAFE = 16000; // launch.css hides an intro that never got going by then
 
 const EYE = AURA_EYES.aqua;
 const EDGE = "var(--aura-edge, #c9d4e5)";
@@ -40,6 +41,14 @@ const STEEL_LIGHT = "#a3b1c6";
 const HAZARD = "#ffc95c";
 const HAZARD_DARK = "#e09a12";
 const FIN = "#b9a3ff";
+
+/** The drawing's frame: a square around the ring (loading.css sizes .launch-scene to match). */
+const VIEWBOX = "0 80 400 400";
+const CX = 200;
+const CY = 280;
+/** The window the launch pad is seen through, and the progress ring around it. */
+const DISC_R = 186;
+const RING_R = 193;
 
 /** Smoke puffs: where each one ends up from the pad, how much it grows and when it starts (ms into lift-off). */
 const BILLOWS: [x: string, y: string, s: number, d: number][] = [
@@ -59,20 +68,17 @@ const BILLOWS: [x: string, y: string, s: number, d: number][] = [
   ["0vw", "-56vh", 3.1, 1500],
 ];
 
-/** The drawing's frame (launch.css sizes .launch-scene to the same 400 × 296). */
-const VIEWBOX = "0 110 400 296";
-
 const STARS: [number, number, number][] = [
-  [26, 130, 1.4],
-  [56, 176, 1.1],
-  [128, 122, 1.2],
-  [282, 124, 1.6],
-  [356, 168, 1.2],
-  [384, 126, 1.1],
-  [236, 116, 1],
+  [200, 104, 1.3],
+  [150, 116, 1.1],
+  [252, 114, 1.5],
+  [118, 142, 1.2],
+  [300, 150, 1.4],
+  [80, 196, 1.1],
+  [334, 204, 1.2],
 ];
 
-/* The <html data-launch> flag is the source of truth: "run" while the intro plays, then "done"; absent when it doesn't play. */
+/* The <html data-launch> flag (flag.ts) is the source of truth: "run" while the screen shows, then "lifted". */
 function subscribe(onChange: () => void) {
   const observer = new MutationObserver(onChange);
   observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-launch"] });
@@ -87,101 +93,88 @@ function untilRest(ship: Element | null) {
   return at < 0.35 ? 0 : (1 - at) * ATTEMPT;
 }
 
-export function LaunchIntro({ eventName, text }: { eventName: string; text: PageCopy["homeIntro"] }) {
+const count = (text: string, done: number, total: number) => text.replace(/\{done\}/g, String(done)).replace(/\{total\}/g, String(total));
+
+export function LoadingScreen({ eventName, routes, text }: { eventName: string; routes: string[]; text: PageCopy["homeLoader"] }) {
   const flag = useSyncExternalStore(subscribe, readFlag, () => "run");
+  const progress = useSyncExternalStore(warmup.subscribe, warmup.get, warmup.initial);
   const [phase, setPhase] = useState<Phase>("work");
-  const [step, setStep] = useState(0);
   const ship = useRef<SVGGElement>(null);
-  const skipButton = useRef<HTMLButtonElement>(null);
-  const skip = useRef<() => void>(null);
+  const ring = useRef<SVGSVGElement>(null);
+  const percent = useRef<HTMLParagraphElement>(null);
+  const shownRatio = useRef(0);
+  const router = useRouter();
   const uid = `launch${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
+  // Cache the site's files, behind the screen or quietly, and prefetch the main pages. Once all is
+  // cached, this browser skips the screen until the site is updated.
   useEffect(() => {
     const html = document.documentElement;
-    if (html.dataset.launch !== "run") return;
-    // Mounted so late that launch.css has already hidden the overlay: let it go quietly.
-    if (performance.now() > FAILSAFE - 2000) {
-      html.dataset.launch = "done";
-      return;
-    }
-    const timers: number[] = [];
-    const after = (ms: number, fn: () => void) => void timers.push(window.setTimeout(fn, ms));
-    const remember = () => {
+    const mode = html.dataset.launch;
+    if (mode !== "run" && mode !== "quiet") return;
+    for (const route of routes) router.prefetch(route);
+    const version = html.dataset.assets ?? "";
+    warmAssets(routes).then(() => {
       try {
-        sessionStorage.setItem(LAUNCH_KEY, "1");
+        localStorage.setItem(ASSETS_KEY, version);
       } catch {}
-    };
-    let stage: "work" | "lift" | "over" = "work";
-    // Escape skips; Tab stays on the skip button, as everything else is behind the intro.
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") skip.current?.();
-      else if (e.key === "Tab" && skipButton.current) {
-        e.preventDefault();
-        skipButton.current.focus();
-      }
-    };
-    const reveal = () => {
-      stage = "over";
-      window.removeEventListener("keydown", onKey);
-      setPhase("clear");
-      after(CLEAR, () => setPhase("gone"));
-    };
-    const lift = () => {
-      if (stage !== "work") return;
-      stage = "lift";
-      after(untilRest(ship.current), () => {
-        remember();
-        setPhase("lift");
-        after(LIFT, reveal);
-      });
-    };
-    skip.current = () => {
-      if (stage === "over") return;
-      stage = "over";
-      timers.forEach(clearTimeout);
-      window.removeEventListener("keydown", onKey);
-      remember();
-      setPhase("skip");
-      after(SKIP, () => setPhase("gone"));
-    };
-    // `performance.now()` counts from when the page started loading, as the overlay has been up since then.
-    const loaded = () => after(Math.max(0, MIN_WORK - performance.now()), lift);
-    if (document.readyState === "complete") loaded();
-    else window.addEventListener("load", loaded, { once: true });
-    after(Math.max(0, MAX_WORK - performance.now()), lift);
-    window.addEventListener("keydown", onKey);
-    return () => {
-      timers.forEach(clearTimeout);
-      window.removeEventListener("load", loaded);
-      window.removeEventListener("keydown", onKey);
-      skip.current = null;
-    };
-  }, []);
+      if (html.dataset.launch === "quiet") html.dataset.launch = "done";
+    });
+  }, [router, routes]);
 
-  // The page behind is let go (scrolling, the hero Aura's fly-in) once the overlay is on its way out.
+  // Lift off once everything is cached (or at MAX_WAIT, while caching carries on), from rest between two tries.
+  const cached = progress.stage === "done";
   useEffect(() => {
-    if (phase === "clear" || phase === "skip") document.documentElement.dataset.launch = "done";
+    if (flag !== "run" || phase !== "work") return;
+    const timers: number[] = [];
+    const wait = cached ? RING : Math.max(0, MAX_WAIT - performance.now());
+    timers.push(window.setTimeout(() => timers.push(window.setTimeout(() => setPhase("lift"), untilRest(ship.current))), wait));
+    return () => timers.forEach(clearTimeout);
+  }, [flag, phase, cached]);
+
+  // Lift-off, then the smoke clears; the page behind is let go (scrolling, the hero Aura's fly-in) as it does.
+  useEffect(() => {
+    if (phase !== "lift" && phase !== "clear") return;
+    if (phase === "clear") document.documentElement.dataset.launch = "lifted";
+    const t = window.setTimeout(() => setPhase(phase === "lift" ? "clear" : "gone"), phase === "lift" ? LIFT : CLEAR);
+    return () => window.clearTimeout(t);
   }, [phase]);
 
-  const working = phase === "work" && flag === "run";
+  // The ring, its tip and the percentage ease towards the progress together, drawn straight onto the
+  // page (not re-rendering the scene on every frame).
+  const ratio = phase === "work" ? progress.ratio : 1;
   useEffect(() => {
-    if (!working) return;
-    const t = window.setInterval(() => setStep((i) => i + 1), STEP);
-    return () => window.clearInterval(t);
-  }, [working]);
+    let frame = 0;
+    let last = -1;
+    const draw = (now: number) => {
+      const from = shownRatio.current;
+      const step = last < 0 ? 16 : Math.max(0, now - last);
+      const value = Math.abs(ratio - from) < 0.002 ? ratio : from + (ratio - from) * (1 - Math.exp(-step / 140));
+      last = now;
+      shownRatio.current = value;
+      ring.current?.style.setProperty("--ring", String(value));
+      if (percent.current) percent.current.textContent = `${Math.round(value * 100)}%`;
+      if (value !== ratio) frame = requestAnimationFrame(draw);
+    };
+    frame = requestAnimationFrame(draw);
+    return () => cancelAnimationFrame(frame);
+  }, [ratio]);
 
-  const shown = phase !== "gone" && (flag === "run" || (flag === "done" && (phase === "clear" || phase === "skip")));
+  const shown = phase !== "gone" && (flag === "run" || (flag === "lifted" && phase === "clear"));
   if (!shown) return null;
 
-  const steps = [text.step1, text.step2, text.step3, text.step4].filter(Boolean);
+  const stage = phase === "work" ? progress.stage : "done";
+  const line =
+    stage === "done" ? text.ready : stage === "page" ? text.page : count(stage === "pages" ? text.pages : text.files, progress.done, progress.total);
   const paint: Paint = { shell: `url(#${uid}-shell)`, visor: `url(#${uid}-visor)` };
 
   return (
-    <div className="launch" data-phase={phase} data-edit="home.intro">
+    <div className="launch" data-phase={phase} data-edit="home.loader">
       <div className="launch-sky" aria-hidden />
       <div className="launch-stage">
         <div className="launch-scene" aria-hidden>
           <Ground uid={uid} />
+          <Ring uid={uid} svgRef={ring} />
           <div className="launch-billows">
             {BILLOWS.map(([x, y, s, d], i) => (
               <span key={i} className="launch-puff" style={{ "--x": x, "--y": y, "--s": s, "--d": `${d}ms`, "--d2": `${(i % 4) * 70}ms` } as CSSProperties}>
@@ -192,46 +185,20 @@ export function LaunchIntro({ eventName, text }: { eventName: string; text: Page
           <Ship uid={uid} paint={paint} shipRef={ship} lifting={phase !== "work"} />
           <Crew paint={paint} />
         </div>
-        <div className="launch-status">
-          <p className="text-[11px] font-bold tracking-[0.2em] text-subtle uppercase">
-            <span className="inline-block">{eventName}</span>
-            {text.kicker ? (
-              <>
-                {" "}
-                <span className="inline-block">· {text.kicker}</span>
-              </>
-            ) : null}
+        <div className="launch-status" aria-hidden>
+          <p className="text-[11px] font-bold tracking-[0.2em] text-subtle uppercase">{eventName}</p>
+          <p ref={percent} className="mt-1 font-display text-3xl font-bold text-fg tabular-nums">
+            0%
           </p>
-          <p className="launch-line font-display text-xl font-semibold text-fg sm:text-2xl" aria-hidden>
-            {phase === "work" ? (
-              steps.length ? (
-                <span key={step}>
-                  {steps[step % steps.length]}
-                  <span className="launch-dots">
-                    <i>.</i>
-                    <i>.</i>
-                    <i>.</i>
-                  </span>
-                </span>
-              ) : null
-            ) : (
-              <span className="text-gradient">{text.liftoff}</span>
-            )}
+          <p className="launch-line text-sm font-medium text-muted">
+            <span key={stage}>{line}</span>
           </p>
-          <div className="launch-bar">
-            <span />
-          </div>
         </div>
       </div>
       <div className="launch-fog" aria-hidden />
       <p role="status" className="sr-only">
         {text.status}
       </p>
-      {phase === "work" || phase === "lift" ? (
-        <button ref={skipButton} type="button" onClick={() => skip.current?.()} className={buttonClasses("outline", "sm", "launch-skip")}>
-          {text.skip}
-        </button>
-      ) : null}
     </div>
   );
 }
@@ -271,6 +238,9 @@ function Defs({ uid }: { uid: string }) {
         <stop offset="0%" stopColor="#ffd27a" stopOpacity="0.8" />
         <stop offset="100%" stopColor="#ffd27a" stopOpacity="0" />
       </radialGradient>
+      <clipPath id={`${uid}-window`}>
+        <circle cx={CX} cy={CY} r={DISC_R} />
+      </clipPath>
       <clipPath id={`${uid}-stripes`}>
         <rect x="132" y="372" width="136" height="7" rx="1.5" />
       </clipPath>
@@ -278,65 +248,97 @@ function Defs({ uid }: { uid: string }) {
   );
 }
 
-/** Behind the smoke: stars, the gantry, the launch pad and the fuel tank with its hose. */
+/** Behind the smoke, seen through a round window: stars, the gantry, the launch pad and the fuel tank with its hose. */
 function Ground({ uid }: { uid: string }) {
   const braces = Array.from({ length: 8 }, (_, i) => `M77 ${172 + i * 26} L97 ${185 + i * 26} L77 ${198 + i * 26}`).join(" ");
   const hose = "M300 352 C282 378 246 364 229 328";
   return (
     <svg viewBox={VIEWBOX} className="launch-layer" focusable="false">
       <Defs uid={uid} />
-      {STARS.map(([x, y, r], i) => (
-        <circle key={i} cx={x} cy={y} r={r} className="launch-star launch-w" style={{ animationDelay: `${-i * 0.7}s` }} />
-      ))}
-      <ellipse cx="200" cy="388" rx="196" ry="10" className="launch-floor" />
+      <circle cx={CX} cy={CY} r={DISC_R} className="launch-window" />
+      <g clipPath={`url(#${uid}-window)`}>
+        {STARS.map(([x, y, r], i) => (
+          <circle key={i} cx={x} cy={y} r={r} className="launch-star launch-w" style={{ animationDelay: `${-i * 0.7}s` }} />
+        ))}
+        <rect x="0" y="385" width="400" height="100" className="launch-earth" />
 
-      {/* Gantry, with the platform that swings away at lift-off */}
-      <rect x="72" y="168" width="5" height="216" rx="1.5" fill={STEEL} />
-      <rect x="97" y="168" width="5" height="216" rx="1.5" fill={STEEL} />
-      <path d={braces} fill="none" stroke={STEEL_LIGHT} strokeWidth="1.6" strokeLinejoin="round" />
-      <rect x="67" y="161" width="40" height="7" rx="2" fill={STEEL_DARK} />
-      <rect x="85" y="151" width="4" height="10" fill={STEEL_DARK} />
-      <circle cx="87" cy="149" r="4" className="launch-beacon" />
-      <g className="launch-arm">
-        <path d="M102 300 L134 274" stroke={STEEL} strokeWidth="2.5" strokeLinecap="round" />
-        <rect x="100" y="270" width="70" height="5" rx="1.5" fill={STEEL_DARK} />
-      </g>
+        {/* Gantry, with the platform that swings away at lift-off */}
+        <rect x="72" y="168" width="5" height="216" rx="1.5" fill={STEEL} />
+        <rect x="97" y="168" width="5" height="216" rx="1.5" fill={STEEL} />
+        <path d={braces} fill="none" stroke={STEEL_LIGHT} strokeWidth="1.6" strokeLinejoin="round" />
+        <rect x="67" y="161" width="40" height="7" rx="2" fill={STEEL_DARK} />
+        <rect x="85" y="151" width="4" height="10" fill={STEEL_DARK} />
+        <circle cx="87" cy="149" r="4" className="launch-beacon" />
+        <g className="launch-arm">
+          <path d="M102 300 L134 274" stroke={STEEL} strokeWidth="2.5" strokeLinecap="round" />
+          <rect x="100" y="270" width="70" height="5" rx="1.5" fill={STEEL_DARK} />
+        </g>
 
-      {/* Launch pad */}
-      <rect x="146" y="362" width="108" height="7" rx="2" fill={STEEL} />
-      <rect x="128" y="369" width="144" height="14" rx="3" fill="#1f2638" />
-      <g clipPath={`url(#${uid}-stripes)`} fill={HAZARD}>
-        {Array.from({ length: 11 }, (_, i) => (
-          <path key={i} d={`M${124 + i * 14} 379 l7 -7 h6 l-7 7 Z`} />
+        {/* Launch pad */}
+        <rect x="146" y="362" width="108" height="7" rx="2" fill={STEEL} />
+        <rect x="128" y="369" width="144" height="14" rx="3" fill="#1f2638" />
+        <g clipPath={`url(#${uid}-stripes)`} fill={HAZARD}>
+          {Array.from({ length: 11 }, (_, i) => (
+            <path key={i} d={`M${124 + i * 14} 379 l7 -7 h6 l-7 7 Z`} />
+          ))}
+        </g>
+        <rect x="138" y="383" width="10" height="4" fill={STEEL_DARK} />
+        <rect x="252" y="383" width="10" height="4" fill={STEEL_DARK} />
+
+        {/* Fuel: the hose comes off at lift-off */}
+        <g className="launch-hose">
+          <path d={hose} fill="none" stroke={STEEL_DARK} strokeWidth="4" strokeLinecap="round" />
+          <path d={hose} fill="none" stroke={EYE} strokeWidth="1.5" strokeDasharray="3 6" strokeLinecap="round" className="launch-fuel launch-w" />
+        </g>
+        <rect x="300" y="314" width="42" height="70" rx="13" fill={HAZARD} stroke={HAZARD_DARK} strokeWidth="1.5" />
+        <rect x="300.75" y="334" width="40.5" height="9" fill="#ffffff" opacity="0.55" />
+        <circle cx="321" cy="362" r="7" fill="#ffffff" stroke={STEEL_DARK} strokeWidth="1.6" />
+        <path d="M321 362 L325 357" stroke="#ff6b6b" strokeWidth="1.6" strokeLinecap="round" className="launch-needle launch-w" />
+        <g transform="translate(344 347)">
+          <g className="launch-valve launch-w" fill="none" stroke="#ff6b6b">
+            <circle r="5.5" strokeWidth="2" />
+            <path d="M-5.5 0 H5.5 M0 -5.5 V5.5" strokeWidth="1.5" />
+          </g>
+        </g>
+
+        {/* A puff of exhaust on every try */}
+        {[
+          [-22, 180, 364, 7],
+          [22, 220, 364, 7],
+          [0, 200, 368, 8],
+        ].map(([dx, cx, cy, r]) => (
+          <circle key={dx} cx={cx} cy={cy} r={r} className="launch-puff-try" style={{ "--dx": `${dx}px` } as CSSProperties} />
         ))}
       </g>
-      <rect x="138" y="383" width="10" height="4" fill={STEEL_DARK} />
-      <rect x="252" y="383" width="10" height="4" fill={STEEL_DARK} />
+    </svg>
+  );
+}
 
-      {/* Fuel: the hose comes off at lift-off */}
-      <g className="launch-hose">
-        <path d={hose} fill="none" stroke={STEEL_DARK} strokeWidth="4" strokeLinecap="round" />
-        <path d={hose} fill="none" stroke={EYE} strokeWidth="1.5" strokeDasharray="3 6" strokeLinecap="round" className="launch-fuel launch-w" />
+/** The progress ring around the window, filling clockwise from the top, with a light at its tip. Its --ring (0 to 1) is set by LoadingScreen. */
+function Ring({ uid, svgRef }: { uid: string; svgRef: RefObject<SVGSVGElement | null> }) {
+  return (
+    <svg ref={svgRef} viewBox={VIEWBOX} className="launch-layer launch-ring" focusable="false">
+      <defs>
+        <linearGradient id={`${uid}-ring`} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="var(--azure, #7cc3ff)" />
+          <stop offset="50%" stopColor="var(--lilac, #b9a3ff)" />
+          <stop offset="100%" stopColor="var(--blush, #ff8fb8)" />
+        </linearGradient>
+      </defs>
+      <circle cx={CX} cy={CY} r={RING_R} className="launch-ring-track" />
+      <circle
+        cx={CX}
+        cy={CY}
+        r={RING_R}
+        pathLength={100}
+        transform={`rotate(-90 ${CX} ${CY})`}
+        stroke={`url(#${uid}-ring)`}
+        className="launch-ring-fill"
+      />
+      <g className="launch-ring-tip">
+        <circle cx={CX} cy={CY - RING_R} r="8" className="launch-ring-glow" />
+        <circle cx={CX} cy={CY - RING_R} r="3.4" fill="#ffffff" />
       </g>
-      <rect x="300" y="314" width="42" height="70" rx="13" fill={HAZARD} stroke={HAZARD_DARK} strokeWidth="1.5" />
-      <rect x="300.75" y="334" width="40.5" height="9" fill="#ffffff" opacity="0.55" />
-      <circle cx="321" cy="362" r="7" fill="#ffffff" stroke={STEEL_DARK} strokeWidth="1.6" />
-      <path d="M321 362 L325 357" stroke="#ff6b6b" strokeWidth="1.6" strokeLinecap="round" className="launch-needle launch-w" />
-      <g transform="translate(344 347)">
-        <g className="launch-valve launch-w" fill="none" stroke="#ff6b6b">
-          <circle r="5.5" strokeWidth="2" />
-          <path d="M-5.5 0 H5.5 M0 -5.5 V5.5" strokeWidth="1.5" />
-        </g>
-      </g>
-
-      {/* A puff of exhaust on every try */}
-      {[
-        [-22, 180, 364, 7],
-        [22, 220, 364, 7],
-        [0, 200, 368, 8],
-      ].map(([dx, cx, cy, r]) => (
-        <circle key={dx} cx={cx} cy={cy} r={r} className="launch-puff-try" style={{ "--dx": `${dx}px` } as CSSProperties} />
-      ))}
     </svg>
   );
 }
@@ -407,7 +409,7 @@ function Crew({ paint }: { paint: Paint }) {
   return (
     <svg viewBox={VIEWBOX} className="launch-layer" focusable="false">
       {/* Checks the list */}
-      <Helper paint={paint} x={22} y={338} s={0.8} arm={35} look={[2, -1.6]} flee={[-210, -10, 0.2]} bob={-0.3} tool={<g transform="rotate(-35)"><Clipboard /></g>} />
+      <Helper paint={paint} x={34} y={338} s={0.8} arm={35} look={[2, -1.6]} flee={[-210, -10, 0.2]} bob={-0.3} tool={<g transform="rotate(-35)"><Clipboard /></g>} />
       {/* Tightens the bolts from the gantry */}
       <Helper paint={paint} x={126} y={236} s={0.75} arm={-90} swing="launch-ratchet" look={[2, 0]} flee={[-230, -90, 0.05]} bob={-0.9} tool={<Wrench />}>
         <Spark className="launch-clank launch-w" x={58} y={27} fill="#ffc53d" />
@@ -440,7 +442,7 @@ function Crew({ paint }: { paint: Paint }) {
         </g>
       </g>
       {/* Opens the fuel valve */}
-      <Helper paint={paint} x={346} y={326} s={0.7} flip arm={-90} swing="launch-crank" look={[2, 0.5]} flee={[230, 20, 0.15]} bob={-1.1} />
+      <Helper paint={paint} x={342} y={326} s={0.7} flip arm={-90} swing="launch-crank" look={[2, 0.5]} flee={[230, 20, 0.15]} bob={-1.1} />
     </svg>
   );
 }

@@ -1,8 +1,9 @@
-/* The home page's launch intro (LaunchIntro.tsx). Shown while <html data-launch="run"> (see flag.ts), and
-   for its own way out after that. .launch[data-phase] drives it: "work" (Aura tries to take off while the
-   crew works on her ship), "lift" (lift-off; the smoke fills the screen), "clear" (the smoke clears) or
-   "skip". Lift-off rules use :not([data-phase="work"]) so that they carry on into "clear". Elements with
-   transform attributes are never animated themselves; a child group is, with its own transform-origin. */
+/* The home page's loading screen (LoadingScreen.tsx). Shown while <html data-launch="run"> (see flag.ts),
+   and for its own way out after that. .launch[data-phase] drives it: "work" (the site's files are cached
+   while Aura tries to take off and the crew works on her ship), "lift" (lift-off; the smoke fills the
+   screen) and "clear" (the smoke clears). Lift-off rules use :not([data-phase="work"]) so that they carry
+   on into "clear". Elements with transform attributes are never animated themselves; a child group is,
+   with its own transform-origin. */
 
 .launch {
   --smoke-hi: #ffffff;
@@ -25,9 +26,9 @@
   --puff: #56627f;
 }
 html[data-launch="run"] .launch,
-.launch:is([data-phase="clear"], [data-phase="skip"]) { display: block; }
+.launch[data-phase="clear"] { display: block; }
 
-/* Hold the page still behind the intro. If it never gets going (its script failed), it lets go by itself. */
+/* Hold the page still behind the screen. If it never gets going (its script failed), it lets go by itself. */
 html[data-launch="run"]:has(.launch) { overflow: hidden; scrollbar-gutter: stable; animation: launch-unlock 0s 16s forwards; }
 html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; }
 @keyframes launch-unlock { to { overflow: visible; } }
@@ -46,7 +47,7 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(42% 36% at 50% 72%, rgb(255 186 90 / 0.5), transparent 70%);
+  background: radial-gradient(42% 36% at 50% 60%, rgb(255 186 90 / 0.5), transparent 70%);
   opacity: 0;
 }
 
@@ -60,43 +61,39 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
   gap: clamp(0.5rem, 2.5dvh, 1.75rem);
   padding: 1rem 1rem 4rem;
 }
-/* The drawing has room at its sides, so on phones it may run a little past the screen's edges. */
 .launch-scene {
   position: relative;
-  width: min(104vw, 38rem, 58dvh * 400 / 296);
-  aspect-ratio: 400 / 296;
+  width: min(92vw, 34rem, 62dvh);
+  aspect-ratio: 1;
 }
 .launch-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .launch-billows { position: absolute; inset: 0; pointer-events: none; }
 
 .launch-status { width: min(88vw, 24rem); text-align: center; }
-.launch-line { position: relative; height: 2.25rem; margin-top: 0.4rem; }
+.launch-line { position: relative; height: 1.5rem; margin-top: 0.25rem; }
 .launch-line > span { position: absolute; inset: 0; white-space: nowrap; animation: launch-say 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
-.launch-dots i { font-style: normal; animation: launch-dot 1.2s infinite both; }
-.launch-dots i:nth-child(2) { animation-delay: 0.2s; }
-.launch-dots i:nth-child(3) { animation-delay: 0.4s; }
-.launch-bar {
-  height: 6px;
-  margin: 0.75rem auto 0;
-  width: min(100%, 16rem);
-  border-radius: 99px;
-  overflow: hidden;
-  background: color-mix(in oklab, var(--fg) 10%, transparent);
+
+/* The round window onto the launch pad, and the progress ring around it, filled from the top to --ring
+   (0 to 1, eased by LoadingScreen.tsx). */
+.launch-window { fill: color-mix(in oklab, var(--surface) 70%, color-mix(in oklab, var(--azure) 14%, transparent)); }
+.launch-earth { fill: color-mix(in oklab, var(--fg) 7%, var(--surface)); }
+.launch-ring-track { fill: none; stroke: color-mix(in oklab, var(--fg) 10%, transparent); stroke-width: 7; }
+.launch-ring { --ring: 0; }
+.launch-ring-fill {
+  fill: none;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: calc(100 - var(--ring) * 100);
+  opacity: min(1, calc(var(--ring) * 200));
 }
-.launch-bar > span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--azure), var(--lilac), var(--blush));
-  transform-origin: left;
-  animation: launch-progress 3s cubic-bezier(0.3, 0.6, 0.4, 1) both;
-}
-.launch .launch-skip { position: absolute; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); }
+.launch-ring-tip { transform-box: view-box; transform-origin: 200px 280px; transform: rotate(calc(var(--ring) * 360deg)); opacity: min(1, calc(var(--ring) * 200)); }
+.launch-ring-glow { fill: color-mix(in oklab, var(--lilac) 55%, transparent); transform-box: fill-box; transform-origin: center; animation: launch-tip 1.2s ease-in-out infinite; }
 
 .launch-fog { position: absolute; inset: 0; background: var(--fog); opacity: 0; pointer-events: none; }
 
 /* Each puff is a cluster of soft bumps, lit from above. */
-.launch-puff { position: absolute; left: 50%; top: 86%; width: 30vmax; aspect-ratio: 1; margin: -15vmax 0 0 -15vmax; }
+.launch-puff { position: absolute; left: 50%; top: 72%; width: 30vmax; aspect-ratio: 1; margin: -15vmax 0 0 -15vmax; }
 .launch-puff > span {
   position: absolute;
   inset: 0;
@@ -116,7 +113,6 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
 /* ------------------------------------------------- The scene at work -- */
 
 .launch-star { fill: color-mix(in oklab, var(--fg) 30%, transparent); animation: launch-twinkle 2.6s ease-in-out infinite; }
-.launch-floor { fill: color-mix(in oklab, var(--fg) 7%, transparent); }
 .launch-beacon { fill: #ff6b6b; animation: launch-beacon 1.4s linear infinite; }
 .launch-arm { transform-box: view-box; transform-origin: 102px 272px; transition: transform 0.7s cubic-bezier(0.5, 0, 0.3, 1); }
 .launch-hose { transition: opacity 0.25s; }
@@ -125,7 +121,7 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
 .launch-valve { transform-box: view-box; transform-origin: 0 0; animation: launch-valve 0.7s ease-in-out infinite alternate; }
 .launch-puff-try { fill: var(--puff); transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-try 2.2s ease-out infinite; }
 
-/* Aura's ship: a try every 2.2s (ATTEMPT in LaunchIntro.tsx). It shudders, hops, and drops back onto the pad. */
+/* Aura's ship: a try every 2.2s (ATTEMPT in LoadingScreen.tsx). It shudders, hops, and drops back onto the pad. */
 .launch-ship { transform-box: view-box; transform-origin: 200px 361px; animation: launch-attempt 2.2s ease-in-out infinite; }
 .launch-flame { transform-box: view-box; transform-origin: 0 0; animation: launch-sputter 2.2s linear infinite; }
 .launch-core { transform-box: fill-box; transform-origin: 50% 0; animation: launch-flicker 0.11s ease-in-out infinite alternate; }
@@ -160,7 +156,7 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
 .launch:not([data-phase="work"]) .launch-arm { transform: rotate(-80deg); }
 .launch:not([data-phase="work"]) .launch-hose { opacity: 0; }
 .launch:not([data-phase="work"]) .launch-beacon { animation-duration: 0.3s; }
-.launch:not([data-phase="work"]) .launch-bar > span { animation: none; }
+.launch:not([data-phase="work"]) .launch-ring-fill { animation: launch-ring-full 0.9s ease-out; }
 
 /* Ignition: the ground shakes, then the ship climbs out of sight on a long flame. */
 .launch[data-phase="lift"] .launch-scene { animation: launch-quake 0.7s linear 0.05s; }
@@ -178,12 +174,11 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
 .launch[data-phase="clear"] .launch-fog { animation: launch-fog-out 0.7s ease-out both; }
 .launch[data-phase="clear"] .launch-puff { animation: launch-drift 1.5s cubic-bezier(0.3, 0.5, 0.4, 1) var(--d2) both; }
 
-.launch[data-phase="skip"] { pointer-events: none; animation: launch-out 0.45s ease both; }
 
-/* The hero's Aura waits behind the intro, then flies down into place from where the ship went up. */
+/* The hero's Aura waits behind the screen, then flies down into place from where the ship went up. */
 @media (prefers-reduced-motion: no-preference) {
-  html[data-launch] [data-launch-land] > .aura-wrap[data-fly="load"] { --fly-x: 0px; --fly-y: -75vh; --fly-dir: 0; --fly-delay: 0.15s; }
-  html[data-launch] [data-launch-land] > .aura-wrap[data-fly="load"]::before { animation-name: launch-trail-down; }
+  html:is([data-launch="run"], [data-launch="lifted"]) [data-launch-land] > .aura-wrap[data-fly="load"] { --fly-x: 0px; --fly-y: -75vh; --fly-dir: 0; --fly-delay: 0.15s; }
+  html:is([data-launch="run"], [data-launch="lifted"]) [data-launch-land] > .aura-wrap[data-fly="load"]::before { animation-name: launch-trail-down; }
   html[data-launch="run"] [data-launch-land] > .aura-wrap[data-fly="load"],
   html[data-launch="run"] [data-launch-land] > .aura-wrap[data-fly="load"]::before,
   html[data-launch="run"] [data-launch-land] > .aura-wrap[data-fly="load"]::after { animation-play-state: paused; }
@@ -196,8 +191,8 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
 /* ----------------------------------------------------------- Keyframes -- */
 
 @keyframes launch-say { from { opacity: 0; transform: translateY(0.5rem); } to { opacity: 1; transform: none; } }
-@keyframes launch-dot { 0%, 20% { opacity: 0; } 45%, 100% { opacity: 1; } }
-@keyframes launch-progress { from { transform: scaleX(0.04); } to { transform: scaleX(0.92); } }
+@keyframes launch-tip { 0%, 100% { transform: scale(0.8); opacity: 0.6; } 50% { transform: scale(1.25); opacity: 1; } }
+@keyframes launch-ring-full { 0% { stroke-width: 7; } 35% { stroke-width: 13; } 100% { stroke-width: 7; } }
 @keyframes launch-twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
 @keyframes launch-beacon { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0.25; } }
 @keyframes launch-flow { to { stroke-dashoffset: -9; } }

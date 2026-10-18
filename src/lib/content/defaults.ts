@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   hackathonUrl: "",
   hackathonPlatform: "",
 
-  showIntro: true,
+  showLoader: true,
   highlights: [
     { label: "Speakers", value: "TBA", icon: "mic" },
     { label: "Tutorials", value: "TBA", icon: "graduation" },

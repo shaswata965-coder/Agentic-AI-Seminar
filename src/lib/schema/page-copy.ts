@@ -103,14 +103,11 @@ export const PAGE_COPY = {
   siteBanner: { tone: tone("lilac") },
 
   /* ------------------------------------------------------------ Home -- */
-  homeIntro: {
-    kicker: label("Label above the checklist", "Pre-flight checks"),
-    step1: short("Checklist line 1", "Tightening the bolts"),
-    step2: short("Checklist line 2", "Fuelling the boosters"),
-    step3: short("Checklist line 3", "Polishing Aura's visor"),
-    step4: short("Checklist line 4", "Running the agent loop"),
-    liftoff: label("Line at lift-off", "Lift-off!"),
-    skip: label("Skip button", "Skip intro"),
+  homeLoader: {
+    page: short("Status: loading the page", "Loading the page"),
+    pages: short("Status: caching pages", "Caching pages ({done} of {total})", "{done} and {total} count the pages as they are fetched."),
+    files: short("Status: caching files", "Caching files ({done} of {total})", "{done} and {total} count the scripts, styles and images."),
+    ready: label("Status: all loaded", "Lift-off!"),
     status: note("Status for screen readers", "Loading the {event} website"),
   },
   homeHero: {

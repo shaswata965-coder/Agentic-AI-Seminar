@@ -4,6 +4,7 @@ import { PreviewBridge } from "@/components/layout/PreviewBridge";
 import { SiteBanner } from "@/components/layout/SiteBanner";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { ServiceWorker } from "@/components/loading/ServiceWorker";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getSettings } from "@/lib/content/queries";
 import { buildAssistantIndex } from "@/lib/content/search";
@@ -42,6 +43,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       ) : null}
       <BackToTop />
       <PreviewBridge />
+      <ServiceWorker />
     </ToastProvider>
   );
 }
