@@ -11,8 +11,10 @@ import { formatDateRange } from "@/lib/format";
 import { BASE_PATH, SITE_ORIGIN, withBase } from "@/lib/paths";
 
 // Self-hosted variable fonts (latin), so builds don't depend on Google Fonts. See app/fonts/LICENSE.md.
-const inter = localFont({ src: "./fonts/inter-latin-var.woff2", weight: "100 900", variable: "--font-inter", display: "swap" });
-const outfit = localFont({ src: "./fonts/outfit-latin-var.woff2", weight: "100 900", variable: "--font-outfit", display: "swap" });
+// Not preloaded: Chrome holds the first paint until preloaded fonts arrive, which kept the home page's
+// loading screen from showing at once. Text shows in the fallback font for a moment instead (display: swap).
+const inter = localFont({ src: "./fonts/inter-latin-var.woff2", weight: "100 900", variable: "--font-inter", display: "swap", preload: false });
+const outfit = localFont({ src: "./fonts/outfit-latin-var.woff2", weight: "100 900", variable: "--font-outfit", display: "swap", preload: false });
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();

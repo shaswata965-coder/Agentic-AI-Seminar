@@ -105,8 +105,8 @@ export const PAGE_COPY = {
   /* ------------------------------------------------------------ Home -- */
   homeLoader: {
     page: short("Status: loading the page", "Loading the page"),
-    pages: short("Status: caching pages", "Caching pages ({done} of {total})", "{done} and {total} count the pages as they are fetched."),
-    files: short("Status: caching files", "Caching files ({done} of {total})", "{done} and {total} count the scripts, styles and images."),
+    pages: short("Status: loading pages", "Loading pages ({done} of {total})", "{done} and {total} count the pages as they arrive."),
+    files: short("Status: caching files", "Caching files ({done} of {total})", "{done} and {total} count the images and scripts."),
     ready: label("Status: all loaded", "Lift-off!"),
     status: note("Status for screen readers", "Loading the {event} website"),
   },

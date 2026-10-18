@@ -37,6 +37,11 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
+  experimental: {
+    // CSS goes into the page itself instead of separate files: the browser can draw as soon as the HTML
+    // arrives, with no stylesheet requests to wait for (the home page's loading screen shows at once).
+    inlineCss: true,
+  },
   partialPrefetching: true,
   basePath,
   poweredByHeader: false,

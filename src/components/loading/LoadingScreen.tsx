@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { memo, useEffect, useId, useRef, useState, useSyncExternalStore, type CSSProperties, type ReactNode, type RefObject } from "react";
 import type { PageCopy } from "@/lib/schema/page-copy";
 import { ASSETS_KEY } from "./flag";
-import { warmAssets, warmup } from "./warm";
+import { showProgress, warmAssets, warmup } from "./warm";
 
 /*
  * The home page's loading screen. While the site's files are fetched and cached (warm.ts), Aura's
@@ -25,8 +25,7 @@ type Phase = "work" | "lift" | "clear" | "gone";
 
 /* Timings in ms; loading.css is written to match. */
 const MAX_WAIT = 10000; // lift off by now (from when the page started loading), even if caching goes on behind
-const RING = 500; // the ring's last stretch
-const ATTEMPT = 3200; // one take-off attempt (lx-attempt)
+const RING = 450; // the ring's last stretch (its transition in loading.css)
 const LIFT = 2600; // lift-off, until the smoke covers the screen
 const CLEAR = 1600; // the smoke clearing
 
@@ -56,86 +55,64 @@ function subscribe(onChange: () => void) {
 }
 const readFlag = () => document.documentElement.dataset.launch ?? "";
 
-/** How long until the ship is back on the pad between two attempts, so that lift-off starts from rest. */
-function untilRest(ship: Element | null) {
-  const attempt = ship?.getAnimations?.().find((a) => a instanceof CSSAnimation && a.animationName === "lx-attempt");
-  const at = (Number(attempt?.currentTime ?? 0) % ATTEMPT) / ATTEMPT;
-  return at < 0.28 || at > 0.9 ? 0 : (1 - at) * ATTEMPT;
-}
-
-/** Run each task when the browser is idle, one at a time. */
-function whenIdle(tasks: (() => void)[]) {
-  const idle = (fn: () => void) => (typeof window.requestIdleCallback === "function" ? window.requestIdleCallback(fn, { timeout: 2000 }) : window.setTimeout(fn, 200));
-  const next = () => {
-    const task = tasks.shift();
-    if (!task) return;
-    task();
-    idle(next);
-  };
-  idle(next);
+/** Lift-off starts from wherever the ship is in its try: it crouches from there (on the compositor), then climbs. */
+function crouch(ship: HTMLElement | null) {
+  if (!ship?.animate) return;
+  const from = getComputedStyle(ship).transform;
+  ship.animate([{ transform: from === "none" ? "none" : from }, { transform: "scale(1.05, 0.93)", offset: 0.6 }, { transform: "scale(0.97, 1.04)" }], {
+    duration: 450,
+    easing: "cubic-bezier(0.3, 0, 0.3, 1)",
+    fill: "forwards",
+  });
 }
 
 const count = (text: string, done: number, total: number) => text.replace(/\{done\}/g, String(done)).replace(/\{total\}/g, String(total));
 
-export function LoadingScreen({ eventName, routes, text }: { eventName: string; routes: string[]; text: PageCopy["homeLoader"] }) {
+export function LoadingScreen({ eventName, routes, files, text }: { eventName: string; routes: string[]; files: string[]; text: PageCopy["homeLoader"] }) {
   const flag = useSyncExternalStore(subscribe, readFlag, () => "run");
   const progress = useSyncExternalStore(warmup.subscribe, warmup.get, warmup.initial);
   const [phase, setPhase] = useState<Phase>("work");
   const ship = useRef<HTMLDivElement>(null);
-  const percent = useRef<HTMLParagraphElement>(null);
-  const shownPercent = useRef(0);
   const router = useRouter();
   const uid = `lx${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
-  // Cache the site's files, behind the screen or quietly; then prefetch the main pages, a little at a
-  // time. Once all is cached, this browser skips the screen until the site is updated.
+  // Load the main pages and cache the site's files, behind the screen or quietly. Once all is in, this
+  // browser skips the screen until the site is updated.
   useEffect(() => {
     const html = document.documentElement;
     const mode = html.dataset.launch;
     if (mode !== "run" && mode !== "quiet") return;
     const version = html.dataset.assets ?? "";
-    warmAssets(routes).then(() => {
+    warmAssets(routes, files, (route) => router.prefetch(route)).then(() => {
       try {
         localStorage.setItem(ASSETS_KEY, version);
       } catch {}
       if (html.dataset.launch === "quiet") html.dataset.launch = "done";
-      whenIdle(routes.map((route) => () => router.prefetch(route)));
     });
-  }, [router, routes]);
+  }, [router, routes, files]);
 
-  // Lift off once everything is cached (or at MAX_WAIT, while caching carries on), from rest between two tries.
+  // Lift off as soon as everything is in (or at MAX_WAIT, while caching carries on).
   const cached = progress.stage === "done";
   useEffect(() => {
     if (flag !== "run" || phase !== "work") return;
-    const timers: number[] = [];
-    const wait = cached ? RING : Math.max(0, MAX_WAIT - performance.now());
-    timers.push(window.setTimeout(() => timers.push(window.setTimeout(() => setPhase("lift"), untilRest(ship.current))), wait));
-    return () => timers.forEach(clearTimeout);
+    const t = window.setTimeout(
+      () => {
+        crouch(ship.current);
+        setPhase("lift");
+      },
+      cached ? RING : Math.max(0, MAX_WAIT - performance.now()),
+    );
+    return () => window.clearTimeout(t);
   }, [flag, phase, cached]);
 
   // Lift-off, then the smoke clears; the page behind is let go (shown, scrolling, the hero Aura's fly-in) as it does.
   useEffect(() => {
     if (phase !== "lift" && phase !== "clear") return;
+    showProgress(1);
     if (phase === "clear") document.documentElement.dataset.launch = "lifted";
     const t = window.setTimeout(() => setPhase(phase === "lift" ? "clear" : "gone"), phase === "lift" ? LIFT : CLEAR);
     return () => window.clearTimeout(t);
   }, [phase]);
-
-  // The percentage counts up smoothly to the progress.
-  const ratio = phase === "work" ? progress.ratio : 1;
-  useEffect(() => {
-    let frame = 0;
-    const tick = () => {
-      const to = Math.round(ratio * 100);
-      const now = shownPercent.current;
-      const next = now < to ? Math.min(to, now + Math.max(1, Math.round((to - now) / 6))) : to;
-      shownPercent.current = next;
-      if (percent.current) percent.current.textContent = `${next}%`;
-      if (next !== to) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [ratio]);
 
   const shown = phase !== "gone" && (flag === "run" || (flag === "lifted" && phase === "clear"));
   if (!shown) return null;
@@ -150,7 +127,7 @@ export function LoadingScreen({ eventName, routes, text }: { eventName: string; 
       <div className="launch-stage">
         <div className="launch-scene" aria-hidden>
           <Scene uid={uid} shipRef={ship} />
-          <Ring ratio={ratio} />
+          <Ring />
           <div className="launch-billows">
             {BILLOWS.map(([x, y, s, d], i) => (
               <span key={i} className="launch-puff" style={{ "--x": x, "--y": y, "--s": s, "--d": `${d}ms`, "--d2": `${(i % 4) * 70}ms` } as CSSProperties}>
@@ -160,11 +137,9 @@ export function LoadingScreen({ eventName, routes, text }: { eventName: string; 
           </div>
         </div>
         <div className="launch-status" aria-hidden>
-          <p className="text-[11px] font-bold tracking-[0.2em] text-subtle uppercase">{eventName}</p>
-          <p ref={percent} className="mt-1 font-display text-3xl font-bold text-fg tabular-nums">
-            0%
-          </p>
-          <p className="launch-line text-sm font-medium text-muted">
+          <p className="launch-kicker">{eventName}</p>
+          <p className="launch-percent" />
+          <p className="launch-line">
             <span key={stage}>{line}</span>
           </p>
         </div>
@@ -181,34 +156,21 @@ export function LoadingScreen({ eventName, routes, text }: { eventName: string; 
 
 /**
  * The progress ring: two half-rings turned into view (the classic two-halves technique), so it moves by
- * rotation alone. Every part turns at the same steady speed; when a step crosses the half-way mark,
- * the second half waits for the first.
+ * rotation alone. loading.css turns them from its --lx-p (0 to 1), which the head script (flag.ts) sets
+ * while the page loads and warm.ts after that, so it moves from the first paint.
  */
-function Ring({ ratio }: { ratio: number }) {
-  const [run, setRun] = useState({ from: 0, to: 0 });
-  if (run.to !== ratio) setRun({ from: run.to, to: ratio });
-  const { from, to } = run;
-  const D = 450;
-  let first = D;
-  let wait = 0;
-  let second = D;
-  if (from < 0.5 && to > 0.5) {
-    first = (D * (0.5 - from)) / (to - from);
-    wait = first;
-    second = D - first;
-  }
-  const turn = (deg: number, ms: number, delay = 0) => ({ transform: `rotate(${deg}deg)`, transitionDuration: `${ms}ms`, transitionDelay: `${delay}ms` }) as CSSProperties;
+function Ring() {
   return (
-    <div className="lx-ring" data-started={to > 0 ? "" : undefined}>
+    <div className="lx-ring">
       <span className="lx-ring-track" />
       <span className="lx-ring-half lx-ring-right">
-        <span className="lx-ring-arc" style={turn(Math.min(to, 0.5) * 360, first)} />
+        <span className="lx-ring-arc" />
       </span>
       <span className="lx-ring-half lx-ring-left">
-        <span className="lx-ring-arc" style={turn(Math.max(0, to - 0.5) * 360, second, wait)} />
+        <span className="lx-ring-arc" />
       </span>
       <span className="lx-ring-cap" />
-      <span className="lx-ring-tip" style={turn(to * 360, D)}>
+      <span className="lx-ring-tip">
         <i />
       </span>
     </div>
