@@ -116,7 +116,8 @@ export function Hero({ s }: { s: SiteSettings }) {
           </dl>
         </div>
 
-        <div className="relative mx-auto flex w-full max-w-[460px] justify-center pt-6 lg:pt-0">
+        {/* data-launch-land: after the launch intro, Aura flies down into place from where her ship went up (launch.css). */}
+        <div data-launch-land="" className="relative mx-auto flex w-full max-w-[460px] justify-center pt-6 lg:pt-0">
           <div aria-hidden className="absolute inset-[8%] -z-10 rounded-full bg-[conic-gradient(from_200deg,var(--azure-soft),var(--lilac-soft),var(--blush-soft),var(--mint-soft),var(--azure-soft))] blur-2xl" />
           <div aria-hidden className="absolute inset-[16%] -z-10 rounded-full border border-dashed border-border-strong opacity-60 animate-spin-slow" />
           <Aura variant="hero" size={340} interactive entrance="load" className="max-w-[78vw]" />

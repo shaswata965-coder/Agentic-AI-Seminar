@@ -38,6 +38,8 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register and the Programme are in the navigation bar, and the hackathon is under *Explore*. Add to calendar and share are in About and the footer |
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
+| | Hackathon announcement on home | ✅ Title, tagline, tracks, team size, mode and prize pool, with *Register your team* and *Hackathon details* (`/hackathon`) buttons |
+| | Loading screen (added on request) | ✅ Launch intro: Aura tries to take off while small Auras work on her ship, lifts off once the page has loaded, and the smoke clears to the page. Once per visit, skippable, off with reduced motion, switchable in Site settings → Home |
 | Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the matching hackathon track |
 | Programme | Tabs by day; each session shows time, title, type tag (Keynote / Talk / Panel / Tutorial / Demo / Hackathon / Break), theme tag, speaker(s), room | ✅ Plus "Other" type, search, *My agenda* (starred sessions), "now / up next" during the event |
 | | Filter by theme / type | ✅ Filters are kept in the URL, so filtered views can be shared |

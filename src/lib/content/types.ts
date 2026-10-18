@@ -43,6 +43,8 @@ export interface SiteSettings extends PageCopy {
   hackathonUrl: string;
   hackathonPlatform: string;
 
+  /** Play the launch intro (components/launch) on the first home page visit of a session. */
+  showIntro: boolean;
   highlights: { label: string; value: string; icon: string }[];
   showCountdown: boolean;
   featuredSpeakers: number;

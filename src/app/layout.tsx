@@ -3,6 +3,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import "./globals.css";
 import { MicroInteractions } from "@/components/effects/MicroInteractions";
+import { launchFlagScript } from "@/components/launch/flag";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { getSettings } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
@@ -87,6 +88,8 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
       <head>
         {/* Lets CSS hide things that JS will animate in, so without JS nothing stays hidden. */}
         <Script id="js-flag" strategy="beforeInteractive">{`document.documentElement.classList.add("js")`}</Script>
+        {/* Decides before the first paint whether the home page's launch intro plays (components/launch/flag.ts). */}
+        {s.showIntro ? <script id="launch-flag" dangerouslySetInnerHTML={{ __html: launchFlagScript(BASE_PATH) }} /> : null}
         {brandCss ? <style id="brand-colour">{brandCss}</style> : null}
       </head>
       <body className="min-h-dvh antialiased">

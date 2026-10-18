@@ -103,6 +103,16 @@ export const PAGE_COPY = {
   siteBanner: { tone: tone("lilac") },
 
   /* ------------------------------------------------------------ Home -- */
+  homeIntro: {
+    kicker: label("Label above the checklist", "Pre-flight checks"),
+    step1: short("Checklist line 1", "Tightening the bolts"),
+    step2: short("Checklist line 2", "Fuelling the boosters"),
+    step3: short("Checklist line 3", "Polishing Aura's visor"),
+    step4: short("Checklist line 4", "Running the agent loop"),
+    liftoff: label("Line at lift-off", "Lift-off!"),
+    skip: label("Skip button", "Skip intro"),
+    status: note("Status for screen readers", "Loading the {event} website"),
+  },
   homeHero: {
     when: label("Fact: when", "When"),
     where: label("Fact: where", "Where"),
@@ -166,6 +176,15 @@ export const PAGE_COPY = {
     portalText: text("Link card: text", "Keynotes, invited talks and panelists, with their bios, talk titles and abstracts."),
     portalEmptyTitle: heading("Link card with no speakers: title", "Speaker profiles"),
     portalEmptyText: text("Link card with no speakers: text", "Profiles, talk titles and abstracts appear here as speakers confirm."),
+  },
+  homeHackathon: {
+    tone: tone("aqua"),
+    eyebrow: eyebrow("Hackathon"),
+    button: label("Button: register", "Register your team"),
+    details: label("Button: hackathon page", "Hackathon details"),
+    teamSize: label("Fact: team size", "Team size"),
+    mode: label("Fact: mode", "Mode"),
+    prizePool: label("Fact: prize pool", "Prize pool"),
   },
   homeVenue: {
     tone: tone("mint"),

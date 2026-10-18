@@ -1,0 +1,305 @@
+/* The home page's launch intro (LaunchIntro.tsx). Shown while <html data-launch="run"> (see flag.ts), and
+   for its own way out after that. .launch[data-phase] drives it: "work" (Aura tries to take off while the
+   crew works on her ship), "lift" (lift-off; the smoke fills the screen), "clear" (the smoke clears) or
+   "skip". Lift-off rules use :not([data-phase="work"]) so that they carry on into "clear". Elements with
+   transform attributes are never animated themselves; a child group is, with its own transform-origin. */
+
+.launch {
+  --smoke-hi: #ffffff;
+  --smoke: #e4e9f2;
+  --smoke-lo: #cfd7e5;
+  --fog: #e4e9f2;
+  --puff: #d3dbe8;
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  overflow: hidden;
+  color: var(--fg);
+}
+.dark .launch {
+  --smoke-hi: #66728f;
+  --smoke: #3d4864;
+  --smoke-lo: #2c3550;
+  --fog: #3d4864;
+  --puff: #56627f;
+}
+html[data-launch="run"] .launch,
+.launch:is([data-phase="clear"], [data-phase="skip"]) { display: block; }
+
+/* Hold the page still behind the intro. If it never gets going (its script failed), it lets go by itself. */
+html[data-launch="run"]:has(.launch) { overflow: hidden; scrollbar-gutter: stable; animation: launch-unlock 0s 16s forwards; }
+html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; }
+@keyframes launch-unlock { to { overflow: visible; } }
+@keyframes launch-out { to { opacity: 0; visibility: hidden; pointer-events: none; } }
+
+.launch-sky {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(55% 45% at 50% 62%, color-mix(in oklab, var(--lilac) 22%, transparent), transparent 70%),
+    radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--azure) 30%, transparent), transparent 75%),
+    var(--bg);
+}
+/* The glow of ignition */
+.launch-sky::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(42% 36% at 50% 72%, rgb(255 186 90 / 0.5), transparent 70%);
+  opacity: 0;
+}
+
+.launch-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.5rem, 2.5dvh, 1.75rem);
+  padding: 1rem 1rem 4rem;
+}
+/* The drawing has room at its sides, so on phones it may run a little past the screen's edges. */
+.launch-scene {
+  position: relative;
+  width: min(104vw, 38rem, 58dvh * 400 / 296);
+  aspect-ratio: 400 / 296;
+}
+.launch-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.launch-billows { position: absolute; inset: 0; pointer-events: none; }
+
+.launch-status { width: min(88vw, 24rem); text-align: center; }
+.launch-line { position: relative; height: 2.25rem; margin-top: 0.4rem; }
+.launch-line > span { position: absolute; inset: 0; white-space: nowrap; animation: launch-say 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
+.launch-dots i { font-style: normal; animation: launch-dot 1.2s infinite both; }
+.launch-dots i:nth-child(2) { animation-delay: 0.2s; }
+.launch-dots i:nth-child(3) { animation-delay: 0.4s; }
+.launch-bar {
+  height: 6px;
+  margin: 0.75rem auto 0;
+  width: min(100%, 16rem);
+  border-radius: 99px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--fg) 10%, transparent);
+}
+.launch-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--azure), var(--lilac), var(--blush));
+  transform-origin: left;
+  animation: launch-progress 3s cubic-bezier(0.3, 0.6, 0.4, 1) both;
+}
+.launch .launch-skip { position: absolute; right: max(1rem, env(safe-area-inset-right)); bottom: max(1rem, env(safe-area-inset-bottom)); }
+
+.launch-fog { position: absolute; inset: 0; background: var(--fog); opacity: 0; pointer-events: none; }
+
+/* Each puff is a cluster of soft bumps, lit from above. */
+.launch-puff { position: absolute; left: 50%; top: 86%; width: 30vmax; aspect-ratio: 1; margin: -15vmax 0 0 -15vmax; }
+.launch-puff > span {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 45% 31%, var(--smoke-hi) 0 9%, transparent 21%),
+    radial-gradient(circle at 26% 46%, var(--smoke-hi) 0 6%, transparent 17%),
+    radial-gradient(circle at 50% 36%, var(--smoke) 0 19%, transparent 26%),
+    radial-gradient(circle at 31% 52%, var(--smoke) 0 20%, transparent 27%),
+    radial-gradient(circle at 69% 50%, var(--smoke) 0 21%, transparent 28%),
+    radial-gradient(circle at 42% 66%, var(--smoke-lo) 0 21%, transparent 28%),
+    radial-gradient(circle at 62% 67%, var(--smoke-lo) 0 19%, transparent 26%),
+    radial-gradient(circle at 50% 52%, var(--smoke) 0 28%, transparent 35%);
+  opacity: 0;
+  transform: scale(0.06);
+}
+
+/* ------------------------------------------------- The scene at work -- */
+
+.launch-star { fill: color-mix(in oklab, var(--fg) 30%, transparent); animation: launch-twinkle 2.6s ease-in-out infinite; }
+.launch-floor { fill: color-mix(in oklab, var(--fg) 7%, transparent); }
+.launch-beacon { fill: #ff6b6b; animation: launch-beacon 1.4s linear infinite; }
+.launch-arm { transform-box: view-box; transform-origin: 102px 272px; transition: transform 0.7s cubic-bezier(0.5, 0, 0.3, 1); }
+.launch-hose { transition: opacity 0.25s; }
+.launch-fuel { animation: launch-flow 0.5s linear infinite; }
+.launch-needle { transform-box: view-box; transform-origin: 321px 362px; animation: launch-needle 1.6s ease-in-out infinite alternate; }
+.launch-valve { transform-box: view-box; transform-origin: 0 0; animation: launch-valve 0.7s ease-in-out infinite alternate; }
+.launch-puff-try { fill: var(--puff); transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-try 2.2s ease-out infinite; }
+
+/* Aura's ship: a try every 2.2s (ATTEMPT in LaunchIntro.tsx). It shudders, hops, and drops back onto the pad. */
+.launch-ship { transform-box: view-box; transform-origin: 200px 361px; animation: launch-attempt 2.2s ease-in-out infinite; }
+.launch-flame { transform-box: view-box; transform-origin: 0 0; animation: launch-sputter 2.2s linear infinite; }
+.launch-core { transform-box: fill-box; transform-origin: 50% 0; animation: launch-flicker 0.11s ease-in-out infinite alternate; }
+.launch-glow { transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-glow 2.2s linear infinite; }
+.launch-layer .aura-svg .aura-float { animation: none; }
+.launch-layer .aura-svg :is(.aura-shadow, .aura-thrust) { display: none; }
+
+/* The crew */
+.launch-bob { animation: launch-hover 1.6s ease-in-out var(--d, 0s) infinite alternate; }
+.launch-blink { transform-box: fill-box; transform-origin: center; animation: launch-blink 3.6s var(--d, 0s) infinite; }
+.launch-swing { transform-box: view-box; transform-origin: 0 0; }
+.launch-ratchet { animation: launch-ratchet 0.5s ease-in-out infinite alternate; }
+.launch-polish { animation: launch-polish 0.32s ease-in-out infinite alternate; }
+.launch-weld { animation: launch-weld 0.16s steps(2) infinite alternate; }
+.launch-crank { animation: launch-crank 0.7s ease-in-out infinite alternate; }
+.launch-twist { animation: launch-twist 4.8s ease-in-out infinite; }
+.launch-carry { animation: launch-carry 4.8s ease-in-out infinite; }
+.launch-cargo { animation: launch-cargo 4.8s step-end infinite; }
+.launch-gear { transform-box: view-box; transform-origin: 0 0; animation: launch-spin 2.4s linear infinite; }
+.launch-arc { transform-box: fill-box; transform-origin: center; animation: launch-arc 0.09s steps(2) infinite alternate; }
+.launch-spark { animation: launch-spark 0.55s ease-out infinite; }
+.launch-tick { opacity: 0; animation: launch-tick 2.8s infinite; }
+.launch-clank { transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-clank 1s ease-out infinite; }
+.launch-shine { transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-shine 1.8s ease-in-out infinite; }
+
+/* ------------------------------------------------------------ Lift-off -- */
+
+/* Work stops where it is; the crew clears the pad. */
+.launch:not([data-phase="work"]) .launch-w { animation-play-state: paused; }
+.launch:not([data-phase="work"]) :is(.launch-puff-try, .launch-shine) { visibility: hidden; }
+.launch:not([data-phase="work"]) [data-flee] { animation: launch-flee 0.9s cubic-bezier(0.5, 0, 0.8, 0.3) var(--fd, 0s) both; }
+.launch:not([data-phase="work"]) .launch-arm { transform: rotate(-80deg); }
+.launch:not([data-phase="work"]) .launch-hose { opacity: 0; }
+.launch:not([data-phase="work"]) .launch-beacon { animation-duration: 0.3s; }
+.launch:not([data-phase="work"]) .launch-bar > span { animation: none; }
+
+/* Ignition: the ground shakes, then the ship climbs out of sight on a long flame. */
+.launch[data-phase="lift"] .launch-scene { animation: launch-quake 0.7s linear 0.05s; }
+.launch:not([data-phase="work"]) .launch-sky::after { animation: launch-flare 2.4s ease-out both; }
+.launch:not([data-phase="work"]) .launch-ship { animation: launch-rise 2.2s linear both; }
+.launch:not([data-phase="work"]) .launch-flame { animation: launch-ignite 2.2s ease-out both; }
+.launch:not([data-phase="work"]) .launch-glow { animation: launch-glow-up 2.2s ease-out both; }
+
+/* Smoke billows out and up until it fills the screen; under it, the scene goes, so the page is there when it clears. */
+.launch:not([data-phase="work"]) .launch-puff > span { animation: launch-billow 1.3s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d) both; }
+.launch:not([data-phase="work"]) .launch-fog { animation: launch-fog-in 0.5s ease-in 1.85s both; }
+.launch:not([data-phase="work"]) :is(.launch-sky, .launch-layer, .launch-status) { animation: launch-hide 0.15s linear 2.42s both; }
+
+.launch[data-phase="clear"] { pointer-events: none; }
+.launch[data-phase="clear"] .launch-fog { animation: launch-fog-out 0.7s ease-out both; }
+.launch[data-phase="clear"] .launch-puff { animation: launch-drift 1.5s cubic-bezier(0.3, 0.5, 0.4, 1) var(--d2) both; }
+
+.launch[data-phase="skip"] { pointer-events: none; animation: launch-out 0.45s ease both; }
+
+/* The hero's Aura waits behind the intro, then flies down into place from where the ship went up. */
+@media (prefers-reduced-motion: no-preference) {
+  html[data-launch] [data-launch-land] > .aura-wrap[data-fly="load"] { --fly-x: 0px; --fly-y: -75vh; --fly-dir: 0; --fly-delay: 0.15s; }
+  html[data-launch] [data-launch-land] > .aura-wrap[data-fly="load"]::before { animation-name: launch-trail-down; }
+  html[data-launch="run"] [data-launch-land] > .aura-wrap[data-fly="load"],
+  html[data-launch="run"] [data-launch-land] > .aura-wrap[data-fly="load"]::before,
+  html[data-launch="run"] [data-launch-land] > .aura-wrap[data-fly="load"]::after { animation-play-state: paused; }
+}
+
+@media print {
+  .launch { display: none !important; }
+}
+
+/* ----------------------------------------------------------- Keyframes -- */
+
+@keyframes launch-say { from { opacity: 0; transform: translateY(0.5rem); } to { opacity: 1; transform: none; } }
+@keyframes launch-dot { 0%, 20% { opacity: 0; } 45%, 100% { opacity: 1; } }
+@keyframes launch-progress { from { transform: scaleX(0.04); } to { transform: scaleX(0.92); } }
+@keyframes launch-twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+@keyframes launch-beacon { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0.25; } }
+@keyframes launch-flow { to { stroke-dashoffset: -9; } }
+@keyframes launch-needle { from { transform: rotate(-30deg); } to { transform: rotate(70deg); } }
+@keyframes launch-valve { from { transform: rotate(-40deg); } to { transform: rotate(40deg); } }
+@keyframes launch-try {
+  0%, 44% { transform: translate(0, 0) scale(0.3); opacity: 0; }
+  50% { opacity: 0.95; }
+  82% { transform: translate(var(--dx), -8px) scale(1.7); opacity: 0.5; }
+  94%, 100% { transform: translate(calc(var(--dx) * 1.3), -14px) scale(2.1); opacity: 0; }
+}
+@keyframes launch-attempt {
+  0%, 36% { transform: none; }
+  40% { transform: translate(-1.4px, 0) rotate(-0.8deg); }
+  43% { transform: translate(1.4px, -1px) rotate(0.8deg); }
+  46% { transform: translate(-1.2px, -2px) rotate(-0.6deg); }
+  49% { transform: translate(1.2px, -3px) rotate(0.6deg); }
+  60% { transform: translate(0, -18px) rotate(-1.5deg); }
+  68% { transform: translate(0, -22px) rotate(1.8deg); }
+  77% { transform: translate(0, -2px) rotate(-0.4deg); }
+  81% { transform: scale(1.04, 0.95); }
+  87% { transform: scale(0.98, 1.02); }
+  92%, 100% { transform: none; }
+}
+@keyframes launch-sputter {
+  0%, 37% { transform: scale(0.3, 0); }
+  41% { transform: scale(0.6, 0.35); }
+  44% { transform: scale(0.35, 0.15); }
+  48% { transform: scale(0.75, 0.6); }
+  56%, 66% { transform: scale(0.85, 0.8); }
+  71% { transform: scale(0.5, 0.3); }
+  74% { transform: scale(0.7, 0.45); }
+  78%, 100% { transform: scale(0.3, 0); }
+}
+@keyframes launch-flicker { to { transform: scale(0.82, 0.88); opacity: 0.85; } }
+@keyframes launch-glow { 0%, 40%, 78%, 100% { opacity: 0; transform: scale(0.5); } 52%, 66% { opacity: 0.8; transform: scale(1); } }
+@keyframes launch-hover { to { transform: translateY(-2.6px); } }
+@keyframes launch-blink { 0%, 90%, 100% { transform: none; } 94% { transform: scaleY(0.1); } }
+@keyframes launch-ratchet { from { transform: rotate(-14deg); } to { transform: rotate(18deg); } }
+@keyframes launch-polish { from { transform: rotate(-16deg); } to { transform: rotate(14deg); } }
+@keyframes launch-weld { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
+@keyframes launch-crank { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
+@keyframes launch-twist {
+  0%, 31% { transform: none; }
+  35% { transform: rotate(-14deg); }
+  39% { transform: rotate(12deg); }
+  43% { transform: rotate(-14deg); }
+  47% { transform: rotate(12deg); }
+  51% { transform: rotate(-10deg); }
+  55%, 100% { transform: none; }
+}
+@keyframes launch-carry { 0%, 6% { transform: none; } 30%, 56% { transform: translate(-82px, 96px); } 84%, 100% { transform: none; } }
+@keyframes launch-cargo { 0% { opacity: 1; } 46% { opacity: 0; } 90% { opacity: 1; } }
+@keyframes launch-spin { to { transform: rotate(360deg); } }
+@keyframes launch-arc { from { transform: scale(0.7); opacity: 0.7; } to { transform: scale(1.15); opacity: 1; } }
+@keyframes launch-spark { from { transform: none; opacity: 1; } to { transform: translate(var(--sx), var(--sy)); opacity: 0; } }
+@keyframes launch-tick { 0%, 8% { opacity: 0; } 14%, 84% { opacity: 1; } 92%, 100% { opacity: 0; } }
+@keyframes launch-clank { 0%, 40% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 70%, 100% { transform: scale(0.4); opacity: 0; } }
+@keyframes launch-shine { 0%, 60%, 100% { transform: scale(0) rotate(0deg); opacity: 0; } 76% { transform: scale(1) rotate(45deg); opacity: 1; } }
+
+@keyframes launch-flee {
+  0% { transform: none; opacity: 1; }
+  25% { transform: translate(calc(var(--fx) * -0.04), 3px); opacity: 1; }
+  100% { transform: translate(var(--fx), var(--fy)); opacity: 0; }
+}
+@keyframes launch-quake {
+  0%, 100% { transform: none; }
+  20% { transform: translate(-3px, 1px); }
+  40% { transform: translate(3px, -1px); }
+  60% { transform: translate(-2px, 1px); }
+  80% { transform: translate(2px, 0); }
+}
+@keyframes launch-flare { 0% { opacity: 0; } 18% { opacity: 1; } 70% { opacity: 0.7; } 100% { opacity: 0.4; } }
+@keyframes launch-rise {
+  0% { transform: none; }
+  5% { transform: translate(-1.6px, 0); }
+  10% { transform: translate(1.6px, -1px); }
+  15% { transform: translate(-1.6px, -1px); }
+  20% { transform: translate(1.6px, -2px); }
+  25% { transform: translate(-1px, -4px); }
+  30% { transform: translate(0, -8px); animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.4); }
+  100% { transform: translate(0, -1100px); }
+}
+@keyframes launch-ignite {
+  0% { transform: scale(0.4, 0.2); }
+  8% { transform: scale(0.9, 0.9); }
+  30% { transform: scale(1.15, 1.5); }
+  100% { transform: scale(1.35, 3.2); }
+}
+@keyframes launch-glow-up { 0% { opacity: 0; transform: scale(0.6); } 15% { opacity: 1; } 100% { opacity: 1; transform: scale(2.4); } }
+@keyframes launch-billow {
+  0% { transform: translate(0, 0) scale(0.06); opacity: 0; }
+  14% { opacity: 1; }
+  100% { transform: translate(var(--x), var(--y)) scale(var(--s)); opacity: 1; }
+}
+@keyframes launch-fog-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes launch-hide { to { opacity: 0; visibility: hidden; } }
+@keyframes launch-fog-out { from { opacity: 1; } to { opacity: 0; } }
+@keyframes launch-drift { to { transform: translate(calc(var(--x) * 0.4), calc(var(--y) * 0.3 - 8vh)) scale(1.3); opacity: 0; } }
+@keyframes launch-trail-down {
+  0% { opacity: 0; transform: translateY(-34%) scale(0.75, 1.7); }
+  15% { opacity: 0.95; }
+  60% { opacity: 0.6; transform: translateY(-24%) scale(0.8, 1.35); }
+  100% { opacity: 0; transform: none; }
+}

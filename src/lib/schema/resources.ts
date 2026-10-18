@@ -627,6 +627,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     title: "Home",
     path: "/",
     sections: [
+      section("intro", "Launch intro", "homeIntro", [bool("showIntro", "Play the launch intro when someone opens the home page")], {
+        description:
+          "While the page loads, Aura tries to take off as small Auras work on her ship; then she lifts off and the smoke clears to show the page. It plays once per visit, never for visitors who ask for reduced motion, and not in this preview: open the home page in a private window to watch it.",
+      }),
       section("hero", "Hero", "homeHero", [bool("showCountdown", "Show the countdown timer")], {
         description: "The event name, tagline, dates and venue come from Site-wide → Event details.",
       }),
@@ -656,6 +660,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         num("featuredSpeakers", "Featured speakers on the home page", { min: 0, max: 12, width: "half" }),
         bool("showMoreSpeakers", "Show the “More speakers to be announced” card"),
       ], { description: "Speakers are added under Speakers; tick “Feature on the home page” to show them here." }),
+      section("hackathon", "Hackathon", "homeHackathon", [], { description: "The hackathon's title, tagline, tracks, team size, mode and prize pool are edited under Hackathon." }),
       section("venue", "Venue & travel", "homeVenue", [], { description: "The routes on the map are edited in the Venue tab → Getting here." }),
       section("partners", "Partners", "homePartners", [], { description: "The logos come from Partners & sponsors." }),
       section("faq", "FAQ & contact", "homeFaq", [], { description: "Questions are added under FAQs; the e-mail and phone under Site-wide → Contact & social." }),
