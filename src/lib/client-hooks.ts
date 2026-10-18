@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 
 /*
  * Browser-only values read through useSyncExternalStore: the server (and the
@@ -63,6 +63,25 @@ export function useLocalStorage(key: string): [string | null, (value: string) =>
     [key],
   );
   return [value, set];
+}
+
+let scrollLocks = 0;
+
+/**
+ * Keep the page from scrolling while `active` (a modal dialog is open): marks <html data-scroll-lock>,
+ * styled in globals.css. Not done with `html:has(dialog[open])`, which made Chrome restyle the whole
+ * page on every element added to it.
+ */
+export function useScrollLock(active: boolean) {
+  useEffect(() => {
+    if (!active) return;
+    scrollLocks += 1;
+    document.documentElement.dataset.scrollLock = "";
+    return () => {
+      scrollLocks -= 1;
+      if (!scrollLocks) delete document.documentElement.dataset.scrollLock;
+    };
+  }, [active]);
 }
 
 /** Replace the current URL's query string without a navigation. */

@@ -26,9 +26,21 @@ let state = INITIAL;
 const listeners = new Set<() => void>();
 let running: Promise<void> | null = null;
 
+let notifying = 0;
+
+/** Record progress; subscribers hear about it at most every 120 ms (and at once when all is done). */
 function update(next: Warmup) {
   state = { ...next, ratio: Math.max(state.ratio, Math.min(1, next.ratio)) };
-  listeners.forEach((fn) => fn());
+  if (next.stage === "done") {
+    window.clearTimeout(notifying);
+    notifying = 0;
+    listeners.forEach((fn) => fn());
+  } else if (!notifying) {
+    notifying = window.setTimeout(() => {
+      notifying = 0;
+      listeners.forEach((fn) => fn());
+    }, 120);
+  }
 }
 
 export const warmup = {

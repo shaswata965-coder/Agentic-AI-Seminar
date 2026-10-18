@@ -693,7 +693,7 @@
 .rich strong { color: var(--fg); font-weight: 650; }
 .rich code { font-size: 0.9em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 0.35em; }
 
-html:has(dialog[open]) { overflow: hidden; }
+html[data-scroll-lock] { overflow: hidden; }
 dialog::backdrop { background: rgb(10 15 30 / 0.45); }
 
 /* Bars that grow as they scroll into view (judging criteria) */

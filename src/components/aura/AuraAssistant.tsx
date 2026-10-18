@@ -4,6 +4,7 @@ import { ArrowRight, CalendarDays, CornerDownLeft, MapPin, Search, Sparkles } fr
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useDeferredValue, useEffect, useId, useMemo, useRef, useState } from "react";
+import { useScrollLock } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
 import { Aura } from "./Aura";
 import { AuraHead } from "./AuraHead";
@@ -75,6 +76,7 @@ export function AuraAssistant({ entries, facts }: { entries: AssistantEntry[]; f
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  useScrollLock(open);
   useEffect(() => {
     const d = dialogRef.current;
     if (!d) return;

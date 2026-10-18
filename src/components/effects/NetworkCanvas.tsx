@@ -62,7 +62,8 @@ export function NetworkCanvas({ className, density = 1, avoid }: { className?: s
 
     const step = () => {
       raf = 0;
-      if (!visible || document.hidden) return;
+      // Also rests behind the home page's loading screen (components/loading), which marks <html data-launch="run">.
+      if (!visible || document.hidden || document.documentElement.dataset.launch === "run") return;
       if (frame++ % 30 === 0) measure();
       ctx.clearRect(0, 0, w, h);
       const max = 130;
@@ -178,8 +179,11 @@ export function NetworkCanvas({ className, density = 1, avoid }: { className?: s
       if (visible) start();
     });
     io.observe(canvas);
-    const mo = new MutationObserver(readPalette);
-    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+    const mo = new MutationObserver(() => {
+      readPalette();
+      start();
+    });
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "data-launch"] });
     const onVis = () => !document.hidden && start();
     window.addEventListener("pointermove", onMove, { passive: true });
     document.addEventListener("pointerleave", onLeave);

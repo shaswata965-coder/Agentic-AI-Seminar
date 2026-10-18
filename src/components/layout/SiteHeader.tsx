@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
+import { useScrollLock } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
 import { explorePages as explorePagesOf, homeNav, primaryNav, registrationNav, sectionNav, type NavCopy, type NavItem } from "@/lib/nav";
 import type { PageCopy } from "@/lib/schema/page-copy";
@@ -120,6 +121,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text }: SiteHea
     };
   }, [exploreOpen]);
 
+  useScrollLock(menuOpen);
   useEffect(() => {
     const d = dialogRef.current;
     if (!d) return;

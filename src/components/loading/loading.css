@@ -1,9 +1,10 @@
 /* The home page's loading screen (LoadingScreen.tsx). Shown while <html data-launch="run"> (see flag.ts),
    and for its own way out after that. .launch[data-phase] drives it: "work" (the site's files are cached
-   while Aura tries to take off and the crew works on her ship), "lift" (lift-off; the smoke fills the
+   while the ship tries to take off and the crew works on it), "lift" (lift-off; the smoke fills the
    screen) and "clear" (the smoke clears). Lift-off rules use :not([data-phase="work"]) so that they carry
-   on into "clear". Elements with transform attributes are never animated themselves; a child group is,
-   with its own transform-origin. */
+   on into "clear".
+   Smoothness: everything that moves is its own element and only its transform or opacity changes, which
+   the compositor animates off the main thread (busy loading the page). Nothing inside an SVG is animated. */
 
 .launch {
   --smoke-hi: #ffffff;
@@ -28,18 +29,22 @@
 html[data-launch="run"] .launch,
 .launch[data-phase="clear"] { display: block; }
 
-/* Hold the page still behind the screen. If it never gets going (its script failed), it lets go by itself. */
-html[data-launch="run"]:has(.launch) { overflow: hidden; scrollbar-gutter: stable; animation: launch-unlock 0s 16s forwards; }
-html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; }
+/* Behind the screen the page is hidden, still and not painted, so it costs the animation nothing. If the
+   screen never gets going (its script failed), the page comes back by itself. */
+html[data-launch="run"] { overflow: hidden; scrollbar-gutter: stable; animation: launch-unlock 0s 16s forwards; }
+html[data-launch="run"] body { visibility: hidden; animation: launch-show 0s 16s forwards; }
+html[data-launch="run"] .launch { visibility: visible; animation: launch-out 0.6s ease 16s forwards; }
+html[data-launch="run"] body :not(.launch, .launch *) { animation-play-state: paused !important; }
 @keyframes launch-unlock { to { overflow: visible; } }
+@keyframes launch-show { to { visibility: visible; } }
 @keyframes launch-out { to { opacity: 0; visibility: hidden; pointer-events: none; } }
 
 .launch-sky {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(55% 45% at 50% 62%, color-mix(in oklab, var(--lilac) 22%, transparent), transparent 70%),
-    radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--azure) 30%, transparent), transparent 75%),
+    radial-gradient(55% 45% at 50% 55%, color-mix(in oklab, var(--lilac) 20%, transparent), transparent 70%),
+    radial-gradient(80% 60% at 50% 0%, color-mix(in oklab, var(--azure) 28%, transparent), transparent 75%),
     var(--bg);
 }
 /* The glow of ignition */
@@ -47,7 +52,7 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(42% 36% at 50% 60%, rgb(255 186 90 / 0.5), transparent 70%);
+  background: radial-gradient(42% 36% at 50% 60%, rgb(255 186 90 / 0.45), transparent 70%);
   opacity: 0;
 }
 
@@ -58,42 +63,270 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.5rem, 2.5dvh, 1.75rem);
+  gap: clamp(0.75rem, 3dvh, 2rem);
   padding: 1rem 1rem 4rem;
 }
-.launch-scene {
-  position: relative;
-  width: min(92vw, 34rem, 62dvh);
-  aspect-ratio: 1;
-}
-.launch-layer { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.launch-billows { position: absolute; inset: 0; pointer-events: none; }
+.launch-scene { position: relative; width: min(88vw, 30rem, 58dvh); aspect-ratio: 1; }
+.launch-billows { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
 
 .launch-status { width: min(88vw, 24rem); text-align: center; }
 .launch-line { position: relative; height: 1.5rem; margin-top: 0.25rem; }
-.launch-line > span { position: absolute; inset: 0; white-space: nowrap; animation: launch-say 0.35s cubic-bezier(0.2, 0.8, 0.3, 1.2) both; }
+.launch-line > span { position: absolute; inset: 0; white-space: nowrap; animation: launch-say 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
 
-/* The round window onto the launch pad, and the progress ring around it, filled from the top to --ring
-   (0 to 1, eased by LoadingScreen.tsx). */
-.launch-window { fill: color-mix(in oklab, var(--surface) 70%, color-mix(in oklab, var(--azure) 14%, transparent)); }
-.launch-earth { fill: color-mix(in oklab, var(--fg) 7%, var(--surface)); }
-.launch-ring-track { fill: none; stroke: color-mix(in oklab, var(--fg) 10%, transparent); stroke-width: 7; }
-.launch-ring { --ring: 0; }
-.launch-ring-fill {
-  fill: none;
-  stroke-width: 7;
-  stroke-linecap: round;
-  stroke-dasharray: 100;
-  stroke-dashoffset: calc(100 - var(--ring) * 100);
-  opacity: min(1, calc(var(--ring) * 200));
+/* --------------------------------------------------------------- Ring -- */
+
+/* Two half-rings turned into view; LoadingScreen.tsx sets each one's angle and timing. */
+.lx-ring { --t: 7px; --ring: color-mix(in oklab, var(--lilac) 80%, var(--azure)); position: absolute; inset: 0; will-change: transform; }
+.lx-ring-track,
+.lx-ring-arc {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  -webkit-mask: radial-gradient(farthest-side, #0000 calc(100% - var(--t)), #000 calc(100% - var(--t) + 0.6px));
+  mask: radial-gradient(farthest-side, #0000 calc(100% - var(--t)), #000 calc(100% - var(--t) + 0.6px));
 }
-.launch-ring-tip { transform-box: view-box; transform-origin: 200px 280px; transform: rotate(calc(var(--ring) * 360deg)); opacity: min(1, calc(var(--ring) * 200)); }
-.launch-ring-glow { fill: color-mix(in oklab, var(--lilac) 55%, transparent); transform-box: fill-box; transform-origin: center; animation: launch-tip 1.2s ease-in-out infinite; }
+.lx-ring-track { background: color-mix(in oklab, var(--fg) 9%, transparent); }
+.lx-ring-half { position: absolute; inset: 0; }
+.lx-ring-right { clip-path: inset(0 0 0 50%); }
+.lx-ring-left { clip-path: inset(0 50% 0 0); }
+.lx-ring-arc { background: var(--ring); transition-property: transform; transition-timing-function: linear; will-change: transform; }
+.lx-ring-right .lx-ring-arc { clip-path: inset(0 50% 0 0); }
+.lx-ring-left .lx-ring-arc { clip-path: inset(0 0 0 50%); }
+.lx-ring-cap { position: absolute; left: 50%; top: 0; width: var(--t); height: var(--t); margin-left: calc(var(--t) / -2); border-radius: 50%; background: var(--ring); opacity: 0; transition: opacity 0.2s; }
+.lx-ring-tip { position: absolute; inset: 0; opacity: 0; transition-property: transform, opacity; transition-timing-function: linear; will-change: transform; }
+.lx-ring-tip i {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--t) / 2);
+  width: 18px;
+  height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff 0 34%, color-mix(in oklab, var(--ring) 70%, transparent) 46%, transparent);
+}
+.lx-ring[data-started] :is(.lx-ring-cap, .lx-ring-tip) { opacity: 1; }
 
-.launch-fog { position: absolute; inset: 0; background: var(--fog); opacity: 0; pointer-events: none; }
+/* ------------------------------------------------------------- Window -- */
 
+.lx-window {
+  position: absolute;
+  inset: 4.5%;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--azure) 34%, var(--surface)) 0%,
+    color-mix(in oklab, var(--lilac) 26%, var(--surface)) 52%,
+    color-mix(in oklab, var(--peach) 34%, var(--surface)) 76%
+  );
+}
+.lx-moon {
+  position: absolute;
+  left: 15%;
+  top: 13%;
+  width: 16%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 40%, #fffaf0 0 38%, #ffe7c9 52%, rgb(255 231 201 / 0) 72%);
+}
+.lx-star {
+  position: absolute;
+  width: 1.3%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 4px #fff;
+  animation: lx-twinkle 2.8s ease-in-out infinite alternate;
+  will-change: opacity;
+}
+.lx-land { position: absolute; inset: 0; width: 100%; height: 100%; }
+.lx-hill-far { fill: color-mix(in oklab, var(--lilac) 32%, var(--surface)); }
+.lx-hill-near { fill: color-mix(in oklab, var(--mint) 28%, var(--surface)); }
+.lx-ground { fill: color-mix(in oklab, var(--fg) 9%, var(--surface)); }
+.lx-beacon {
+  position: absolute;
+  left: 17.4%;
+  top: 22.2%;
+  width: 2.6%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #ff6b6b 0 45%, rgb(255 107 107 / 0.35) 60%, transparent);
+  animation: lx-beacon 1.4s ease-in-out infinite alternate;
+  will-change: opacity;
+}
+.lx-arm {
+  position: absolute;
+  left: 22%;
+  top: 55.6%;
+  width: 18.5%;
+  height: 2.2%;
+  border-radius: 2px;
+  background: #3b4763;
+  transform-origin: 0 50%;
+  transition: transform 0.8s cubic-bezier(0.5, 0, 0.3, 1);
+}
+
+/* --------------------------------------------------------------- Ship -- */
+
+/* Above the smoke, so she stays in sight as she climbs out of it */
+.lx-ship { position: absolute; z-index: 2; will-change: transform; }
+.lx-ship-try { position: relative; transform-origin: 50% 100%; animation: lx-attempt 3.2s infinite; will-change: transform; }
+.lx-ship-art { position: relative; display: block; width: 100%; height: auto; }
+.lx-flame {
+  position: absolute;
+  left: 41%;
+  top: 95.5%;
+  width: 18%;
+  height: 24%;
+  border-radius: 45% 45% 50% 50% / 22% 22% 78% 78%;
+  background: linear-gradient(180deg, #fff6c8, #ffd25c 30%, #ff9a4d 64%, rgb(255 122 69 / 0));
+  transform-origin: 50% 0;
+  animation: lx-sputter 3.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.lx-flame i {
+  position: absolute;
+  left: 26%;
+  top: 0;
+  width: 48%;
+  height: 58%;
+  border-radius: inherit;
+  background: linear-gradient(180deg, #fff, #fff3b8 60%, rgb(255 243 184 / 0));
+  transform-origin: 50% 0;
+  animation: lx-flicker 0.18s ease-in-out infinite alternate;
+}
+.lx-glow {
+  position: absolute;
+  left: 5%;
+  top: 80%;
+  width: 90%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgb(255 196 92 / 0.6), transparent);
+  animation: lx-glow 3.2s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.lx-trail {
+  position: absolute;
+  left: 42%;
+  top: 97%;
+  width: 16%;
+  height: 130vh;
+  border-radius: 50% 50% 40% 40% / 3% 3% 8% 8%;
+  background: linear-gradient(180deg, #fff1b3, #ffc27a 5%, var(--smoke-hi) 13%, color-mix(in oklab, var(--smoke) 75%, transparent) 45%, transparent 85%);
+  transform: scaleY(0);
+  transform-origin: 50% 0;
+}
+/* Her eyes in the visor: determined while trying, happy once she is off */
+.lx-eyes { position: absolute; inset: 0; transform-origin: 50% 20.6%; }
+.lx-eyes i { position: absolute; top: 18.2%; width: 7.5%; height: 4.8%; border-radius: 50%; background: #5fe3ff; box-shadow: 0 0 6px #5fe3ff; }
+.lx-eyes i:first-child { left: 37.25%; }
+.lx-eyes i:last-child { left: 55.25%; }
+.lx-eyes-try i:first-child { transform: rotate(14deg); }
+.lx-eyes-try i:last-child { transform: rotate(-14deg); }
+.lx-eyes-try { animation: lx-blink 4.2s ease-in-out infinite; will-change: transform; }
+.lx-eyes-joy { opacity: 0; }
+.lx-eyes-joy i {
+  top: 17.4%;
+  width: 9%;
+  height: 4.6%;
+  background: none;
+  box-shadow: none;
+  border: max(2px, 0.45vmin) solid transparent;
+  border-top-color: #5fe3ff;
+  filter: drop-shadow(0 0 3px #5fe3ff);
+}
+.lx-eyes-joy i:first-child { left: 36.5%; }
+.lx-eyes-joy i:last-child { left: 54.5%; }
+.lx-glint {
+  position: absolute;
+  aspect-ratio: 1;
+  background: #fff;
+  clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+  opacity: 0;
+  animation: lx-glint 1.9s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.lx-dust {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, var(--puff), transparent);
+  opacity: 0;
+  animation: lx-dust 3.2s ease-out infinite;
+  will-change: transform, opacity;
+}
+
+/* --------------------------------------------------------------- Crew -- */
+
+.lx-crew { position: absolute; will-change: transform, opacity; }
+.lx-bob { position: relative; animation: lx-bob 2.6s ease-in-out infinite alternate; will-change: transform; }
+.lx-flip { position: relative; transform: scaleX(-1); }
+.lx-member { position: relative; display: block; width: 100%; height: auto; color: var(--fg); }
+.lx-tool { position: absolute; display: block; }
+.lx-tool svg { display: block; width: 100%; height: auto; }
+.lx-wrench { transform-origin: 0 50%; animation: lx-ratchet 0.9s ease-in-out infinite alternate; will-change: transform; }
+.lx-rag { transform-origin: 0 50%; animation: lx-wipe 0.55s ease-in-out infinite alternate; will-change: transform; }
+.lx-gear { animation: lx-spin 2.4s linear infinite; will-change: transform; }
+.lx-arc {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff 0 24%, #bff3ff 44%, rgb(95 227 255 / 0));
+  animation: lx-arc 0.45s ease-in-out infinite alternate;
+  will-change: transform, opacity;
+}
+.lx-spark {
+  position: absolute;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, #fff7cc, #ffc53d 60%, rgb(255 197 61 / 0));
+  animation: lx-spark 0.75s ease-out infinite;
+  will-change: transform, opacity;
+}
+.lx-tick {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #14a874;
+  color: #fff;
+  font-size: max(9px, 1.5vmin);
+  font-weight: 800;
+  line-height: 1;
+  opacity: 0;
+  transform-origin: 50% 100%;
+  animation: lx-tick 2.8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+/* The parts courier flies an ellipse round the ship (two sideways swings a quarter turn apart), smaller at the back */
+.lx-orbit-x { animation: lx-orbit-x 3.4s ease-in-out infinite alternate; will-change: transform; }
+.lx-orbit-y { animation: lx-orbit-y 3.4s ease-in-out -1.7s infinite alternate; will-change: transform; }
+
+/* ------------------------------------------------------------ Lift-off -- */
+
+.launch:not([data-phase="work"]) :is(.lx-bob, .lx-wrench, .lx-rag, .lx-gear, .lx-orbit-x, .lx-orbit-y, .lx-arc, .lx-spark, .lx-tick) { animation-play-state: paused; }
+.launch:not([data-phase="work"]) .lx-crew { animation: lx-flee 0.9s cubic-bezier(0.5, 0, 0.75, 0.3) var(--fd, 0s) both; }
+.launch:not([data-phase="work"]) :is(.lx-glint, .lx-dust) { animation: none; opacity: 0; }
+.launch:not([data-phase="work"]) .lx-arm { transform: rotate(-75deg); }
+.launch:not([data-phase="work"]) .lx-beacon { animation-duration: 0.3s; }
+.launch:not([data-phase="work"]) .lx-eyes-try { animation: none; opacity: 0; transition: opacity 0.2s; }
+.launch:not([data-phase="work"]) .lx-eyes-joy { opacity: 1; transition: opacity 0.2s; }
+
+/* Ignition: she crouches, then climbs out of sight on a long flame and its trail. */
+.launch:not([data-phase="work"]) .launch-sky::after { animation: launch-flare 2.4s ease-out both; }
+.launch:not([data-phase="work"]) .lx-ship-try { animation: lx-crouch 0.45s cubic-bezier(0.3, 0, 0.3, 1) both; }
+.launch:not([data-phase="work"]) .lx-ship { animation: lx-rise 2.1s cubic-bezier(0.55, 0, 0.85, 0.35) 0.3s both, launch-hide 0.15s linear 2.42s both; }
+.launch:not([data-phase="work"]) .lx-flame { animation: lx-ignite 2.4s ease-out both; }
+.launch:not([data-phase="work"]) .lx-glow { animation: lx-glow-up 2.4s ease-out both; }
+.launch:not([data-phase="work"]) .lx-trail { animation: lx-trail 1.8s cubic-bezier(0.4, 0, 0.6, 1) 0.35s both; }
+.launch:not([data-phase="work"]) .lx-ring { animation: lx-ring-done 0.8s ease-out both, launch-hide 0.15s linear 2.42s both; }
+
+/* Smoke billows out and up until it fills the screen; under it the scene goes, so the page is there when it clears. */
+.launch-puff { position: absolute; left: 50%; top: 76%; width: 30vmax; aspect-ratio: 1; margin: -15vmax 0 0 -15vmax; will-change: transform, opacity; }
 /* Each puff is a cluster of soft bumps, lit from above. */
-.launch-puff { position: absolute; left: 50%; top: 72%; width: 30vmax; aspect-ratio: 1; margin: -15vmax 0 0 -15vmax; }
 .launch-puff > span {
   position: absolute;
   inset: 0;
@@ -108,72 +341,16 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
     radial-gradient(circle at 50% 52%, var(--smoke) 0 28%, transparent 35%);
   opacity: 0;
   transform: scale(0.06);
+  will-change: transform, opacity;
 }
-
-/* ------------------------------------------------- The scene at work -- */
-
-.launch-star { fill: color-mix(in oklab, var(--fg) 30%, transparent); animation: launch-twinkle 2.6s ease-in-out infinite; }
-.launch-beacon { fill: #ff6b6b; animation: launch-beacon 1.4s linear infinite; }
-.launch-arm { transform-box: view-box; transform-origin: 102px 272px; transition: transform 0.7s cubic-bezier(0.5, 0, 0.3, 1); }
-.launch-hose { transition: opacity 0.25s; }
-.launch-fuel { animation: launch-flow 0.5s linear infinite; }
-.launch-needle { transform-box: view-box; transform-origin: 321px 362px; animation: launch-needle 1.6s ease-in-out infinite alternate; }
-.launch-valve { transform-box: view-box; transform-origin: 0 0; animation: launch-valve 0.7s ease-in-out infinite alternate; }
-.launch-puff-try { fill: var(--puff); transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-try 2.2s ease-out infinite; }
-
-/* Aura's ship: a try every 2.2s (ATTEMPT in LoadingScreen.tsx). It shudders, hops, and drops back onto the pad. */
-.launch-ship { transform-box: view-box; transform-origin: 200px 361px; animation: launch-attempt 2.2s ease-in-out infinite; }
-.launch-flame { transform-box: view-box; transform-origin: 0 0; animation: launch-sputter 2.2s linear infinite; }
-.launch-core { transform-box: fill-box; transform-origin: 50% 0; animation: launch-flicker 0.11s ease-in-out infinite alternate; }
-.launch-glow { transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-glow 2.2s linear infinite; }
-.launch-layer .aura-svg .aura-float { animation: none; }
-.launch-layer .aura-svg :is(.aura-shadow, .aura-thrust) { display: none; }
-
-/* The crew */
-.launch-bob { animation: launch-hover 1.6s ease-in-out var(--d, 0s) infinite alternate; }
-.launch-blink { transform-box: fill-box; transform-origin: center; animation: launch-blink 3.6s var(--d, 0s) infinite; }
-.launch-swing { transform-box: view-box; transform-origin: 0 0; }
-.launch-ratchet { animation: launch-ratchet 0.5s ease-in-out infinite alternate; }
-.launch-polish { animation: launch-polish 0.32s ease-in-out infinite alternate; }
-.launch-weld { animation: launch-weld 0.16s steps(2) infinite alternate; }
-.launch-crank { animation: launch-crank 0.7s ease-in-out infinite alternate; }
-.launch-twist { animation: launch-twist 4.8s ease-in-out infinite; }
-.launch-carry { animation: launch-carry 4.8s ease-in-out infinite; }
-.launch-cargo { animation: launch-cargo 4.8s step-end infinite; }
-.launch-gear { transform-box: view-box; transform-origin: 0 0; animation: launch-spin 2.4s linear infinite; }
-.launch-arc { transform-box: fill-box; transform-origin: center; animation: launch-arc 0.09s steps(2) infinite alternate; }
-.launch-spark { animation: launch-spark 0.55s ease-out infinite; }
-.launch-tick { opacity: 0; animation: launch-tick 2.8s infinite; }
-.launch-clank { transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-clank 1s ease-out infinite; }
-.launch-shine { transform-box: fill-box; transform-origin: center; opacity: 0; animation: launch-shine 1.8s ease-in-out infinite; }
-
-/* ------------------------------------------------------------ Lift-off -- */
-
-/* Work stops where it is; the crew clears the pad. */
-.launch:not([data-phase="work"]) .launch-w { animation-play-state: paused; }
-.launch:not([data-phase="work"]) :is(.launch-puff-try, .launch-shine) { visibility: hidden; }
-.launch:not([data-phase="work"]) [data-flee] { animation: launch-flee 0.9s cubic-bezier(0.5, 0, 0.8, 0.3) var(--fd, 0s) both; }
-.launch:not([data-phase="work"]) .launch-arm { transform: rotate(-80deg); }
-.launch:not([data-phase="work"]) .launch-hose { opacity: 0; }
-.launch:not([data-phase="work"]) .launch-beacon { animation-duration: 0.3s; }
-.launch:not([data-phase="work"]) .launch-ring-fill { animation: launch-ring-full 0.9s ease-out; }
-
-/* Ignition: the ground shakes, then the ship climbs out of sight on a long flame. */
-.launch[data-phase="lift"] .launch-scene { animation: launch-quake 0.7s linear 0.05s; }
-.launch:not([data-phase="work"]) .launch-sky::after { animation: launch-flare 2.4s ease-out both; }
-.launch:not([data-phase="work"]) .launch-ship { animation: launch-rise 2.2s linear both; }
-.launch:not([data-phase="work"]) .launch-flame { animation: launch-ignite 2.2s ease-out both; }
-.launch:not([data-phase="work"]) .launch-glow { animation: launch-glow-up 2.2s ease-out both; }
-
-/* Smoke billows out and up until it fills the screen; under it, the scene goes, so the page is there when it clears. */
+.launch-fog { position: absolute; inset: 0; background: var(--fog); opacity: 0; pointer-events: none; will-change: opacity; }
 .launch:not([data-phase="work"]) .launch-puff > span { animation: launch-billow 1.3s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d) both; }
 .launch:not([data-phase="work"]) .launch-fog { animation: launch-fog-in 0.5s ease-in 1.85s both; }
-.launch:not([data-phase="work"]) :is(.launch-sky, .launch-layer, .launch-status) { animation: launch-hide 0.15s linear 2.42s both; }
+.launch:not([data-phase="work"]) :is(.launch-sky, .lx-window, .launch-status) { animation: launch-hide 0.15s linear 2.42s both; }
 
 .launch[data-phase="clear"] { pointer-events: none; }
 .launch[data-phase="clear"] .launch-fog { animation: launch-fog-out 0.7s ease-out both; }
 .launch[data-phase="clear"] .launch-puff { animation: launch-drift 1.5s cubic-bezier(0.3, 0.5, 0.4, 1) var(--d2) both; }
-
 
 /* The hero's Aura waits behind the screen, then flies down into place from where the ship went up. */
 @media (prefers-reduced-motion: no-preference) {
@@ -190,99 +367,62 @@ html[data-launch="run"] .launch { animation: launch-out 0.6s ease 16s forwards; 
 
 /* ----------------------------------------------------------- Keyframes -- */
 
-@keyframes launch-say { from { opacity: 0; transform: translateY(0.5rem); } to { opacity: 1; transform: none; } }
-@keyframes launch-tip { 0%, 100% { transform: scale(0.8); opacity: 0.6; } 50% { transform: scale(1.25); opacity: 1; } }
-@keyframes launch-ring-full { 0% { stroke-width: 7; } 35% { stroke-width: 13; } 100% { stroke-width: 7; } }
-@keyframes launch-twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
-@keyframes launch-beacon { 0%, 49% { opacity: 1; } 50%, 100% { opacity: 0.25; } }
-@keyframes launch-flow { to { stroke-dashoffset: -9; } }
-@keyframes launch-needle { from { transform: rotate(-30deg); } to { transform: rotate(70deg); } }
-@keyframes launch-valve { from { transform: rotate(-40deg); } to { transform: rotate(40deg); } }
-@keyframes launch-try {
-  0%, 44% { transform: translate(0, 0) scale(0.3); opacity: 0; }
-  50% { opacity: 0.95; }
-  82% { transform: translate(var(--dx), -8px) scale(1.7); opacity: 0.5; }
-  94%, 100% { transform: translate(calc(var(--dx) * 1.3), -14px) scale(2.1); opacity: 0; }
-}
-@keyframes launch-attempt {
-  0%, 36% { transform: none; }
-  40% { transform: translate(-1.4px, 0) rotate(-0.8deg); }
-  43% { transform: translate(1.4px, -1px) rotate(0.8deg); }
-  46% { transform: translate(-1.2px, -2px) rotate(-0.6deg); }
-  49% { transform: translate(1.2px, -3px) rotate(0.6deg); }
-  60% { transform: translate(0, -18px) rotate(-1.5deg); }
-  68% { transform: translate(0, -22px) rotate(1.8deg); }
-  77% { transform: translate(0, -2px) rotate(-0.4deg); }
-  81% { transform: scale(1.04, 0.95); }
-  87% { transform: scale(0.98, 1.02); }
+@keyframes launch-say { from { opacity: 0; transform: translateY(0.4rem); } to { opacity: 1; transform: none; } }
+@keyframes lx-twinkle { from { opacity: 0.25; } to { opacity: 0.95; } }
+@keyframes lx-beacon { from { opacity: 1; } to { opacity: 0.25; } }
+
+/* One try: rest, rise and sway, fall back with a soft landing (each stretch eased on its own). */
+@keyframes lx-attempt {
+  0%, 28% { transform: none; animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  46% { transform: translateY(-9%) rotate(-1.2deg); animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
+  60% { transform: translateY(-11%) rotate(1deg); animation-timing-function: cubic-bezier(0.55, 0, 0.8, 0.4); }
+  74% { transform: translateY(0) scale(1.035, 0.965); animation-timing-function: cubic-bezier(0.2, 0.8, 0.3, 1); }
+  84% { transform: translateY(-1.2%) scale(0.99, 1.01); animation-timing-function: cubic-bezier(0.45, 0, 0.55, 1); }
   92%, 100% { transform: none; }
 }
-@keyframes launch-sputter {
-  0%, 37% { transform: scale(0.3, 0); }
-  41% { transform: scale(0.6, 0.35); }
-  44% { transform: scale(0.35, 0.15); }
-  48% { transform: scale(0.75, 0.6); }
-  56%, 66% { transform: scale(0.85, 0.8); }
-  71% { transform: scale(0.5, 0.3); }
-  74% { transform: scale(0.7, 0.45); }
-  78%, 100% { transform: scale(0.3, 0); }
+@keyframes lx-sputter {
+  0%, 24% { transform: scale(0.55, 0.3); opacity: 0.75; }
+  40% { transform: scale(1, 1); opacity: 1; }
+  60% { transform: scale(0.95, 0.9); opacity: 1; }
+  70% { transform: scale(0.6, 0.35); opacity: 0.8; }
+  80%, 100% { transform: scale(0.55, 0.3); opacity: 0.75; }
 }
-@keyframes launch-flicker { to { transform: scale(0.82, 0.88); opacity: 0.85; } }
-@keyframes launch-glow { 0%, 40%, 78%, 100% { opacity: 0; transform: scale(0.5); } 52%, 66% { opacity: 0.8; transform: scale(1); } }
-@keyframes launch-hover { to { transform: translateY(-2.6px); } }
-@keyframes launch-blink { 0%, 90%, 100% { transform: none; } 94% { transform: scaleY(0.1); } }
-@keyframes launch-ratchet { from { transform: rotate(-14deg); } to { transform: rotate(18deg); } }
-@keyframes launch-polish { from { transform: rotate(-16deg); } to { transform: rotate(14deg); } }
-@keyframes launch-weld { from { transform: rotate(-2deg); } to { transform: rotate(2deg); } }
-@keyframes launch-crank { from { transform: rotate(-22deg); } to { transform: rotate(22deg); } }
-@keyframes launch-twist {
-  0%, 31% { transform: none; }
-  35% { transform: rotate(-14deg); }
-  39% { transform: rotate(12deg); }
-  43% { transform: rotate(-14deg); }
-  47% { transform: rotate(12deg); }
-  51% { transform: rotate(-10deg); }
-  55%, 100% { transform: none; }
+@keyframes lx-flicker { from { transform: scaleY(1); } to { transform: scaleY(0.88); } }
+@keyframes lx-glow { 0%, 26%, 76%, 100% { opacity: 0.25; transform: scale(0.7); } 42%, 62% { opacity: 1; transform: scale(1); } }
+@keyframes lx-dust {
+  0%, 72% { transform: translateX(0) scale(0.3); opacity: 0; }
+  77% { opacity: 0.9; }
+  100% { transform: translate(var(--dx, 0), -25%) scale(1.8); opacity: 0; }
 }
-@keyframes launch-carry { 0%, 6% { transform: none; } 30%, 56% { transform: translate(-82px, 96px); } 84%, 100% { transform: none; } }
-@keyframes launch-cargo { 0% { opacity: 1; } 46% { opacity: 0; } 90% { opacity: 1; } }
-@keyframes launch-spin { to { transform: rotate(360deg); } }
-@keyframes launch-arc { from { transform: scale(0.7); opacity: 0.7; } to { transform: scale(1.15); opacity: 1; } }
-@keyframes launch-spark { from { transform: none; opacity: 1; } to { transform: translate(var(--sx), var(--sy)); opacity: 0; } }
-@keyframes launch-tick { 0%, 8% { opacity: 0; } 14%, 84% { opacity: 1; } 92%, 100% { opacity: 0; } }
-@keyframes launch-clank { 0%, 40% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.2); opacity: 1; } 70%, 100% { transform: scale(0.4); opacity: 0; } }
-@keyframes launch-shine { 0%, 60%, 100% { transform: scale(0) rotate(0deg); opacity: 0; } 76% { transform: scale(1) rotate(45deg); opacity: 1; } }
+@keyframes lx-blink { 0%, 92%, 100% { transform: none; } 95% { transform: scaleY(0.12); } }
+@keyframes lx-glint {
+  0%, 55%, 100% { transform: scale(0) rotate(0deg); opacity: 0; }
+  72% { transform: scale(1) rotate(45deg); opacity: 1; }
+  88% { transform: scale(0.2) rotate(90deg); opacity: 0; }
+}
+@keyframes lx-bob { from { transform: translateY(0); } to { transform: translateY(-7%); } }
+@keyframes lx-ratchet { from { transform: rotate(-22deg); } to { transform: rotate(18deg); } }
+@keyframes lx-wipe { from { transform: rotate(-20deg); } to { transform: rotate(16deg); } }
+@keyframes lx-spin { to { transform: rotate(360deg); } }
+@keyframes lx-arc { from { transform: scale(0.75); opacity: 0.75; } to { transform: scale(1.12); opacity: 1; } }
+@keyframes lx-spark { from { transform: translate(0, 0) scale(1); opacity: 1; } to { transform: translate(var(--sx), var(--sy)) scale(0.3); opacity: 0; } }
+@keyframes lx-tick {
+  0%, 12% { transform: scale(0.3); opacity: 0; }
+  24% { transform: scale(1.08); opacity: 1; }
+  30%, 72% { transform: scale(1); opacity: 1; }
+  86%, 100% { transform: scale(0.8) translateY(-20%); opacity: 0; }
+}
+@keyframes lx-orbit-x { from { transform: translateX(-233%); } to { transform: translateX(233%); } }
+@keyframes lx-orbit-y { from { transform: translateY(-39%) scale(0.84); } to { transform: translateY(39%) scale(1.06); } }
 
-@keyframes launch-flee {
-  0% { transform: none; opacity: 1; }
-  25% { transform: translate(calc(var(--fx) * -0.04), 3px); opacity: 1; }
-  100% { transform: translate(var(--fx), var(--fy)); opacity: 0; }
-}
-@keyframes launch-quake {
-  0%, 100% { transform: none; }
-  20% { transform: translate(-3px, 1px); }
-  40% { transform: translate(3px, -1px); }
-  60% { transform: translate(-2px, 1px); }
-  80% { transform: translate(2px, 0); }
-}
+@keyframes lx-flee { from { transform: none; opacity: 1; } to { transform: translate(var(--fx), var(--fy)) scale(0.7); opacity: 0; } }
+@keyframes lx-crouch { 0% { transform: none; } 60% { transform: scale(1.05, 0.93); } 100% { transform: scale(0.97, 1.04); } }
+@keyframes lx-rise { from { transform: none; } to { transform: translateY(-150vh); } }
+@keyframes lx-ignite { 0% { transform: scale(0.6, 0.4); } 15% { transform: scale(1.15, 1.3); } 100% { transform: scale(1.3, 2.4); } }
+@keyframes lx-glow-up { 0% { opacity: 0.4; transform: scale(0.8); } 15% { opacity: 1; } 100% { opacity: 1; transform: scale(2.2); } }
+@keyframes lx-trail { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes lx-ring-done { 0% { transform: none; } 40% { transform: scale(1.025); } 100% { transform: none; } }
 @keyframes launch-flare { 0% { opacity: 0; } 18% { opacity: 1; } 70% { opacity: 0.7; } 100% { opacity: 0.4; } }
-@keyframes launch-rise {
-  0% { transform: none; }
-  5% { transform: translate(-1.6px, 0); }
-  10% { transform: translate(1.6px, -1px); }
-  15% { transform: translate(-1.6px, -1px); }
-  20% { transform: translate(1.6px, -2px); }
-  25% { transform: translate(-1px, -4px); }
-  30% { transform: translate(0, -8px); animation-timing-function: cubic-bezier(0.5, 0, 0.85, 0.4); }
-  100% { transform: translate(0, -1100px); }
-}
-@keyframes launch-ignite {
-  0% { transform: scale(0.4, 0.2); }
-  8% { transform: scale(0.9, 0.9); }
-  30% { transform: scale(1.15, 1.5); }
-  100% { transform: scale(1.35, 3.2); }
-}
-@keyframes launch-glow-up { 0% { opacity: 0; transform: scale(0.6); } 15% { opacity: 1; } 100% { opacity: 1; transform: scale(2.4); } }
 @keyframes launch-billow {
   0% { transform: translate(0, 0) scale(0.06); opacity: 0; }
   14% { opacity: 1; }

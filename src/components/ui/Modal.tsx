@@ -2,6 +2,7 @@
 
 import { X } from "lucide-react";
 import { useEffect, useRef, type ReactNode } from "react";
+import { useScrollLock } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
 
 /**
@@ -24,6 +25,7 @@ export function Modal({
   size?: "md" | "lg" | "xl";
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  useScrollLock(open);
 
   useEffect(() => {
     const dialog = ref.current;
