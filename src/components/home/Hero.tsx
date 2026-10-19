@@ -128,8 +128,7 @@ export function Hero({ s }: { s: SiteSettings }) {
             interactive
             entrance="load"
             placard={placard}
-            label={placard ? `Aura, the workshop's agentic AI guide, holding up a sign: “${placard}”` : undefined}
-            bubbleSide={placard ? "left" : "right"}
+            label={placard ? `Aura, the workshop's agentic AI guide, holding a placard: “${placard}”` : undefined}
             className="max-w-[78vw]"
           />
         </div>

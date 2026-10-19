@@ -19,7 +19,7 @@ export type Pose =
   | "holdBoth"
   | "holdSide"
   | "raise"
-  | "raiseWave"
+  | "holdWide"
   | "toFace"
   | "point"
   | "think"

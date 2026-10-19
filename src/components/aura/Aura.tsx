@@ -48,7 +48,7 @@ export interface AuraProps {
   sleepWhenIdle?: boolean;
   /** Fine-tune the preset (expression, prop, effects…). */
   overrides?: Partial<AuraLook>;
-  /** Words on a placard Aura holds up in her right hand (she waves with the left one instead). */
+  /** Words on a large placard Aura holds in front of her in both fins (she doesn't wave then). */
   placard?: string;
   onActivate?: () => void;
   /** Entrance animation (default "auto"). */
@@ -81,10 +81,9 @@ export function Aura({
 }: AuraProps) {
   const preset = AURA_PRESETS[variant];
   const sign = placard?.trim() || undefined;
-  const chosen: AuraLook = { ...preset, ...overrides };
-  // Holding a placard keeps the right arm up: a wave becomes a wave with the left, and she rests with the sign held high.
-  const rest: Pose = sign ? "raise" : "idle";
-  const base: AuraLook = sign ? { ...chosen, pose: chosen.pose === "wave" || chosen.pose === "cheer" ? "raiseWave" : "raise" } : chosen;
+  // Both fins hold the placard, awake or asleep.
+  const base: AuraLook = { ...preset, ...overrides, ...(sign ? { pose: "holdWide" as const } : null) };
+  const rest: Pose = sign ? "holdWide" : "idle";
   const lines = tips ?? preset.tips;
   const rawId = useId();
   const uid = `aura${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -113,7 +112,7 @@ export function Aura({
     timers.current.push(setTimeout(fn, ms));
   };
 
-  const waves = base.pose === "wave" || base.pose === "cheer" || base.pose === "raiseWave";
+  const waves = base.pose === "wave" || base.pose === "cheer";
   const arrival = entranceKind(entrance, size, variant);
 
   useEffect(() => {

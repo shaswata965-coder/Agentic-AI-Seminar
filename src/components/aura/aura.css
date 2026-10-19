@@ -35,13 +35,6 @@
   transform-box: view-box;
   transform-origin: 0 0;
 }
-/* The placard rocks about the hand holding it (its local origin). */
-.aura-svg .aura-placard {
-  transform-box: view-box;
-  transform-origin: 0 0;
-  animation: aura-placard 4.2s ease-in-out infinite;
-  animation-delay: calc(var(--aura-phase, 0s) - 1s);
-}
 
 /* Hover & float */
 .aura-svg .aura-float { animation: aura-float 4.2s ease-in-out infinite; animation-delay: var(--aura-phase, 0s); }
@@ -120,7 +113,6 @@
 @keyframes aura-glow { 0%, 100% { opacity: 0.75; } 50% { opacity: 1; } }
 @keyframes aura-scan { from { transform: translateY(0); } to { transform: translateY(60px); } }
 @keyframes aura-sway { 0%, 100% { transform: rotate(calc(var(--rot) - 3deg)); } 50% { transform: rotate(calc(var(--rot) + 3deg)); } }
-@keyframes aura-placard { 0%, 100% { transform: rotate(-1.6deg); } 50% { transform: rotate(1.6deg); } }
 @keyframes aura-wave { 0%, 100% { transform: rotate(calc(var(--rot) - 14deg)); } 50% { transform: rotate(calc(var(--rot) + 16deg)); } }
 @keyframes aura-tap { from { transform: rotate(calc(var(--rot) - 3deg)); } to { transform: rotate(calc(var(--rot) + 4deg)); } }
 @keyframes aura-twirl {
@@ -262,7 +254,6 @@
   .aura-svg .aura-rise,
   .aura-svg .aura-confetti,
   .aura-svg .aura-arm-sway,
-  .aura-svg .aura-placard,
   .aura-svg .aura-head-bob,
   .aura-svg .aura-eye-glow,
   .aura-svg .aura-chest-glow,

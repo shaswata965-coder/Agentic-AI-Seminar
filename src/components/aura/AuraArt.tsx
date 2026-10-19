@@ -35,7 +35,7 @@ const FRONT_PROPS = new Set<PropKind>([
   "clipboard", "book", "tablet", "laptop", "camera", "bigHeart", "heartPulse", "ticket", "stopwatch",
 ]);
 
-type ArmPose = { l: number; r: number; wave?: "l" | "r" | "both"; sway?: boolean; tap?: boolean };
+type ArmPose = { l: number; r: number; wave?: "r" | "both"; sway?: boolean; tap?: boolean };
 
 export const POSES: Record<Pose, ArmPose> = {
   idle: { l: 7, r: -7, sway: true },
@@ -43,9 +43,9 @@ export const POSES: Record<Pose, ArmPose> = {
   hold: { l: 7, r: 40 },
   holdBoth: { l: -45, r: 45 },
   holdSide: { l: 7, r: -25 },
+  /** Both fins out to the sides, gripping the top corners of something wide held in front (a placard). */
+  holdWide: { l: 48, r: -48 },
   raise: { l: 7, r: -155 },
-  /** Right arm up (holding a placard, say) while the left one waves. */
-  raiseWave: { l: 140, r: -155, wave: "l" },
   toFace: { l: 7, r: 150 },
   point: { l: 7, r: -80 },
   think: { l: -150, r: -7 },
@@ -91,7 +91,7 @@ export interface AuraArtProps extends AuraLook {
   width?: number | string;
   height?: number | string;
   title?: string;
-  /** Words on a placard held up in the right hand (draw her with a raised right arm: "raise" or "raiseWave"). */
+  /** Words on a large placard held in front of her in both fins (draw her with the "holdWide" pose). */
   placard?: string;
 }
 
@@ -135,7 +135,7 @@ export function AuraArt({
   const gripL = armTip(PIVOT_L, arms.l);
   const fx = new Set<Effect>(effects);
   const showCheeks = ["happy", "love", "wink", "star"].includes(expression);
-  const showEmblem = !wear && !(prop && FRONT_PROPS.has(prop));
+  const showEmblem = !wear && !(prop && FRONT_PROPS.has(prop)) && !placard;
 
   return (
     <svg
@@ -218,6 +218,8 @@ export function AuraArt({
         </g>
       ) : null}
       {fx.has("orbit") ? <Orbit clip={url("orbitBack")} eye={C.eye} /> : null}
+      {/* A placard stands in front of the orbit, so all of it goes behind. */}
+      {fx.has("orbit") && placard ? <Orbit clip={url("orbitFront")} eye={C.eye} /> : null}
 
       <ellipse className="aura-shadow" cx="130" cy="288" rx="48" ry="7" fill={C.shadow} />
 
@@ -302,7 +304,7 @@ export function AuraArt({
               waves={fx.has("waves")}
             />
           ) : null}
-          {placard ? <Placard text={placard} grip={gripR} line={C.line} url={url} /> : null}
+          {placard ? <Placard text={placard} line={C.line} url={url} /> : null}
 
           {/* Arms */}
           <Arm pivot={PIVOT_L} deg={arms.l} side="l" fill={url("body")} edge={C.edge} anim={armAnim(arms, "l")} />
@@ -311,8 +313,8 @@ export function AuraArt({
       </g>
 
       {/* Front layer */}
-      {fx.has("orbit") ? <Orbit clip={url("orbitFront")} eye={C.eye} /> : null}
-      {fx.has("sparkles") ? <Sparkles eye={C.eye} clearTopRight={Boolean(placard)} /> : null}
+      {fx.has("orbit") && !placard ? <Orbit clip={url("orbitFront")} eye={C.eye} /> : null}
+      {fx.has("sparkles") ? <Sparkles eye={C.eye} placard={Boolean(placard)} /> : null}
       {fx.has("hearts") ? <FloatingHearts /> : null}
       {fx.has("code") ? <FloatingCode eye={C.eye} /> : null}
       {fx.has("zzz") ? <Zzz eye={C.eye} /> : null}
@@ -336,7 +338,7 @@ function phaseFor(uid: string) {
 }
 
 function armAnim(pose: ArmPose, side: "l" | "r") {
-  if (pose.wave === "both" || pose.wave === side) return "aura-arm-wave";
+  if (pose.wave === "both" || (pose.wave === "r" && side === "r")) return "aura-arm-wave";
   if (pose.tap) return side === "l" ? "aura-arm-tap" : "aura-arm-tap aura-arm-tap-alt";
   if (pose.sway) return "aura-arm-sway";
   return "";
@@ -906,9 +908,10 @@ function textWidth(text: string) {
   return w;
 }
 
-/* The board: its size, where its centre sits from the hand, and the room for text inside the frame. */
-const BOARD = { w: 132, h: 68, x: -24, y: -112 };
-const BOARD_TEXT = { w: 108, h: 48, max: 16, leading: 1.14 };
+/* The board, held in front of the body below the shoulders with its top corners in the fins of the
+   "holdWide" pose (her hover glow still shows beneath), and the room for text inside its frame, clear of the fins. */
+const BOARD = { x: 12, y: 184, w: 236, h: 80 };
+const BOARD_TEXT = { cx: 130, cy: 226, w: 188, h: 50, max: 30, leading: 1.1 };
 
 /** The text in one to three lines, at the largest size that fits the board (fewer, then more even, lines win ties). */
 export function fitPlacard(text: string) {
@@ -927,36 +930,31 @@ export function fitPlacard(text: string) {
 }
 
 /**
- * A placard on a stick, held up in the right hand above and beside the head, rocking gently. Each line is
- * drawn at its measured width (textLength), so it fits the board whichever font has loaded.
+ * A large placard held in front of her, drawn before the arms so the fins grip its top corners. Each line
+ * is drawn at its measured width (textLength), so it fits the board whichever font has loaded.
  */
-function Placard({ text, grip, line, url }: { text: string; grip: Pt; line: string; url: (name: string) => string }) {
+function Placard({ text, line, url }: { text: string; line: string; url: (name: string) => string }) {
   const { lines, size } = fitPlacard(text);
   const lead = size * BOARD_TEXT.leading;
-  const { w, h } = BOARD;
+  const { x, y, w, h } = BOARD;
   return (
-    <g transform={`translate(${grip.x.toFixed(1)} ${grip.y.toFixed(1)})`}>
-      <g className="aura-placard">
-        <rect x="-2.6" y={BOARD.y} width="5.2" height={-BOARD.y + 6} rx="2.6" fill="#5b6b86" />
-        <g transform={`translate(${BOARD.x} ${BOARD.y})`}>
-          <rect x={-w / 2 + 2} y={-h / 2 + 4} width={w} height={h} rx="10" fill="#0f172a" opacity="0.14" />
-          <rect x={-w / 2} y={-h / 2} width={w} height={h} rx="10" fill={url("screen")} stroke={line} strokeOpacity="0.4" strokeWidth="1" />
-          <rect x={-w / 2 + 4} y={-h / 2 + 4} width={w - 8} height={h - 8} rx="7" fill="#ffffff" />
-          <g fill="#1d2946" fontWeight="700" textAnchor="middle" style={{ fontFamily: "var(--font-display, sans-serif)" }}>
-            {lines.map((l, i) => (
-              <text
-                key={i}
-                x="0"
-                y={((i - (lines.length - 1) / 2) * lead + size * 0.35).toFixed(2)}
-                fontSize={size.toFixed(2)}
-                textLength={(textWidth(l) * size).toFixed(1)}
-                lengthAdjust="spacingAndGlyphs"
-              >
-                {l}
-              </text>
-            ))}
-          </g>
-        </g>
+    <g>
+      <rect x={x + 2} y={y + 5} width={w} height={h} rx="12" fill="#0f172a" opacity="0.16" />
+      <rect x={x} y={y} width={w} height={h} rx="12" fill={url("screen")} stroke={line} strokeOpacity="0.4" strokeWidth="1" />
+      <rect x={x + 5} y={y + 5} width={w - 10} height={h - 10} rx="8" fill="#ffffff" />
+      <g fill="#1d2946" fontWeight="700" textAnchor="middle" style={{ fontFamily: "var(--font-display, sans-serif)" }}>
+        {lines.map((l, i) => (
+          <text
+            key={i}
+            x={BOARD_TEXT.cx}
+            y={(BOARD_TEXT.cy + (i - (lines.length - 1) / 2) * lead + size * 0.35).toFixed(2)}
+            fontSize={size.toFixed(2)}
+            textLength={(textWidth(l) * size).toFixed(1)}
+            lengthAdjust="spacingAndGlyphs"
+          >
+            {l}
+          </text>
+        ))}
       </g>
     </g>
   );
@@ -993,23 +991,21 @@ function Orbit({ clip, eye }: { clip: string; eye: string }) {
   );
 }
 
-/** `clearTopRight` leaves out the sparkle a placard would cover. */
-function Sparkles({ eye, clearTopRight = false }: { eye: string; clearTopRight?: boolean }) {
+/** With a `placard`, the two lower sparkles move up, clear of it. */
+function Sparkles({ eye, placard = false }: { eye: string; placard?: boolean }) {
   const pts = [
     { x: 34, y: 62, s: 0.62, c: eye },
     { x: 226, y: 50, s: 0.8, c: "#ffd166" },
-    { x: 238, y: 200, s: 0.55, c: "#b9a3ff" },
-    { x: 22, y: 216, s: 0.7, c: "#ff8fb8" },
+    { x: 238, y: placard ? 150 : 200, s: 0.55, c: "#b9a3ff" },
+    { x: 22, y: placard ? 166 : 216, s: 0.7, c: "#ff8fb8" },
   ];
   return (
     <g>
-      {pts.map((p, i) =>
-        clearTopRight && i === 1 ? null : (
-          <g key={i} transform={`translate(${p.x} ${p.y}) scale(${p.s})`}>
-            <path className={`aura-twinkle aura-delay-${i}`} d={SPARK_PATH} fill={p.c} />
-          </g>
-        ),
-      )}
+      {pts.map((p, i) => (
+        <g key={i} transform={`translate(${p.x} ${p.y}) scale(${p.s})`}>
+          <path className={`aura-twinkle aura-delay-${i}`} d={SPARK_PATH} fill={p.c} />
+        </g>
+      ))}
     </g>
   );
 }
