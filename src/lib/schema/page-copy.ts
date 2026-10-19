@@ -120,6 +120,9 @@ export const PAGE_COPY = {
     closed: label("Registration closed", "Closed"),
     countdown: label("Countdown label", "Starts"),
   },
+  homePlacard: {
+    text: short("Placard", "Registration opening soon", `What the sign Aura holds up says; about 35 characters fit. Clear it and she waves hello instead. ${PLACEHOLDERS}`),
+  },
   homeHighlights: { stub: label("Label on the ticket stub", "At a glance") },
   homeNews: {
     tone: tone("peach"),

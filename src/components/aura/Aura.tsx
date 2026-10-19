@@ -48,6 +48,8 @@ export interface AuraProps {
   sleepWhenIdle?: boolean;
   /** Fine-tune the preset (expression, prop, effects…). */
   overrides?: Partial<AuraLook>;
+  /** Words on a placard Aura holds up in her right hand (she waves with the left one instead). */
+  placard?: string;
   onActivate?: () => void;
   /** Entrance animation (default "auto"). */
   entrance?: AuraEntrance;
@@ -70,6 +72,7 @@ export function Aura({
   look,
   sleepWhenIdle,
   overrides,
+  placard,
   onActivate,
   entrance = "auto",
   entranceFrom,
@@ -77,7 +80,11 @@ export function Aura({
   className,
 }: AuraProps) {
   const preset = AURA_PRESETS[variant];
-  const base: AuraLook = { ...preset, ...overrides };
+  const sign = placard?.trim() || undefined;
+  const chosen: AuraLook = { ...preset, ...overrides };
+  // Holding a placard keeps the right arm up: a wave becomes a wave with the left, and she rests with the sign held high.
+  const rest: Pose = sign ? "raise" : "idle";
+  const base: AuraLook = sign ? { ...chosen, pose: chosen.pose === "wave" || chosen.pose === "cheer" ? "raiseWave" : "raise" } : chosen;
   const lines = tips ?? preset.tips;
   const rawId = useId();
   const uid = `aura${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
@@ -88,7 +95,8 @@ export function Aura({
   const lastReaction = useRef<"twirl" | "hop">("hop");
 
   const [tempExpression, setTempExpression] = useState<Expression | null>(null);
-  const [poseOverride, setPoseOverride] = useState<Pose | null>(null);
+  // After waving hello she rests (the pose `rest`).
+  const [relaxed, setRelaxed] = useState(false);
   const [reaction, setReaction] = useState<"twirl" | "hop" | null>(null);
   const [bubble, setBubble] = useState<string | null>(null);
   const [idle, setIdle] = useState(false);
@@ -98,14 +106,14 @@ export function Aura({
   if (prevVariant !== variant) {
     setPrevVariant(variant);
     setTempExpression(null);
-    setPoseOverride(null);
+    setRelaxed(false);
   }
 
   const later = (fn: () => void, ms: number) => {
     timers.current.push(setTimeout(fn, ms));
   };
 
-  const waves = base.pose === "wave" || base.pose === "cheer";
+  const waves = base.pose === "wave" || base.pose === "cheer" || base.pose === "raiseWave";
   const arrival = entranceKind(entrance, size, variant);
 
   useEffect(() => {
@@ -116,7 +124,7 @@ export function Aura({
   // Wave hello, then relax.
   useEffect(() => {
     if (!waves) return;
-    const t = setTimeout(() => setPoseOverride("idle"), 4500);
+    const t = setTimeout(() => setRelaxed(true), 4500);
     return () => clearTimeout(t);
   }, [waves, variant]);
 
@@ -170,8 +178,8 @@ export function Aura({
     setTempExpression(base.expression === "happy" ? "star" : "happy");
     later(() => setTempExpression(null), 1700);
     if (waves) {
-      setPoseOverride(null);
-      later(() => setPoseOverride("idle"), 3600);
+      setRelaxed(false);
+      later(() => setRelaxed(true), 3600);
     }
     if (lines.length) {
       setBubble(lines[tipIndex.current % lines.length]);
@@ -182,7 +190,7 @@ export function Aura({
   }
 
   const expression: Expression = idle ? "sleepy" : (tempExpression ?? base.expression);
-  const pose: Pose = idle ? "idle" : (poseOverride ?? base.pose);
+  const pose: Pose = idle || relaxed ? rest : base.pose;
   const effects: Effect[] = idle
     ? [...(base.effects ?? []).filter((e) => e !== "confetti"), "zzz"]
     : (base.effects ?? []);
@@ -211,6 +219,7 @@ export function Aura({
       className="aura-svg h-auto w-full"
       width={size}
       height={Math.round((size * AURA_H) / AURA_W)}
+      placard={sign}
     />
   );
 

@@ -70,6 +70,7 @@ function RegistrationFact({ s }: { s: SiteSettings }) {
 
 export function Hero({ s }: { s: SiteSettings }) {
   const c = copy(s, "homeHero");
+  const placard = copy(s, "homePlacard").text.trim();
   // "Agentic AI Workshop 2026" → highlighted "Agentic AI", then "Workshop", then a muted "2026".
   const { title, year } = splitEventName(s.eventName);
   const lead = title.split(/\s+/);
@@ -116,11 +117,21 @@ export function Hero({ s }: { s: SiteSettings }) {
           </dl>
         </div>
 
-        {/* data-launch-land: after the loading screen, Aura flies down into place from where her ship went up (loading.css). */}
-        <div data-launch-land="" className="relative mx-auto flex w-full max-w-[460px] justify-center pt-6 lg:pt-0">
+        {/* data-launch-land: after the loading screen, Aura flies down into place from where her ship went up (loading.css).
+            She holds up the placard from Home → Hero announcements. */}
+        <div data-launch-land="" data-edit="home.placard" className="relative mx-auto flex w-full max-w-[460px] justify-center pt-6 lg:pt-0">
           <div aria-hidden className="absolute inset-[8%] -z-10 rounded-full bg-[conic-gradient(from_200deg,var(--azure-soft),var(--lilac-soft),var(--blush-soft),var(--mint-soft),var(--azure-soft))] blur-2xl" />
           <div aria-hidden className="absolute inset-[16%] -z-10 rounded-full border border-dashed border-border-strong opacity-60 animate-spin-slow" />
-          <Aura variant="hero" size={340} interactive entrance="load" className="max-w-[78vw]" />
+          <Aura
+            variant="hero"
+            size={340}
+            interactive
+            entrance="load"
+            placard={placard}
+            label={placard ? `Aura, the workshop's agentic AI guide, holding up a sign: “${placard}”` : undefined}
+            bubbleSide={placard ? "left" : "right"}
+            className="max-w-[78vw]"
+          />
         </div>
       </div>
 

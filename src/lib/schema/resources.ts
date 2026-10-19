@@ -634,6 +634,9 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("hero", "Hero", "homeHero", [bool("showCountdown", "Show the countdown timer")], {
         description: "The event name, tagline, dates and venue come from Site-wide → Event details.",
       }),
+      section("placard", "Hero announcements", "homePlacard", [], {
+        description: "A short announcement on the placard Aura holds up in the hero, beside the event's name.",
+      }),
       section("highlights", "Highlight strip", "homeHighlights", [
         objects("highlights", "Highlights", "Highlight", [
           text("label", "Label", { required: true, width: "third" }),

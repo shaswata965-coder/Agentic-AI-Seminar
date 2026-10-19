@@ -35,7 +35,7 @@ const FRONT_PROPS = new Set<PropKind>([
   "clipboard", "book", "tablet", "laptop", "camera", "bigHeart", "heartPulse", "ticket", "stopwatch",
 ]);
 
-type ArmPose = { l: number; r: number; wave?: "r" | "both"; sway?: boolean; tap?: boolean };
+type ArmPose = { l: number; r: number; wave?: "l" | "r" | "both"; sway?: boolean; tap?: boolean };
 
 export const POSES: Record<Pose, ArmPose> = {
   idle: { l: 7, r: -7, sway: true },
@@ -44,6 +44,8 @@ export const POSES: Record<Pose, ArmPose> = {
   holdBoth: { l: -45, r: 45 },
   holdSide: { l: 7, r: -25 },
   raise: { l: 7, r: -155 },
+  /** Right arm up (holding a placard, say) while the left one waves. */
+  raiseWave: { l: 140, r: -155, wave: "l" },
   toFace: { l: 7, r: 150 },
   point: { l: 7, r: -80 },
   think: { l: -150, r: -7 },
@@ -89,6 +91,8 @@ export interface AuraArtProps extends AuraLook {
   width?: number | string;
   height?: number | string;
   title?: string;
+  /** Words on a placard held up in the right hand (draw her with a raised right arm: "raise" or "raiseWave"). */
+  placard?: string;
 }
 
 export function AuraArt({
@@ -107,6 +111,7 @@ export function AuraArt({
   width,
   height,
   title,
+  placard,
 }: AuraArtProps) {
   const id = (name: string) => `${uid}-${name}`;
   const url = (name: string) => `url(#${id(name)})`;
@@ -297,6 +302,7 @@ export function AuraArt({
               waves={fx.has("waves")}
             />
           ) : null}
+          {placard ? <Placard text={placard} grip={gripR} line={C.line} url={url} /> : null}
 
           {/* Arms */}
           <Arm pivot={PIVOT_L} deg={arms.l} side="l" fill={url("body")} edge={C.edge} anim={armAnim(arms, "l")} />
@@ -306,7 +312,7 @@ export function AuraArt({
 
       {/* Front layer */}
       {fx.has("orbit") ? <Orbit clip={url("orbitFront")} eye={C.eye} /> : null}
-      {fx.has("sparkles") ? <Sparkles eye={C.eye} /> : null}
+      {fx.has("sparkles") ? <Sparkles eye={C.eye} clearTopRight={Boolean(placard)} /> : null}
       {fx.has("hearts") ? <FloatingHearts /> : null}
       {fx.has("code") ? <FloatingCode eye={C.eye} /> : null}
       {fx.has("zzz") ? <Zzz eye={C.eye} /> : null}
@@ -330,7 +336,7 @@ function phaseFor(uid: string) {
 }
 
 function armAnim(pose: ArmPose, side: "l" | "r") {
-  if (pose.wave === "both" || (pose.wave === "r" && side === "r")) return "aura-arm-wave";
+  if (pose.wave === "both" || pose.wave === side) return "aura-arm-wave";
   if (pose.tap) return side === "l" ? "aura-arm-tap" : "aura-arm-tap aura-arm-tap-alt";
   if (pose.sway) return "aura-arm-sway";
   return "";
@@ -878,6 +884,84 @@ function PropArt({
   }
 }
 
+/* -------------------------------------------------------------- Placard -- */
+
+/** Advance widths of Outfit Bold (the display font), in hundredths of an em, for " " (32) to "~" (126). */
+const OUTFIT_BOLD = [
+  19, 29, 46, 66, 60, 68, 69, 25, 31, 31, 49, 56, 28, 46, 30, 38,
+  67, 38, 56, 56, 61, 56, 57, 53, 56, 57, 29, 28, 56, 56, 56, 50,
+  76, 73, 64, 69, 75, 61, 59, 78, 73, 29, 53, 70, 56, 86, 74, 81,
+  63, 82, 65, 58, 64, 70, 71, 100, 71, 69, 61, 35, 38, 35, 47, 50,
+  32, 59, 59, 50, 59, 55, 44, 58, 57, 26, 27, 55, 26, 87, 57, 58,
+  59, 59, 44, 46, 40, 54, 54, 78, 54, 53, 48, 34, 30, 34, 56,
+];
+
+/** Width of a line of text, in em. */
+function textWidth(text: string) {
+  let w = 0;
+  for (const ch of text) {
+    const i = ch.charCodeAt(0) - 32;
+    w += (i >= 0 && i < OUTFIT_BOLD.length ? OUTFIT_BOLD[i] : 60) / 100;
+  }
+  return w;
+}
+
+/* The board: its size, where its centre sits from the hand, and the room for text inside the frame. */
+const BOARD = { w: 132, h: 68, x: -24, y: -112 };
+const BOARD_TEXT = { w: 108, h: 48, max: 16, leading: 1.14 };
+
+/** The text in one to three lines, at the largest size that fits the board (fewer, then more even, lines win ties). */
+export function fitPlacard(text: string) {
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const join = (from: number, to?: number) => words.slice(from, to).join(" ");
+  let best = { lines: [join(0)], size: 0, widest: Infinity };
+  const consider = (lines: string[]) => {
+    const widest = Math.max(...lines.map(textWidth));
+    const size = Math.min(BOARD_TEXT.max, BOARD_TEXT.w / widest, BOARD_TEXT.h / (lines.length * BOARD_TEXT.leading));
+    if (size > best.size + 0.05 || (size > best.size - 0.05 && lines.length === best.lines.length && widest < best.widest)) best = { lines, size, widest };
+  };
+  consider([join(0)]);
+  for (let i = 1; i < words.length; i++) consider([join(0, i), join(i)]);
+  for (let i = 1; i < words.length; i++) for (let j = i + 1; j < words.length; j++) consider([join(0, i), join(i, j), join(j)]);
+  return best;
+}
+
+/**
+ * A placard on a stick, held up in the right hand above and beside the head, rocking gently. Each line is
+ * drawn at its measured width (textLength), so it fits the board whichever font has loaded.
+ */
+function Placard({ text, grip, line, url }: { text: string; grip: Pt; line: string; url: (name: string) => string }) {
+  const { lines, size } = fitPlacard(text);
+  const lead = size * BOARD_TEXT.leading;
+  const { w, h } = BOARD;
+  return (
+    <g transform={`translate(${grip.x.toFixed(1)} ${grip.y.toFixed(1)})`}>
+      <g className="aura-placard">
+        <rect x="-2.6" y={BOARD.y} width="5.2" height={-BOARD.y + 6} rx="2.6" fill="#5b6b86" />
+        <g transform={`translate(${BOARD.x} ${BOARD.y})`}>
+          <rect x={-w / 2 + 2} y={-h / 2 + 4} width={w} height={h} rx="10" fill="#0f172a" opacity="0.14" />
+          <rect x={-w / 2} y={-h / 2} width={w} height={h} rx="10" fill={url("screen")} stroke={line} strokeOpacity="0.4" strokeWidth="1" />
+          <rect x={-w / 2 + 4} y={-h / 2 + 4} width={w - 8} height={h - 8} rx="7" fill="#ffffff" />
+          <g fill="#1d2946" fontWeight="700" textAnchor="middle" style={{ fontFamily: "var(--font-display, sans-serif)" }}>
+            {lines.map((l, i) => (
+              <text
+                key={i}
+                x="0"
+                y={((i - (lines.length - 1) / 2) * lead + size * 0.35).toFixed(2)}
+                fontSize={size.toFixed(2)}
+                textLength={(textWidth(l) * size).toFixed(1)}
+                lengthAdjust="spacingAndGlyphs"
+              >
+                {l}
+              </text>
+            ))}
+          </g>
+        </g>
+      </g>
+    </g>
+  );
+}
+
 /* -------------------------------------------------------------- Effects -- */
 
 function Orbit({ clip, eye }: { clip: string; eye: string }) {
@@ -909,7 +993,8 @@ function Orbit({ clip, eye }: { clip: string; eye: string }) {
   );
 }
 
-function Sparkles({ eye }: { eye: string }) {
+/** `clearTopRight` leaves out the sparkle a placard would cover. */
+function Sparkles({ eye, clearTopRight = false }: { eye: string; clearTopRight?: boolean }) {
   const pts = [
     { x: 34, y: 62, s: 0.62, c: eye },
     { x: 226, y: 50, s: 0.8, c: "#ffd166" },
@@ -918,11 +1003,13 @@ function Sparkles({ eye }: { eye: string }) {
   ];
   return (
     <g>
-      {pts.map((p, i) => (
-        <g key={i} transform={`translate(${p.x} ${p.y}) scale(${p.s})`}>
-          <path className={`aura-twinkle aura-delay-${i}`} d={SPARK_PATH} fill={p.c} />
-        </g>
-      ))}
+      {pts.map((p, i) =>
+        clearTopRight && i === 1 ? null : (
+          <g key={i} transform={`translate(${p.x} ${p.y}) scale(${p.s})`}>
+            <path className={`aura-twinkle aura-delay-${i}`} d={SPARK_PATH} fill={p.c} />
+          </g>
+        ),
+      )}
     </g>
   );
 }
