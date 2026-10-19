@@ -129,13 +129,15 @@ export function PreviewBridge() {
     };
   }, [router]);
 
-  // Once a refresh has rendered, outline the section again and measure it.
+  // Once a refresh has rendered, outline the section again and measure it. If it has gone out of
+  // sight (moved in Section order), scroll back to it; otherwise leave the scroll where it is.
   useEffect(() => {
     if (pending || !refreshing.current || window.parent === window) return;
     refreshing.current = false;
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
-        focus(anchor.current, false);
+        const box = findSection(anchor.current)?.getBoundingClientRect();
+        focus(anchor.current, Boolean(box && (box.bottom < 0 || box.top > window.innerHeight)));
         window.parent.postMessage(measure(anchor.current), window.location.origin);
       }),
     );

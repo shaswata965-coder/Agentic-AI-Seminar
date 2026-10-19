@@ -2,6 +2,7 @@ import { ArrowRight, Download, GraduationCap, MapPin, Mic, Printer, Ticket } fro
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { CSSProperties, ReactNode } from "react";
+import { InOrder } from "@/components/layout/InOrder";
 import { PageHero } from "@/components/layout/PageHero";
 import { HackathonSpotlight } from "@/components/programme/HackathonSpotlight";
 import { Kiosks } from "@/components/programme/Kiosks";
@@ -19,6 +20,7 @@ import { copy } from "@/lib/copy";
 import { eventCalendarLinks, eventDays, registrationHref } from "@/lib/event";
 import { eventDayDate, eventDayLabel, formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
+import { sectionOrder } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -49,14 +51,17 @@ export default async function ProgrammePage() {
   const hero = copy(s, "programmeHero");
   const sc = copy(s, "programmeSchedule");
   const pl = copy(s, "programmePlan");
-  // The bar under the hero jumps to each section, named by its label.
-  const jumps = [
-    { href: "#overview", label: s.programmeOverview.eyebrow },
-    { href: "#schedule", label: sc.eyebrow },
-    { href: "#kiosks", label: s.programmeKiosks.eyebrow },
-    { href: "#hackathon", label: s.programmeHackathon.eyebrow },
-    { href: "#plan", label: pl.eyebrow },
-  ].filter((j) => j.label);
+  // The bar under the hero jumps to each section, named by its label, in the order the sections come.
+  const jumpTo = {
+    overview: { href: "#overview", label: s.programmeOverview.eyebrow },
+    schedule: { href: "#schedule", label: sc.eyebrow },
+    kiosks: { href: "#kiosks", label: s.programmeKiosks.eyebrow },
+    hackathon: { href: "#hackathon", label: s.programmeHackathon.eyebrow },
+    plan: { href: "#plan", label: pl.eyebrow },
+  };
+  const jumps = sectionOrder(s, "programme")
+    .map((key) => jumpTo[key])
+    .filter((j) => j.label);
   const plan: { href: string; title: string; text: string; icon: ReactNode; tone: string }[] = [
     { href: "/venue", title: pl.venueTitle, text: pl.venueText, icon: <MapPin size={21} aria-hidden />, tone: "tone-mint" },
     { href: registrationHref(s), title: pl.registrationTitle, text: registrationText(s), icon: <Ticket size={21} aria-hidden />, tone: "tone-butter" },
@@ -88,58 +93,64 @@ export default async function ProgrammePage() {
         </ol>
       </nav>
 
-      <ProgrammeOverview s={s} sessions={sessions} tba={tba} />
-
-      <Section id="schedule" edit="programme.schedule" tone={sc.tone} bg={sc.background} labelledBy="schedule-title">
-        <SectionHeading id="schedule-title" eyebrow={sc.eyebrow} title={sc.title} className="mb-6 sm:mb-8" />
-        {tba ? (
-          <ScheduleTba s={s} />
-        ) : (
-          <>
-            <div className="mb-6 flex flex-wrap items-center gap-3">
-              {s.programmeStatus === "draft" ? (
-                <Badge tone="butter" dot>
-                  {sc.draft}
-                </Badge>
+      <InOrder
+        s={s}
+        page="programme"
+        sections={{
+          overview: <ProgrammeOverview s={s} sessions={sessions} tba={tba} />,
+          schedule: (
+            <Section id="schedule" edit="programme.schedule" tone={sc.tone} bg={sc.background} labelledBy="schedule-title">
+              <SectionHeading id="schedule-title" eyebrow={sc.eyebrow} title={sc.title} className="mb-6 sm:mb-8" />
+              {tba ? (
+                <ScheduleTba s={s} />
               ) : (
-                <Badge tone="mint" dot>
-                  {sc.final}
-                </Badge>
+                <>
+                  <div className="mb-6 flex flex-wrap items-center gap-3">
+                    {s.programmeStatus === "draft" ? (
+                      <Badge tone="butter" dot>
+                        {sc.draft}
+                      </Badge>
+                    ) : (
+                      <Badge tone="mint" dot>
+                        {sc.final}
+                      </Badge>
+                    )}
+                    {s.programmeNote ? <p className="text-sm text-muted">{s.programmeNote}</p> : null}
+                    {sc.printTip ? (
+                      <span className="ml-auto hidden items-center gap-1.5 text-xs text-subtle sm:inline-flex">
+                        <Printer size={14} aria-hidden /> {sc.printTip}
+                      </span>
+                    ) : null}
+                  </div>
+                  {sc.filterHint ? <p className="mb-6 max-w-2xl text-sm text-muted">{sc.filterHint}</p> : null}
+                  <ProgrammeView sessions={withTimes} speakers={mini} days={days} />
+                </>
               )}
-              {s.programmeNote ? <p className="text-sm text-muted">{s.programmeNote}</p> : null}
-              {sc.printTip ? (
-                <span className="ml-auto hidden items-center gap-1.5 text-xs text-subtle sm:inline-flex">
-                  <Printer size={14} aria-hidden /> {sc.printTip}
-                </span>
-              ) : null}
-            </div>
-            {sc.filterHint ? <p className="mb-6 max-w-2xl text-sm text-muted">{sc.filterHint}</p> : null}
-            <ProgrammeView sessions={withTimes} speakers={mini} days={days} />
-          </>
-        )}
-      </Section>
-
-      <Kiosks s={s} kiosks={kiosks} />
-
-      <HackathonSpotlight s={s} h={h} sessions={tba ? [] : sessions} />
-
-      <Section id="plan" edit="programme.plan" tone={pl.tone} bg={pl.background} labelledBy="plan-title">
-        <SectionHeading id="plan-title" eyebrow={pl.eyebrow} title={pl.title} className="mb-8 sm:mb-10" />
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {plan.map((p, i) => (
-            <li key={p.title} data-reveal style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties}>
-              <Link href={p.href} data-glow="" className={`${p.tone} card group flex h-full flex-col p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
-                <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:rotate-6">{p.icon}</span>
-                <span className="mt-4 flex items-center gap-1.5 font-display text-lg font-semibold text-fg">
-                  {p.title}
-                  <ArrowRight size={16} aria-hidden className="opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100" />
-                </span>
-                <span className="mt-1.5 text-sm text-muted">{p.text}</span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Section>
+            </Section>
+          ),
+          kiosks: <Kiosks s={s} kiosks={kiosks} />,
+          hackathon: <HackathonSpotlight s={s} h={h} sessions={tba ? [] : sessions} />,
+          plan: (
+            <Section id="plan" edit="programme.plan" tone={pl.tone} bg={pl.background} labelledBy="plan-title">
+              <SectionHeading id="plan-title" eyebrow={pl.eyebrow} title={pl.title} className="mb-8 sm:mb-10" />
+              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {plan.map((p, i) => (
+                  <li key={p.title} data-reveal style={{ "--reveal-delay": `${i * 70}ms` } as CSSProperties}>
+                    <Link href={p.href} data-glow="" className={`${p.tone} card group flex h-full flex-col p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
+                      <span className="grid h-11 w-11 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:rotate-6">{p.icon}</span>
+                      <span className="mt-4 flex items-center gap-1.5 font-display text-lg font-semibold text-fg">
+                        {p.title}
+                        <ArrowRight size={16} aria-hidden className="opacity-0 transition-all duration-300 group-hover:translate-x-1 group-hover:opacity-100" />
+                      </span>
+                      <span className="mt-1.5 text-sm text-muted">{p.text}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          ),
+        }}
+      />
     </TagScope>
   );
 }

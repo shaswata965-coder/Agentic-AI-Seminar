@@ -20,6 +20,7 @@ import {
 } from "@/lib/content/constants";
 import type { Tone } from "@/lib/content/constants";
 import { copyFields, type CopyKey } from "./page-copy";
+import { isOrderPage, orderField, SECTION_ORDER } from "./section-order";
 import {
   bool,
   color,
@@ -31,6 +32,7 @@ import {
   list,
   num,
   objects,
+  order as orderList,
   ref,
   refList,
   richtext,
@@ -860,6 +862,20 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     sections: [section("hero", "Hero", "auraHero"), section("playground", "Playground", "auraPlayground"), section("looks", "Around the site", "auraLooks")],
   },
 ];
+
+// Pages with sections that can be moved get a Section order tab (see section-order.ts); the hero stays first.
+for (const p of SETTINGS_PAGES) {
+  if (!isOrderPage(p.key)) continue;
+  const titleOf = (key: string) => p.sections.find((s) => s.key === key)?.title ?? key;
+  const options = SECTION_ORDER[p.key].map((key) => ({ value: key, label: titleOf(key) }));
+  p.sections.push(
+    section("order", "Section order", undefined, [orderList(orderField(p.key), "Order of sections", options, { pinned: [titleOf("hero")] })], {
+      description:
+        "Move the sections up or down the page by dragging them or with their arrows; the preview follows. The hero always stays at the top. A section that isn't showing right now (one with nothing in it yet, say) keeps its place for when it appears. Each section's background is set in its own tab, so after a move you may want to check that tinted and plain sections still take turns.",
+      anchor: "",
+    }),
+  );
+}
 
 // Each section previews itself at `[data-edit="<page>.<section>"]` unless it names another place.
 for (const p of SETTINGS_PAGES) for (const s of p.sections) s.anchor ??= `${p.key}.${s.key}`;

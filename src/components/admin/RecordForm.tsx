@@ -9,6 +9,7 @@ import { emptyValue } from "@/lib/content/normalize";
 import { isoToLocalInput, localInputToIso } from "@/lib/format";
 import type { FieldDef } from "@/lib/schema/fields";
 import { MediaPicker } from "./MediaPicker";
+import { OrderInput } from "./OrderInput";
 import { RefListSelect, RefSelect } from "./RefSelect";
 
 type Values = Record<string, unknown>;
@@ -233,6 +234,8 @@ function FieldInput({ field: f, value, onChange, errors, path }: { field: FieldD
         </fieldset>
       );
     }
+    case "order":
+      return <OrderInput field={f} value={value} onChange={onChange} error={error} />;
     case "objectList":
       return <ObjectListInput field={f} value={Array.isArray(value) ? (value as Values[]) : []} onChange={onChange} errors={errors} path={path} help={help} err={err} />;
     case "group":

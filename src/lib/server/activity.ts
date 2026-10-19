@@ -84,7 +84,7 @@ function format(raw: unknown, def: FieldDef | undefined, titles: Map<string, str
   if (typeof raw === "boolean") return raw ? "Yes" : "No";
   const s = typeof raw === "object" ? JSON.stringify(raw) : String(raw);
   if (!s) return "";
-  if (def?.type === "select" || def?.type === "multiselect") return def.options.find((o) => o.value === s)?.label ?? s;
+  if (def?.type === "select" || def?.type === "multiselect" || def?.type === "order") return def.options.find((o) => o.value === s)?.label ?? s;
   if (def?.type === "ref" || def?.type === "refList") return titles.get(s) ?? s;
   if (def?.type === "datetime") return `${formatDateTime(s) || s} IST`;
   return s;

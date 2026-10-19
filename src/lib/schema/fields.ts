@@ -70,6 +70,13 @@ export interface RefField extends Base {
   type: "ref" | "refList";
   resource: string;
 }
+/** The order of a fixed set of items (a page's sections): each option once, in the order chosen. */
+export interface OrderField extends Base {
+  type: "order";
+  options: Option[];
+  /** Items shown above the list that stay where they are (a page's hero). */
+  pinned?: string[];
+}
 
 export type FieldDef =
   | TextField
@@ -81,7 +88,8 @@ export type FieldDef =
   | StringListField
   | ObjectListField
   | GroupField
-  | RefField;
+  | RefField
+  | OrderField;
 
 /** A tab of fields inside a singleton editor (Settings, Hackathon). */
 export interface FieldSection {
@@ -126,3 +134,4 @@ export const time = (name: string, label: string, extra: Partial<DateField> = {}
 export const ref = (name: string, label: string, resource: string, extra: Partial<RefField> = {}): RefField => ({ name, label, type: "ref", resource, ...extra });
 export const refList = (name: string, label: string, resource: string, extra: Partial<RefField> = {}): RefField => ({ name, label, type: "refList", resource, ...extra });
 export const color = (name: string, label: string, extra: Partial<TextField> = {}): TextField => ({ name, label, type: "color", ...extra });
+export const order = (name: string, label: string, options: Option[], extra: Partial<OrderField> = {}): OrderField => ({ name, label, type: "order", options, ...extra });

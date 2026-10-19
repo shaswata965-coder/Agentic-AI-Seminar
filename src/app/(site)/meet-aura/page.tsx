@@ -3,6 +3,7 @@ import { Aura } from "@/components/aura/Aura";
 import { AuraPlayground } from "@/components/aura/AuraPlayground";
 import { AURA_PRESETS } from "@/components/aura/presets";
 import type { AuraVariant } from "@/components/aura/types";
+import { InOrder } from "@/components/layout/InOrder";
 import { PageHero } from "@/components/layout/PageHero";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
@@ -34,21 +35,31 @@ export default async function MeetAuraPage() {
   return (
     <TagScope style="corner">
       <PageHero edit="meetAura.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="hero" description={hero.description} />
-      <Section edit="meetAura.playground" tone={pg.tone} bg={pg.background} labelledBy="playground-title">
-        <SectionHeading id="playground-title" eyebrow={pg.eyebrow} title={pg.title} description={pg.description} />
-        <AuraPlayground />
-      </Section>
-      <Section edit="meetAura.looks" tone={lk.tone} bg={lk.background} labelledBy="looks-title">
-        <SectionHeading id="looks-title" eyebrow={lk.eyebrow} title={lk.title} description={lk.description} />
-        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-          {variants.map((v) => (
-            <li key={v} data-glow="" className="card flex flex-col items-center p-4 text-center transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">
-              <Aura variant={v} size={130} lite label={AURA_PRESETS[v].label} entrance="zip" />
-              <p className="mt-2 text-sm font-semibold text-fg">{WHERE[v]}</p>
-            </li>
-          ))}
-        </ul>
-      </Section>
+      <InOrder
+        s={s}
+        page="meetAura"
+        sections={{
+          playground: (
+            <Section edit="meetAura.playground" tone={pg.tone} bg={pg.background} labelledBy="playground-title">
+              <SectionHeading id="playground-title" eyebrow={pg.eyebrow} title={pg.title} description={pg.description} />
+              <AuraPlayground />
+            </Section>
+          ),
+          looks: (
+            <Section edit="meetAura.looks" tone={lk.tone} bg={lk.background} labelledBy="looks-title">
+              <SectionHeading id="looks-title" eyebrow={lk.eyebrow} title={lk.title} description={lk.description} />
+              <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+                {variants.map((v) => (
+                  <li key={v} data-glow="" className="card flex flex-col items-center p-4 text-center transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">
+                    <Aura variant={v} size={130} lite label={AURA_PRESETS[v].label} entrance="zip" />
+                    <p className="mt-2 text-sm font-semibold text-fg">{WHERE[v]}</p>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          ),
+        }}
+      />
     </TagScope>
   );
 }

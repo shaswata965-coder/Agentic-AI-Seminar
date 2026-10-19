@@ -1,6 +1,6 @@
 "use client";
 
-import { CircleCheck, ExternalLink, Info, Save, TriangleAlert } from "lucide-react";
+import { ArrowUpDown, CircleCheck, ExternalLink, Info, Save, TriangleAlert } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
@@ -11,10 +11,13 @@ import { siteVars } from "@/lib/copy";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
 import { settingsPagesFor } from "@/lib/permissions";
+import type { OrderField } from "@/lib/schema/fields";
 import { PAGE_COPY, type CopyField, type CopyKey } from "@/lib/schema/page-copy";
 import { SETTINGS_PAGES, type SettingsPage, type SettingsSection } from "@/lib/schema/resources";
+import { arrange, isOrderPage, orderField, SECTION_ORDER } from "@/lib/schema/section-order";
 import { PageTitle, useMe } from "../AdminShell";
 import { api, ApiError, useApi } from "../api";
+import { OrderInput } from "../OrderInput";
 import { RecordForm } from "../RecordForm";
 import { CopyForm, copyIssues } from "./CopyForm";
 import { PreviewPane, type Report } from "./PreviewPane";
@@ -28,6 +31,17 @@ function sectionOf(key: string): { page: SettingsPage; section: SettingsSection 
   const top = key.split(".")[0];
   for (const page of SETTINGS_PAGES) for (const section of page.sections) if (section.copy === top || section.fields.some((f) => f.name === top)) return { page, section };
   return null;
+}
+
+/** A Section order tab's field. */
+const orderOf = (s: SettingsSection) => (s.fields[0]?.type === "order" ? (s.fields[0] as OrderField) : null);
+
+/** A page's sections as they come on the page: the fixed ones (hero…), the movable ones in their current order, then Section order. */
+function inPageOrder(page: SettingsPage, value: Values | null): SettingsSection[] {
+  if (!isOrderPage(page.key)) return page.sections;
+  const keys: readonly string[] = arrange(SECTION_ORDER[page.key], value?.[orderField(page.key)]);
+  const rank = (s: SettingsSection) => (orderOf(s) ? keys.length : keys.indexOf(s.key));
+  return [...page.sections].sort((a, b) => rank(a) - rank(b)); // the fixed ones rank -1 and keep their places (stable sort)
 }
 
 /**
@@ -66,12 +80,16 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
   const [revision, setRevision] = useState(0);
   const [syncing, setSyncing] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
+  // On a Section order tab, the preview goes to the section last moved.
+  const [moved, setMoved] = useState<{ page: string; anchor: string } | null>(null);
   const hadDraft = useRef(false);
 
   const value = draft ?? data?.data ?? null;
   const dirty = draft !== null;
   const page = pages.find((p) => p.key === pageKey) ?? pages[0];
   const section = page.sections.find((s) => s.key === sectionKey) ?? page.sections[0];
+  const ordering = orderOf(section);
+  const anchor = ordering ? (moved?.page === page.key ? moved.anchor : null) : (section.anchor ?? null);
   const vars = useMemo(() => (value ? siteVars(value as unknown as SiteSettings) : {}), [value]);
 
   // Unsaved changes go to the preview a moment after typing stops.
@@ -225,7 +243,7 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
               {page.description ? <p className="mb-3 text-sm text-muted">{page.description}</p> : null}
               <nav aria-label={`Sections of ${page.title}`} className="mb-4">
                 <ul className="flex flex-wrap gap-1.5">
-                  {page.sections.map((s) => (
+                  {inPageOrder(page, value).map((s) => (
                     <li key={s.key}>
                       <button
                         type="button"
@@ -236,6 +254,7 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                           s.key === section.key ? "bg-surface text-fg shadow-card ring-border-strong" : "text-muted ring-transparent hover:bg-surface/70 hover:text-fg",
                         )}
                       >
+                        {orderOf(s) ? <ArrowUpDown size={14} aria-hidden /> : null}
                         {s.title}
                         {flagged.has(`${page.key}.${s.key}`) ? <span className="h-2 w-2 rounded-full bg-butter-ink" aria-label="has layout warnings" /> : null}
                         {Object.keys(errors).some((k) => sectionOf(k)?.section === s) ? <span className="h-2 w-2 rounded-full bg-blush-ink" aria-label="has errors" /> : null}
@@ -245,39 +264,41 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                 </ul>
               </nav>
 
-              <section aria-label="Layout check" className="card mb-4 px-5 py-4" data-layout-check="">
-                <h3 className="flex items-center gap-2 font-display text-base font-bold text-fg">
-                  {lengthNotes.length || domNotes.length ? <TriangleAlert size={17} aria-hidden className="text-butter-ink" /> : <CircleCheck size={17} aria-hidden className="text-mint-ink" />}
-                  Layout check
-                </h3>
-                {missing ? (
-                  <p className="mt-2 flex items-start gap-2 text-sm text-muted">
-                    <Info size={15} aria-hidden className="mt-0.5 shrink-0" /> This section isn&apos;t on the page right now (for example, it appears once something is added or switched on), so it can&apos;t be measured.
-                  </p>
-                ) : null}
-                {lengthNotes.length || domNotes.length ? (
-                  <ul className="mt-2 grid gap-1.5 text-sm">
-                    {lengthNotes.map(({ name, issue }) => (
-                      <li key={`len-${name}`} className="flex items-start gap-2 text-fg" data-issue="length">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-butter-ink" aria-hidden />
-                        <span>
-                          <strong>{section.copy ? labelOf(section.copy, name) : name}:</strong> {issue.message}
-                        </span>
-                      </li>
-                    ))}
-                    {domNotes.map((n) => (
-                      <li key={`dom-${n.message}`} className="flex items-start gap-2 text-fg" data-issue={n.kind}>
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-butter-ink" aria-hidden />
-                        <span>
-                          <strong>On the page:</strong> {n.message}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                ) : !missing ? (
-                  <p className="mt-2 text-sm text-muted">The texts fit: nothing is too long or too short for this section&apos;s layout{report?.width ? ` at ${report.width}px wide` : ""}.</p>
-                ) : null}
-              </section>
+              {ordering ? null : (
+                <section aria-label="Layout check" className="card mb-4 px-5 py-4" data-layout-check="">
+                  <h3 className="flex items-center gap-2 font-display text-base font-bold text-fg">
+                    {lengthNotes.length || domNotes.length ? <TriangleAlert size={17} aria-hidden className="text-butter-ink" /> : <CircleCheck size={17} aria-hidden className="text-mint-ink" />}
+                    Layout check
+                  </h3>
+                  {missing ? (
+                    <p className="mt-2 flex items-start gap-2 text-sm text-muted">
+                      <Info size={15} aria-hidden className="mt-0.5 shrink-0" /> This section isn&apos;t on the page right now (for example, it appears once something is added or switched on), so it can&apos;t be measured.
+                    </p>
+                  ) : null}
+                  {lengthNotes.length || domNotes.length ? (
+                    <ul className="mt-2 grid gap-1.5 text-sm">
+                      {lengthNotes.map(({ name, issue }) => (
+                        <li key={`len-${name}`} className="flex items-start gap-2 text-fg" data-issue="length">
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-butter-ink" aria-hidden />
+                          <span>
+                            <strong>{section.copy ? labelOf(section.copy, name) : name}:</strong> {issue.message}
+                          </span>
+                        </li>
+                      ))}
+                      {domNotes.map((n) => (
+                        <li key={`dom-${n.message}`} className="flex items-start gap-2 text-fg" data-issue={n.kind}>
+                          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-butter-ink" aria-hidden />
+                          <span>
+                            <strong>On the page:</strong> {n.message}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : !missing ? (
+                    <p className="mt-2 text-sm text-muted">The texts fit: nothing is too long or too short for this section&apos;s layout{report?.width ? ` at ${report.width}px wide` : ""}.</p>
+                  ) : null}
+                </section>
+              )}
               <form
                 className="card p-5 sm:p-6"
                 onSubmit={(e) => {
@@ -301,7 +322,15 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                       vars={vars}
                     />
                   ) : null}
-                  {section.fields.length ? (
+                  {ordering ? (
+                    <OrderInput
+                      field={ordering}
+                      value={value[ordering.name]}
+                      onChange={(v) => edit({ ...value, [ordering.name]: v })}
+                      onMove={(key) => setMoved({ page: page.key, anchor: `${page.key}.${key}` })}
+                      error={errors[ordering.name]}
+                    />
+                  ) : section.fields.length ? (
                     <div className={cn(section.copy && "border-t border-border pt-6")}>
                       <RecordForm fields={section.fields} value={value} onChange={edit} errors={errors} />
                     </div>
@@ -313,7 +342,7 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
 
             <div className="min-w-0 xl:sticky xl:top-4 xl:h-[calc(100dvh-8rem)] xl:self-start">
               {previewReady ? (
-                <PreviewPane path={path} anchor={section.anchor ?? null} revision={revision} syncing={syncing} onReport={onReport} />
+                <PreviewPane path={path} anchor={anchor} revision={revision} syncing={syncing} onReport={onReport} />
               ) : (
                 <div className="card grid h-full min-h-[28rem] place-items-center text-sm text-muted">Opening the preview…</div>
               )}

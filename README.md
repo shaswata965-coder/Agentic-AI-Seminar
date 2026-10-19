@@ -25,7 +25,7 @@ It's a fast, accessible, mobile-first site with light and dark modes, a light pa
 
 **Admin panel (`/admin`)**
 - Sign-in with administrator, editor and volunteer roles. Volunteers get a responsibility and only the permissions an administrator ticks, and everything they change goes to a **task tracker** where administrators see who changed what (before and after) and mark it reviewed.
-- **Site settings with a tab per page:** every section's texts, colours and background, and the site's accent colours, with the real page as a live preview beside the form (Next.js Draft Mode, visible only to the editor until saved) and warnings when text is too long or short for the layout, both from recommended lengths and from measuring the previewed page.
+- **Site settings with a tab per page:** every section's texts, colours and background, the order of each page's sections (drag or arrows; the hero stays at the top), and the site's accent colours, with the real page as a live preview beside the form (Next.js Draft Mode, visible only to the editor until saved) and warnings when text is too long or short for the layout, both from recommended lengths and from measuring the previewed page.
 - Edit everything: event details and dates, registration status and deadlines, announcements, speakers, programme, panels, tutorials, demos, kiosks, sponsors and tiers, organisers, volunteers, mentors and judges, FAQs, venue and travel, contact and social links, branding (logos, brand colour), SEO and Analytics, and the post-event switches.
 - Media library: uploads are resized and compressed automatically and stored in MongoDB.
 - Registrations and enquiries: search, status, notes and CSV export for Excel.
@@ -197,6 +197,8 @@ scripts/               seed, seed:demo, create-admin
 assets/fonts/          fonts for the social preview images (SIL Open Font License); site fonts are in src/app/fonts
 docs/                  admin guide and requirements checklist
 ```
+
+**Section order:** the sections of a page that admins may move are listed, in their default order, in `src/lib/schema/section-order.ts` (by their Site settings section keys). Each such page gets a *Section order* tab in Site settings (an `order` field, `<page>Order`, so volunteers can move only their own pages' sections), and the page renders those sections through `<InOrder s={s} page="…" sections={{ key: <Section …/>, … }}>` (`components/layout/InOrder.tsx`), with its hero outside it, first. A saved order is made whole as it's read: unknown keys are dropped and sections added since are put back after the one they follow by default. To make a new section movable, add its key to the page's list and to the page's `sections`.
 
 **Adding a field to a content type** (for example a "pronouns" field for speakers): add it to the collection's `fields` in `src/lib/schema/resources.ts` and to its type in `src/lib/content/types.ts`, then render it. The admin form, validation and database schema follow automatically.
 

@@ -1,6 +1,7 @@
 import { z, type ZodType } from "zod";
 import { cleanLine, cleanText, harmlessLink, SAFE_LINK } from "@/lib/safe-text";
 import type { FieldDef } from "@/lib/schema/fields";
+import { arrange } from "@/lib/schema/section-order";
 
 /*
  * Builds a zod schema from admin field definitions. Unknown keys are
@@ -113,6 +114,15 @@ function fieldSchema(f: FieldDef): ZodType {
         .array(z.string().regex(OBJECT_ID, msg(f, "invalid reference")))
         .max(MAX_ITEMS, msg(f, `at most ${MAX_ITEMS} items`))
         .default([]);
+    case "order": {
+      // Every option once: unknown items are dropped and missing ones put back in their default place.
+      const values = f.options.map((o) => o.value);
+      return z
+        .array(z.string().max(100))
+        .max(values.length * 2, msg(f, "too many items"))
+        .transform((a) => arrange(values, a))
+        .default(values);
+    }
   }
 }
 

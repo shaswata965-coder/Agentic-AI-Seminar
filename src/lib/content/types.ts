@@ -8,6 +8,7 @@ import type {
   ThemeKey,
 } from "./constants";
 import type { PageCopy } from "@/lib/schema/page-copy";
+import type { SectionOrders } from "@/lib/schema/section-order";
 import type { Tone } from "./constants";
 
 export interface IconItem {
@@ -20,7 +21,7 @@ export interface IconItem {
 export type Palette = Record<Tone, string>;
 
 /** Everything in Admin → Site settings, including every section's texts and colours (PageCopy). */
-export interface SiteSettings extends PageCopy {
+export interface SiteSettings extends PageCopy, SectionOrders {
   eventName: string;
   shortName: string;
   tagline: string;

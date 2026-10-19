@@ -24,6 +24,8 @@ export function emptyValue(f: FieldDef): unknown {
       return [];
     case "group":
       return {};
+    case "order":
+      return f.options.map((o) => o.value);
     case "ref":
       return "";
     default:

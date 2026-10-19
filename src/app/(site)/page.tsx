@@ -8,6 +8,7 @@ import { Partners } from "@/components/home/Partners";
 import { SpeakersPreview } from "@/components/home/SpeakersPreview";
 import { Themes } from "@/components/home/Themes";
 import { Venue } from "@/components/home/Venue";
+import { InOrder } from "@/components/layout/InOrder";
 import { LoadingScreen } from "@/components/loading/LoadingScreen";
 import { getAnnouncements, getDemos, getFaqs, getHackathon, getKiosks, getPeople, getSettings, getSpeakers, getSponsors } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
@@ -44,15 +45,21 @@ export default async function HomePage() {
       {s.showLoader ? <LoadingScreen eventName={s.eventName} routes={routes} files={files} text={copy(s, "homeLoader")} /> : null}
       <JsonLd data={eventJsonLd(s)} />
       <Hero s={s} />
-      <Highlights s={s} />
-      <Announcements s={s} items={announcements} />
-      <Themes s={s} />
-      <About s={s} />
-      <SpeakersPreview s={s} speakers={speakers} />
-      <HackathonTeaser s={s} h={h} />
-      <Venue s={s} />
-      <Partners s={s} sponsors={sponsors} />
-      <FaqContact s={s} faqs={faqs} />
+      <InOrder
+        s={s}
+        page="home"
+        sections={{
+          highlights: <Highlights s={s} />,
+          news: <Announcements s={s} items={announcements} />,
+          themes: <Themes s={s} />,
+          about: <About s={s} />,
+          speakers: <SpeakersPreview s={s} speakers={speakers} />,
+          hackathon: <HackathonTeaser s={s} h={h} />,
+          venue: <Venue s={s} />,
+          partners: <Partners s={s} sponsors={sponsors} />,
+          faq: <FaqContact s={s} faqs={faqs} />,
+        }}
+      />
     </>
   );
 }

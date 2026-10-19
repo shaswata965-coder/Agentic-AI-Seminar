@@ -21,6 +21,7 @@ function schemaFromFields(fields: FieldDef[]): SchemaDefinition {
         break;
       case "multiselect":
       case "stringList":
+      case "order":
         def[f.name] = { type: [String], default: [] };
         break;
       case "objectList":
