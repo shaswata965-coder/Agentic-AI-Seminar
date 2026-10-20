@@ -156,8 +156,9 @@ export function LoadingScreen({ eventName, routes, files, text }: { eventName: s
 
 /**
  * The progress ring: two half-rings turned into view (the classic two-halves technique), so it moves by
- * rotation alone. loading.css turns them from its --lx-p (0 to 1), which the head script (flag.ts) sets
- * while the page loads and warm.ts after that, so it moves from the first paint.
+ * rotation alone. loading.css turns them from its inherited --lx-p (0 to 1), which the head script (flag.ts)
+ * sets on <html> while the page loads and warm.ts after that, so it moves from the first paint without
+ * mutating React DOM attributes or causing hydration mismatches.
  */
 function Ring() {
   return (

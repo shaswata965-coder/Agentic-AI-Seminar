@@ -66,7 +66,7 @@ export const PAGE_COPY = {
     organisers: label("Organisers", "Organisers"),
     organisersText: note("Organisers: description", "Faculty, student organisers and volunteers"),
     themes: label("Home: Themes", "Themes"),
-    themesText: note("Themes: description", "Healthcare, scientific discovery and entrepreneurship"),
+    themesText: note("Themes: description", "Healthcare, scientific discovery and enterprise"),
     routeMap: label("Home: Route map", "Route map"),
     routeMapText: note("Route map: description", "Follow the route to campus on the map"),
     faq: label("Home: FAQ", "FAQ"),

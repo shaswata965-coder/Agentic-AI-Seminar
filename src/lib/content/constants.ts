@@ -11,7 +11,7 @@ export const THEME_META: Record<
 > = {
   healthcare: { label: "Agentic AI in Healthcare", short: "Healthcare", tone: "blush", aura: "healthcare", icon: "heart" },
   science: { label: "Agentic AI for Scientific Discovery", short: "Scientific Discovery", tone: "lilac", aura: "science", icon: "atom" },
-  entrepreneurship: { label: "Agentic AI and Entrepreneurship", short: "Entrepreneurship", tone: "peach", aura: "entrepreneurship", icon: "rocket" },
+  entrepreneurship: { label: "Agentic AI and Enterprise", short: "Enterprise", tone: "peach", aura: "entrepreneurship", icon: "rocket" },
   general: { label: "Cross-cutting", short: "General", tone: "azure", aura: "guide", icon: "spark" },
 };
 

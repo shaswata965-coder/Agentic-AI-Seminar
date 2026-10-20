@@ -1,64 +1,18 @@
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
-import { Aura } from "@/components/aura/Aura";
-import { Tilt } from "@/components/effects/Tilt";
-import { Section, SectionHeading } from "@/components/ui/Section";
-import { THEME_META } from "@/lib/content/constants";
 import type { SiteSettings } from "@/lib/content/types";
-import { copy } from "@/lib/copy";
 
-export function Themes({ s }: { s: SiteSettings }) {
-  const c = copy(s, "homeThemes");
-  return (
-    <Section id="themes" edit="home.themes" tone={c.tone} bg={c.background} labelledBy="themes-title" tags="corner">
-      <SectionHeading
-        id="themes-title"
-        eyebrow={c.eyebrow}
-        title={c.title}
-        description={c.description}
-        align="center"
-      />
-      <ul className="grid gap-6 lg:grid-cols-3">
-        {s.themes.map((t, i) => {
-          const meta = THEME_META[t.key] ?? THEME_META.general;
-          return (
-            <li key={t.key} data-reveal style={{ ["--reveal-delay" as string]: `${i * 110}ms` }}>
-              <Tilt className="h-full">
-                <article className={`tone-${meta.tone} card relative flex h-full flex-col overflow-hidden p-6 sm:p-7`}>
-                  <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_var(--mx,70%)_var(--my,0%),color-mix(in_oklab,var(--accent)_30%,transparent),transparent_70%)]" />
-                  <div className="relative flex items-start justify-between gap-4">
-                    <span className="tag tag-eyebrow">{c.theme ? `${c.theme} ${i + 1}` : i + 1}</span>
-                    <span aria-hidden className="font-display text-6xl leading-none font-black text-[color-mix(in_oklab,var(--accent)_45%,transparent)]">
-                      0{i + 1}
-                    </span>
-                  </div>
-                  <div className="relative mx-auto my-4">
-                    <Aura variant={meta.aura} size={168} interactive bubbleSide={i === 2 ? "left" : "right"} />
-                  </div>
-                  <h3 className="relative font-display text-2xl font-bold text-fg">{t.title}</h3>
-                  <p className="relative mt-3 text-[15.5px] leading-relaxed text-muted">{t.description}</p>
-                  <ul className="relative mt-6 grid gap-2 border-t border-border pt-5 text-sm font-semibold">
-                    {[
-                      { href: `/programme?theme=${t.key}`, label: c.talks },
-                      { href: `/tutorials?theme=${t.key}`, label: c.tutorials },
-                      { href: `/hackathon#track-${t.key}`, label: c.track },
-                    ]
-                      .filter((l) => l.label)
-                      .map((l) => (
-                      <li key={l.href}>
-                        <Link href={l.href} className="group flex items-center justify-between rounded-xl px-3 py-2 text-accent-ink transition-colors hover:bg-accent-soft">
-                          {l.label}
-                          <ArrowRight size={16} aria-hidden className="transition-transform group-hover:translate-x-1" />
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </article>
-              </Tilt>
-            </li>
-          );
-        })}
-      </ul>
-    </Section>
-  );
+export const THEME_IMAGES: Record<string, string> = {
+  healthcare: "/themes/health-care.png",
+  science: "/themes/Agentic AI for Scientific Discovery.png",
+  entrepreneurship: "/themes/Agentic AI and Enterprise.png",
+  "Agentic AI in Healthcare": "/themes/health-care.png",
+  "Agentic AI for Scientific Discovery": "/themes/Agentic AI for Scientific Discovery.png",
+  "Agentic AI and Enterprise": "/themes/Agentic AI and Enterprise.png",
+};
+
+/**
+ * The three workshop themes are now integrated directly into the homepage Hero section
+ * in the left column beside Aura.
+ */
+export function Themes({ s: _s }: { s: SiteSettings }) {
+  return null;
 }
