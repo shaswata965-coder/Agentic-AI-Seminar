@@ -22,7 +22,7 @@ export function About({ s }: { s: SiteSettings }) {
   const points = s.aboutPoints.slice(0, 8).map((p) => ({ ...p, title: fill(p.title), description: fill(p.description) }));
   const c = copy(s, "homeAbout");
   return (
-    <Section id="about" edit="home.about" tone={c.tone} bg={c.background} labelledBy="about-title" tags="underline">
+    <Section id="about" edit="home.about" tone={c.tone} bg={c.background} labelledBy="about-title" tags="underline" className="pb-12 sm:pb-16">
       <div className="text-center">
         {c.eyebrow ? <Eyebrow centered>{c.eyebrow}</Eyebrow> : null}
         <h2 id="about-title" className="sr-only">

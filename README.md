@@ -2,7 +2,7 @@
 
 Official website for the **Agentic AI Workshop 2026**, organised by the Indian Institute of Technology Delhi and the Yardi School of Artificial Intelligence (ScAI), IIT Delhi, **15–16 December 2026**.
 
-It's a fast, accessible, mobile-first site with light and dark modes, a light pastel palette and **Aura**, an original rounded robot guide. Aura looks different in each section: a stethoscope for healthcare, a flask for science, a rocket for entrepreneurship, a clipboard for the programme, a laptop and headset for the hackathon, and so on. Organisers update all content from a built-in admin panel, with no code changes.
+It's a fast, accessible, mobile-first site with light and dark modes, a light pastel palette and **Aura**, an original rounded robot guide. Aura looks different in each section: a stethoscope for healthcare, a flask for science, a rocket for enterprise, a clipboard for the programme, a laptop and headset for the hackathon, and so on. Organisers update all content from a built-in admin panel, with no code changes.
 
 **Stack:** Next.js 16 (App Router, React 19, TypeScript) · Node.js · MongoDB (Mongoose) · Tailwind CSS 4.
 

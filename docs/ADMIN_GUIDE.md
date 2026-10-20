@@ -123,7 +123,7 @@ Fill in name, role (e.g. "PhD scholar"), department, affiliation, profile link a
 
 **Hackathon** (left menu) has tabs:
 - **Overview:** title, tagline, description, mode (on-site / hybrid), team size, prize pool, eligibility.
-- **Problem tracks:** one per theme (Healthcare, Scientific Discovery, Entrepreneurship), each with example problems.
+- **Problem tracks:** one per theme (Healthcare, Scientific Discovery, Enterprise), each with example problems.
 - **Rules & conduct:** rules and code of conduct.
 - **Timeline:** registration → idea submission → shortlisting → final round (15–16 Dec) → results. Add dates as they are confirmed; the timeline highlights the current stage automatically.
 - **Prizes & judging:** prizes and judging criteria (with weights if you like).

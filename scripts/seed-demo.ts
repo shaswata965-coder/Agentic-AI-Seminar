@@ -234,7 +234,7 @@ const PEOPLE = [
 
 const ANNOUNCEMENTS = [
   { title: "Sample announcement: first speakers revealed", body: "This is sample content added by the demo seed to preview the announcements box.", tone: "info", linkUrl: "/speakers", linkLabel: "Meet the speakers", pinned: true },
-  { title: "Sample announcement: hackathon tracks published", body: "Teams can explore the three tracks: healthcare, scientific discovery and entrepreneurship.", tone: "success", linkUrl: "/hackathon", linkLabel: "Hackathon details" },
+  { title: "Sample announcement: hackathon tracks published", body: "Teams can explore the three tracks: healthcare, scientific discovery and enterprise.", tone: "success", linkUrl: "/hackathon", linkLabel: "Hackathon details" },
 ];
 
 /* ------------------------------------------------------------- Helpers -- */
