@@ -18,7 +18,7 @@ const PAGES: AssistantEntry[] = [
 ];
 
 const SECTIONS: AssistantEntry[] = [
-  { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Enterprise", href: "/#themes", keywords: "themes healthcare science discovery enterprise startups" },
+  { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Entrepreneurship", href: "/#themes", keywords: "themes healthcare science discovery entrepreneurship startups" },
   { kind: "Section", title: "Announcements", href: "/#news", keywords: "news updates announcements" },
   { kind: "Section", title: "Industry kiosks", subtitle: "On the programme page", href: "/programme#kiosks", keywords: "industry kiosk exhibit exhibitor booth companies" },
   { kind: "Section", title: "Route map", subtitle: "Interactive map of the way to IIT Delhi", href: "/#venue", keywords: "map route directions airport railway metro road how to reach" },

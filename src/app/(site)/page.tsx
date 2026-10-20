@@ -5,7 +5,7 @@ import { HackathonTeaser } from "@/components/home/HackathonTeaser";
 import { Hero } from "@/components/home/Hero";
 import { Highlights } from "@/components/home/Highlights";
 import { Partners } from "@/components/home/Partners";
-import { SpeakersCarousel } from "@/components/home/SpeakersCarousel";
+import { SpeakersPreview } from "@/components/home/SpeakersPreview";
 import { Themes } from "@/components/home/Themes";
 import { Venue } from "@/components/home/Venue";
 import { InOrder } from "@/components/layout/InOrder";
@@ -49,16 +49,11 @@ export default async function HomePage() {
         s={s}
         page="home"
         sections={{
-          highlights: (
-            <>
-              <Highlights s={s} />
-              <SpeakersCarousel speakers={speakers} />
-            </>
-          ),
+          highlights: <Highlights s={s} />,
           news: <Announcements s={s} items={announcements} />,
           themes: <Themes s={s} />,
           about: <About s={s} />,
-          speakers: null,
+          speakers: <SpeakersPreview s={s} speakers={speakers} />,
           hackathon: <HackathonTeaser s={s} h={h} />,
           venue: <Venue s={s} />,
           partners: <Partners s={s} sponsors={sponsors} />,

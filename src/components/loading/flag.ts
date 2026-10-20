@@ -14,9 +14,8 @@
  *
  * With "run", the script also moves the progress ring from the start, before the site's own scripts
  * have arrived: every 150 ms it counts the page's scripts and images that have loaded and sets --lx-p
- * (0 to PAGE_SHARE) on <html> (PROGRESS_TARGETS), which loading.css draws.
- * warm.ts carries on from there. Set on <html>, CSS variables inherit to .lx-ring and .launch-percent
- * without mutating React-managed DOM elements and causing hydration mismatches.
+ * (0 to PAGE_SHARE) on the ring and the percentage (PROGRESS_TARGETS), which loading.css draws.
+ * warm.ts carries on from there. (Set on <html>, it would restyle the whole page each time.)
  */
 
 /** localStorage key holding the version of the files last cached in full. */
@@ -25,8 +24,8 @@ export const ASSETS_KEY = "aaiw-assets";
 /** How far the ring gets while the page itself loads (warm.ts's first stage ends there). */
 export const PAGE_SHARE = 0.25;
 
-/** The element that shows the progress (--lx-p): html (inherits to the ring and percentage without mutating React DOM elements). */
-export const PROGRESS_TARGETS = "html";
+/** The elements that show the progress (--lx-p): the ring and the percentage. */
+export const PROGRESS_TARGETS = ".lx-ring, .launch-percent";
 
 /** The inline script for the root layout's <head>. `basePath` is the sub-path the site is served from, or "". */
 export function launchFlagScript(basePath: string) {

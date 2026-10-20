@@ -16,7 +16,7 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
     { Icon: Trophy, label: c.prizePool, value: h.prizePool },
   ];
   return (
-    <section id="hackathon" data-edit="home.hackathon" aria-labelledby="hackathon-teaser-title" data-tags="slash" className={`tone-${c.tone} scroll-mt-24 pt-8 pb-16 sm:pt-12 sm:pb-24`}>
+    <section id="hackathon" data-edit="home.hackathon" aria-labelledby="hackathon-teaser-title" data-tags="slash" className={`tone-${c.tone} scroll-mt-24 py-16 sm:py-24`}>
       <div className="container-site">
         <div className="relative overflow-hidden rounded-[2rem] border border-border bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft)_55%,var(--blush-soft))] p-6 shadow-card-lg sm:p-12">
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent)]" />
