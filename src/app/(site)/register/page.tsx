@@ -13,7 +13,7 @@ import { TagScope } from "@/components/ui/Tag";
 import { getSettings } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
-import { eventCalendarLinks } from "@/lib/event";
+import { eventCalendarLinks, hackathonRegistrationHref } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 
@@ -141,11 +141,10 @@ export default async function RegisterPage() {
               <div className="card grid gap-3 p-6">
                 <h2 className="font-display text-xl font-bold text-fg">{dl.title}</h2>
                 {s.workshopDeadline ? <Deadline iso={s.workshopDeadline} label={dl.workshop} /> : <p className="text-sm text-muted">{dl.workshopTba}</p>}
-                {s.hackathonDeadline ? <Deadline iso={s.hackathonDeadline} label={dl.hackathon} /> : <p className="text-sm text-muted">{dl.hackathonTba}</p>}
               </div>
               <div id="hackathon-note" className="scroll-mt-28">
                 <h2 className="sr-only">{dl.portalKicker}</h2>
-                <Portal href="/hackathon" tone="lilac" compact kicker={dl.portalKicker} title={dl.portalTitle} text={dl.portalText} art={<TrophyArt />} />
+                <Portal href={hackathonRegistrationHref(s)} tone="aqua" compact kicker={dl.portalKicker} title={dl.portalTitle} text={dl.portalText} art={<TrophyArt />} />
               </div>
             </div>
           </aside>

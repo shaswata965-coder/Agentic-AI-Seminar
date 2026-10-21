@@ -1,13 +1,14 @@
-import { CalendarDays, MapPin, Ticket } from "lucide-react";
+import { CalendarDays, MapPin } from "lucide-react";
 import type { ReactNode } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { NetworkCanvas } from "@/components/effects/NetworkCanvas";
-import { DeadlineGate } from "@/components/forms/DeadlineGate";
-import type { SiteSettings } from "@/lib/content/types";
+import type { HackathonInfo, SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { splitEventName, venueLine } from "@/lib/event";
 import { formatDate, formatDateRange } from "@/lib/format";
 import { Countdown } from "./Countdown";
+import { HeroPlacards, type HeroPlacard } from "./HeroPlacards";
+import { RegisterChooser } from "./RegisterChooser";
 
 /** One fact under the title: a coloured rule, a small label and the value. */
 function Fact({ label, icon, tone, children }: { label: string; icon: ReactNode; tone: string; children: ReactNode }) {
@@ -22,55 +23,15 @@ function Fact({ label, icon, tone, children }: { label: string; icon: ReactNode;
   );
 }
 
-function StatusDot({ live = false }: { live?: boolean }) {
-  return (
-    <span aria-hidden className="relative flex h-2.5 w-2.5">
-      {live ? <span className="absolute inline-flex h-full w-full animate-ping-soft rounded-full bg-[var(--accent)]" /> : null}
-      <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[var(--accent-ink)]" />
-    </span>
-  );
-}
-
-/** Workshop registration as set in Admin → Site settings → Site-wide → Registration, closing by itself at the deadline. */
-function RegistrationFact({ s }: { s: SiteSettings }) {
+export function Hero({ s, h }: { s: SiteSettings; h: HackathonInfo }) {
   const c = copy(s, "homeHero");
-  const icon = <Ticket size={14} aria-hidden />;
-  const closed = (
-    <Fact label={c.registration} icon={icon} tone="tone-blush">
-      <span className="inline-flex items-center gap-2">
-        <StatusDot />
-        {c.closed}
-      </span>
-    </Fact>
-  );
-  if (s.workshopStatus === "closed") return closed;
-  if (s.workshopStatus !== "open") {
-    return (
-      <Fact label={c.registration} icon={icon} tone="tone-butter">
-        <span className="inline-flex items-center gap-2">
-          <StatusDot />
-          {c.soon}
-        </span>
-      </Fact>
-    );
-  }
-  const until = s.workshopDeadline ? formatDate(s.workshopDeadline, { day: "numeric", month: "short" }) : "";
-  return (
-    <DeadlineGate deadline={s.workshopDeadline} closed={closed}>
-      <Fact label={c.registration} icon={icon} tone="tone-mint">
-        <span className="inline-flex items-center gap-2">
-          <StatusDot live />
-          {c.open}
-          {until ? <span className="font-sans text-sm font-medium text-muted">{c.until ? `${c.until} ${until}` : until}</span> : null}
-        </span>
-      </Fact>
-    </DeadlineGate>
-  );
-}
-
-export function Hero({ s }: { s: SiteSettings }) {
-  const c = copy(s, "homeHero");
-  const placard = copy(s, "homePlacard").text.trim();
+  const p = copy(s, "homePlacard");
+  const tones = copy(s, "homeRegister");
+  // Aura's two placards, in turn: workshop and hackathon registration ({status} is filled in as they show).
+  const placards: HeroPlacard[] = [
+    { key: "workshop" as const, text: p.text, tab: p.workshopTab, tone: tones.workshopTone, status: s.workshopStatus, deadline: s.workshopDeadline },
+    { key: "hackathon" as const, text: p.hackathon, tab: p.hackathonTab, tone: tones.hackathonTone, status: s.hackathonStatus, deadline: s.hackathonDeadline },
+  ].filter((x) => x.text.trim());
   // "Agentic AI Workshop 2026" → highlighted "Agentic AI", then "Workshop", then a muted "2026".
   const { title, year } = splitEventName(s.eventName);
   const lead = title.split(/\s+/);
@@ -82,8 +43,8 @@ export function Hero({ s }: { s: SiteSettings }) {
       <div aria-hidden className="bg-dots absolute inset-0 -z-20 [mask-image:radial-gradient(80%_70%_at_50%_40%,black,transparent)]" />
       <NetworkCanvas className="absolute inset-0 -z-10" avoid="[data-graph-avoid]" />
 
-      <div className="container-site grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-6 lg:pt-14 lg:pb-14">
-        {/* hero-copy keeps the hero as tall as it used to be; the space is shared evenly around the text. */}
+      <div className="container-site grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-x-6 lg:gap-y-10 lg:pt-14 lg:pb-12">
+        {/* hero-copy makes the text as tall as Aura beside it; the space is shared evenly around the text. */}
         <div className="hero-copy flex flex-col justify-evenly gap-8">
           <div>
             <h1 id="hero-title" data-graph-avoid="text" className="font-display text-[2.6rem] leading-[1.02] font-extrabold tracking-tight text-fg sm:text-6xl lg:text-[4.4rem]">
@@ -113,25 +74,18 @@ export function Hero({ s }: { s: SiteSettings }) {
             <Fact label={c.where} icon={<MapPin size={14} aria-hidden />} tone="tone-lilac">
               {venueLine(s)}
             </Fact>
-            <RegistrationFact s={s} />
           </dl>
         </div>
 
         {/* data-launch-land: after the loading screen, Aura flies down into place from where her ship went up (loading.css).
-            She holds up the placard from Home → Hero announcements. */}
-        <div data-launch-land="" data-edit="home.placard" className="relative mx-auto flex w-full max-w-[460px] justify-center pt-6 lg:pt-0">
+            She holds up the placards from Home → Hero announcements in turn. */}
+        <div data-launch-land="" data-edit="home.placard" className="relative mx-auto flex w-full max-w-[460px] flex-col items-center pt-6 lg:pt-0">
           <div aria-hidden className="absolute inset-[8%] -z-10 rounded-full bg-[conic-gradient(from_200deg,var(--azure-soft),var(--lilac-soft),var(--blush-soft),var(--mint-soft),var(--azure-soft))] blur-2xl" />
           <div aria-hidden className="absolute inset-[16%] -z-10 rounded-full border border-dashed border-border-strong opacity-60 animate-spin-slow" />
-          <Aura
-            variant="hero"
-            size={340}
-            interactive
-            entrance="load"
-            placard={placard}
-            label={placard ? `Aura, the workshop's agentic AI guide, holding a placard: “${placard}”` : undefined}
-            className="max-w-[78vw]"
-          />
+          <HeroPlacards placards={placards} words={{ open: p.open, soon: p.soon, closed: p.closed }} />
         </div>
+
+        <RegisterChooser s={s} h={h} className="lg:col-span-2" />
       </div>
 
       {s.showCountdown ? (

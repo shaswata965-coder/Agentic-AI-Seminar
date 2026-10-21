@@ -108,6 +108,14 @@ export function Aura({
     setRelaxed(false);
   }
 
+  // Each new text on the placard flips it over (not the first one, which arrives with her).
+  const [prevSign, setPrevSign] = useState(sign);
+  const [flips, setFlips] = useState(0);
+  if (prevSign !== sign) {
+    setPrevSign(sign);
+    setFlips((n) => n + 1);
+  }
+
   const later = (fn: () => void, ms: number) => {
     timers.current.push(setTimeout(fn, ms));
   };
@@ -219,6 +227,7 @@ export function Aura({
       width={size}
       height={Math.round((size * AURA_H) / AURA_W)}
       placard={sign}
+      placardFlip={flips}
     />
   );
 

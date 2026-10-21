@@ -212,6 +212,9 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
     "Teams design and build agentic AI systems that tackle real problems aligned with the workshop's three themes. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
   mode: "To be announced (on-site / hybrid)",
   teamSize: "To be announced",
+  teamType: "Students, researchers and early-career professionals; teams may mix institutions",
+  dates: "",
+  location: "",
   prizePool: "TBA",
   eligibility: [
     "Open to students, researchers and early-career professionals. Final eligibility rules will be announced.",

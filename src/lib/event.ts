@@ -79,6 +79,7 @@ export function deadlinePassed(iso: string | null | undefined, now = Date.now())
 export function registrationHref(s: SiteSettings) {
   return s.workshopUrl || "/register";
 }
+/** Team registration: an external platform, or the form at the foot of the Hackathon page. */
 export function hackathonRegistrationHref(s: SiteSettings) {
-  return s.hackathonUrl || "/hackathon/register";
+  return s.hackathonUrl || "/hackathon#register";
 }

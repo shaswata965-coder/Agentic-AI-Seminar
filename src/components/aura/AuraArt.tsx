@@ -93,6 +93,8 @@ export interface AuraArtProps extends AuraLook {
   title?: string;
   /** Words on a large placard held in front of her in both fins (draw her with the "holdWide" pose). */
   placard?: string;
+  /** Counts the placard's changes of text; each one flips it over. */
+  placardFlip?: number;
 }
 
 export function AuraArt({
@@ -112,6 +114,7 @@ export function AuraArt({
   height,
   title,
   placard,
+  placardFlip = 0,
 }: AuraArtProps) {
   const id = (name: string) => `${uid}-${name}`;
   const url = (name: string) => `url(#${id(name)})`;
@@ -304,7 +307,7 @@ export function AuraArt({
               waves={fx.has("waves")}
             />
           ) : null}
-          {placard ? <Placard text={placard} line={C.line} url={url} /> : null}
+          {placard ? <Placard key={placardFlip} flip={placardFlip > 0} text={placard} line={C.line} url={url} /> : null}
 
           {/* Arms */}
           <Arm pivot={PIVOT_L} deg={arms.l} side="l" fill={url("body")} edge={C.edge} anim={armAnim(arms, "l")} />
@@ -933,12 +936,12 @@ export function fitPlacard(text: string) {
  * A large placard held in front of her, drawn before the arms so the fins grip its top corners. Each line
  * is drawn at its measured width (textLength), so it fits the board whichever font has loaded.
  */
-function Placard({ text, line, url }: { text: string; line: string; url: (name: string) => string }) {
+function Placard({ text, line, url, flip = false }: { text: string; line: string; url: (name: string) => string; flip?: boolean }) {
   const { lines, size } = fitPlacard(text);
   const lead = size * BOARD_TEXT.leading;
   const { x, y, w, h } = BOARD;
   return (
-    <g>
+    <g className={flip ? "aura-placard-flip" : undefined}>
       <rect x={x + 2} y={y + 5} width={w} height={h} rx="12" fill="#0f172a" opacity="0.16" />
       <rect x={x} y={y} width={w} height={h} rx="12" fill={url("screen")} stroke={line} strokeOpacity="0.4" strokeWidth="1" />
       <rect x={x + 5} y={y + 5} width={w - 10} height={h - 10} rx="8" fill="#ffffff" />

@@ -637,7 +637,11 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         description: "The event name, tagline, dates and venue come from Site-wide → Event details.",
       }),
       section("placard", "Hero announcements", "homePlacard", [], {
-        description: "A short announcement on the placard Aura holds up in the hero, beside the event's name.",
+        description:
+          "Aura holds up two placards in turn in the hero: one for workshop registration, one for hackathon registration. {status} in a placard becomes that registration's status (Site-wide → Registration) in the words below, and turns to closed by itself at the deadline. Clear one placard to show only the other.",
+      }),
+      section("register", "Registration choice", "homeRegister", [], {
+        description: "The two large cards under the hero, one for each registration. Their status comes from Site-wide → Registration; the hackathon card's team size and prize pool from Hackathon.",
       }),
       section("highlights", "Highlight strip", "homeHighlights", [
         objects("highlights", "Highlights", "Highlight", [
@@ -730,25 +734,23 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     key: "hackathon",
     title: "Hackathon",
     path: "/hackathon",
-    description: "Headings, labels and colours of the Hackathon page. Its title, tracks, rules, timeline, prizes and results are edited under Hackathon in the menu.",
+    description: "Headings, labels and colours of the Hackathon page, team registration included. Its title, tracks, rules, timeline, prizes and results are edited under Hackathon in the menu.",
     sections: [
       section("hero", "Hero", "hackathonHero"),
-      section("overview", "Overview", "hackathonOverview"),
-      section("tracks", "Problem tracks", "hackathonTracks"),
+      section("overview", "At a glance", "hackathonOverview", [], { description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview." }),
+      section("prizes", "Prize money", "hackathonPrizes", [], { description: "The first three prizes stand on a podium; any others are listed below it as special awards." }),
       section("timeline", "Timeline", "hackathonTimeline"),
-      section("prizes", "Prizes & judging", "hackathonPrizes"),
+      section("register", "Registration form", "hackathonRegisterForm", [], {
+        description: "Whether registration is open, its deadline and an external platform link are set under Site-wide → Registration.",
+      }),
+      section("tracks", "Problem tracks", "hackathonTracks"),
+      section("judging", "Judging", "hackathonJudging"),
       section("people", "Mentors & judges", "hackathonPeople", [], { description: "Mentors and judges are added under Organisers & volunteers." }),
       section("resources", "Resources", "hackathonResources"),
       section("rules", "Rules & FAQ", "hackathonRules"),
       section("results", "Results", "hackathonResults", [], { description: "Shown once “Post-event: show hackathon winners” is on (Site-wide → Features)." }),
       section("cta", "Closing call to action", "hackathonCta"),
     ],
-  },
-  {
-    key: "hackathonRegister",
-    title: "Hackathon registration",
-    path: "/hackathon/register",
-    sections: [section("hero", "Hero", "hackathonRegisterHero"), section("form", "Form & status", "hackathonRegisterForm")],
   },
   {
     key: "register",
@@ -906,8 +908,11 @@ export const HACKATHON_DEF: SingletonDef = {
         text("title", "Title", { required: true }),
         text("tagline", "Tagline"),
         richtext("overview", "Overview"),
+        text("teamSize", "Team size", { width: "half", placeholder: "2 to 4 members" }),
+        text("teamType", "Who can join", { width: "half", help: "The kind of teams you're looking for, in a line." }),
+        text("dates", "Dates", { width: "half", help: "Leave blank to show the workshop's dates (Site settings → Site-wide → Event details)." }),
+        text("location", "Location", { width: "half", help: "Leave blank to show the workshop's venue." }),
         text("mode", "Mode", { width: "half", placeholder: "On-site / hybrid, to be announced" }),
-        text("teamSize", "Team size", { width: "half" }),
         text("prizePool", "Prize pool", { width: "half", placeholder: "TBA" }),
         list("eligibility", "Eligibility", { itemLabel: "Rule" }),
         textarea("registrationNote", "Registration note"),

@@ -107,8 +107,8 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
             {done.emailSent ? "We've e-mailed a confirmation to the team lead." : "Please note this ID. The organisers will contact your team lead."} Watch the Hackathon page for the idea-submission date.
           </p>
           <div className="mt-6">
-            <ButtonLink href="/hackathon" variant="outline">
-              Back to the hackathon
+            <ButtonLink href="/hackathon#timeline" variant="outline">
+              See what happens next
             </ButtonLink>
           </div>
         </div>

@@ -33,6 +33,7 @@ export const LENGTHS: Record<Exclude<Kind, "tone" | "background">, { min: number
 };
 
 const PLACEHOLDERS = "You can write {event}, {dates} or {venue}; they are filled in from Event details.";
+const STATUS = "{status} is replaced by that registration's status, in the words below.";
 
 const tone = (d: Tone, label = "Colour"): CopyField => ({ kind: "tone", label, default: d });
 const bg = (d: Background): CopyField => ({ kind: "background", label: "Background", default: d });
@@ -113,15 +114,36 @@ export const PAGE_COPY = {
   homeHero: {
     when: label("Fact: when", "When"),
     where: label("Fact: where", "Where"),
-    registration: label("Fact: registration", "Registration"),
-    open: label("Registration open", "Open"),
-    until: label("Word before the deadline", "until"),
-    soon: label("Registration opening soon", "Opening soon"),
-    closed: label("Registration closed", "Closed"),
     countdown: label("Countdown label", "Starts"),
   },
   homePlacard: {
-    text: short("Placard", "Registration opening soon", `What the sign Aura holds up says; about 35 characters fit. Clear it and she waves hello instead. ${PLACEHOLDERS}`),
+    text: short("Placard 1: workshop", "Workshop registration {status}", `What the first sign Aura holds up says; about 35 characters fit. ${STATUS}`),
+    hackathon: short("Placard 2: hackathon", "Hackathon registration {status}", `What the second sign says. Clear both and she waves hello instead. ${STATUS}`),
+    open: label("{status} while registration is open", "is open!"),
+    soon: label("{status} before it opens", "opening soon"),
+    closed: label("{status} once it has closed", "has closed"),
+    workshopTab: label("Switch under Aura: workshop", "Workshop"),
+    hackathonTab: label("Switch under Aura: hackathon", "Hackathon"),
+  },
+  homeRegister: {
+    workshopTone: tone("peach", "Workshop card colour"),
+    hackathonTone: tone("aqua", "Hackathon card colour"),
+    title: title("Two ways to take part"),
+    description: intro("Attending the workshop and joining the hackathon are separate registrations. Pick one, or both."),
+    workshopKicker: short("Workshop card: label", "For attendees"),
+    workshopTitle: heading("Workshop card: title", "Workshop registration"),
+    workshopText: text("Workshop card: text", "Two days of keynotes, panels, hands-on tutorials and live demos, with industry kiosks alongside.", PLACEHOLDERS),
+    workshopButton: label("Workshop card: button", "Register for the workshop"),
+    hackathonKicker: short("Hackathon card: label", "For teams"),
+    hackathonTitle: heading("Hackathon card: title", "Hackathon team registration"),
+    hackathonText: text("Hackathon card: text", "Build agents for health, science and startups, with the final round live at the workshop."),
+    hackathonButton: label("Hackathon card: button", "Register your team"),
+    teamSize: label("Hackathon card: team size", "Team size"),
+    prizePool: label("Hackathon card: prize pool", "Prize pool"),
+    open: label("Status: open", "Open"),
+    until: label("Word before the deadline", "until"),
+    soon: label("Status: opening soon", "Opening soon"),
+    closed: label("Status: closed", "Closed"),
   },
   homeHighlights: { stub: label("Label on the ticket stub", "At a glance") },
   homeNews: {
@@ -365,15 +387,20 @@ export const PAGE_COPY = {
   hackathonOverview: {
     tone: tone("aqua"),
     background: bg("plain"),
-    title: title("Overview"),
-    mode: label("Fact: mode", "Mode"),
+    eyebrow: eyebrow("At a glance"),
+    title: title("Who, when and where"),
     teamSize: label("Fact: team size", "Team size"),
+    teamType: label("Fact: who can join", "Who can join"),
+    dates: label("Fact: dates", "Dates"),
+    datesNote: note("Under the dates", "Final round live at the workshop"),
+    location: label("Fact: location", "Location"),
+    mode: label("Fact: mode", "Mode"),
     prizePool: label("Fact: prize pool", "Prize pool"),
     eligibility: heading("Eligibility title", "Eligibility"),
   },
   hackathonTracks: {
     tone: tone("lilac"),
-    background: bg("band"),
+    background: bg("plain"),
     eyebrow: eyebrow("Problem tracks"),
     title: title("Pick a track aligned with the workshop themes"),
     description: intro("Final problem statements will be announced at launch. Here are examples to get you thinking."),
@@ -388,12 +415,18 @@ export const PAGE_COPY = {
   hackathonPrizes: {
     tone: tone("butter"),
     background: bg("band"),
-    eyebrow: eyebrow("Prizes"),
+    eyebrow: eyebrow("Prize money"),
     title: title("Prizes & recognition"),
-    description: intro("Total prize pool: {prizePool}", "Introduction", "{prizePool} is the prize pool from the Hackathon page."),
-    judgingEyebrow: short("Judging: label above the title", "Judging"),
-    judgingTitle: heading("Judging: title", "How projects are judged"),
-    judgingText: text("Judging: introduction", "Indicative criteria. Final weights will be confirmed with the rules."),
+    intro: intro("Prizes for the top three teams, and awards for the best agent in each track."),
+    pool: label("Prize pool label", "Total prize pool"),
+    awards: heading("Other prizes: title", "Special awards"),
+  },
+  hackathonJudging: {
+    tone: tone("lilac"),
+    background: bg("band"),
+    eyebrow: eyebrow("Judging"),
+    title: title("How projects are judged"),
+    description: intro("Indicative criteria. Final weights will be confirmed with the rules."),
   },
   hackathonPeople: {
     tone: tone("peach"),
@@ -433,17 +466,16 @@ export const PAGE_COPY = {
   },
   hackathonCta: { tone: tone("aqua"), title: title("Ready to build?") },
 
-  /* ------------------------------------------- Hackathon registration -- */
-  hackathonRegisterHero: {
-    tone: tone("aqua"),
-    crumb: crumb("Hackathon registration"),
-    eyebrow: eyebrow("Hackathon"),
-    title: title("Register your team"),
-    open: label("Status: open", "Registration open"),
-    closed: label("Status: closed", "Registration closed"),
-    soon: label("Status: soon", "Opening soon"),
-  },
   hackathonRegisterForm: {
+    tone: tone("aqua"),
+    background: bg("band"),
+    eyebrow: eyebrow("Registration"),
+    title: title("Register your team"),
+    needTitle: heading("Checklist: title", "What you'll need"),
+    need1: note("Checklist: first item", "A team name and a track"),
+    need2: note("Checklist: second item", "Each member's name, e-mail and institution"),
+    need3: note("Checklist: third item", "A few lines on your idea"),
+    tracksLink: short("Link to the tracks", "Not sure which track? See the tracks"),
     externalTitle: heading("External platform: title", "Registration happens on {platform}", "{platform} is the platform name from Event → Registration."),
     externalText: text("External platform: text", "Create your team and submit your details on the platform. It opens in a new tab."),
     externalButton: label("External platform: button", "Go to {platform}"),
@@ -454,7 +486,6 @@ export const PAGE_COPY = {
     ),
     closedTitle: heading("Closed: title", "Hackathon registration is closed"),
     closedText: text("Closed: text", "Thanks to everyone who registered! Shortlisted teams will be contacted by e-mail."),
-    portalTitle: heading("Link card: title", "Tracks, rules and prizes"),
   },
 
   /* ---------------------------------------------------- Registration -- */
@@ -493,12 +524,10 @@ export const PAGE_COPY = {
   registerDeadlines: {
     title: heading("Title", "Deadlines"),
     workshop: short("Workshop deadline", "Workshop registration closes"),
-    hackathon: short("Hackathon deadline", "Hackathon registration closes"),
     workshopTba: text("Workshop deadline not set", "Workshop registration deadline: to be announced."),
-    hackathonTba: text("Hackathon deadline not set", "Hackathon registration deadline: to be announced."),
     portalKicker: short("Hackathon card: label", "Joining the hackathon?"),
-    portalTitle: heading("Hackathon card: title", "Hackathon details"),
-    portalText: text("Hackathon card: text", "Teams register separately: one member registers for the whole team."),
+    portalTitle: heading("Hackathon card: title", "Register your team there"),
+    portalText: text("Hackathon card: text", "The hackathon has its own page and team registration: one member registers for the whole team."),
   },
 
   /* -------------------------------------------------------- Partners -- */

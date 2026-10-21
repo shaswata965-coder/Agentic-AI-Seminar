@@ -252,30 +252,11 @@
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
 }
 
-/* Home hero text column: as tall as it was when it also held the logo box, the
-   Register / Hackathon / Programme buttons and the share row (measured per width). */
+/* Home hero text column: beside Aura (with her placard and its switch), as tall as she is, so the text sits
+   in the middle of the space. Stacked on narrower screens, it needs no height of its own. */
 @utility hero-copy {
-  min-height: 818px;
-  @media (width >= 460px) {
-    min-height: 726px;
-  }
-  @media (width >= 580px) {
-    min-height: 527px;
-  }
-  @media (width >= 640px) {
-    min-height: 607px;
-  }
-  @media (width >= 700px) {
-    min-height: 543px;
-  }
-  @media (width >= 768px) {
-    min-height: 482px;
-  }
   @media (width >= 1024px) {
-    min-height: 628px;
-  }
-  @media (width >= 1200px) {
-    min-height: 564px;
+    min-height: 440px;
   }
 }
 
@@ -695,6 +676,28 @@
 
 html[data-scroll-lock] { overflow: hidden; }
 dialog::backdrop { background: rgb(10 15 30 / 0.45); }
+
+/* Home hero: how long each of Aura's placards stays up (HeroPlacards.tsx), shown as a bar filling under its
+   switch. It holds while the pointer or focus is on her, the switch or a registration card. With reduced motion
+   it doesn't run, so the placards change only when asked. */
+@media (prefers-reduced-motion: no-preference) {
+  .placard-timer { transform-origin: left; animation: grow-x 6s linear both; }
+  [data-placard]:has([data-launch-land]:hover, [data-launch-land]:focus-within, [data-placard-key]:hover, [data-placard-key]:focus-visible) .placard-timer { animation-play-state: paused; }
+}
+
+/* Home registration cards (RegisterChooser.tsx): the edge spins on the card whose placard Aura is holding up,
+   and on the one under the pointer; the other rests, dimmed. */
+.reg-choice-ring { transition: opacity 0.5s ease; }
+@media (prefers-reduced-motion: no-preference) {
+  .reg-choice-ring { animation: spin-slow 5s linear infinite; will-change: transform; }
+}
+[data-placard] .reg-choice:not(:hover, :focus-visible) .reg-choice-ring { opacity: 0.22; animation-play-state: paused; }
+[data-placard="workshop"] .reg-choice[data-placard-key="workshop"] .reg-choice-ring,
+[data-placard="hackathon"] .reg-choice[data-placard-key="hackathon"] .reg-choice-ring { opacity: 1; animation-play-state: running; }
+[data-placard="workshop"] .reg-choice[data-placard-key="workshop"],
+[data-placard="hackathon"] .reg-choice[data-placard-key="hackathon"] {
+  box-shadow: 0 26px 60px -28px color-mix(in oklab, var(--accent) 85%, transparent), var(--card-shadow-lg);
+}
 
 /* Bars that grow as they scroll into view (judging criteria) */
 @keyframes grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }

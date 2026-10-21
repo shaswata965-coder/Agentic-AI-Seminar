@@ -36,7 +36,7 @@ This guide is for the organising team of the **Agentic AI Workshop 2026**. It ex
 
 ## 3. Site settings: every page, with a live preview
 
-**Site settings** has a tab for each page of the site (*Home*, *About*, *Programme*, *Speakers*, *Tutorials*, *Hackathon*, *Hackathon registration*, *Registration*, *Partners*, *Venue*, *Organisers*, *Photo gallery*, *Slides & recordings*, *Meet Aura*) and a **Site-wide** tab for what every page shares. Each tab lists the page's sections in the order they appear.
+**Site settings** has a tab for each page of the site (*Home*, *About*, *Programme*, *Speakers*, *Tutorials*, *Hackathon*, *Registration*, *Partners*, *Venue*, *Organisers*, *Photo gallery*, *Slides & recordings*, *Meet Aura*) and a **Site-wide** tab for what every page shares. Each tab lists the page's sections in the order they appear.
 
 - **Section order:** on *Home*, *About*, *Programme*, *Hackathon*, *Partners*, *Venue*, *Organisers* and *Meet Aura*, the last tab, **Section order**, lists the page's sections so you can put them in order of priority: drag a section into place, or move it one step at a time with its arrows. The preview jumps to the section you moved. The hero (the page's landing section) always stays at the top and can't be moved. **Back to the default order** undoes it all. A section that isn't showing right now (the hackathon results before they're switched on, say) keeps its place for when it appears. Backgrounds are set per section, so after a move check that tinted and plain sections still take turns. On *Programme*, the "On this page" bar under the hero follows the new order. The other pages have a single section, or parts that sit side by side (*Registration*), so there is nothing to move.
 
@@ -58,13 +58,13 @@ If two people edit Site settings at the same time, their previews show each othe
 - Venue, hall/building (leave blank to show "to be announced") and full address.
 
 **Site settings → Site-wide → Registration**
-- **Workshop registration:** *Opening soon*, *Open* or *Closed*, plus the deadline. The deadline appears on the website, and the form closes automatically once it passes. The home page shows the same status under the title (*Open until …*, *Opening soon* or *Closed*). Afterwards, also set the status to *Closed*.
+- **Workshop registration:** *Opening soon*, *Open* or *Closed*, plus the deadline. The deadline appears on the website, and the form closes automatically once it passes. The home page shows the same status on its workshop registration card under the hero (*Open until …*, *Opening soon* or *Closed*) and on Aura's workshop placard. Afterwards, also set the status to *Closed*.
 - **External form (optional):** paste a Google Form / Unstop / Devfolio link to send people there instead of the built-in form.
 - **Fees:** in the *Registration* tab → *Fees*: one row per category (e.g. Students, Academia, Industry), plus an optional note.
 - **Confirmation e-mail text:** extra lines added to the confirmation e-mail, for example what to bring.
-- **Hackathon registration:** status, deadline, and optionally the external platform link and its name.
+- **Hackathon registration:** status, deadline, and optionally the external platform link and its name. Teams register in the *Registration* section of the Hackathon page (`/hackathon#register`; the old `/hackathon/register` address leads there), or on the external platform when a link is set. The home page's hackathon card and Aura's hackathon placard show this status.
 
-**Site settings → Home:** whether the loading screen is used and its texts (*Loading screen*: the status lines under the progress ring and the line at lift-off; the first time someone opens the site, and after each update, it caches the site's files so the rest of the visit is quick; it isn't shown in the preview, so open the home page in a private window to see it), the highlight strip (e.g. *Speakers — TBA*, *Prize pool — TBA*; up to 6), whether the countdown is shown (*Hero*), what the large placard Aura holds in both fins in the hero says (*Hero announcements*; “Registration opening soon” to start with; about 35 characters fit, and with the text cleared she waves hello instead), how many featured speakers appear on the home page (*Speakers*), and the button labels of the hackathon section (*Hackathon*; its title, tagline, tracks and facts come from **Hackathon**).
+**Site settings → Home:** whether the loading screen is used and its texts (*Loading screen*: the status lines under the progress ring and the line at lift-off; the first time someone opens the site, and after each update, it caches the site's files so the rest of the visit is quick; it isn't shown in the preview, so open the home page in a private window to see it), the highlight strip (e.g. *Speakers — TBA*, *Prize pool — TBA*; up to 6), whether the countdown is shown (*Hero*), the two placards Aura holds up in turn in the hero (*Hero announcements*: one for workshop registration, one for hackathon registration; `{status}` in a placard becomes that registration's status in the words you set below them, *is open!*, *opening soon* or *has closed*, and turns to closed by itself at the deadline; about 35 characters fit; clear one to show only the other, or both and she waves hello instead; a switch under her names them, and she pauses while a visitor points at her or a card), the two large registration cards under the hero (*Registration choice*: their titles, texts, buttons, colours and status words; one leads to the workshop registration page, the other to the hackathon's team registration), how many featured speakers appear on the home page (*Speakers*), and the button labels of the hackathon section (*Hackathon*; its title, tagline, tracks and facts come from **Hackathon**).
 
 **Site settings → Home → About and Themes**, and the **About** tab: the topics circled around Aura in the home page About section (up to 8: a two or three word topic, an icon, and the summary she gives in her speech bubble when a visitor hovers over or taps the topic; write {dates}, {venue} or {event} in a summary to fill them in from these settings); the text of the About page (workshop motivation, "What is agentic AI?", who should attend, activities); and the three theme cards (title and a 2–3 line description).
 
@@ -122,13 +122,15 @@ Fill in name, role (e.g. "PhD scholar"), department, affiliation, profile link a
 ## 9. Hackathon
 
 **Hackathon** (left menu) has tabs:
-- **Overview:** title, tagline, description, mode (on-site / hybrid), team size, prize pool, eligibility.
+- **Overview:** title, tagline, description, team size, who can join, dates and location (leave these two blank to show the workshop's), mode (on-site / hybrid), prize pool, eligibility and the registration note. The first section of the Hackathon page, *At a glance*, shows them.
 - **Problem tracks:** one per theme (Healthcare, Scientific Discovery, Entrepreneurship), each with example problems.
 - **Rules & conduct:** rules and code of conduct.
 - **Timeline:** registration → idea submission → shortlisting → final round (15–16 Dec) → results. Add dates as they are confirmed; the timeline highlights the current stage automatically.
-- **Prizes & judging:** prizes and judging criteria (with weights if you like).
+- **Prizes & judging:** prizes and judging criteria (with weights if you like). The first three prizes stand on a podium under the prize pool; any more are listed below it as special awards.
 - **Resources:** APIs, datasets, compute credits and other links for participants.
 - **Results:** winners. They stay hidden until you switch on **Post-event: show hackathon winners** in **Site settings → Site-wide → Features & post-event**.
+
+The Hackathon page starts with what teams need to decide: *At a glance* (team size, who can join, dates, location, mode, prize pool), the prize money, the timeline and the team registration form; tracks, judging, mentors and judges, resources, rules and results follow. Change the order in **Site settings → Hackathon → Section order**.
 
 Mentors and judges are added under **Organisers & volunteers** (section 7).
 

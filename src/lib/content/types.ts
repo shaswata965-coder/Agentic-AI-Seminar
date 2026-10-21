@@ -108,6 +108,12 @@ export interface HackathonInfo {
   overview: string;
   mode: string;
   teamSize: string;
+  /** Who can form a team, in a line. */
+  teamType: string;
+  /** When it runs; empty means the workshop's dates. */
+  dates: string;
+  /** Where it runs; empty means the workshop's venue. */
+  location: string;
   prizePool: string;
   eligibility: string[];
   registrationNote: string;

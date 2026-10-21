@@ -24,7 +24,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Speakers | Page `/speakers` (featured speakers on home) |
 | Tutorials & Demos | Page `/tutorials` |
 | Industry Kiosks | Section `/programme#kiosks` |
-| Hackathon | Page `/hackathon` (+ `/hackathon/register`; teaser on home) |
+| Hackathon | Page `/hackathon`: at a glance (team, dates, location), prize money, timeline, then team registration (`/hackathon#register`); teaser on home |
 | Registration | Page `/register`, or an external form link (Admin → Site settings → Site-wide → Registration) |
 | Organisers | Page `/organisers` |
 | Venue & Travel | Page `/venue`, with the interactive route map at `/#venue` |
@@ -35,13 +35,14 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Section | Requirement | Status |
 | --- | --- | --- |
-| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register and the Programme are in the navigation bar, and the hackathon is under *Explore*. Add to calendar and share are in About and the footer |
+| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register and the Programme are in the navigation bar, and the hackathon is under *Explore*. Under the hero, two large cards lead to workshop registration and hackathon team registration. Add to calendar and share are in About and the footer |
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
 | | Hackathon announcement on home | ✅ Title, tagline, tracks, team size, mode and prize pool, with *Register your team* and *Hackathon details* (`/hackathon`) buttons |
 | | Loading screen (added on request) | ✅ Caches the main pages' scripts, styles, fonts and images (Cache Storage, served by a service worker) while Aura tries to take off and small Auras work on her ship inside a progress ring; once all is cached she lifts off and the smoke clears to the page. Shown on the first visit and after updates; caching without the screen for reduced motion; switchable in Site settings → Home |
 | | Section order (added on request) | ✅ Site settings → <page> → Section order: the sections of Home, About, Programme, Hackathon, Partners, Venue, Organisers and Meet Aura can be dragged (or moved with arrows) into order of priority, with the live preview following; each page's hero stays fixed at the top |
-| | Hero placard (added on request) | ✅ The hero Aura holds a large placard in both fins with a short announcement (“Registration opening soon”), edited in Site settings → Home → Hero announcements; the text wraps to fit the board, and with it cleared she waves hello instead |
+| | Hero placard (added on request) | ✅ The hero Aura holds up two placards in turn, one for workshop registration and one for hackathon registration, each showing its live status; a switch under her names them. Edited in Site settings → Home → Hero announcements; the text wraps to fit the board, and with both cleared she waves hello instead |
+| | Two registrations (added on request) | ✅ Under the hero, two large cards, *Workshop registration* and *Hackathon team registration*, each with its status and a big button; the card matching Aura's placard lights up, and pointing at a card brings its placard up (Site settings → Home → Registration choice) |
 | Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the matching hackathon track |
 | Programme | Tabs by day; each session shows time, title, type tag (Keynote / Talk / Panel / Tutorial / Demo / Hackathon / Break), theme tag, speaker(s), room | ✅ Plus "Other" type, search, *My agenda* (starred sessions), "now / up next" during the event |
 | | Filter by theme / type | ✅ Filters are kept in the URL, so filtered views can be shared |

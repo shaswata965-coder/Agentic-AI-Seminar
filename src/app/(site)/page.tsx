@@ -12,7 +12,6 @@ import { InOrder } from "@/components/layout/InOrder";
 import { LoadingScreen } from "@/components/loading/LoadingScreen";
 import { getAnnouncements, getDemos, getFaqs, getHackathon, getKiosks, getPeople, getSettings, getSpeakers, getSponsors } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
-import { hackathonRegistrationHref } from "@/lib/event";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
 import { explorePages, postEventNav, primaryNav, registrationNav } from "@/lib/nav";
 
@@ -30,7 +29,7 @@ export default async function HomePage() {
   ]);
   // What the loading screen loads behind it: the main pages, and the uploaded images they show (the
   // gallery, which can be large, is left to load when visited).
-  const routes = [...primaryNav(s.siteNav), registrationNav(s.siteNav), ...explorePages(s.siteNav), ...postEventNav(s, s.siteNav), { href: hackathonRegistrationHref(s) }]
+  const routes = [...primaryNav(s.siteNav), registrationNav(s.siteNav), ...explorePages(s.siteNav), ...postEventNav(s, s.siteNav)]
     .map((n) => n.href)
     .filter((href) => href.startsWith("/"));
   const files = [
@@ -44,7 +43,7 @@ export default async function HomePage() {
     <>
       {s.showLoader ? <LoadingScreen eventName={s.eventName} routes={routes} files={files} text={copy(s, "homeLoader")} /> : null}
       <JsonLd data={eventJsonLd(s)} />
-      <Hero s={s} />
+      <Hero s={s} h={h} />
       <InOrder
         s={s}
         page="home"

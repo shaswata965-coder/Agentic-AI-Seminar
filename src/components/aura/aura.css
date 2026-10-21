@@ -239,6 +239,19 @@
   .aura-wrap { opacity: 1 !important; animation: none !important; }
 }
 
+/* New words on the placard: the board flips down from the top edge her fins hold (Aura's placardFlip). */
+.aura-svg .aura-placard-flip {
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+  animation: aura-placard-flip 0.7s cubic-bezier(0.3, 1.35, 0.5, 1) both;
+}
+@keyframes aura-placard-flip {
+  0% { transform: scaleY(0.04); opacity: 0.4; }
+  35% { opacity: 1; }
+  70% { transform: scaleY(1.05); }
+  100% { transform: scaleY(1); }
+}
+
 /* Small instances & touch devices: keep the gentle hover + blink, drop the extras */
 .aura--lite .aura-svg .aura-orbit-spin,
 .aura--lite .aura-svg .aura-orbit-node,
