@@ -81,7 +81,7 @@ export function hackathonEmail(s: SiteSettings, h: HackathonInfo, t: { teamName:
   const body = `<p>Hi ${esc(t.leaderName)},</p>
 <p>Your team <strong>${esc(t.teamName)}</strong> is registered for the <strong>${esc(h.title)}</strong>.</p>
 ${box(`<p style="margin:0;font-size:13px;color:#64748b">Team registration ID</p><p style="margin:4px 0 0;font-size:22px;font-weight:700;letter-spacing:.06em;color:#3b5bdb">${esc(t.regId)}</p>`)}
-<p><strong>Track:</strong> ${esc(t.track || "Undecided")}</p>
+<p><strong>Theme:</strong> ${esc(t.track || "Undecided")}</p>
 <p><strong>Team members</strong></p><ul>${list}</ul>
 <p>Keep an eye on the hackathon page for the idea-submission date, rules and resources.</p>
 <p>${button(absoluteUrl("/hackathon"), "Hackathon details")}</p>
@@ -90,7 +90,7 @@ ${box(`<p style="margin:0;font-size:13px;color:#64748b">Team registration ID</p>
 
 Your team "${t.teamName}" is registered for the ${h.title}.
 Team registration ID: ${t.regId}
-Track: ${t.track || "Undecided"}
+Theme: ${t.track || "Undecided"}
 Members:
 ${t.members.map((m) => `- ${m.name} <${m.email}>`).join("\n")}
 

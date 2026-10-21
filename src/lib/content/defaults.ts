@@ -152,7 +152,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     {
       name: "Title partner",
       price: "On request",
-      perks: ["Prominent branding across the venue and website", "Speaking slot in the opening session", "Premium kiosk space", "Hackathon track sponsorship"],
+      perks: ["Prominent branding across the venue and website", "Speaking slot in the opening session", "Premium kiosk space", "Hackathon theme sponsorship"],
     },
     {
       name: "Platinum",
@@ -209,7 +209,7 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
   title: "Agentic AI Hackathon 2026",
   tagline: "Build agents that matter for health, science and startups.",
   overview:
-    "Teams design and build agentic AI systems that tackle real problems aligned with the workshop's three themes. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
+    "One hackathon, three themes: teams design and build agentic AI systems that tackle real problems in healthcare, scientific discovery or entrepreneurship. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
   mode: "To be announced (on-site / hybrid)",
   teamSize: "To be announced",
   teamType: "Students, researchers and early-career professionals; teams may mix institutions",
@@ -275,7 +275,7 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
     { place: "Winner", reward: "TBA", description: "" },
     { place: "Runner-up", reward: "TBA", description: "" },
     { place: "Second runner-up", reward: "TBA", description: "" },
-    { place: "Best agent in each track", reward: "TBA", description: "" },
+    { place: "Best agent in each theme", reward: "TBA", description: "" },
   ],
   judgingCriteria: [
     { name: "Impact & relevance", weight: 25, description: "Does it address a real problem in one of the themes?" },
@@ -286,7 +286,7 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
   ],
   resources: [
     { kind: "api", title: "Model & API access", description: "Details of API credits and model access will be shared with registered teams.", url: "" },
-    { kind: "dataset", title: "Datasets", description: "Curated datasets for each track, to be announced.", url: "" },
+    { kind: "dataset", title: "Datasets", description: "Curated datasets for each theme, to be announced.", url: "" },
     { kind: "compute", title: "Compute credits", description: "Cloud / GPU credits, if available, will be announced.", url: "" },
   ],
   resultsNote: "Congratulations to all the teams who took part!",

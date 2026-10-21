@@ -1,13 +1,14 @@
 import { ArrowRight, Clock, Trophy, Users } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
 import { Eyebrow } from "@/components/ui/Section";
 import { THEME_META } from "@/lib/content/constants";
 import type { HackathonInfo, SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
 
-/** The hackathon on the home page: its pitch, tracks and facts, with team registration and a button to the full hackathon page. */
+/** The hackathon on the home page: its pitch, its three themes and facts, with team registration and a button to the full hackathon page. */
 export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo }) {
   const c = copy(s, "homeHackathon");
   const facts = [
@@ -30,7 +31,8 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
                 {h.title}
               </h2>
               <p className="mt-4 max-w-xl text-lg text-muted">{h.tagline}</p>
-              <ul className="mt-6 flex flex-wrap gap-2">
+              {c.themes && h.tracks.length ? <p className="mt-6 text-xs font-bold tracking-[0.14em] text-subtle uppercase">{c.themes}</p> : null}
+              <ul className={cn("flex flex-wrap gap-2", c.themes ? "mt-2.5" : "mt-6")}>
                 {h.tracks.map((t) => {
                   const meta = THEME_META[t.theme] ?? THEME_META.general;
                   return (

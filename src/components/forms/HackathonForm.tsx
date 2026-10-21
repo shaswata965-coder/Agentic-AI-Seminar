@@ -42,7 +42,7 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
     const e: Record<string, string> = {};
     if (i === 0) {
       if (team.teamName.trim().length < 2) e.teamName = "Please choose a team name.";
-      if (!team.track) e.track = "Please pick a track (you can choose “Undecided”).";
+      if (!team.track) e.track = "Please pick a theme (you can choose “Undecided”).";
     }
     if (i === 1) {
       members.forEach((m, j) => {
@@ -132,7 +132,7 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
         {step === 0 ? (
           <div className="grid animate-fade-up gap-5 sm:grid-cols-2">
             <TextField label="Team name" required value={team.teamName} onChange={(e) => setTeam({ ...team, teamName: e.target.value })} error={errors.teamName} maxLength={60} />
-            <SelectField label="Track" required placeholder="Choose a track" value={team.track} onChange={(e) => setTeam({ ...team, track: e.target.value })} error={errors.track} options={[...tracks, { value: "undecided", label: "Undecided, we'll pick later" }]} />
+            <SelectField label="Theme" required placeholder="Choose a theme" value={team.track} onChange={(e) => setTeam({ ...team, track: e.target.value })} error={errors.track} options={[...tracks, { value: "undecided", label: "Undecided, we'll pick later" }]} />
           </div>
         ) : null}
 

@@ -23,7 +23,7 @@ export async function GET(req: NextRequest, ctx: RouteContext<"/api/admin/export
   } else if (kind === "hackathon") {
     const rows = await HackathonRegistration.find({}).sort({ createdAt: 1 }).lean();
     csv = toCsv(
-      ["Team ID", "Registered at (IST)", "Status", "Team", "Track", "Members", "Lead name", "Lead e-mail", "Lead phone", "All members", "Idea title", "Idea summary", "GitHub", "Notes"],
+      ["Team ID", "Registered at (IST)", "Status", "Team", "Theme", "Members", "Lead name", "Lead e-mail", "Lead phone", "All members", "Idea title", "Idea summary", "GitHub", "Notes"],
       rows.map((r) => [r.regId, r.createdAt, r.status, r.teamName, r.track, r.members.length, r.members[0]?.name, r.members[0]?.email, r.members[0]?.phone, r.members.map((m) => `${m.name} <${m.email}> (${m.organisation})`), r.ideaTitle, r.ideaSummary, r.githubUrl, r.notes]),
     );
   } else if (kind === "enquiries") {

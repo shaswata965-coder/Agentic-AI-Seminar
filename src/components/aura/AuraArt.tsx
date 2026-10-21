@@ -1,4 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
+import { IITD_EMBLEM } from "@/components/layout/InstituteLogo";
+import { withBase } from "@/lib/paths";
 import type { AuraLook, Effect, Emblem, Expression, Headwear, Pose, PropKind } from "./types";
 import { AURA_EYES } from "./presets";
 
@@ -18,6 +20,8 @@ const PIVOT_R = { x: 198, y: 170 };
 const EYE_L = { x: 110, y: 102 };
 const EYE_R = { x: 150, y: 102 };
 const CHEST = { x: 130, y: 207 };
+/** The IIT Delhi pin, on her upper chest to the right: above a placard, clear of the chest emblem and the fins at rest. */
+const BADGE = { x: 155, y: 171, r: 13 };
 
 const ARM_PATH =
   "M0 -6 C9.5 -6 13.5 5 13 21 C12.5 37 7 51 0 54 C-7 51 -12.5 37 -13 21 C-13.5 5 -9.5 -6 0 -6 Z";
@@ -95,6 +99,8 @@ export interface AuraArtProps extends AuraLook {
   placard?: string;
   /** Counts the placard's changes of text; each one flips it over. */
   placardFlip?: number;
+  /** The IIT Delhi emblem pinned on her chest: its address (by default the bundled one), or false for none. */
+  badge?: string | false;
 }
 
 export function AuraArt({
@@ -115,6 +121,7 @@ export function AuraArt({
   title,
   placard,
   placardFlip = 0,
+  badge = withBase(IITD_EMBLEM),
 }: AuraArtProps) {
   const id = (name: string) => `${uid}-${name}`;
   const url = (name: string) => `url(#${id(name)})`;
@@ -252,6 +259,7 @@ export function AuraArt({
 
           {showEmblem ? <ChestEmblem kind={emblem} eye={C.eye} glow={url("glow")} /> : null}
           {wear === "stethoscope" ? <Stethoscope silver={url("silver")} /> : null}
+          {badge ? <Badge href={badge} edge={C.line} /> : null}
 
           {/* Levitation glow between head and body */}
           <ellipse cx="130" cy="147.5" rx="24" ry="2.6" fill={C.eye} opacity="0.35" />
@@ -887,6 +895,20 @@ function PropArt({
     default:
       return null;
   }
+}
+
+/* ---------------------------------------------------------------- Badge -- */
+
+/** The IIT Delhi emblem on a white pin, so it reads on her in both themes. Props and fins held across her go over it. */
+function Badge({ href, edge }: { href: string; edge: string }) {
+  const { x, y, r } = BADGE;
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <circle cx="0.8" cy="1.8" r={r} fill="#0f172a" opacity="0.14" />
+      <circle r={r} fill="#ffffff" stroke={edge} strokeOpacity="0.45" strokeWidth="1" />
+      <image href={href} x={-(r - 1.6)} y={-(r - 1.6)} width={(r - 1.6) * 2} height={(r - 1.6) * 2} preserveAspectRatio="xMidYMid meet" />
+    </g>
+  );
 }
 
 /* -------------------------------------------------------------- Placard -- */

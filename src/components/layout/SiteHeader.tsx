@@ -46,11 +46,11 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text }: SiteHea
   const iitdLogo = (
     <Link href="/" aria-label="IIT Delhi, home page" className="group/logo flex items-center gap-2.5 justify-self-start rounded-full pr-2">
       <span className="rounded-full bg-[conic-gradient(from_210deg,var(--azure),var(--lilac),var(--blush),var(--mint),var(--azure))] p-[2px] shadow-card transition-[rotate,scale] duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover/logo:scale-105 group-hover/logo:rotate-12">
-        <span className="flex rounded-full bg-surface p-[3px]">
-          <InstituteLogo kind="iitd" upload={logos.iitd} decorative className="h-8 lg:h-9" />
+        <span className="flex rounded-full bg-white p-[3px]">
+          <InstituteLogo kind="iitd" upload={logos.iitd} decorative className="h-10 lg:h-12" />
         </span>
       </span>
-      <span className="font-display text-[17px] leading-none font-extrabold tracking-tight whitespace-nowrap text-fg lg:text-lg">
+      <span className="font-display text-lg leading-none font-extrabold tracking-tight whitespace-nowrap text-fg lg:text-xl">
         IIT <span className="text-gradient">Delhi</span>
       </span>
     </Link>

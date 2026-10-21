@@ -17,11 +17,13 @@ const fonts = Promise.all([
   readFile(join(process.cwd(), "assets/fonts/outfit-latin-500-normal.woff")),
   readFile(join(process.cwd(), "assets/fonts/outfit-latin-800-normal.woff")),
 ]);
+// The IIT Delhi emblem, inlined: the image is drawn from a data URI, where the site's own addresses don't load.
+const emblem = readFile(join(process.cwd(), "public/logos/iit-delhi.svg")).then((b) => `data:image/svg+xml;base64,${b.toString("base64")}`);
 
 export default async function OpenGraphImage() {
-  const [s, [regular, heavy]] = await Promise.all([getSettings(), fonts]);
+  const [s, [regular, heavy], badge] = await Promise.all([getSettings(), fonts, emblem]);
   const look = auraLook("hero");
-  const aura = svgDataUri(toSvgString(<AuraArt uid="og" palette="light" {...look} width={400} height={462} />));
+  const aura = svgDataUri(toSvgString(<AuraArt uid="og" palette="light" {...look} badge={badge} width={400} height={462} />));
   return new ImageResponse(
     (
       <div
@@ -37,7 +39,10 @@ export default async function OpenGraphImage() {
       >
         <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", width: 700 }}>
           <div style={{ display: "flex", gap: 12 }}>
-            <div style={{ display: "flex", padding: "10px 18px", borderRadius: 8, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>IIT Delhi</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "8px 18px 8px 10px", borderRadius: 8, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>
+              <img src={badge} alt="" width={40} height={40} />
+              IIT Delhi
+            </div>
             <div style={{ display: "flex", padding: "10px 18px", borderRadius: 8, background: "rgba(255,255,255,0.85)", fontSize: 24, fontWeight: 700 }}>Yardi ScAI</div>
           </div>
           <div style={{ display: "flex", flexDirection: "column" }}>

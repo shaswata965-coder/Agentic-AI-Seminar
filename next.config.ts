@@ -47,10 +47,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // `standalone` output is used by the Docker image (see Dockerfile).
   output: process.env.NEXT_OUTPUT === "standalone" ? "standalone" : undefined,
-  // Fonts read from disk by the social preview images.
+  // Fonts and the IIT Delhi emblem, read from disk by the social preview images.
   outputFileTracingIncludes: {
-    "/opengraph-image": ["./assets/fonts/*.woff"],
-    "/twitter-image": ["./assets/fonts/*.woff"],
+    "/opengraph-image": ["./assets/fonts/*.woff", "./public/logos/iit-delhi.svg"],
+    "/twitter-image": ["./assets/fonts/*.woff", "./public/logos/iit-delhi.svg"],
   },
   cacheLife: {
     // Content managed from the admin panel. Saving in the admin expires the

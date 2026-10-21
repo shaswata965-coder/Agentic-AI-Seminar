@@ -159,7 +159,7 @@ export function RegistrationsManager() {
                 <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">{type === "workshop" ? "Name" : "Team"}</th>
                 <th className="px-4 py-3">{type === "workshop" ? "Organisation" : "Lead"}</th>
-                <th className="px-4 py-3">{type === "workshop" ? "Category" : "Track"}</th>
+                <th className="px-4 py-3">{type === "workshop" ? "Category" : "Theme"}</th>
                 <th className="px-4 py-3">Registered</th>
                 <th className="px-4 py-3">Status</th>
               </tr>
@@ -199,7 +199,7 @@ export function RegistrationsManager() {
             <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
               {(isTeam(open)
                 ? [
-                    ["Track", open.track],
+                    ["Theme", open.track],
                     ["Idea", open.ideaTitle],
                     ["GitHub", open.githubUrl],
                     ["Confirmation e-mail", open.emailSent ? "Sent" : "Not sent"],

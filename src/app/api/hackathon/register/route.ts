@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   }
   const d = parsed.data;
   if (d.track && d.track !== "undecided" && !h.tracks.some((t) => t.theme === d.track) && !Object.hasOwn(THEME_META, d.track)) {
-    return error(422, "Please check the highlighted fields.", { fieldErrors: { track: "Please choose one of the tracks." } });
+    return error(422, "Please check the highlighted fields.", { fieldErrors: { track: "Please choose one of the themes." } });
   }
   const key = teamKey(d.teamName);
   if (key.length < 2) return error(422, "Please choose a team name with letters or numbers.", { fieldErrors: { teamName: "Invalid team name" } });
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
             organiserNotice(s, to, `New hackathon team: ${d.teamName}`, [
               ["Team", d.teamName],
               ["ID", regId],
-              ["Track", trackLabel],
+              ["Theme", trackLabel],
               ["Lead", `${d.members[0].name} <${d.members[0].email}>`],
               ["Members", String(d.members.length)],
               ["Idea", d.ideaTitle || "-"],

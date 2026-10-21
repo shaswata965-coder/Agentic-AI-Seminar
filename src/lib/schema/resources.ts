@@ -669,7 +669,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         num("featuredSpeakers", "Featured speakers on the home page", { min: 0, max: 12, width: "half" }),
         bool("showMoreSpeakers", "Show the “More speakers to be announced” card"),
       ], { description: "Speakers are added under Speakers; tick “Feature on the home page” to show them here." }),
-      section("hackathon", "Hackathon", "homeHackathon", [], { description: "The hackathon's title, tagline, tracks, team size, mode and prize pool are edited under Hackathon." }),
+      section("hackathon", "Hackathon", "homeHackathon", [], { description: "The hackathon's title, tagline, themes, team size, mode and prize pool are edited under Hackathon." }),
       section("venue", "Venue & travel", "homeVenue", [], { description: "The routes on the map are edited in the Venue tab → Getting here." }),
       section("partners", "Partners", "homePartners", [], { description: "The logos come from Partners & sponsors." }),
       section("faq", "FAQ & contact", "homeFaq", [], { description: "Questions are added under FAQs; the e-mail and phone under Site-wide → Contact & social." }),
@@ -714,7 +714,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         textarea("programmeNote", "Note above the schedule"),
       ], { description: "Sessions are added under Programme." }),
       section("kiosks", "Industry kiosks", "programmeKiosks", [textarea("kioskIntro", "Introduction")], { description: "Kiosks are added under Industry kiosks." }),
-      section("hackathon", "Hackathon", "programmeHackathon", [], { description: "The title, tagline, tracks and dates come from the Hackathon page in the menu." }),
+      section("hackathon", "Hackathon", "programmeHackathon", [], { description: "The title, tagline, themes and dates come from the Hackathon page in the menu." }),
       section("plan", "Plan your visit", "programmePlan"),
     ],
   },
@@ -734,7 +734,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     key: "hackathon",
     title: "Hackathon",
     path: "/hackathon",
-    description: "Headings, labels and colours of the Hackathon page, team registration included. Its title, tracks, rules, timeline, prizes and results are edited under Hackathon in the menu.",
+    description: "Headings, labels and colours of the Hackathon page, team registration included. Its title, themes, rules, timeline, prizes and results are edited under Hackathon in the menu.",
     sections: [
       section("hero", "Hero", "hackathonHero"),
       section("overview", "At a glance", "hackathonOverview", [], { description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview." }),
@@ -743,7 +743,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("register", "Registration form", "hackathonRegisterForm", [], {
         description: "Whether registration is open, its deadline and an external platform link are set under Site-wide → Registration.",
       }),
-      section("tracks", "Problem tracks", "hackathonTracks"),
+      section("tracks", "Themes", "hackathonTracks", [], { description: "The three themes of the one hackathon. They are edited under Hackathon → Themes." }),
       section("judging", "Judging", "hackathonJudging"),
       section("people", "Mentors & judges", "hackathonPeople", [], { description: "Mentors and judges are added under Organisers & volunteers." }),
       section("resources", "Resources", "hackathonResources"),
@@ -920,9 +920,10 @@ export const HACKATHON_DEF: SingletonDef = {
     },
     {
       key: "tracks",
-      title: "Problem tracks",
+      title: "Themes",
+      description: "One hackathon with three themes: every team takes part in the same hackathon and picks the theme its idea fits.",
       fields: [
-        objects("tracks", "Tracks", "Track", [
+        objects("tracks", "Themes", "Theme", [
           select("theme", "Theme", themeOptions, { width: "half" }),
           text("title", "Title", { required: true, width: "half" }),
           textarea("description", "Description"),

@@ -2,6 +2,7 @@ import { CalendarClock, Clock, Trophy, Users } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
 import { TrophyArt } from "@/components/portals/PortalArt";
 import { ButtonLink } from "@/components/ui/Button";
+import { cn } from "@/lib/cn";
 import { Portal } from "@/components/ui/Portal";
 import { Eyebrow } from "@/components/ui/Section";
 import { THEME_META } from "@/lib/content/constants";
@@ -10,7 +11,7 @@ import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
 import { eventDayLabel, timeRange } from "@/lib/format";
 
-/** The hackathon on the programme page: the pitch, its tracks and facts, when it sits in the schedule and its key dates. */
+/** The hackathon on the programme page: the pitch, its three themes and facts, when it sits in the schedule and its key dates. */
 export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: HackathonInfo; sessions: Session[] }) {
   const c = copy(s, "programmeHackathon");
   const facts = [
@@ -35,7 +36,8 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
                 {h.title}
               </h2>
               <p className="mt-4 max-w-xl text-lg text-muted">{h.tagline}</p>
-              <ul className="mt-6 flex flex-wrap gap-2">
+              {c.themes && h.tracks.length ? <p className="mt-6 text-xs font-bold tracking-[0.14em] text-subtle uppercase">{c.themes}</p> : null}
+              <ul className={cn("flex flex-wrap gap-2", c.themes ? "mt-2.5" : "mt-6")}>
                 {h.tracks.map((t) => {
                   const meta = THEME_META[t.theme] ?? THEME_META.general;
                   return (

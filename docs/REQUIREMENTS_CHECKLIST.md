@@ -38,12 +38,12 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register and the Programme are in the navigation bar, and the hackathon is under *Explore*. Under the hero, two large cards lead to workshop registration and hackathon team registration. Add to calendar and share are in About and the footer |
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
-| | Hackathon announcement on home | ✅ Title, tagline, tracks, team size, mode and prize pool, with *Register your team* and *Hackathon details* (`/hackathon`) buttons |
+| | Hackathon announcement on home | ✅ Title, tagline, its three themes (*One hackathon, three themes*), team size, mode and prize pool, with *Register your team* and *Hackathon details* (`/hackathon`) buttons |
 | | Loading screen (added on request) | ✅ Caches the main pages' scripts, styles, fonts and images (Cache Storage, served by a service worker) while Aura tries to take off and small Auras work on her ship inside a progress ring; once all is cached she lifts off and the smoke clears to the page. Shown on the first visit and after updates; caching without the screen for reduced motion; switchable in Site settings → Home |
 | | Section order (added on request) | ✅ Site settings → <page> → Section order: the sections of Home, About, Programme, Hackathon, Partners, Venue, Organisers and Meet Aura can be dragged (or moved with arrows) into order of priority, with the live preview following; each page's hero stays fixed at the top |
 | | Hero placard (added on request) | ✅ The hero Aura holds up two placards in turn, one for workshop registration and one for hackathon registration, each showing its live status; a switch under her names them. Edited in Site settings → Home → Hero announcements; the text wraps to fit the board, and with both cleared she waves hello instead |
 | | Two registrations (added on request) | ✅ Under the hero, two large cards, *Workshop registration* and *Hackathon team registration*, each with its status and a big button; the card matching Aura's placard lights up, and pointing at a card brings its placard up (Site settings → Home → Registration choice) |
-| Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the matching hackathon track |
+| Themes | Three cards with icon, 2–3 line description, links to related talks, tutorials and hackathon track | ✅ Links open the programme and tutorials pre-filtered by theme, and the theme in the hackathon (one hackathon with three themes, not one per theme) |
 | Programme | Tabs by day; each session shows time, title, type tag (Keynote / Talk / Panel / Tutorial / Demo / Hackathon / Break), theme tag, speaker(s), room | ✅ Plus "Other" type, search, *My agenda* (starred sessions), "now / up next" during the event |
 | | Filter by theme / type | ✅ Filters are kept in the URL, so filtered views can be shared |
 | | "Schedule to be announced" placeholder until finalised | ✅ Programme status *TBA / Draft / Final* |
@@ -61,7 +61,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Requirement | Status |
 | --- | --- |
-| Overview and problem tracks for the three themes | ✅ One track per theme with example problem statements |
+| Overview and problem tracks for the three themes | ✅ Changed on request: one hackathon with three themes (not three hackathons), shown in one frame branching to each theme, with example problem statements; teams pick a theme when registering |
 | Eligibility, team size, mode (on-site / hybrid), rules and code of conduct | ✅ |
 | Timeline graphic: registration → idea submission → shortlisting → final round (15–16 Dec) → results; dates TBA | ✅ Shows the current stage automatically from the dates |
 | Prizes, judging criteria, mentors / judges (cards like speakers), resources | ✅ Same card component as speakers and organisers |
@@ -81,7 +81,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Requirement | How |
 | --- | --- |
-| Clean, modern, tech-forward; IIT Delhi / ScAI branding; subtle network / node graphics | Light pastel palette with an adjustable brand colour, official logos (upload), animated node network in the hero, agent-loop diagram, Aura the guide robot in a different pose in each section |
+| Clean, modern, tech-forward; IIT Delhi / ScAI branding; subtle network / node graphics | Light pastel palette with an adjustable brand colour, official logos (the IIT Delhi emblem built in as a vector, large in the header and the home hero, and as a badge on Aura across the site), animated node network in the hero, agent-loop diagram, Aura the guide robot in a different pose in each section |
 | Responsive, mobile-friendly | Mobile-first layouts and a full-screen mobile menu; checked at phone, tablet and desktop widths |
 | Accessibility | Semantic headings and landmarks, skip link, keyboard-operable menus, tabs and dialogs, visible focus, labelled fields with inline errors, alt text, reduced-motion support, light and dark modes |
 | Performance (under 3 s, compressed images, no heavy animation on mobile) | Pre-rendered and cached pages, self-hosted fonts, WebP uploads, lazy map and video embeds; the node network and most Aura animations are switched off on phones and touch devices |
@@ -110,7 +110,7 @@ Each pending item has a placeholder and an admin screen ready for it:
 | Speakers and panelists with photos, bios, talk titles | Speakers |
 | Detailed schedule, venue hall names | Programme; Site settings → Site-wide → Event details (hall) |
 | Tutorial, demo and kiosk details | Tutorials, Demos, Industry kiosks |
-| Hackathon tracks, dates, prizes, platform | Hackathon; Site settings → Site-wide → Registration (platform link) |
+| Hackathon themes, dates, prizes, platform | Hackathon; Site settings → Site-wide → Registration (platform link) |
 | Registration links, fees, deadlines | Site settings → Site-wide → Registration; Registration → Fees |
 | Organiser photos and profile links; volunteer list | Organisers & volunteers |
 | Sponsors / partners and contact e-mail | Partners & sponsors; Site settings → Site-wide → Contact & social |

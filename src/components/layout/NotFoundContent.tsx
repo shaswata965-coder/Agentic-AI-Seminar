@@ -14,7 +14,7 @@ export function NotFoundContent() {
         <div className="mt-10 grid w-full max-w-4xl gap-4 md:grid-cols-3">
           <Portal href="/" tone="lilac" compact kicker="Home" title="Back to the start" art={<HomeArt />} />
           <Portal href="/programme" tone="azure" compact kicker="Programme" title="The two days" art={<ScheduleArt />} />
-          <Portal href="/hackathon" tone="aqua" compact kicker="Hackathon" title="Tracks and prizes" art={<TrophyArt />} />
+          <Portal href="/hackathon" tone="aqua" compact kicker="Hackathon" title="Themes and prizes" art={<TrophyArt />} />
         </div>
       </div>
     </section>

@@ -41,7 +41,7 @@ export function Themes({ s }: { s: SiteSettings }) {
                     {[
                       { href: `/programme?theme=${t.key}`, label: c.talks },
                       { href: `/tutorials?theme=${t.key}`, label: c.tutorials },
-                      { href: `/hackathon#track-${t.key}`, label: c.track },
+                      { href: `/hackathon#theme-${t.key}`, label: c.track },
                     ]
                       .filter((l) => l.label)
                       .map((l) => (

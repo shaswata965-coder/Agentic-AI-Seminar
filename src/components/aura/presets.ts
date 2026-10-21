@@ -150,7 +150,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     effects: ["code"],
     eyeColor: AURA_EYES.mint,
     tips: [
-      "Form a team, pick a track, build an agent!",
+      "Form a team, pick a theme, build an agent!",
       "Final round happens live at the workshop, 15–16 Dec.",
       "Read the judging criteria before you start building.",
     ],

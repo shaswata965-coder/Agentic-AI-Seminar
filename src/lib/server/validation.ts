@@ -56,7 +56,7 @@ const member = z.object({
 
 export const hackathonSchema = z.object({
   teamName: z.string(TYPE).overwrite(cleanLine).trim().min(2, "Please choose a team name.").max(60, "Team name is too long."),
-  track: z.string(TYPE).trim().max(40).regex(/^[a-z0-9-]*$/, "Please choose a track."),
+  track: z.string(TYPE).trim().max(40).regex(/^[a-z0-9-]*$/, "Please choose a theme."),
   members: z
     .array(member)
     .min(1, "Add at least the team lead.")

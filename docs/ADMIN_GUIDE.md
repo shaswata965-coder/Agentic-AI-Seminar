@@ -123,14 +123,14 @@ Fill in name, role (e.g. "PhD scholar"), department, affiliation, profile link a
 
 **Hackathon** (left menu) has tabs:
 - **Overview:** title, tagline, description, team size, who can join, dates and location (leave these two blank to show the workshop's), mode (on-site / hybrid), prize pool, eligibility and the registration note. The first section of the Hackathon page, *At a glance*, shows them.
-- **Problem tracks:** one per theme (Healthcare, Scientific Discovery, Entrepreneurship), each with example problems.
+- **Themes:** there is one hackathon, with three themes (Healthcare, Scientific Discovery, Entrepreneurship); every team takes part in the same hackathon, with one timeline, one set of rules and one prize pool, and picks the theme its idea fits on the registration form. Each theme has a title, a description and example problems.
 - **Rules & conduct:** rules and code of conduct.
 - **Timeline:** registration → idea submission → shortlisting → final round (15–16 Dec) → results. Add dates as they are confirmed; the timeline highlights the current stage automatically.
 - **Prizes & judging:** prizes and judging criteria (with weights if you like). The first three prizes stand on a podium under the prize pool; any more are listed below it as special awards.
 - **Resources:** APIs, datasets, compute credits and other links for participants.
 - **Results:** winners. They stay hidden until you switch on **Post-event: show hackathon winners** in **Site settings → Site-wide → Features & post-event**.
 
-The Hackathon page starts with what teams need to decide: *At a glance* (team size, who can join, dates, location, mode, prize pool), the prize money, the timeline and the team registration form; tracks, judging, mentors and judges, resources, rules and results follow. Change the order in **Site settings → Hackathon → Section order**.
+The Hackathon page starts with what teams need to decide: *At a glance* (team size, who can join, dates, location, mode, prize pool), the prize money, the timeline and the team registration form; the themes (*One hackathon, three themes*), judging, mentors and judges, resources, rules and results follow. Change the order in **Site settings → Hackathon → Section order**.
 
 Mentors and judges are added under **Organisers & volunteers** (section 7).
 
@@ -148,7 +148,7 @@ Mentors and judges are added under **Organisers & volunteers** (section 7).
 All under **Site settings → Site-wide**.
 
 - **Contact & social:** official e-mail, phone (optional), LinkedIn, X, Instagram, YouTube, and the address that is e-mailed about new hackathon teams and enquiries (workshop registrations are listed under **Registrations**).
-- **Logos & images:** the **IIT Delhi** emblem (left corner of the navigation bar) and the **ScAI** logo (right corner) are built in; upload a file only to replace one (PNG or SVG with a transparent background is best). Also: an event logo and a custom social-media preview image (1200 × 630 px).
+- **Logos & images:** the **IIT Delhi** emblem (left corner of the navigation bar, and large at the top of the home page beside *Organised by*, whose words are under *Home → Hero*) and the **ScAI** logo (right corner) are built in; Aura wears the emblem as a badge on every page; upload a file only to replace one (PNG or SVG with a transparent background is best). Also: an event logo and a custom social-media preview image (1200 × 630 px).
 - **Colours:** the **brand colour** (e.g. `#3b5bdb`) for buttons and highlights, and the seven accent colours the sections use (see section 3).
 - **SEO & analytics:** the Google Analytics ID (`G-…`) and search keywords.
 - **Banner:** a site-wide notice (e.g. "Registration closes on 30 November"), its link and colour.

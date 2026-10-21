@@ -103,7 +103,7 @@ export function ScheduleArt() {
   );
 }
 
-/** Hackathon: the trophy in a ring of tracks. */
+/** Hackathon: the trophy in a ring of its themes. */
 export function TrophyArt() {
   return (
     <span className="relative grid h-full w-full place-items-center">

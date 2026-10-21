@@ -47,7 +47,7 @@ export default async function HackathonPage() {
   const registerHref = s.hackathonUrl || "#register";
   const hero = copy(s, "hackathonHero", { platform: s.hackathonPlatform || "the platform" });
   const ov = copy(s, "hackathonOverview");
-  const tr = copy(s, "hackathonTracks");
+  const tr = copy(s, "hackathonTracks", { count: h.tracks.length });
   const tl = copy(s, "hackathonTimeline");
   const pr = copy(s, "hackathonPrizes");
   const rf = copy(s, "hackathonRegisterForm", { platform: s.hackathonPlatform || "our hackathon platform" });
@@ -177,7 +177,7 @@ export default async function HackathonPage() {
                     </div>
                   ) : null}
                   {rf.tracksLink && h.tracks.length ? (
-                    <a href="#tracks" className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
+                    <a href="#themes" className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
                       <span className="mi-underline">{rf.tracksLink}</span>
                       <ArrowDown size={15} aria-hidden className="transition-transform duration-300 group-hover:translate-y-0.5" />
                     </a>
@@ -209,37 +209,59 @@ export default async function HackathonPage() {
             </Section>
           ),
           tracks: (
-            <Section id="tracks" edit="hackathon.tracks" tone={tr.tone} bg={tr.background} labelledBy="tracks-title">
-              <SectionHeading id="tracks-title" eyebrow={tr.eyebrow} title={tr.title} description={tr.description} />
-              <ul className="grid gap-5 lg:grid-cols-3">
-                {h.tracks.map((t) => {
-                  const meta = THEME_META[t.theme] ?? THEME_META.general;
-                  return (
-                    <li key={t.title} id={`track-${t.theme}`} className={`tone-${meta.tone} card scroll-mt-28 p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`} data-reveal data-glow="">
-                      <div className="flex items-center gap-3">
-                        <Aura variant={meta.aura} size={76} lite />
-                        <div>
-                          <Badge tone={meta.tone} size="xs">
-                            {meta.short}
-                          </Badge>
-                          <h3 className="mt-1 font-display text-xl font-semibold text-fg">{t.title}</h3>
+            <Section id="themes" edit="hackathon.tracks" tone={tr.tone} bg={tr.background} labelledBy="tracks-title">
+              <SectionHeading id="tracks-title" eyebrow={tr.eyebrow} title={tr.title} description={tr.description} align="center" />
+              {/* One frame for the one hackathon: its name at the top, branching to its themes. */}
+              <div className="relative rounded-[2rem] border border-border bg-[color-mix(in_oklab,var(--surface)_70%,transparent)] p-4 shadow-card-lg sm:p-7">
+                <div className="tone-aqua mx-auto flex w-fit max-w-full items-center gap-3 rounded-2xl bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft))] px-4 py-3 ring-1 ring-border sm:px-5">
+                  <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface text-accent-ink shadow-card">
+                    <Trophy size={20} aria-hidden />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-display text-lg leading-tight font-bold text-fg">{h.title}</span>
+                    {tr.frame ? <span className="block text-sm text-muted">{tr.frame}</span> : null}
+                  </span>
+                </div>
+                {/* Wide screens: a line down from the hackathon, branching to the middle of each of the three columns (gap-5 between them). */}
+                {h.tracks.length === 3 ? (
+                  <div aria-hidden className="relative hidden h-10 lg:block">
+                    <span className="absolute top-0 left-1/2 h-5 w-0.5 -translate-x-1/2 bg-border-strong" />
+                    <span className="absolute top-5 right-[calc((100%-2.5rem)/6)] left-[calc((100%-2.5rem)/6)] h-0.5 bg-border-strong" />
+                    {["left-[calc((100%-2.5rem)/6)]", "left-1/2", "left-[calc(100%-(100%-2.5rem)/6)]"].map((x) => (
+                      <span key={x} className={`absolute top-5 h-5 w-0.5 -translate-x-1/2 bg-border-strong ${x}`} />
+                    ))}
+                  </div>
+                ) : null}
+                <ul className="mt-5 grid gap-5 lg:mt-0 lg:grid-cols-3">
+                  {h.tracks.map((t, i) => {
+                    const meta = THEME_META[t.theme] ?? THEME_META.general;
+                    return (
+                      <li key={t.title} id={`theme-${t.theme}`} className={`tone-${meta.tone} card scroll-mt-28 p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`} data-reveal data-glow="">
+                        <div className="flex items-center gap-3">
+                          <Aura variant={meta.aura} size={76} lite />
+                          <div>
+                            <Badge tone={meta.tone} size="xs">
+                              {tr.theme ? `${tr.theme} ${i + 1}` : meta.short}
+                            </Badge>
+                            <h3 className="mt-1 font-display text-xl font-semibold text-fg">{t.title}</h3>
+                          </div>
                         </div>
-                      </div>
-                      <p className="mt-4 text-[15px] text-muted">{t.description}</p>
-                      {t.problems.length ? (
-                        <ul className="mt-4 grid gap-2">
-                          {t.problems.map((p, i) => (
-                            <li key={i} className="flex gap-2 rounded-xl bg-accent-soft p-3 text-sm text-fg">
-                              <span className="font-display font-bold text-accent-ink">{i + 1}.</span>
-                              {p}
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ul>
+                        <p className="mt-4 text-[15px] text-muted">{t.description}</p>
+                        {t.problems.length ? (
+                          <ul className="mt-4 grid gap-2">
+                            {t.problems.map((p, j) => (
+                              <li key={j} className="flex gap-2 rounded-xl bg-accent-soft p-3 text-sm text-fg">
+                                <span className="font-display font-bold text-accent-ink">{j + 1}.</span>
+                                {p}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </Section>
           ),
           judging: h.judgingCriteria.length ? (
