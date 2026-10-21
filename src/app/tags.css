@@ -167,14 +167,14 @@
     --tag-radius: 0;
     --tag-clip: polygon(0 0, 100% 0, calc(100% - 0.55em) 50%, 100% 100%, 0 100%);
   }
-  /* // code comment: hackathon and hands-on sessions. */
+  /* // code comment (no section uses it by default). */
   [data-tags="slash"] {
     --tag-pad: 0;
     --tag-font: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
     --tag-bg: transparent;
     --tag-before: "//";
   }
-  /* Tinted label with an accent edge: notices and practical details. */
+  /* Tinted label with an accent edge: notices, practical details and the hackathon. */
   [data-tags="tab"] {
     --tag-pad: 0.25em 0.65em 0.25em 0.75em;
     --tag-radius: 0 0.3rem 0.3rem 0;

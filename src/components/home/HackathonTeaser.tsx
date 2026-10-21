@@ -1,9 +1,8 @@
 import { ArrowRight, Clock, Trophy, Users } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
+import { ThemePoints } from "@/components/hackathon/ThemePoints";
 import { ButtonLink } from "@/components/ui/Button";
-import { cn } from "@/lib/cn";
 import { Eyebrow } from "@/components/ui/Section";
-import { THEME_META } from "@/lib/content/constants";
 import type { HackathonInfo, SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
@@ -17,7 +16,7 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
     { Icon: Trophy, label: c.prizePool, value: h.prizePool },
   ];
   return (
-    <section id="hackathon" data-edit="home.hackathon" aria-labelledby="hackathon-teaser-title" data-tags="slash" className={`tone-${c.tone} scroll-mt-24 py-16 sm:py-24`}>
+    <section id="hackathon" data-edit="home.hackathon" aria-labelledby="hackathon-teaser-title" data-tags="tab" className={`tone-${c.tone} scroll-mt-24 py-16 sm:py-24`}>
       <div className="container-site">
         <div className="relative overflow-hidden rounded-[2rem] border border-border bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft)_55%,var(--blush-soft))] p-6 shadow-card-lg sm:p-12">
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent)]" />
@@ -31,17 +30,7 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
                 {h.title}
               </h2>
               <p className="mt-4 max-w-xl text-lg text-muted">{h.tagline}</p>
-              {c.themes && h.tracks.length ? <p className="mt-6 text-xs font-bold tracking-[0.14em] text-subtle uppercase">{c.themes}</p> : null}
-              <ul className={cn("flex flex-wrap gap-2", c.themes ? "mt-2.5" : "mt-6")}>
-                {h.tracks.map((t) => {
-                  const meta = THEME_META[t.theme] ?? THEME_META.general;
-                  return (
-                    <li key={t.title} className={`tone-${meta.tone} tag text-sm`}>
-                      {t.title}
-                    </li>
-                  );
-                })}
-              </ul>
+              <ThemePoints tracks={h.tracks} label={c.themes} className="mt-6" />
               <dl className="mt-7 grid gap-3 sm:grid-cols-3">
                 {facts.map(({ Icon, label, value }) => (
                   <div key={label} className="rounded-2xl bg-surface/80 p-4 ring-1 ring-border backdrop-blur">

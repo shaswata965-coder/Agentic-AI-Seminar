@@ -81,7 +81,7 @@ export default async function HackathonPage() {
     );
 
   return (
-    <TagScope style="slash">
+    <TagScope style="tab">
       <JsonLd data={eventJsonLd(s, { "@type": "Event", name: h.title, description: h.tagline, url: absoluteUrl("/hackathon") })} />
       <PageHero edit="hackathon.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={h.title} aura="hackathon" description={h.tagline}>
         <ButtonLink href={registerHref} size="lg" icon={<Trophy size={19} aria-hidden />} iconRight={external ? <ExternalLink size={16} aria-hidden /> : undefined}>
