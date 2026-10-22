@@ -6,7 +6,7 @@ import { Hero } from "@/components/home/Hero";
 import { Highlights } from "@/components/home/Highlights";
 import { Partners } from "@/components/home/Partners";
 import { SpeakersPreview } from "@/components/home/SpeakersPreview";
-import { Themes } from "@/components/home/Themes";
+import { themePhoto, Themes } from "@/components/home/Themes";
 import { Venue } from "@/components/home/Venue";
 import { InOrder } from "@/components/layout/InOrder";
 import { LoadingScreen } from "@/components/loading/LoadingScreen";
@@ -34,7 +34,7 @@ export default async function HomePage() {
     .filter((href) => href.startsWith("/"));
   const files = [
     ...new Set(
-      [s.logoIITD, s.logoScAI, s.eventLogo, ...s.themes.map((t) => t.image), ...speakers.map((x) => x.photo), ...people.map((x) => x.photo), ...sponsors.map((x) => x.logo), ...kiosks.map((x) => x.logo), ...demos.map((x) => x.image)].filter(
+      [s.logoIITD, s.logoScAI, s.eventLogo, ...s.themes.map(themePhoto), ...speakers.map((x) => x.photo), ...people.map((x) => x.photo), ...sponsors.map((x) => x.logo), ...kiosks.map((x) => x.logo), ...demos.map((x) => x.image)].filter(
         (src): src is string => typeof src === "string" && src.startsWith("/"),
       ),
     ),
