@@ -1,6 +1,7 @@
-# Reverse proxy for the load test: the README's production server block, inside the main context of
-# Ubuntu's stock /etc/nginx/nginx.conf (worker_processes auto, 768 connections per worker), so the test
-# runs through what a server set up from the README would run. up.sh fills in the @...@ values.
+# The "plain" reverse proxy (NGINX_PROFILE=plain): the README's server block before the load tests (a plain
+# proxy_pass to Next.js), inside the main context of Ubuntu's stock /etc/nginx/nginx.conf (worker_processes
+# auto, 768 connections per worker). It failed the one-minute rush of 2,000; kept for comparison. up.sh
+# fills in the @...@ values.
 
 worker_processes @WORKERS@;
 pid @RUN@/nginx.pid;
@@ -32,7 +33,7 @@ http {
     log_format loadtest '$remote_addr $status $request_method "$uri" $request_time $upstream_response_time $body_bytes_sent';
     access_log @RUN@/logs/nginx-access.log loadtest buffer=256k flush=2s;
 
-    # ---- From README.md, "Reverse proxy with HTTPS (Nginx)" -----------------------------------------
+    # ---- From README.md, "Reverse proxy with HTTPS (Nginx)", until 22 October 2026 ------------------
     server {
         listen 443 ssl http2;
         server_name localhost;

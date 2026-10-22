@@ -1,6 +1,6 @@
 # Load tests
 
-End-to-end load tests for the website: real HTTPS through nginx (the README's production server block) to
+End-to-end load tests for the website: real HTTPS through nginx (configured as the README says) to
 `next start` and MongoDB, with every form actually submitted, stored and e-mailed, from many client IP
 addresses or from one. Results of the last full run: [`docs/LOAD_TEST_REPORT.md`](../docs/LOAD_TEST_REPORT.md).
 
@@ -19,9 +19,10 @@ Chromium (Playwright probe) ─────────────┘          
 
 ### Client IP addresses
 
-The site rate-limits its forms per client IP (8 workshop registrations, 6 hackathon teams and 5 messages per
-address per 10 to 15 minutes, `src/lib/server/rate-limit.ts`), so the same users can get very different
-results depending on how many addresses they come from. Each scenario runs in these modes:
+The site rate-limits its forms per person and per client IP (`src/lib/server/form-limits.ts`: 8 workshop
+registrations, 6 hackathon teams and 5 messages per person, 100, 40 and 40 per address, per 10 to 15 minutes;
+none per address for networks in `RATE_LIMIT_EXEMPT`), so the same users can get very different results
+depending on how many addresses they come from. Each scenario runs in these modes:
 
 | Mode | Addresses | Like |
 | --- | --- | --- |
@@ -86,8 +87,9 @@ NEXT_PUBLIC_SITE_URL=https://localhost npm run build
 SERVER_CPUS=0,1 K6_CPUS=2,3 loadtest/run.sh                                 # everything, about 70 minutes
 SERVER_CPUS=0,1 K6_CPUS=2,3 loadtest/run.sh submission:distinct submission:shared
 SCALE=0.05 PACE=0.2 loadtest/run.sh daily:distinct                         # quick smoke run
-NGINX_PROFILE=tuned LABEL=tuned loadtest/run.sh submission:distinct         # with the tuned nginx
+NGINX_PROFILE=plain LABEL=plain loadtest/run.sh submission:distinct         # with the README's earlier nginx
 ARRIVAL=600 LABEL=10min loadtest/run.sh submission:distinct                 # the 2,000 arrive over 10 minutes
+RATE_LIMIT_EXEMPT=127.20.0.1 LABEL=exempt loadtest/run.sh contest:shared   # the shared address exempt
 ```
 
 `run.sh` starts a fresh stack for every run ([`stack/up.sh`](stack/up.sh): nginx, `next start`, the SMTP sink),
@@ -103,12 +105,14 @@ monitor, and writes everything to `loadtest/results/<time>/<scenario>-<mode>/`:
 | `nginx-access.log`, `nginx-error.log`, `next.log`, `k6.log`, `probe.jsonl`, `monitor.jsonl` | the raw material |
 
 `SERVER_CPUS` and `K6_CPUS` keep the load generator from taking CPU from the server (`taskset`): with `0,1`
-the server side has two cores, like a small VM. `NGINX_PROFILE=tuned` swaps the README's nginx server block
-for [`stack/nginx.tuned.conf.template`](stack/nginx.tuned.conf.template) (build files from disk, more
-connections, a 2-second micro-cache, nothing compressed per request; see the report's finding 2).
-`NGINX_CONNECTIONS` (default 768, Ubuntu's stock value) and `NGINX_WORKERS` change the README profile's nginx;
-`ARRIVAL` spreads the submission rush over that many seconds (default 60); `LABEL` is added to the result
-folder's name; `SMTP_SINK_DELAY_MS` slows the SMTP sink down like a real mail server.
+the server side has two cores, like a small VM. nginx runs the README's configuration
+([`stack/nginx.tuned.conf.template`](stack/nginx.tuned.conf.template), the same directives; keep them in
+step); `NGINX_PROFILE=plain` runs the plain `proxy_pass` the README had before the load tests
+([`stack/nginx.conf.template`](stack/nginx.conf.template), with `NGINX_CONNECTIONS`, default 768, Ubuntu's
+stock value). `ARRIVAL` spreads the submission rush over that many seconds (default 60); `LABEL` is added to
+the result folder's name; `RATE_LIMIT_EXEMPT`, `SMTP_MAX_CONNECTIONS` and `SMTP_MAX_PER_MINUTE` go to the site;
+`SMTP_SINK_MAX_CONNECTIONS` makes the SMTP sink refuse connections past that many with "421", like a mail
+provider, and `SMTP_SINK_DELAY_MS` slows it down like a real mail server.
 
 To test another deployment, run a script directly against it with k6, e.g.
 `k6 run -e BASE_URL=https://staging.example.org loadtest/k6/daily.js` (sign-in details for the organiser

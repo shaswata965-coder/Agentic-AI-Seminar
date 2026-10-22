@@ -6,7 +6,8 @@
  *
  *   SMTP_SINK_PORT=2525 SMTP_SINK_STATS=smtp-stats.json node smtp-sink.mjs
  *
- * SMTP_SINK_DELAY_MS adds a delay before each message is accepted, like a real mail server's.
+ * SMTP_SINK_DELAY_MS adds a delay before each message is accepted, like a real mail server's, and
+ * SMTP_SINK_MAX_CONNECTIONS turns away connections past that many at once with "421", as providers do.
  */
 import { writeFileSync } from "node:fs";
 import net from "node:net";
@@ -14,6 +15,7 @@ import net from "node:net";
 const port = Number(process.env.SMTP_SINK_PORT ?? 2525);
 const statsFile = process.env.SMTP_SINK_STATS ?? "smtp-stats.json";
 const delayMs = Number(process.env.SMTP_SINK_DELAY_MS ?? 0);
+const maxConnections = Number(process.env.SMTP_SINK_MAX_CONNECTIONS) || Infinity;
 
 const KINDS = [
   ["workshop-confirmation", /^You're registered:/],
@@ -23,7 +25,7 @@ const KINDS = [
   ["organiser-enquiry-notice", /^(Contact message|Exhibitor enquiry|Sponsorship enquiry) from/],
 ];
 
-const stats = { messages: 0, recipients: 0, connections: 0, open: 0, peakOpen: 0, byKind: {}, perRecipient: {} };
+const stats = { messages: 0, recipients: 0, connections: 0, refused: 0, open: 0, peakOpen: 0, byKind: {}, perRecipient: {} };
 
 function record(subject, rcpts) {
   stats.messages += 1;
@@ -41,6 +43,12 @@ function decodeSubject(raw) {
 }
 
 const server = net.createServer((sock) => {
+  if (stats.open >= maxConnections) {
+    stats.refused += 1;
+    sock.on("error", () => {});
+    sock.end("421 4.7.0 Too many connections, try again later\r\n");
+    return;
+  }
   stats.connections += 1;
   stats.open += 1;
   stats.peakOpen = Math.max(stats.peakOpen, stats.open);

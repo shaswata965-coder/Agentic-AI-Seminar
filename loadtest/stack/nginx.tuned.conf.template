@@ -1,14 +1,11 @@
-# The "tuned" reverse proxy (NGINX_PROFILE=tuned in up.sh): the README's server block plus what the
-# submission-rush test showed a small server needs. Differences from nginx.conf.template:
-#   1. nginx serves the build files (/_next/static, content-hashed and immutable) from disk, instead of
-#      passing each one to the single Node.js process;
-#   2. 4,096 connections per worker, and kept-alive connections to Next.js;
-#   3. a 2-second micro-cache for anonymous page and router-prefetch requests, so a rush of identical
-#      requests reaches Next.js about once per page every 2 seconds. Signed-in organisers and the admin's
-#      live preview (Draft Mode) bypass it, and an edit saved in the admin reaches visitors after about 2 s;
-#   4. nothing is compressed per request: pages are cached already gzipped (Next.js compresses each once
-#      per cache fill), and build files are served from gzipped copies made after the build
-#      (gzip_static; up.sh makes them, as a deploy step would after `npm run build`).
+# The reverse proxy as README.md now sets it up ("Reverse proxy with HTTPS (Nginx)"): its upstream, cache,
+# maps and server block, word for word but for the load test's paths, ports and host name, plus a log
+# line per request for tools/report.mjs. Keep the two in step. up.sh fills in the @...@ values.
+#   - 4,096 connections per worker, and kept-alive connections to Next.js;
+#   - build files (/_next/static, content-hashed) fetched from Next.js once and kept;
+#   - pages, router prefetches and public files cached for 2 seconds, one gzipped and one plain copy each,
+#     so a rush reaches Next.js about once per page every 2 seconds. Signed-in organisers and the admin's
+#     live preview (Draft Mode) bypass it; /api/ and /admin are never cached.
 
 worker_processes @WORKERS@;
 pid @RUN@/nginx.pid;
@@ -20,6 +17,7 @@ events {
 }
 
 http {
+    # Ubuntu's stock nginx.conf.
     sendfile on;
     tcp_nopush on;
     types_hash_max_size 2048;
@@ -27,11 +25,7 @@ http {
     default_type application/octet-stream;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
-
-    # Only what isn't already compressed (API answers, files in public/), at the cheapest level.
     gzip on;
-    gzip_comp_level 1;
-    gzip_types text/plain text/css text/x-component application/javascript application/json application/manifest+json image/svg+xml;
 
     client_body_temp_path @RUN@/tmp/body;
     proxy_temp_path @RUN@/tmp/proxy;
@@ -42,24 +36,14 @@ http {
     log_format loadtest '$remote_addr $status $request_method "$uri" $request_time $upstream_response_time $body_bytes_sent $upstream_cache_status';
     access_log @RUN@/logs/nginx-access.log loadtest buffer=256k flush=2s;
 
-    upstream site {
+    # ---- From README.md ------------------------------------------------------------------------------
+    upstream aaiw {
         server 127.0.0.1:@APP_PORT@;
         keepalive 64;
     }
-
-    proxy_cache_path @RUN@/cache levels=1:2 keys_zone=pages:10m max_size=256m inactive=10m use_temp_path=off;
-
-    # Requests that must never be answered from the cache: a signed-in organiser, or the admin's preview.
-    map "$cookie_aaiw_admin$cookie___prerender_bypass" $skip_cache {
-        default 1;
-        ""      0;
-    }
-
-    # Cache one gzipped and one plain copy of each page, whatever exact Accept-Encoding a browser sends.
-    map $http_accept_encoding $page_encoding {
-        ~*gzip  gzip;
-        default "";
-    }
+    proxy_cache_path @RUN@/cache levels=1:2 keys_zone=aaiw:10m max_size=512m inactive=7d use_temp_path=off;
+    map "$cookie_aaiw_admin$cookie___prerender_bypass" $aaiw_no_cache { default 1; "" 0; }
+    map $http_accept_encoding $aaiw_encoding { ~*gzip gzip; default ""; }
 
     server {
         listen 443 ssl http2;
@@ -72,41 +56,33 @@ http {
         proxy_set_header Connection "";
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-For $remote_addr; # overwrite (not append) so clients can't spoof their IP
+        proxy_set_header X-Forwarded-For $remote_addr;
 
-        # 1. Build files, straight from disk. (For a sub-path, use location /<base>/_next/static/.)
+        location /api/  { proxy_pass http://aaiw; }
+        location /admin { proxy_pass http://aaiw; }
+
         location /_next/static/ {
-            alias @ROOT@/.next/static/;
-            gzip_static on;
-            gzip off;
-            add_header Cache-Control "public, max-age=31536000, immutable";
-            add_header X-Content-Type-Options nosniff;
+            proxy_pass http://aaiw;
+            proxy_set_header Accept-Encoding $aaiw_encoding;
+            proxy_cache aaiw;
+            proxy_cache_key "$host$request_uri|$aaiw_encoding";
+            proxy_cache_valid 200 30d;
+            proxy_cache_lock on;
+            proxy_ignore_headers Vary;
         }
 
-        # APIs and the admin panel: never cached.
-        location /api/ {
-            proxy_pass http://site;
-        }
-        location /admin {
-            proxy_pass http://site;
-        }
-
-        # 3. Pages, router prefetches and public files: micro-cached.
         location / {
-            proxy_pass http://site;
-            proxy_set_header Accept-Encoding $page_encoding;
-            proxy_cache pages;
-            proxy_cache_key "$scheme$host$request_uri|$page_encoding|$http_rsc|$http_next_router_prefetch|$http_next_router_segment_prefetch|$http_next_router_state_tree|$http_next_url";
-            # Next.js allows 5 minutes (s-maxage=300): keep 2 s. The key above already holds every header
-            # a page varies on (Vary).
-            proxy_ignore_headers Cache-Control Expires Vary;
+            proxy_pass http://aaiw;
+            proxy_set_header Accept-Encoding $aaiw_encoding;
+            proxy_cache aaiw;
+            proxy_cache_key "$host$request_uri|$aaiw_encoding|$http_rsc|$http_next_router_prefetch|$http_next_router_segment_prefetch|$http_next_router_state_tree|$http_next_url";
             proxy_cache_valid 200 301 302 307 308 404 2s;
-            proxy_cache_lock on;                          # one request per page goes to Next.js; the rest wait
+            proxy_ignore_headers Cache-Control Expires Vary;
+            proxy_cache_lock on;
             proxy_cache_use_stale updating error timeout http_500 http_502 http_503 http_504;
             proxy_cache_background_update on;
-            proxy_cache_bypass $skip_cache;
-            proxy_no_cache $skip_cache;
-            add_header X-Cache $upstream_cache_status;
+            proxy_cache_bypass $aaiw_no_cache;
+            proxy_no_cache $aaiw_no_cache;
         }
     }
     server { listen 80; server_name localhost; return 301 https://$host$request_uri; }

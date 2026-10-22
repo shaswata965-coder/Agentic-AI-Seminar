@@ -94,7 +94,9 @@ All settings are environment variables; [`.env.example`](.env.example) documents
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | | First administrator, created on the first sign-in to an empty database (password: 10+ characters) |
 | `COOKIE_SECURE` | | `false` only to test a production build over plain HTTP. Not needed on localhost |
 | `CLIENT_IP_HEADER` | | Header holding the visitor's IP address, if your proxy sets one it overwrites (e.g. `x-real-ip`, `cf-connecting-ip`). By default the last `X-Forwarded-For` entry is used. Used for rate limits |
+| `RATE_LIMIT_EXEMPT` | | IPv4 addresses or ranges (e.g. `103.27.8.0/22, 14.139.60.5`) where many people share one address and may all register at once, such as the institute's network or the hackathon venue's. Elsewhere one address may send at most 100 registrations, 40 teams and 40 messages per 10 to 15 minutes; each person (address and e-mail) 8, 6 and 5 |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS` | | Outgoing mail for confirmations and organiser notifications. Without them, forms still work but no e-mail is sent |
+| `SMTP_MAX_CONNECTIONS`, `SMTP_MAX_PER_MINUTE` | | Connections to the mail server at once (default 3), and e-mails a minute at most (default no limit; set it under your provider's limit, e.g. 30 for Microsoft 365). E-mails beyond it wait their turn, and one the server turns away for now is tried again for about 8 minutes |
 | `MAIL_FROM` | | Sender, e.g. `"Agentic AI Workshop 2026 <no-reply@iitd.ac.in>"` |
 | `NOTIFY_EMAIL` | | Where organiser notifications go: new hackathon teams and enquiries (overridable in Admin → Site settings → Site-wide → Contact & social) |
 | `NEXT_PUBLIC_GA_ID` | | Google Analytics 4 ID `G-…` (or set it in Admin → Site settings → Site-wide → SEO & analytics) |
@@ -137,7 +139,20 @@ To update: `git pull && npm ci && npm run build && pm2 restart aaiw`.
 
 ### Reverse proxy with HTTPS (Nginx)
 
+Put this in `/etc/nginx/sites-available/agentic-ai-workshop` and enable it (`ln -s ../sites-available/agentic-ai-workshop /etc/nginx/sites-enabled/`):
+
 ```nginx
+upstream aaiw {
+    server 127.0.0.1:3000;
+    keepalive 64;                                      # reuse connections to Node.js
+}
+# Build files are cached for good, pages for 2 seconds (nginx creates the folder).
+proxy_cache_path /var/cache/nginx/aaiw levels=1:2 keys_zone=aaiw:10m max_size=512m inactive=7d use_temp_path=off;
+# Signed-in organisers and the admin's live preview always get fresh pages.
+map "$cookie_aaiw_admin$cookie___prerender_bypass" $aaiw_no_cache { default 1; "" 0; }
+# One gzipped and one plain copy of everything cached.
+map $http_accept_encoding $aaiw_encoding { ~*gzip gzip; default ""; }
+
 server {
     listen 443 ssl http2;
     server_name agenticai.iitd.ac.in;
@@ -145,19 +160,58 @@ server {
     ssl_certificate_key /etc/ssl/iitd/privkey.pem;
     client_max_body_size 10m;                          # uploads (MAX_UPLOAD_MB)
 
-    location / {                                       # for a sub-path use: location /agentic-ai-workshop/ { … }
-        proxy_pass http://127.0.0.1:3000;
-        proxy_set_header Host $host;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header X-Forwarded-For $remote_addr; # overwrite (not append) so clients can't spoof their IP
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Forwarded-For $remote_addr;     # overwrite (not append) so clients can't spoof their IP
+
+    # Forms, APIs and the admin panel: never cached.
+    location /api/  { proxy_pass http://aaiw; }
+    location /admin { proxy_pass http://aaiw; }
+
+    # Build files: a file's name changes with its content, so each is fetched from Node.js once.
+    location /_next/static/ {
+        proxy_pass http://aaiw;
+        proxy_set_header Accept-Encoding $aaiw_encoding;
+        proxy_cache aaiw;
+        proxy_cache_key "$host$request_uri|$aaiw_encoding";
+        proxy_cache_valid 200 30d;
+        proxy_cache_lock on;
+        proxy_ignore_headers Vary;
+    }
+
+    # Pages, prefetches and files in public/: cached for 2 seconds, so a rush reaches Node.js about once
+    # per page every 2 seconds, and an edit saved in the admin reaches visitors within about 2 seconds.
+    location / {
+        proxy_pass http://aaiw;
+        proxy_set_header Accept-Encoding $aaiw_encoding;
+        proxy_cache aaiw;
+        proxy_cache_key "$host$request_uri|$aaiw_encoding|$http_rsc|$http_next_router_prefetch|$http_next_router_segment_prefetch|$http_next_router_state_tree|$http_next_url";
+        proxy_cache_valid 200 301 302 307 308 404 2s;
+        proxy_ignore_headers Cache-Control Expires Vary; # the key above holds every header a page varies on
+        proxy_cache_lock on;
+        proxy_cache_use_stale updating error timeout http_500 http_502 http_503 http_504;
+        proxy_cache_background_update on;
+        proxy_cache_bypass $aaiw_no_cache;
+        proxy_no_cache $aaiw_no_cache;
     }
 }
 server { listen 80; server_name agenticai.iitd.ac.in; return 301 https://$host$request_uri; }
 ```
 
-`Host` must be passed through: the admin API rejects cross-site requests by comparing the browser's `Origin` with it.
+And in `/etc/nginx/nginx.conf`, give nginx enough connections for a busy day (every visitor holds one, and every request passed to Node.js another; Ubuntu's default is 768 per worker):
 
-Expecting a rush, such as thousands registering within minutes of a deadline? This configuration serves every request through the one Node.js process: on a 2-core server it handled 200 new visitors a minute but not 2,000 arriving within one minute. See [`docs/LOAD_TEST_REPORT.md`](docs/LOAD_TEST_REPORT.md) for a tested configuration that handles it. For a sub-path, build with `NEXT_PUBLIC_BASE_PATH` set to the same path and proxy that location without stripping the prefix.
+```nginx
+worker_rlimit_nofile 65535;      # at the top, beside worker_processes
+events {
+    worker_connections 4096;
+}
+```
+
+Then `sudo nginx -t && sudo systemctl reload nginx`. On a 2-core server this served 2,000 people registering within the same minute with no errors, where a plain `proxy_pass` failed most of them ([`docs/LOAD_TEST_REPORT.md`](docs/LOAD_TEST_REPORT.md)).
+
+`Host` must be passed through: the admin API rejects cross-site requests by comparing the browser's `Origin` with it. For a sub-path, build with `NEXT_PUBLIC_BASE_PATH` set to the same path, put the path in front of every `location` (`/agentic-ai-workshop/api/`, `/agentic-ai-workshop/admin`, `/agentic-ai-workshop/_next/static/`, `/agentic-ai-workshop/`) and proxy without stripping the prefix. Run one Node.js process only: rate limits and the page cache live in its memory.
 
 ### After deploying
 
@@ -205,7 +259,7 @@ docs/                  admin guide and requirements checklist
 
 **Adding a field to a content type** (for example a "pronouns" field for speakers): add it to the collection's `fields` in `src/lib/schema/resources.ts` and to its type in `src/lib/content/types.ts`, then render it. The admin form, validation and database schema follow automatically.
 
-**Caching:** public pages are rendered once and cached (`'use cache'` with tags). Saving in the admin expires the matching tags, so the next visitor gets fresh content. Time-based refresh (5 minutes) is only a safety net for direct database edits.
+**Caching:** public pages are rendered once and cached (`'use cache'` with tags). Saving in the admin expires the matching tags, so the next visitor gets fresh content (behind the nginx configuration above, within about 2 seconds, its micro-cache; organisers signed in see it at once). Time-based refresh (5 minutes) is only a safety net for direct database edits.
 
 **IIT Delhi badge:** every full-size Aura wears the IIT Delhi emblem on a white pin on her upper chest (`Badge` in `components/aura/AuraArt.tsx`, drawn from `public/logos/iit-delhi.svg`; the social preview images inline it, as they render from a data URI). It sits above a placard and clear of the chest emblem; props and fins held across her go over it. Pass `badge={false}` to leave it off.
 

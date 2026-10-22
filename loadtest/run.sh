@@ -6,8 +6,9 @@
 #   loadtest/run.sh                                   # every scenario in every IP mode
 #   loadtest/run.sh submission:distinct contest:shared
 #   SCALE=0.05 PACE=0.2 loadtest/run.sh daily:distinct   # quick smoke run
-#   NGINX_PROFILE=tuned LABEL=tuned loadtest/run.sh submission:distinct   # the tuned nginx (stack/up.sh)
+#   NGINX_PROFILE=plain LABEL=plain loadtest/run.sh submission:distinct   # the README's earlier nginx (stack/up.sh)
 #   ARRIVAL=600 LABEL=10min loadtest/run.sh submission:distinct          # the 2,000 arrive over 10 minutes
+#   RATE_LIMIT_EXEMPT=127.20.0.1 LABEL=exempt loadtest/run.sh contest:shared   # the shared address exempt
 #
 # Scenarios: daily (100 users), submission (2,000), contest (300 → 400). IP modes:
 #   distinct  every user has an address of their own (127.10.0.0/20)
