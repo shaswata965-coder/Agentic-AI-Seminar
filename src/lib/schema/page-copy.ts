@@ -395,7 +395,6 @@ export const PAGE_COPY = {
     datesNote: note("Under the dates", "Final round live at the workshop"),
     location: label("Fact: location", "Location"),
     mode: label("Fact: mode", "Mode"),
-    prizePool: label("Fact: prize pool", "Prize pool"),
     eligibility: heading("Eligibility title", "Eligibility"),
   },
   hackathonTracks: {

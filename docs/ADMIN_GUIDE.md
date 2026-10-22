@@ -129,7 +129,7 @@ Fill in name, role (e.g. "PhD scholar"), department, affiliation, profile link a
 - **Prizes & judging:** prizes and judging criteria (with weights if you like). The first three prizes stand on a podium under the prize pool; any more are listed below it as special awards.
 - **Results:** winners. They stay hidden until you switch on **Post-event: show hackathon winners** in **Site settings → Site-wide → Features & post-event**.
 
-The Hackathon page starts with what teams need to decide: *At a glance* (team size, who can join, dates, location, mode, prize pool, with the prize money under them), the timeline, the themes (*One hackathon, three themes*) and the team registration form; judging, mentors and judges, rules and results follow. Change the order in **Site settings → Hackathon → Section order**.
+The Hackathon page starts with what teams need to decide: *At a glance* (who can join with the eligibility rules, team size, dates, location and mode, with the prize pool and prizes in a panel beside them, all on one screen on a computer), the timeline, the themes (*One hackathon, three themes*) and the team registration form; judging, mentors and judges, rules and results follow. Change the order in **Site settings → Hackathon → Section order**.
 
 Mentors and judges are added under **Organisers & volunteers** (section 7).
 

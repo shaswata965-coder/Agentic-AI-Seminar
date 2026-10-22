@@ -741,7 +741,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("hero", "Hero", "hackathonHero"),
       section("overview", "At a glance", "hackathonOverview", [], { description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview." }),
       section("prizes", "Prize money", "hackathonPrizes", [], {
-        description: "Part of At a glance, under its facts. The first three prizes stand on a podium; any others are listed below it as special awards.",
+        description: "A panel beside the At a glance facts, so both fit on one screen. The first three prizes stand on a small podium; any others are listed below it as special awards.",
         within: "overview",
       }),
       section("timeline", "Timeline", "hackathonTimeline"),

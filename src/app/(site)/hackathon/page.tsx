@@ -97,59 +97,58 @@ export default async function HackathonPage() {
         page="hackathon"
         sections={{
           overview: (
-            <Section id="overview" edit="hackathon.overview" tone={ov.tone} bg={ov.background} labelledBy="overview-title">
-              <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+            <Section id="overview" edit="hackathon.overview" tone={ov.tone} bg={ov.background} labelledBy="overview-title" className="lg:py-10">
+              {/* The facts and the prize money side by side, compact enough to fit on one screen. */}
+              <div className="grid gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:gap-10">
                 <div>
                   {ov.eyebrow ? <Eyebrow>{ov.eyebrow}</Eyebrow> : null}
-                  <h2 id="overview-title" className="mt-4 font-display text-3xl font-bold text-fg sm:text-4xl lg:text-[2.75rem] lg:leading-[1.1]">
+                  <h2 id="overview-title" className="mt-3 font-display text-3xl font-bold text-fg sm:text-4xl">
                     {ov.title}
                   </h2>
-                  <RichText text={h.overview} className="mt-4 text-[17px] leading-relaxed text-muted" />
-                </div>
-                <dl className="grid gap-3 sm:grid-cols-2">
-                  {[
-                    { label: ov.teamSize, value: h.teamSize, icon: <Users size={17} aria-hidden />, tone: "tone-azure" },
-                    { label: ov.teamType, value: h.teamType, icon: <GraduationCap size={17} aria-hidden />, tone: "tone-lilac" },
-                    { label: ov.dates, value: h.dates || formatDateRange(s.startDate, s.endDate), note: ov.datesNote, icon: <CalendarDays size={17} aria-hidden />, tone: "tone-mint" },
-                    { label: ov.location, value: h.location || venueLine(s), icon: <MapPin size={17} aria-hidden />, tone: "tone-peach" },
-                    { label: ov.mode, value: h.mode, icon: <Laptop size={17} aria-hidden />, tone: "tone-aqua" },
-                    { label: ov.prizePool, value: h.prizePool, icon: <Trophy size={17} aria-hidden />, tone: "tone-butter" },
-                  ].map((f) => (
-                    <div key={f.label} data-glow="" className={`${f.tone} card group p-5 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`}>
-                      <dt className="flex items-center gap-2.5 text-xs font-bold tracking-[0.12em] text-accent-ink uppercase">
-                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent-soft transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6">{f.icon}</span>
-                        {f.label}
-                      </dt>
-                      <dd className="mt-3 font-display text-lg leading-snug font-semibold text-fg">{f.value || "TBA"}</dd>
-                      {f.note ? <dd className="mt-1 text-sm text-muted">{f.note}</dd> : null}
-                    </div>
-                  ))}
-                </dl>
-              </div>
-              {h.eligibility.length ? (
-                <div className="mt-10 card p-6">
-                  <h3 className="flex items-center gap-2 font-display text-xl font-semibold text-fg">
-                    <Users size={20} aria-hidden className="text-aqua-ink" /> {ov.eligibility}
-                  </h3>
-                  <ul className="mt-3 grid gap-2 sm:grid-cols-3">
-                    {h.eligibility.map((e, i) => (
-                      <li key={i} className="rounded-xl bg-surface-2 p-3 text-sm text-muted">
-                        {e}
-                      </li>
+                  <RichText text={h.overview} className="mt-3 text-[15px] leading-relaxed text-muted sm:text-base" />
+                  {/* Who can join, with the eligibility rules under it, takes the large tile; the rest fit round it. */}
+                  <dl className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-3">
+                    {[
+                      {
+                        label: ov.teamType,
+                        value: h.teamType,
+                        icon: <GraduationCap size={15} aria-hidden />,
+                        tone: "tone-lilac",
+                        span: "col-span-2 sm:row-span-2",
+                        more: h.eligibility.length ? (
+                          <>
+                            <p className="text-[11px] font-bold tracking-[0.12em] text-subtle uppercase">{ov.eligibility}</p>
+                            <ul className="mt-1.5 grid gap-1.5">
+                              {h.eligibility.map((e, i) => (
+                                <li key={i} className="flex items-start gap-2 text-[13px] leading-snug text-muted">
+                                  <CircleCheck size={14} aria-hidden className="mt-0.5 shrink-0 text-accent-ink" />
+                                  {e}
+                                </li>
+                              ))}
+                            </ul>
+                          </>
+                        ) : null,
+                      },
+                      { label: ov.teamSize, value: h.teamSize, icon: <Users size={15} aria-hidden />, tone: "tone-azure" },
+                      { label: ov.dates, value: h.dates || formatDateRange(s.startDate, s.endDate), note: ov.datesNote, icon: <CalendarDays size={15} aria-hidden />, tone: "tone-mint" },
+                      { label: ov.location, value: h.location || venueLine(s), icon: <MapPin size={15} aria-hidden />, tone: "tone-peach", span: "sm:col-span-2" },
+                      { label: ov.mode, value: h.mode, icon: <Laptop size={15} aria-hidden />, tone: "tone-aqua" },
+                    ].map((f) => (
+                      <div key={f.label} data-glow="" className={`${f.tone} card group p-3.5 transition-[translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-card-lg ${f.span ?? ""}`}>
+                        <dt className="flex items-center gap-2 text-[11px] font-bold tracking-[0.12em] text-accent-ink uppercase">
+                          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent-soft transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:-rotate-6">{f.icon}</span>
+                          {f.label}
+                        </dt>
+                        <dd className="mt-2 font-display text-[15px] leading-snug font-semibold text-fg">{f.value || "TBA"}</dd>
+                        {f.note ? <dd className="mt-0.5 text-xs text-muted">{f.note}</dd> : null}
+                        {f.more ? <dd className="mt-3 border-t border-border pt-3">{f.more}</dd> : null}
+                      </div>
                     ))}
-                  </ul>
+                  </dl>
                 </div>
-              ) : null}
-              {/* The prize money, as part of the overview. */}
-              <div id="prizes" data-edit="hackathon.prizes" className={`tone-${pr.tone} mt-16 scroll-mt-24 sm:mt-20`}>
-                <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
-                  {pr.eyebrow ? <Eyebrow centered>{pr.eyebrow}</Eyebrow> : null}
-                  <h3 id="prizes-title" className="mt-4 font-display text-2xl font-bold text-fg sm:text-3xl">
-                    {pr.title}
-                  </h3>
-                  {pr.intro ? <p className="mt-3 text-base text-muted sm:text-lg">{pr.intro}</p> : null}
+                <div id="prizes" data-edit="hackathon.prizes" className={`tone-${pr.tone} scroll-mt-24`}>
+                  <HackathonPrizes prizes={h.prizes} pool={h.prizePool} poolLabel={pr.pool} awardsTitle={pr.awards} eyebrow={pr.eyebrow} title={pr.title} intro={pr.intro} titleId="prizes-title" />
                 </div>
-                <HackathonPrizes prizes={h.prizes} pool={h.prizePool} poolLabel={pr.pool} awardsTitle={pr.awards} />
               </div>
             </Section>
           ),
