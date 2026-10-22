@@ -177,7 +177,6 @@ server {
         proxy_cache aaiw;
         proxy_cache_key "$host$request_uri|$aaiw_encoding";
         proxy_cache_valid 200 30d;
-        proxy_cache_lock on;
         proxy_ignore_headers Vary;
     }
 

@@ -1,31 +1,58 @@
 # Load test report
 
-End-to-end load tests of the production build (commit `fbf90b7`) for the three loads in the brief: **100
-people on an ordinary day**, **2,000 during the submission (registration) period** and **300+ during the
-hackathon**, each with every visitor on their own IP address and with many behind one shared address.
-Run on 22 October 2026. The test suite, and how to run it again, is in [`loadtest/`](../loadtest/README.md).
+End-to-end load tests for the three loads in the brief: **100 people on an ordinary day**, **2,000 during
+the submission (registration) period** and **300+ during the hackathon**, each with every visitor on their
+own IP address and with many behind one shared address. Run on 22 October 2026, first on the production
+build of commit `fbf90b7` (the findings below), then again after fixing what they found. The test suite, and
+how to run it again, is in [`loadtest/`](../loadtest/README.md).
 
-## Verdict
+## Status after the fixes
 
-| Load | As deployed by the README | With the tuned nginx below |
+The three problems the first tests found are fixed in the code and the README, and were tested again on
+the same 2-core server, with nginx configured exactly as the README now says and a mail server that, like a
+provider, refuses more than 3 connections at once:
+
+| Load | Result |
+| --- | --- |
+| 2,000 people arriving within one minute | ✅ All 2,000 registered. Pages p95 12 ms, page with all its files p95 40 ms, submissions p95 35 ms, no errors. |
+| The same, one in four behind 10 campus addresses | ✅ All 2,000 registered, nobody turned away (347 were before). |
+| 100 people on an ordinary day, all on one address | ✅ Nobody turned away (62 were before). Pages p95 11 ms. |
+| 300 → 400 contest participants, all on one address | ✅ with the address in `RATE_LIMIT_EXEMPT`: nobody turned away, pages p95 14 ms. Without it, 15 of 62 messages were refused (the 40-per-10-minutes ceiling). |
+| 2,000 registering within one minute, all on one address | ✅ with the address in `RATE_LIMIT_EXEMPT`: all 2,000 registered. Without it, 173 got through: no single unlisted address may send that many. |
+| E-mail during the rush | ✅ 2,582 e-mails over 28 connections, never more than 3 at once; none lost. With the site misconfigured to open 8 connections against the 3-connection server, refused e-mails were retried and all delivered within 40 s. |
+| Data integrity | ✅ In every run, before and after: each registration stored exactly once, every saved one e-mailed. |
+
+What changed: the forms limit each **person** (address and e-mail) to 8 registrations, 6 teams and 5 messages
+per 10 to 15 minutes, and an **address** as a whole to 100, 40 and 40, with no ceiling for networks listed in
+`RATE_LIMIT_EXEMPT` ([finding 1](#1-people-behind-one-ip-address-are-turned-away)); the README's nginx configuration caches build
+files and micro-caches pages for 2 seconds ([finding 2](#2-a-one-minute-rush-of-2000-overwhelms-the-readmes-deployment)); e-mail goes over a pool of connections
+at a configurable rate and is retried ([finding 3](#3-confirmation-e-mails-one-smtp-connection-each-and-no-retry)).
+
+**On the server, before registration opens:**
+
+1. Deploy this version (`git pull && npm ci && npm run build && pm2 restart aaiw`, or
+   `git pull && docker compose up -d --build`).
+2. Replace the nginx site configuration with the README's ("Reverse proxy with HTTPS (Nginx)"), raise
+   `worker_connections` in `/etc/nginx/nginx.conf` as it says, then `sudo nginx -t && sudo systemctl reload nginx`.
+3. Set `RATE_LIMIT_EXEMPT` to IIT Delhi's outgoing IPv4 addresses (the institute's network team can say which)
+   and, for the hackathon, the venue network's.
+4. Set `SMTP_MAX_PER_MINUTE` under the mail provider's sending limit (e.g. 30 for Microsoft 365), or use a
+   transactional mail service for the rush.
+
+In the rush runs the test's own load generator (two cores, shared with the real-browser probe) was the
+busiest part: with the probe running, it measured seconds at p95 for pages that nginx served in 10 to 17
+ms, so the run without the probe gives the server's numbers. See [Limits of this test](#limits-of-this-test).
+
+## Verdict before the fixes
+
+| Load | As deployed by the README then | With the tuned nginx |
 | --- | --- | --- |
 | 100 people at once (ordinary day) | ✅ Pass. Pages p95 98 ms; Next.js used 44 % of one core. | not needed |
 | 300 → 400 participants (contest) | ✅ Pass. Pages p95 172 ms. | ✅ Pages p95 14 ms. |
 | 2,000 people arriving within one minute (deadline rush) | ❌ **Fail.** 86 % of people could not register: Node.js saturated, nginx ran out of connections, 7,700 errors. | ✅ **Pass.** All 2,000 registered; pages p95 611 ms, submissions p95 651 ms, no errors. |
 | 2,000 people arriving over ten minutes | ✅ Pass. Pages p95 105 ms. | not needed |
-| Many people behind **one IP address** (campus, hostel or office network) | ❌ **Fail, whatever the server.** The forms allow 8 workshop registrations, 6 hackathon teams and 5 messages per address per 10 to 15 minutes; everyone else behind that address is turned away. | ❌ same (this is in the site's code) |
+| Many people behind **one IP address** (campus, hostel or office network) | ❌ **Fail, whatever the server.** The forms allowed 8 workshop registrations, 6 hackathon teams and 5 messages per address per 10 to 15 minutes; everyone else behind that address was turned away. | ❌ same (this was in the site's code) |
 | Data integrity under load | ✅ In every run, including the failing ones: each registration stored exactly once, no duplicate e-mail or team, nobody in two teams, every saved registration e-mailed, no visitor e-mailed more than 3 times. | ✅ |
-
-Before registration opens:
-
-1. **Decide how to treat shared IP addresses** ([finding 1](#1-people-behind-one-ip-address-are-turned-away)). On IIT Delhi's
-   network, in a college lab or behind a mobile operator's shared address, the 9th person to register within
-   15 minutes is told *"Too many attempts. Please wait a few minutes"*.
-2. **Use the tuned nginx configuration** ([finding 2](#2-a-one-minute-rush-of-2000-overwhelms-the-readmes-deployment)) or put
-   a CDN in front, if a rush is possible (a deadline, or the link shared in a large group). It is a
-   configuration change plus one deploy step; the site's code is unchanged.
-3. **Check the mail provider's sending limits** ([finding 3](#3-confirmation-e-mails-one-smtp-connection-each-and-no-retry)): a
-   rush of 2,000 sends about 2,600 e-mails in two minutes, and a confirmation that fails is not retried.
 
 ## What was tested
 
@@ -35,8 +62,9 @@ Chromium (Playwright probe) ─────────────┘          
 ```
 
 - **The stack as the README deploys it**: `npm run build` and `npm start` (one Node.js 22 process), MongoDB
-  8, and nginx 1.24 with the README's server block (HTTPS, HTTP/2, `X-Forwarded-For $remote_addr`) inside
-  Ubuntu's stock `nginx.conf` (768 connections per worker). E-mail went to an SMTP sink that accepts and
+  8, and nginx 1.24 with the README's configuration: first its earlier server block (HTTPS, HTTP/2,
+  `X-Forwarded-For $remote_addr`) inside Ubuntu's stock `nginx.conf` (768 connections per worker), after the
+  fixes its current one. E-mail went to an SMTP sink that accepts and
   counts every message, so sending was part of every request that sends.
 - **A small server**: nginx, Next.js and MongoDB were pinned to **2 CPU cores** (like a 2-vCPU VM, 15 GB
   RAM available); the load generator ran on the other two.
@@ -87,9 +115,23 @@ through (an error, or rate-limited). CPU is % of one core, average / peak; the s
 | Rush (1 min) · distinct · **tuned** | **611 ms** | **2.0 s** | **651 ms** | 0 % | **2,000** | 0 | 0 | 20 / 79 | 6 / 28 | ✅ | ✅ |
 | Contest · distinct · tuned v1 | 27 ms | 50 ms | 23 ms | 0 % | 50 | 0 | 0 | 9 / 60 | 25 / 50 | ✅ | ✅ |
 | Contest · distinct · **tuned** | **14 ms** | **27 ms** | **22 ms** | 0 % | 56 | 0 | 0 | 13 / 65 | 5 / 10 | ✅ | ✅ |
+| **After the fixes** (README's nginx, new code, mail server allowing 3 connections) | | | | | | | | | | | |
+| Rush (1 min) · distinct, no browser probe | **12 ms** | **40 ms** | **35 ms** | 0 % | **2,000** | 0 | 0 | 18 / 97 | 6 / 31 | ✅ | ✅ |
+| Rush (1 min) · distinct | 2.3 s | 9.2 s | 2.3 s | 0 % | 2,000 | 0 | 0 | 21 / 74 | 7 / 39 | ❌ load generator | ✅ |
+| Rush (1 min) · campus | 3.5 s | 12.3 s | 4.2 s | 0 % | **2,000** | **0** | 0 | 21 / 77 | 7 / 29 | ❌ load generator | ✅ |
+| Rush (1 min) · shared | 754 ms | 2.2 s | 923 ms | 0 % | 173 | 1,827 | 0 | 11 / 85 | 6 / 33 | ❌ ceiling | ✅ |
+| Rush (1 min) · shared, address exempt | 2.2 s | 7.8 s | 2.4 s | 0 % | **2,000** | **0** | 0 | 21 / 75 | 7 / 29 | ❌ load generator | ✅ |
+| Ordinary day · shared | **11 ms** | 28 ms | 41 ms | 0 % | 78 | **0** | 0 | 14 / 77 | 4 / 7 | ✅ | ✅ |
+| Contest · shared | 13 ms | 25 ms | 27 ms | 0 % | 40 | 15 | 0 | 13 / 66 | 5 / 9 | ❌ ceiling | ✅ |
+| Contest · shared, address exempt | **14 ms** | 27 ms | 26 ms | 0 % | 46 | **0** | 0 | 13 / 71 | 5 / 19 | ✅ | ✅ |
 
-*Tuned v1* compressed every response in nginx; *tuned* (the recommended configuration) serves
-pre-compressed copies instead (finding 2). Each run's full report, with response-time percentiles for every
+*Tuned v1* compressed every response in nginx; *tuned* served pre-compressed copies from disk instead. The
+README's configuration (finding 2), tested *after the fixes*, keeps build files in nginx's cache instead,
+which works the same with Docker, where the files are inside the container. *Load generator*: the service
+levels were missed as measured by k6, whose two cores were saturated together with the real-browser probe;
+nginx served the same requests in 10 to 17 ms (pages) and 55 to 84 ms (submissions) at p95, and the run
+without the probe met every service level. *Ceiling*: one address not listed in `RATE_LIMIT_EXEMPT` sending
+more than the forms allow per address (finding 1). Each run's full report, with response-time percentiles for every
 kind of request, nginx status codes, connections, memory, e-mails, the real browser's timings and the data
 checks, is in [`LOAD_TEST_RUNS.md`](LOAD_TEST_RUNS.md).
 
@@ -104,6 +146,13 @@ light and heavy runs alike, with nothing logged by the site: the probe's interac
 ### 1. People behind one IP address are turned away
 
 **Severity: high. Where: `src/app/api/register/route.ts`, `api/hackathon/register`, `api/enquiries`.**
+
+> **Fixed** (`src/lib/server/form-limits.ts`): limits now apply per person (address and e-mail: 8
+> registrations, 6 teams, 5 messages per 10 to 15 minutes) and per address as a whole (100, 40 and 40), with
+> no per-address ceiling for networks listed in `RATE_LIMIT_EXEMPT`. Re-tested: the campus mix and an
+> ordinary day on one address turn nobody away; a whole contest or rush on one address needs that address
+> listed, and then turns nobody away. The trade-off: one unlisted machine can now send up to 100
+> confirmation e-mails in 15 minutes (each address at most 3 a day), recorded in `docs/SECURITY_REPORT.md`.
 
 Each form is rate-limited per client IP address: **8 workshop registrations per 15 minutes, 6 hackathon
 teams per 15 minutes, 5 messages per 10 minutes.** Every person behind the same address shares that
@@ -133,13 +182,18 @@ them isn't the answer. Options, from least to most work:
 - Add a CAPTCHA-style challenge (e.g. Cloudflare Turnstile) only when an address passes the small limit,
   instead of refusing.
 
-Which trade-off to take is the organisers' call; the load tests can measure whichever is chosen
-(`loadtest/run.sh submission:campus submission:shared`).
+The second and first options were implemented (see the note above); the load tests measure them with
+`loadtest/run.sh submission:campus submission:shared`.
 
 ### 2. A one-minute rush of 2,000 overwhelms the README's deployment
 
 **Severity: high if a rush is possible. Where: the deployment (README "Reverse proxy with HTTPS"), not the
 code.**
+
+> **Fixed** in the README: its nginx configuration is now the one below (option a, with build files kept in
+> nginx's cache rather than served from disk), and the load tests run exactly that configuration by
+> default. Re-tested: 2,000 people in one minute all registered, pages p95 12 ms. It has to be applied on
+> the server (see [Status after the fixes](#status-after-the-fixes)).
 
 With the README's nginx, every request, including the ~20 build files and 18 router prefetches of each first
 visit, goes to the single Node.js process. When 2,000 people arrived within a minute:
@@ -154,24 +208,25 @@ visit, goes to the single Node.js process. When 2,000 people arrived within a mi
 The same 2,000 spread over ten minutes was fine (pages p95 105 ms), so the default deployment copes with at
 least 200 new visitors a minute; 2,000 in a minute is too many. A minute-long rush needs one of:
 
-**a) The tuned nginx configuration**, tested above: [`loadtest/stack/nginx.tuned.conf.template`](../loadtest/stack/nginx.tuned.conf.template). Compared with the
-README's block it
+**a) The tuned nginx configuration**, now the README's (tested as [`loadtest/stack/nginx.tuned.conf.template`](../loadtest/stack/nginx.tuned.conf.template)). Compared with the
+README's earlier block it
 
-1. serves `/_next/static/` (content-hashed build files) from disk instead of through Node.js;
+1. keeps `/_next/static/` (content-hashed build files) in nginx's cache, so Node.js serves each once instead
+   of on every visit;
 2. raises `worker_connections` to 4,096 and keeps connections to Node.js alive (`upstream … keepalive`);
 3. micro-caches anonymous page and router-prefetch requests for **2 seconds**, so a rush reaches Node.js about
    once per page every 2 s. Signed-in organisers (`aaiw_admin` cookie) and the admin's live preview (Draft
    Mode, `__prerender_bypass`) bypass it, and `/api/` and `/admin` are never cached. An edit saved in the
    admin reaches visitors after about 2 seconds instead of at once (measured: an announcement appeared to
    visitors 2.0 s after it was saved, and to the organiser at once);
-4. compresses nothing per request: pages are cached already gzipped, and build files are served from
-   gzipped copies made once after each build, with
-   `find .next/static -type f \( -name '*.js' -o -name '*.css' \) -exec gzip -9 -k -f {} +`. A first
-   version that let nginx compress every response (*tuned v1* above) served everyone but spent most of the
-   server's CPU on compression, so a rush still saw 4 to 11 s at p95.
+4. compresses nothing per request: pages and build files are cached already gzipped (Next.js compresses
+   each once). A first version that let nginx compress every response (*tuned v1* above) served everyone
+   but spent most of the server's CPU on compression, so a rush still saw 4 to 11 s at p95.
 
 With it, 2,000 people in one minute all registered on the same two cores, with nginx using 6 % CPU on
-average.
+average. Right after a deploy, the cache holds none of the new build files yet: in the test, which starts
+with an empty cache, the first ~700 file requests of the rush waited up to 1.5 s while Node.js served each
+file once.
 
 **b) A CDN in front** (e.g. Cloudflare): Next.js already marks pages and prefetches `s-maxage=300` and build
 files immutable, so a CDN would absorb most of the rush. Purge it after admin edits, or edits take up to 5
@@ -183,6 +238,14 @@ Only one Node.js process should run: rate limits and the page cache live in its 
 ### 3. Confirmation e-mails: one SMTP connection each, and no retry
 
 **Severity: medium. Where: `src/lib/server/mail.ts`.**
+
+> **Fixed**: e-mail goes over a pool of connections (`SMTP_MAX_CONNECTIONS`, default 3), at most
+> `SMTP_MAX_PER_MINUTE` a minute if set (e-mails beyond it wait their turn), and a temporary refusal or a
+> dropped connection is retried for about 8 minutes. Re-tested against a mail server that refuses more than
+> 3 connections: the rush's 2,582 e-mails went over 28 connections, none lost; with the site set to open
+> 8, the refused ones were retried and all delivered within 40 seconds. Set the rate under your provider's
+> limit. Next.js sends waiting e-mails before it stops if it is stopped gracefully; a forced restart while
+> e-mails are waiting can lose them (they show *Not sent* in the admin).
 
 The one-minute rush sent **about 2,600 e-mails in under two minutes** (confirmations, team confirmations,
 acknowledgements and organiser notices), each over a new SMTP connection (up to 102 open at once). A failed
@@ -218,9 +281,9 @@ pages a first visitor is likely to open next (registration, hackathon, programme
 
 - Everything ran on one machine over loopback: no network latency or bandwidth limits, so times are what the
   server adds. Visitors on mobile data will see more.
-- In the rush runs the load generator peaked near its own two cores (up to 190 %), which adds to the
-  measured tail times; server-side times (from nginx's log) were lower, e.g. pages p95 158 ms inside Next.js
-  in the passing tuned rush.
+- In the rush runs the load generator peaked near its own two cores (up to 193 %), shared with the
+  real-browser probe, which adds to the times it measures; nginx's own times (in each run's report) were far
+  lower. The one rush run without the probe is the clearest measure of the server.
 - The certificate was a 2048-bit RSA one. An ECDSA certificate makes each new HTTPS connection cheaper still.
 - Each iteration of the daily and rush scenarios is a new visitor with nothing cached; returning visitors
   are lighter (the service worker caches the site's files).

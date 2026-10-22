@@ -1,6 +1,6 @@
 # Load test runs, 22 October 2026
 
-The full report of every run behind [LOAD_TEST_REPORT.md](LOAD_TEST_REPORT.md), as `loadtest/tools/report.mjs` wrote it. Run names are `<scenario>-<IP mode>[-<variant>]`: `readme-10min` is the README deployment with the 2,000 arriving over ten minutes, `tuned` is the first tuned nginx (nginx compressing every response) and `tuned-v2` the recommended one (now `loadtest/stack/nginx.tuned.conf.template`). The daily-distinct browser probe predates its own submission cap, so after 8 registrations it was rate-limited itself; its page timings are unaffected.
+The full report of every run behind [LOAD_TEST_REPORT.md](LOAD_TEST_REPORT.md), as `loadtest/tools/report.mjs` wrote it. Run names are `<scenario>-<IP mode>[-<variant>]`: `readme-10min` is the README deployment with the 2,000 arriving over ten minutes, `tuned` is the first tuned nginx (nginx compressing every response) and `tuned-v2` the recommended one (now `loadtest/stack/nginx.tuned.conf.template`). Runs ending `-final` are after the fixes (the README's current nginx configuration, the new rate limits and e-mail, and an SMTP sink refusing more than 3 connections at once); `-exempt` ran with the shared address in `RATE_LIMIT_EXEMPT`, and `-noprobe` without the real-browser probe. The daily-distinct browser probe predates its own submission cap, so after 8 registrations it was rate-limited itself; its page timings are unaffected.
 
 ## daily-distinct
 
@@ -672,6 +672,423 @@ Real browser (Chromium): 86/86 attempts loaded and filled in the form, 7 registe
 | a confirmation e-mail for every team | ✅ | 0 sent, 0/0 marked sent |
 | organisers told of every team | ✅ | 0 notices |
 | an acknowledgement and an organiser notice for every enquiry | ✅ | 56 acks, 56 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 1 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## submission-distinct-final-noprobe
+
+```
+Submission rush: 2000 people registering at once · IP mode: distinct
+  peak users 2003 · requests 91506 (380.5/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    3398  med     5 ms  p95    12 ms  p99    25 ms  max    73 ms
+  page ready (HTML + files)       3398  med    13 ms  p95    40 ms  p99   1.53 s  max   1.91 s
+  files (JS, fonts, images)      48460  med     2 ms  p95    14 ms  p99   1.49 s  max   1.89 s
+  router prefetches              37474  med     1 ms  p95    12 ms  p99   1.00 s  max   1.51 s
+  form submissions                2114  med    11 ms  p95    35 ms  p99    85 ms  max   254 ms
+  PDF / calendar                     0  med     0 ms  p95     0 ms  p99     0 ms  max     0 ms
+  admin panel API                   50  med    32 ms  p95   685 ms  p99   1.13 s  max   1.15 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers           2098         16             0      0
+  People           registered  blocked
+  workshop              1469        0
+  hackathon              423        0
+  enquiry                108        0
+
+  All thresholds met.
+```
+
+nginx: 91515 requests from 2004 client IPs (max 70 from one); statuses 200×89401, 201×2098, 409×16.
+nginx micro-cache: HIT×85966, MISS×819, not cached (disk, API)×2166, UPDATING×708, STALE×1856.
+Time at nginx, request to last byte (ms): page p50 0 / p95 22 / p99 509; api p50 178 / p95 178 / p99 178; static p50 0 / p95 0 / p99 1492; admin p50 31 / p95 1122 / p99 1143; submit p50 10 / p95 32 / p99 84.
+Time in Next.js (nginx upstream, ms): page p50 58 / p95 1022 / p99 1051 / max 1051; api p50 178 / p95 178 / p99 178 / max 178; static p50 1521 / p95 1802 / p99 1842 / max 1890; admin p50 31 / p95 1122 / p99 1143 / max 1143; submit p50 10 / p95 32 / p99 84 / max 254.
+CPU % (avg / peak, 100 = one core): next 18/97, mongod 3/8, nginx 6/31, smtp 1/4, k6 27/168. Peak memory MB: next 431, mongod 197, nginx 63, smtp 57, k6 3491.
+Peak connections: nginx 1460, Next.js 360, MongoDB 12. SMTP: 2583 e-mails over 27 connections (peak 3 open at once).
+
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 1469 stored, 1469 expected from k6 + 0 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 423 stored, 423 expected |
+| every saved enquiry is stored | ✅ | 112 stored, 112 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 1513 sent, 1469/1469 marked sent |
+| a confirmation e-mail for every team | ✅ | 423 sent, 423/423 marked sent |
+| organisers told of every team | ✅ | 423 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 112 acks, 112 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 2 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## submission-distinct-final
+
+```
+Submission rush: 2000 people registering at once · IP mode: distinct
+  peak users 2003 · requests 90628 (376.8/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    3359  med    14 ms  p95   2.34 s  p99   4.31 s  max   8.40 s
+  page ready (HTML + files)       3359  med    47 ms  p95   9.22 s  p99  14.30 s  max  17.12 s
+  files (JS, fonts, images)      48295  med    17 ms  p95   2.46 s  p99   4.94 s  max   8.51 s
+  router prefetches              36810  med     5 ms  p95   1.88 s  p99   4.41 s  max   7.63 s
+  form submissions                2100  med    25 ms  p95   2.34 s  p99   4.23 s  max   6.01 s
+  PDF / calendar                     0  med     0 ms  p95     0 ms  p99     0 ms  max     0 ms
+  admin panel API                   54  med    59 ms  p95   1.18 s  p99   2.46 s  max   2.51 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers           2077         23             0      0
+  People           registered  blocked
+  workshop              1484        0
+  hackathon              410        0
+  enquiry                106        0
+
+  FAILED thresholds:
+    ✗ http_req_duration{kind:prefetch} p(95)<1000
+    ✗ http_req_duration{kind:document} p(95)<1500, p(99)<3000
+    ✗ page_ready p(95)<3000
+    ✗ http_req_duration{kind:asset} p(95)<1000
+    ✗ http_req_duration{kind:submit} p(95)<2000
+```
+
+nginx: 92292 requests from 2004 client IPs (max 1664 from one); statuses 200×90185, 201×2084, 409×23.
+nginx micro-cache: MISS×123, HIT×86729, not cached (disk, API)×2163, STALE×2516, UPDATING×761.
+Time at nginx, request to last byte (ms): page p50 0 / p95 15 / p99 80; api p50 171 / p95 171 / p99 171; static p50 0 / p95 0 / p99 1000; admin p50 46 / p95 1149 / p99 1176; submit p50 14 / p95 73 / p99 161.
+Time in Next.js (nginx upstream, ms): page p50 43 / p95 121 / p99 692 / max 692; api p50 171 / p95 171 / p99 171 / max 171; static p50 1243 / p95 1301 / p99 1307 / max 1307; admin p50 46 / p95 1149 / p99 1176 / max 1176; submit p50 14 / p95 71 / p99 144 / max 242.
+CPU % (avg / peak, 100 = one core): next 21/74, mongod 3/8, nginx 7/39, smtp 1/4, k6 33/193. Peak memory MB: next 947, mongod 187, nginx 63, smtp 59, k6 4004.
+Peak connections: nginx 1579, Next.js 32, MongoDB 12. SMTP: 2582 e-mails over 28 connections (peak 3 open at once).
+Real browser (Chromium): 36/36 attempts loaded and filled in the form, 7 registered; page load p50 571 ms / p95 1532 ms; LCP p50 344 ms / p95 1072 ms; submit to confirmation p50 502 ms / p95 988 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 1491 stored, 1484 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 410 stored, 410 expected |
+| every saved enquiry is stored | ✅ | 115 stored, 115 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 1532 sent, 1491/1491 marked sent |
+| a confirmation e-mail for every team | ✅ | 410 sent, 410/410 marked sent |
+| organisers told of every team | ✅ | 410 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 115 acks, 115 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 2 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## submission-campus-final
+
+```
+Submission rush: 2000 people registering at once · IP mode: campus
+  peak users 2003 · requests 89937 (373.8/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    3314  med     9 ms  p95   3.46 s  p99   7.82 s  max  13.42 s
+  page ready (HTML + files)       3314  med    23 ms  p95  12.28 s  p99  16.08 s  max  22.46 s
+  files (JS, fonts, images)      48225  med     4 ms  p95   2.80 s  p99   5.56 s  max  13.54 s
+  router prefetches              36240  med     2 ms  p95   2.23 s  p99   5.04 s  max  12.50 s
+  form submissions                2094  med    24 ms  p95   4.22 s  p99   7.16 s  max  11.73 s
+  PDF / calendar                     0  med     0 ms  p95     0 ms  p99     0 ms  max     0 ms
+  admin panel API                   54  med    60 ms  p95   1.35 s  p99   1.77 s  max   2.21 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers           2074         20             0      0
+  People           registered  blocked
+  workshop              1509        0
+  hackathon              402        0
+  enquiry                 89        0
+
+  FAILED thresholds:
+    ✗ http_req_duration{kind:document} p(95)<1500, p(99)<3000
+    ✗ http_req_duration{kind:prefetch} p(95)<1000
+    ✗ page_ready p(95)<3000
+    ✗ http_req_duration{kind:asset} p(95)<1000
+    ✗ http_req_duration{kind:submit} p(95)<2000
+```
+
+nginx: 91662 requests from 1514 client IPs (max 2392 from one); statuses 200×89561, 201×2081, 409×20.
+nginx micro-cache: HIT×85885, MISS×122, not cached (disk, API)×2157, STALE×2560, UPDATING×938.
+Time at nginx, request to last byte (ms): page p50 0 / p95 17 / p99 95; api p50 159 / p95 159 / p99 159; static p50 0 / p95 0 / p99 1500; admin p50 49 / p95 1353 / p99 1375; submit p50 13 / p95 84 / p99 350.
+Time in Next.js (nginx upstream, ms): page p50 61 / p95 157 / p99 328 / max 328; api p50 159 / p95 159 / p99 159 / max 159; static p50 1509 / p95 1575 / p99 1578 / max 1578; admin p50 49 / p95 1353 / p99 1375 / max 1375; submit p50 13 / p95 75 / p99 193 / max 406.
+CPU % (avg / peak, 100 = one core): next 21/77, mongod 3/8, nginx 7/29, smtp 1/4, k6 29/168. Peak memory MB: next 535, mongod 185, nginx 64, smtp 57, k6 3912.
+Peak connections: nginx 1541, Next.js 32, MongoDB 12. SMTP: 2549 e-mails over 27 connections (peak 3 open at once).
+Real browser (Chromium): 38/38 attempts loaded and filled in the form, 7 registered; page load p50 517 ms / p95 921 ms; LCP p50 296 ms / p95 1184 ms; submit to confirmation p50 877 ms / p95 5867 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 1516 stored, 1509 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 402 stored, 402 expected |
+| every saved enquiry is stored | ✅ | 91 stored, 91 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 1563 sent, 1516/1516 marked sent |
+| a confirmation e-mail for every team | ✅ | 402 sent, 402/402 marked sent |
+| organisers told of every team | ✅ | 402 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 91 acks, 91 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 2 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## submission-shared-final
+
+```
+Submission rush: 2000 people registering at once · IP mode: shared
+  peak users 2003 · requests 90589 (376.5/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    3358  med     8 ms  p95   754 ms  p99   2.04 s  max   5.22 s
+  page ready (HTML + files)       3358  med    21 ms  p95   2.16 s  p99   4.95 s  max   7.45 s
+  files (JS, fonts, images)      48295  med     4 ms  p95   707 ms  p99   1.50 s  max   3.76 s
+  router prefetches              36760  med     2 ms  p95   561 ms  p99   1.32 s  max   4.16 s
+  form submissions                2110  med     5 ms  p95   923 ms  p99   1.85 s  max   5.15 s
+  PDF / calendar                     0  med     0 ms  p95     0 ms  p99     0 ms  max     0 ms
+  admin panel API                   56  med    18 ms  p95   537 ms  p99   1.22 s  max   1.22 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers            179          1          1930      0
+  People           registered  blocked
+  workshop                96     1386
+  hackathon               39      360
+  enquiry                 38       81
+
+  FAILED thresholds:
+    ✗ submissions{outcome:rate_limited} count==0
+```
+
+nginx: 92461 requests from 2 client IPs (max 90589 from one); statuses 200×90344, 201×186, 409×1, 429×1930.
+nginx micro-cache: HIT×86978, MISS×122, not cached (disk, API)×2175, STALE×2471, UPDATING×715.
+Time at nginx, request to last byte (ms): page p50 0 / p95 10 / p99 62; api p50 226 / p95 226 / p99 226; static p50 0 / p95 0 / p99 1000; admin p50 17 / p95 1213 / p99 1220; submit p50 4 / p95 29 / p99 214.
+Time in Next.js (nginx upstream, ms): page p50 43 / p95 231 / p99 721 / max 721; api p50 226 / p95 226 / p99 226 / max 226; static p50 1362 / p95 1418 / p99 1420 / max 1420; admin p50 17 / p95 1213 / p99 1220 / max 1220; submit p50 4 / p95 27 / p99 208 / max 281.
+CPU % (avg / peak, 100 = one core): next 11/85, mongod 1/3, nginx 6/33, smtp 0/3, k6 28/189. Peak memory MB: next 422, mongod 187, nginx 63, smtp 55, k6 4144.
+Peak connections: nginx 1540, Next.js 20, MongoDB 12. SMTP: 261 e-mails over 4 connections (peak 3 open at once).
+Real browser (Chromium): 41/41 attempts loaded and filled in the form, 7 registered; page load p50 494 ms / p95 788 ms; LCP p50 316 ms / p95 812 ms; submit to confirmation p50 410 ms / p95 2448 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 103 stored, 96 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 39 stored, 39 expected |
+| every saved enquiry is stored | ✅ | 40 stored, 40 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 103 sent, 103/103 marked sent |
+| a confirmation e-mail for every team | ✅ | 39 sent, 39/39 marked sent |
+| organisers told of every team | ✅ | 39 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 40 acks, 40 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 2 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## submission-shared-final-exempt
+
+```
+Submission rush: 2000 people registering at once · IP mode: shared
+  peak users 2003 · requests 91578 (407.0/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    3382  med     8 ms  p95   2.23 s  p99   4.50 s  max   8.22 s
+  page ready (HTML + files)       3382  med    21 ms  p95   7.79 s  p99  11.38 s  max  16.24 s
+  files (JS, fonts, images)      48555  med     3 ms  p95   2.64 s  p99   4.87 s  max   9.76 s
+  router prefetches              37482  med     2 ms  p95   2.47 s  p99   4.84 s  max   8.37 s
+  form submissions                2096  med    19 ms  p95   2.45 s  p99   4.82 s  max   7.48 s
+  PDF / calendar                     0  med     0 ms  p95     0 ms  p99     0 ms  max     0 ms
+  admin panel API                   53  med    45 ms  p95   1.11 s  p99   1.18 s  max   1.25 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers           2071         25             0      0
+  People           registered  blocked
+  workshop              1471        0
+  hackathon              413        0
+  enquiry                116        0
+
+  FAILED thresholds:
+    ✗ http_req_duration{kind:submit} p(95)<2000
+    ✗ page_ready p(95)<3000
+    ✗ http_req_duration{kind:asset} p(95)<1000
+    ✗ http_req_duration{kind:document} p(95)<1500, p(99)<3000
+    ✗ http_req_duration{kind:prefetch} p(95)<1000
+```
+
+nginx: 93389 requests from 2 client IPs (max 91578 from one); statuses 200×91286, 201×2078, 409×25.
+nginx micro-cache: MISS×129, HIT×87594, not cached (disk, API)×2158, STALE×2577, UPDATING×931.
+Time at nginx, request to last byte (ms): page p50 0 / p95 13 / p99 72; api p50 146 / p95 146 / p99 146; admin p50 39 / p95 1109 / p99 1113; static p50 0 / p95 0 / p99 1000; submit p50 12 / p95 55 / p99 119.
+Time in Next.js (nginx upstream, ms): page p50 54 / p95 220 / p99 660 / max 660; api p50 146 / p95 146 / p99 146 / max 146; admin p50 39 / p95 1109 / p99 1113 / max 1113; static p50 1259 / p95 1286 / p99 1286 / max 1286; submit p50 12 / p95 52 / p99 105 / max 202.
+CPU % (avg / peak, 100 = one core): next 21/75, mongod 3/8, nginx 7/29, smtp 1/3, k6 30/172. Peak memory MB: next 486, mongod 192, nginx 63, smtp 58, k6 4264.
+Peak connections: nginx 1517, Next.js 29, MongoDB 12. SMTP: 2593 e-mails over 28 connections (peak 3 open at once).
+Real browser (Chromium): 39/39 attempts loaded and filled in the form, 7 registered; page load p50 457 ms / p95 925 ms; LCP p50 392 ms / p95 948 ms; submit to confirmation p50 1234 ms / p95 2720 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 1478 stored, 1471 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 413 stored, 413 expected |
+| every saved enquiry is stored | ✅ | 125 stored, 125 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 1517 sent, 1478/1478 marked sent |
+| a confirmation e-mail for every team | ✅ | 413 sent, 413/413 marked sent |
+| organisers told of every team | ✅ | 413 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 125 acks, 125 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 2 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## daily-shared-final
+
+```
+Ordinary day: 100 people on the site at once · IP mode: shared
+  peak users 101 · requests 77648 (123.2/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    4108  med     5 ms  p95    11 ms  p99    31 ms  max   240 ms
+  page ready (HTML + files)       4108  med    10 ms  p95    28 ms  p99    59 ms  max   278 ms
+  files (JS, fonts, images)      30965  med     2 ms  p95     6 ms  p99    18 ms  max   215 ms
+  router prefetches              42366  med     1 ms  p95     4 ms  p99    10 ms  max   138 ms
+  form submissions                  78  med    13 ms  p95    41 ms  p99   185 ms  max   194 ms
+  PDF / calendar                   105  med     7 ms  p95    38 ms  p99    51 ms  max    72 ms
+  admin panel API                   15  med    27 ms  p95   154 ms  p99   336 ms  max   382 ms
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers             78          0             0      0
+  People           registered  blocked
+  workshop                43        0
+  hackathon               10        0
+  enquiry                 25        0
+
+  All thresholds met.
+```
+
+nginx: 81766 requests from 2 client IPs (max 77648 from one); statuses 200×81681, 201×85.
+nginx micro-cache: MISS×167, HIT×64147, not cached (disk, API)×207, STALE×16830, UPDATING×415.
+Time at nginx, request to last byte (ms): page p50 0 / p95 45 / p99 107; api p50 6 / p95 38 / p99 71; admin p50 27 / p95 381 / p99 381; static p50 0 / p95 0 / p99 21; submit p50 12 / p95 40 / p99 193.
+Time in Next.js (nginx upstream, ms): page p50 27 / p95 152 / p99 330 / max 671; api p50 6 / p95 38 / p99 71 / max 155; admin p50 27 / p95 381 / p99 381 / max 381; static p50 33 / p95 126 / p99 131 / max 131; submit p50 12 / p95 40 / p99 193 / max 193.
+CPU % (avg / peak, 100 = one core): next 14/77, mongod 1/8, nginx 4/7, smtp 0/2, k6 10/36. Peak memory MB: next 438, mongod 189, nginx 30, smtp 54, k6 389.
+Peak connections: nginx 103, Next.js 26, MongoDB 12. SMTP: 120 e-mails over 2 connections (peak 2 open at once).
+Real browser (Chromium): 90/90 attempts loaded and filled in the form, 7 registered; page load p50 445 ms / p95 730 ms; LCP p50 304 ms / p95 688 ms; submit to confirmation p50 330 ms / p95 1239 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 50 stored, 43 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 10 stored, 10 expected |
+| every saved enquiry is stored | ✅ | 25 stored, 25 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 50 sent, 50/50 marked sent |
+| a confirmation e-mail for every team | ✅ | 10 sent, 10/10 marked sent |
+| organisers told of every team | ✅ | 10 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 25 acks, 25 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 1 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## contest-shared-final
+
+```
+Hackathon contest: 300 participants, peak 400 · IP mode: shared
+  peak users 403 · requests 104123 (157.6/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    8196  med     6 ms  p95    13 ms  p99    29 ms  max   204 ms
+  page ready (HTML + files)       8196  med    10 ms  p95    25 ms  p99    51 ms  max   240 ms
+  files (JS, fonts, images)      19904  med     2 ms  p95     5 ms  p99    15 ms  max    76 ms
+  router prefetches              75384  med     1 ms  p95     3 ms  p99    12 ms  max   1.03 s
+  form submissions                  55  med     9 ms  p95    27 ms  p99    34 ms  max    35 ms
+  PDF / calendar                   523  med     5 ms  p95    17 ms  p99    43 ms  max   150 ms
+  admin panel API                   50  med    23 ms  p95   671 ms  p99   1.14 s  max   1.14 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers             40          0            15      0
+  People           registered  blocked
+  workshop                 0        0
+  hackathon                0        0
+  enquiry                 40       15
+
+  FAILED thresholds:
+    ✗ submissions{outcome:rate_limited} count==0
+```
+
+nginx: 108152 requests from 2 client IPs (max 104123 from one); statuses 200×108085, 201×52, 429×15.
+nginx micro-cache: MISS×147, HIT×91405, not cached (disk, API)×637, STALE×15070, UPDATING×893.
+Time at nginx, request to last byte (ms): page p50 0 / p95 30 / p99 67; api p50 4 / p95 12 / p99 38; admin p50 22 / p95 1130 / p99 1142; static p50 0 / p95 4 / p99 19; submit p50 8 / p95 19 / p99 33.
+Time in Next.js (nginx upstream, ms): page p50 32 / p95 954 / p99 1015 / max 1027; api p50 4 / p95 13 / p99 38 / max 150; admin p50 22 / p95 1130 / p99 1142 / max 1142; static p50 29 / p95 62 / p99 95 / max 95; submit p50 8 / p95 19 / p99 33 / max 33.
+CPU % (avg / peak, 100 = one core): next 13/66, mongod 1/4, nginx 5/9, smtp 0/1, k6 18/69. Peak memory MB: next 409, mongod 189, nginx 35, smtp 54, k6 1832.
+Peak connections: nginx 413, Next.js 31, MongoDB 12. SMTP: 87 e-mails over 3 connections (peak 3 open at once).
+Real browser (Chromium): 88/88 attempts loaded and filled in the form, 7 registered; page load p50 478 ms / p95 798 ms; LCP p50 328 ms / p95 732 ms; submit to confirmation p50 289 ms / p95 774 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 7 stored, 0 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 0 stored, 0 expected |
+| every saved enquiry is stored | ✅ | 40 stored, 40 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 7 sent, 7/7 marked sent |
+| a confirmation e-mail for every team | ✅ | 0 sent, 0/0 marked sent |
+| organisers told of every team | ✅ | 0 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 40 acks, 40 notices |
+| no visitor address got more than 3 e-mails | ✅ | max 1 |
+| no server errors (5xx) at nginx | ✅ | none |
+| nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
+| no errors logged by the site | ✅ | 0 errors, 0 mail failures |
+
+## contest-shared-final-exempt
+
+```
+Hackathon contest: 300 participants, peak 400 · IP mode: shared
+  peak users 403 · requests 105521 (159.8/s) · failed 0.00% · checks 100.00%
+
+  Response times                 count      median        p95        p99        max
+  pages (HTML)                    8222  med     6 ms  p95    14 ms  p99    44 ms  max   832 ms
+  page ready (HTML + files)       8221  med    11 ms  p95    27 ms  p99    82 ms  max   914 ms
+  files (JS, fonts, images)      21160  med     2 ms  p95     5 ms  p99    15 ms  max   177 ms
+  router prefetches              75514  med     1 ms  p95     4 ms  p99    23 ms  max   1.01 s
+  form submissions                  46  med    10 ms  p95    26 ms  p99    55 ms  max    63 ms
+  PDF / calendar                   514  med     5 ms  p95    15 ms  p99    63 ms  max   190 ms
+  admin panel API                   54  med    22 ms  p95   465 ms  p99   1.16 s  max   1.18 s
+
+  Submissions      saved  duplicate  rate-limited  error
+  answers             46          0             0      0
+  People           registered  blocked
+  workshop                 0        0
+  hackathon                0        0
+  enquiry                 46        0
+
+  All thresholds met.
+```
+
+nginx: 109575 requests from 2 client IPs (max 105521 from one); statuses 200×109517, 201×58.
+nginx micro-cache: HIT×93103, MISS×140, not cached (disk, API)×623, STALE×15083, UPDATING×626.
+Time at nginx, request to last byte (ms): page p50 0 / p95 28 / p99 59; api p50 4 / p95 10 / p99 45; admin p50 22 / p95 1145 / p99 1176; static p50 0 / p95 4 / p99 15; submit p50 10 / p95 25 / p99 63.
+Time in Next.js (nginx upstream, ms): page p50 32 / p95 941 / p99 1004 / max 1013; api p50 4 / p95 10 / p99 45 / max 163; admin p50 22 / p95 1145 / p99 1176 / max 1176; static p50 128 / p95 174 / p99 176 / max 176; submit p50 10 / p95 25 / p99 63 / max 63.
+CPU % (avg / peak, 100 = one core): next 13/71, mongod 1/4, nginx 5/19, smtp 0/1, k6 17/64. Peak memory MB: next 404, mongod 196, nginx 34, smtp 54, k6 1830.
+Peak connections: nginx 405, Next.js 34, MongoDB 12. SMTP: 99 e-mails over 1 connections (peak 1 open at once).
+Real browser (Chromium): 90/90 attempts loaded and filled in the form, 7 registered; page load p50 446 ms / p95 749 ms; LCP p50 296 ms / p95 748 ms; submit to confirmation p50 303 ms / p95 1419 ms.
+
+| Data check | | |
+| --- | --- | --- |
+| every registered person is stored once (workshop) | ✅ | 7 stored, 0 expected from k6 + 7 from the browser probe |
+| every registered team is stored once (hackathon) | ✅ | 0 stored, 0 expected |
+| every saved enquiry is stored | ✅ | 46 stored, 46 expected |
+| no e-mail address registered twice | ✅ | 0 duplicates |
+| no team name registered twice | ✅ | 0 duplicates |
+| nobody in two teams | ✅ | 0 people |
+| a confirmation e-mail for every workshop registration | ✅ | 7 sent, 7/7 marked sent |
+| a confirmation e-mail for every team | ✅ | 0 sent, 0/0 marked sent |
+| organisers told of every team | ✅ | 0 notices |
+| an acknowledgement and an organiser notice for every enquiry | ✅ | 46 acks, 46 notices |
 | no visitor address got more than 3 e-mails | ✅ | max 1 |
 | no server errors (5xx) at nginx | ✅ | none |
 | nginx had enough connections | ✅ | 0 "worker_connections are not enough" |
