@@ -658,6 +658,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
           select("key", "Theme", themeOptions.filter((t) => t.value !== "general"), { required: true, width: "half" }),
           text("title", "Title", { required: true, width: "half" }),
           textarea("description", "Description (2–3 lines)", { rows: 3 }),
+          image("image", "Photo", { help: "A landscape photo (16:9 works best) across the top of the card, with Aura below it. Leave it empty to show Aura on her own." }),
         ], { titleKey: "title", maxItems: 3 }),
       ]),
       section("about", "About", "homeAbout", [

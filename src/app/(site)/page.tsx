@@ -34,7 +34,7 @@ export default async function HomePage() {
     .filter((href) => href.startsWith("/"));
   const files = [
     ...new Set(
-      [s.logoIITD, s.logoScAI, s.eventLogo, ...speakers.map((x) => x.photo), ...people.map((x) => x.photo), ...sponsors.map((x) => x.logo), ...kiosks.map((x) => x.logo), ...demos.map((x) => x.image)].filter(
+      [s.logoIITD, s.logoScAI, s.eventLogo, ...s.themes.map((t) => t.image), ...speakers.map((x) => x.photo), ...people.map((x) => x.photo), ...sponsors.map((x) => x.logo), ...kiosks.map((x) => x.logo), ...demos.map((x) => x.image)].filter(
         (src): src is string => typeof src === "string" && src.startsWith("/"),
       ),
     ),

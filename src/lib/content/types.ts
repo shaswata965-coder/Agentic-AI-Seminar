@@ -56,7 +56,7 @@ export interface SiteSettings extends PageCopy, SectionOrders {
   aboutPoints: IconItem[];
   audience: IconItem[];
   activities: IconItem[];
-  themes: { key: Exclude<ThemeKey, "general">; title: string; description: string }[];
+  themes: { key: Exclude<ThemeKey, "general">; title: string; description: string; image?: string }[];
 
   programmeStatus: ProgrammeStatus;
   programmeNote: string;
