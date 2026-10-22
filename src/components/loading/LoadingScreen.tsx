@@ -138,7 +138,8 @@ export function LoadingScreen({ eventName, routes, files, text }: { eventName: s
         </div>
         <div className="launch-status" aria-hidden>
           <p className="launch-kicker">{eventName}</p>
-          <p className="launch-percent" />
+          {/* The head script (flag.ts) sets its --lx-p before hydration, like the ring's */}
+          <p className="launch-percent" suppressHydrationWarning />
           <p className="launch-line">
             <span key={stage}>{line}</span>
           </p>
@@ -157,11 +158,12 @@ export function LoadingScreen({ eventName, routes, files, text }: { eventName: s
 /**
  * The progress ring: two half-rings turned into view (the classic two-halves technique), so it moves by
  * rotation alone. loading.css turns them from its --lx-p (0 to 1), which the head script (flag.ts) sets
- * while the page loads and warm.ts after that, so it moves from the first paint.
+ * while the page loads and warm.ts after that, so it moves from the first paint. The head script's style is
+ * on it before React hydrates, so React is told not to expect the server's (style-less) HTML here.
  */
 function Ring() {
   return (
-    <div className="lx-ring">
+    <div className="lx-ring" suppressHydrationWarning>
       <span className="lx-ring-track" />
       <span className="lx-ring-half lx-ring-right">
         <span className="lx-ring-arc" />
