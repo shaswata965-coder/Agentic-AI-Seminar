@@ -4,6 +4,7 @@ import { PreviewBridge } from "@/components/layout/PreviewBridge";
 import { SiteBanner } from "@/components/layout/SiteBanner";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { VercelAnalytics } from "@/components/layout/VercelAnalytics";
 import { ServiceWorker } from "@/components/loading/ServiceWorker";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getSettings } from "@/lib/content/queries";
@@ -44,6 +45,8 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
       <BackToTop />
       <PreviewBridge />
       <ServiceWorker />
+      {/* Vercel sets VERCEL=1 when it builds and runs the site; elsewhere there is nothing to report to. */}
+      {process.env.VERCEL ? <VercelAnalytics /> : null}
     </ToastProvider>
   );
 }
