@@ -39,26 +39,35 @@ const failedThresholds = summary
   : ["no k6 summary"];
 
 /* ---- MongoDB ----------------------------------------------------------------------------------- */
-await mongoose.connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/aaiw-loadtest", { serverSelectionTimeoutMS: 5000 });
-const db = mongoose.connection.db;
-const stored = {
-  workshop: await db.collection("registrations").countDocuments(),
-  hackathon: await db.collection("hackathonregistrations").countDocuments(),
-  enquiries: await db.collection("enquiries").countDocuments(),
-};
-const dupEmails = (await db.collection("registrations").aggregate([{ $group: { _id: "$email", n: { $sum: 1 } } }, { $match: { n: { $gt: 1 } } }]).toArray()).length;
-const dupTeams = (await db.collection("hackathonregistrations").aggregate([{ $group: { _id: "$teamKey", n: { $sum: 1 } } }, { $match: { n: { $gt: 1 } } }]).toArray()).length;
-const inTwoTeams = (
-  await db
-    .collection("hackathonregistrations")
-    .aggregate([{ $unwind: "$members" }, { $group: { _id: "$members.email", teams: { $addToSet: "$_id" } } }, { $match: { "teams.1": { $exists: true } } }])
-    .toArray()
-).length;
-const emailSentFlags = {
-  workshop: await db.collection("registrations").countDocuments({ emailSent: true }),
-  hackathon: await db.collection("hackathonregistrations").countDocuments({ emailSent: true }),
-};
-await mongoose.disconnect();
+// The next run empties the database, so `--reuse-db` takes these from the run's earlier report.json.
+async function readDb() {
+  await mongoose.connect(process.env.MONGODB_URI ?? "mongodb://127.0.0.1:27017/aaiw-loadtest", { serverSelectionTimeoutMS: 5000 });
+  const db = mongoose.connection.db;
+  const duplicates = async (collection, field) => (await db.collection(collection).aggregate([{ $group: { _id: field, n: { $sum: 1 } } }, { $match: { n: { $gt: 1 } } }]).toArray()).length;
+  const out = {
+    stored: {
+      workshop: await db.collection("registrations").countDocuments(),
+      hackathon: await db.collection("hackathonregistrations").countDocuments(),
+      enquiries: await db.collection("enquiries").countDocuments(),
+    },
+    dupEmails: await duplicates("registrations", "$email"),
+    dupTeams: await duplicates("hackathonregistrations", "$teamKey"),
+    inTwoTeams: (
+      await db
+        .collection("hackathonregistrations")
+        .aggregate([{ $unwind: "$members" }, { $group: { _id: "$members.email", teams: { $addToSet: "$_id" } } }, { $match: { "teams.1": { $exists: true } } }])
+        .toArray()
+    ).length,
+    emailSentFlags: {
+      workshop: await db.collection("registrations").countDocuments({ emailSent: true }),
+      hackathon: await db.collection("hackathonregistrations").countDocuments({ emailSent: true }),
+    },
+  };
+  await mongoose.disconnect();
+  return out;
+}
+const dbState = process.argv.includes("--reuse-db") ? json("report.json").db : await readDb();
+const { stored, dupEmails, dupTeams, inTwoTeams, emailSentFlags } = dbState;
 
 /* ---- E-mail -------------------------------------------------------------------------------------- */
 const smtp = json("smtp-stats.json") ?? { byKind: {}, perRecipient: {} };
@@ -112,11 +121,20 @@ const conns = Object.fromEntries(["nginx", "next", "mongod"].map((k) => [k, Math
 /* ---- Browser probe ------------------------------------------------------------------------------- */
 const probe = lines("probe.jsonl").map((l) => JSON.parse(l));
 const probeStat = (k) => {
-  const s = sortNum(probe.filter((p) => p.ok).map((p) => p[k]));
+  const s = sortNum(probe.map((p) => p[k]));
   return { p50: Math.round(pct(s, 50)), p95: Math.round(pct(s, 95)), max: Math.round(s.at(-1) ?? 0) };
 };
 const browser = probe.length
-  ? { attempts: probe.length, registered: probe.filter((p) => p.ok).length, failures: probe.filter((p) => !p.ok).map((p) => p.outcome ?? p.error).slice(0, 5), ttfb: probeStat("ttfb"), load: probeStat("load"), lcp: probeStat("lcp"), submit: probeStat("submit") }
+  ? {
+      attempts: probe.length,
+      registered: probe.filter((p) => p.outcome === "registered").length,
+      filledIn: probe.filter((p) => p.ok).length,
+      failures: probe.filter((p) => !p.ok).map((p) => p.outcome ?? p.error).slice(0, 5),
+      ttfb: probeStat("ttfb"),
+      load: probeStat("load"),
+      lcp: probeStat("lcp"),
+      submit: probeStat("submit"),
+    }
   : null;
 
 /* ---- Checks -------------------------------------------------------------------------------------- */
@@ -150,6 +168,7 @@ const report = {
   resources,
   peakConnections: conns,
   browser,
+  db: dbState,
   checks: checks.map(([name, ok, detail]) => ({ name, ok, detail })),
   integrityOk,
 };
@@ -166,7 +185,7 @@ const md = [
   `Time in Next.js (nginx upstream, ms): ${Object.entries(upstreamStats).map(([k, v]) => `${k} p50 ${v.p50} / p95 ${v.p95} / p99 ${v.p99} / max ${v.max}`).join("; ")}.`,
   `CPU % (avg / peak, 100 = one core): ${Object.entries(resources).map(([k, v]) => `${k} ${v.cpuAvg}/${v.cpuPeak}`).join(", ")}. Peak memory MB: ${Object.entries(resources).map(([k, v]) => `${k} ${v.rssPeakMb}`).join(", ")}.`,
   `Peak connections: nginx ${conns.nginx}, Next.js ${conns.next}, MongoDB ${conns.mongod}. SMTP: ${report.emails.total} e-mails over ${report.emails.smtpConnections} connections (peak ${report.emails.peakSmtpConnections} open at once).`,
-  browser ? `Real browser (Chromium): ${browser.registered}/${browser.attempts} registered; page load p50 ${browser.load.p50} ms / p95 ${browser.load.p95} ms; LCP p50 ${browser.lcp.p50} ms / p95 ${browser.lcp.p95} ms; submit to confirmation p50 ${browser.submit.p50} ms / p95 ${browser.submit.p95} ms.${browser.failures.length ? ` Failures: ${browser.failures.join("; ")}` : ""}` : "",
+  browser ? `Real browser (Chromium): ${browser.filledIn}/${browser.attempts} attempts loaded and filled in the form, ${browser.registered} registered; page load p50 ${browser.load.p50} ms / p95 ${browser.load.p95} ms; LCP p50 ${browser.lcp.p50} ms / p95 ${browser.lcp.p95} ms; submit to confirmation p50 ${browser.submit.p50} ms / p95 ${browser.submit.p95} ms.${browser.failures.length ? ` Failures: ${browser.failures.join("; ")}` : ""}` : "",
   "",
   "| Data check | | |",
   "| --- | --- | --- |",

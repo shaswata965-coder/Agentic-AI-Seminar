@@ -2,7 +2,7 @@
 /*
  * Real people in a real browser while k6 applies the load: headless Chromium (Playwright) opens the
  * registration page with nothing cached, fills in the three steps of the form and sends it, again and
- * again. Each attempt is a line in PROBE_OUT: how long the page took (time to first byte, DOM ready,
+ * again (sending at most PROBE_MAX_SUBMITS, default 7). Each attempt is a line in PROBE_OUT: how long the page took (time to first byte, DOM ready,
  * load, largest contentful paint) and how long the registration took to confirm.
  *
  *   BASE_URL=https://localhost PROBE_SECONDS=120 PROBE_WORKERS=2 PROBE_OUT=probe.jsonl node browser-probe.mjs
@@ -18,6 +18,10 @@ const SECONDS = Number(process.env.PROBE_SECONDS ?? 120);
 const WORKERS = Number(process.env.PROBE_WORKERS ?? 2);
 const OUT = process.env.PROBE_OUT ?? "probe.jsonl";
 const RUN = process.env.RUN_ID ?? String(Date.now() % 1e8);
+// The probe connects from one address, and the site allows 8 registrations per address per 15 minutes:
+// past this many it only measures the page and the form, so it never meets the limit itself.
+const MAX_SUBMITS = Number(process.env.PROBE_MAX_SUBMITS ?? 7);
+let submits = 0;
 
 async function loadPlaywright() {
   if (process.env.PLAYWRIGHT_MODULE) return import(process.env.PLAYWRIGHT_MODULE);
@@ -54,6 +58,12 @@ async function attempt(browser, n) {
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByRole("button", { name: "Continue" }).click();
     await page.getByLabel("I agree to be contacted about this workshop").check();
+    if (submits >= MAX_SUBMITS) {
+      row.ok = true;
+      row.outcome = "filled in (not sent: probe's own limit)";
+      return row;
+    }
+    submits += 1;
     const sent = Date.now();
     await page.getByRole("button", { name: "Complete registration" }).click();
     // Either the confirmation, or a refusal or error in a toast (both sit in status regions).
