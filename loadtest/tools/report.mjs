@@ -76,9 +76,13 @@ const visitorMax = Math.max(0, ...Object.entries(smtp.perRecipient ?? {}).filter
 
 /* ---- nginx --------------------------------------------------------------------------------------- */
 const access = lines("nginx-access.log").map((l) => {
-  const [ip, status, method, uri, rt, urt] = l.split(" ");
-  return { ip, status: Number(status), method, uri: uri.replace(/"/g, ""), rt: Number(rt) * 1000, urt: Number(urt) * 1000 };
+  const [ip, status, method, uri, rt, urt, , cache] = l.split(" ");
+  return { ip, status: Number(status), method, uri: uri.replace(/"/g, ""), rt: Number(rt) * 1000, urt: Number(urt) * 1000, cache };
 });
+// With the tuned nginx profile: how requests were answered (HIT from the micro-cache, MISS from Next.js,
+// "-" from disk or not cacheable).
+const cacheStatus = {};
+for (const r of access) if (r.cache !== undefined) cacheStatus[r.cache] = (cacheStatus[r.cache] ?? 0) + 1;
 const statuses = {};
 for (const r of access) statuses[r.status] = (statuses[r.status] ?? 0) + 1;
 const perIp = {};
@@ -109,7 +113,10 @@ const nextErrors = {
 };
 
 /* ---- Resources ----------------------------------------------------------------------------------- */
-const samples = lines("monitor.jsonl").map((l) => JSON.parse(l));
+// Only the run itself (plus the 10 s run.sh waits for e-mails after it).
+const allSamples = lines("monitor.jsonl").map((l) => JSON.parse(l));
+const runEnds = (allSamples[0]?.t ?? 0) + (summary?.state?.testRunDurationMs ?? Infinity) + 15_000;
+const samples = allSamples.filter((s) => s.t <= runEnds);
 const resources = {};
 for (const g of ["next", "mongod", "nginx", "smtp", "k6"]) {
   const cpu = samples.map((s) => s.cpu[g] ?? 0);
@@ -163,7 +170,7 @@ const report = {
   expected,
   stored,
   emails: { ...smtp.byKind, total: smtp.messages ?? 0, peakSmtpConnections: smtp.peakOpen ?? 0, smtpConnections: smtp.connections ?? 0, visitorMax },
-  nginx: { requests: access.length, distinctClientIps: Object.keys(perIp).length, maxRequestsFromOneIp: Math.max(0, ...Object.values(perIp)), statuses, upstreamMs: upstreamStats, errors: nginxErrors },
+  nginx: { requests: access.length, distinctClientIps: Object.keys(perIp).length, maxRequestsFromOneIp: Math.max(0, ...Object.values(perIp)), statuses, upstreamMs: upstreamStats, errors: nginxErrors, cacheStatus },
   next: nextErrors,
   resources,
   peakConnections: conns,
@@ -182,6 +189,7 @@ const md = [
   "```",
   "",
   `nginx: ${access.length} requests from ${report.nginx.distinctClientIps} client IPs (max ${report.nginx.maxRequestsFromOneIp} from one); statuses ${Object.entries(statuses).map(([s, n]) => `${s}×${n}`).join(", ")}.`,
+  Object.keys(cacheStatus).length ? `nginx micro-cache: ${Object.entries(cacheStatus).map(([k, n]) => `${k === "-" ? "not cached (disk, API)" : k}×${n}`).join(", ")}.` : "",
   `Time in Next.js (nginx upstream, ms): ${Object.entries(upstreamStats).map(([k, v]) => `${k} p50 ${v.p50} / p95 ${v.p95} / p99 ${v.p99} / max ${v.max}`).join("; ")}.`,
   `CPU % (avg / peak, 100 = one core): ${Object.entries(resources).map(([k, v]) => `${k} ${v.cpuAvg}/${v.cpuPeak}`).join(", ")}. Peak memory MB: ${Object.entries(resources).map(([k, v]) => `${k} ${v.rssPeakMb}`).join(", ")}.`,
   `Peak connections: nginx ${conns.nginx}, Next.js ${conns.next}, MongoDB ${conns.mongod}. SMTP: ${report.emails.total} e-mails over ${report.emails.smtpConnections} connections (peak ${report.emails.peakSmtpConnections} open at once).`,

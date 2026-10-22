@@ -1,0 +1,100 @@
+# The "tuned" reverse proxy (NGINX_PROFILE=tuned in up.sh): the README's server block plus what the
+# submission-rush test showed a small server needs. Differences from nginx.conf.template:
+#   1. nginx serves the build files (/_next/static, content-hashed and immutable) from disk, instead of
+#      passing each one to the single Node.js process;
+#   2. 4,096 connections per worker, and kept-alive connections to Next.js;
+#   3. a 2-second micro-cache for anonymous page and router-prefetch requests, so a rush of identical
+#      requests reaches Next.js about once per page every 2 seconds. Signed-in organisers and the admin's
+#      live preview (Draft Mode) bypass it, and an edit saved in the admin reaches visitors within 2 s.
+
+worker_processes @WORKERS@;
+pid @RUN@/nginx.pid;
+error_log @RUN@/logs/nginx-error.log warn;
+worker_rlimit_nofile 65535;
+
+events {
+    worker_connections 4096;
+}
+
+http {
+    sendfile on;
+    tcp_nopush on;
+    types_hash_max_size 2048;
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+
+    # nginx compresses (in its workers) rather than Next.js (in its one process); see Accept-Encoding below.
+    gzip on;
+    gzip_comp_level 4;
+    gzip_types text/plain text/css text/x-component application/javascript application/json application/manifest+json image/svg+xml;
+
+    client_body_temp_path @RUN@/tmp/body;
+    proxy_temp_path @RUN@/tmp/proxy;
+    fastcgi_temp_path @RUN@/tmp/fastcgi;
+    uwsgi_temp_path @RUN@/tmp/uwsgi;
+    scgi_temp_path @RUN@/tmp/scgi;
+
+    log_format loadtest '$remote_addr $status $request_method "$uri" $request_time $upstream_response_time $body_bytes_sent $upstream_cache_status';
+    access_log @RUN@/logs/nginx-access.log loadtest buffer=256k flush=2s;
+
+    upstream site {
+        server 127.0.0.1:@APP_PORT@;
+        keepalive 64;
+    }
+
+    proxy_cache_path @RUN@/cache levels=1:2 keys_zone=pages:10m max_size=256m inactive=10m use_temp_path=off;
+
+    # Requests that must never be answered from the cache: a signed-in organiser, or the admin's preview.
+    map "$cookie_aaiw_admin$cookie___prerender_bypass" $skip_cache {
+        default 1;
+        ""      0;
+    }
+
+    server {
+        listen 443 ssl http2;
+        server_name localhost;
+        ssl_certificate     @RUN@/tls/cert.pem;
+        ssl_certificate_key @RUN@/tls/key.pem;
+        client_max_body_size 10m;
+
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $remote_addr; # overwrite (not append) so clients can't spoof their IP
+
+        # 1. Build files, straight from disk. (For a sub-path, use location /<base>/_next/static/.)
+        location /_next/static/ {
+            alias @ROOT@/.next/static/;
+            add_header Cache-Control "public, max-age=31536000, immutable";
+            add_header X-Content-Type-Options nosniff;
+        }
+
+        # APIs and the admin panel: never cached.
+        location /api/ {
+            proxy_pass http://site;
+        }
+        location /admin {
+            proxy_pass http://site;
+        }
+
+        # 3. Pages, router prefetches and public files: micro-cached.
+        location / {
+            proxy_pass http://site;
+            proxy_set_header Accept-Encoding "";  # store one uncompressed copy; nginx gzips per visitor
+            proxy_cache pages;
+            proxy_cache_key "$scheme$host$request_uri|$http_rsc|$http_next_router_prefetch|$http_next_router_segment_prefetch|$http_next_router_state_tree|$http_next_url";
+            proxy_ignore_headers Cache-Control Expires;  # Next.js allows 5 minutes (s-maxage=300); keep 2 s
+            proxy_cache_valid 200 301 302 307 308 404 2s;
+            proxy_cache_lock on;                          # one request per page goes to Next.js; the rest wait
+            proxy_cache_use_stale updating error timeout http_500 http_502 http_503 http_504;
+            proxy_cache_background_update on;
+            proxy_cache_bypass $skip_cache;
+            proxy_no_cache $skip_cache;
+            add_header X-Cache $upstream_cache_status;
+        }
+    }
+    server { listen 80; server_name localhost; return 301 https://$host$request_uri; }
+}
