@@ -5,7 +5,10 @@
 #   2. 4,096 connections per worker, and kept-alive connections to Next.js;
 #   3. a 2-second micro-cache for anonymous page and router-prefetch requests, so a rush of identical
 #      requests reaches Next.js about once per page every 2 seconds. Signed-in organisers and the admin's
-#      live preview (Draft Mode) bypass it, and an edit saved in the admin reaches visitors within 2 s.
+#      live preview (Draft Mode) bypass it, and an edit saved in the admin reaches visitors within 2 s;
+#   4. nothing is compressed per request: pages are cached already gzipped (Next.js compresses each once
+#      per cache fill), and build files are served from gzipped copies made after the build
+#      (gzip_static; up.sh makes them, as a deploy step would after `npm run build`).
 
 worker_processes @WORKERS@;
 pid @RUN@/nginx.pid;
@@ -25,9 +28,9 @@ http {
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_prefer_server_ciphers on;
 
-    # nginx compresses (in its workers) rather than Next.js (in its one process); see Accept-Encoding below.
+    # Only what isn't already compressed (API answers, files in public/), at the cheapest level.
     gzip on;
-    gzip_comp_level 4;
+    gzip_comp_level 1;
     gzip_types text/plain text/css text/x-component application/javascript application/json application/manifest+json image/svg+xml;
 
     client_body_temp_path @RUN@/tmp/body;
@@ -52,6 +55,12 @@ http {
         ""      0;
     }
 
+    # Cache one gzipped and one plain copy of each page, whatever exact Accept-Encoding a browser sends.
+    map $http_accept_encoding $page_encoding {
+        ~*gzip  gzip;
+        default "";
+    }
+
     server {
         listen 443 ssl http2;
         server_name localhost;
@@ -68,6 +77,8 @@ http {
         # 1. Build files, straight from disk. (For a sub-path, use location /<base>/_next/static/.)
         location /_next/static/ {
             alias @ROOT@/.next/static/;
+            gzip_static on;
+            gzip off;
             add_header Cache-Control "public, max-age=31536000, immutable";
             add_header X-Content-Type-Options nosniff;
         }
@@ -83,10 +94,12 @@ http {
         # 3. Pages, router prefetches and public files: micro-cached.
         location / {
             proxy_pass http://site;
-            proxy_set_header Accept-Encoding "";  # store one uncompressed copy; nginx gzips per visitor
+            proxy_set_header Accept-Encoding $page_encoding;
             proxy_cache pages;
-            proxy_cache_key "$scheme$host$request_uri|$http_rsc|$http_next_router_prefetch|$http_next_router_segment_prefetch|$http_next_router_state_tree|$http_next_url";
-            proxy_ignore_headers Cache-Control Expires;  # Next.js allows 5 minutes (s-maxage=300); keep 2 s
+            proxy_cache_key "$scheme$host$request_uri|$page_encoding|$http_rsc|$http_next_router_prefetch|$http_next_router_segment_prefetch|$http_next_router_state_tree|$http_next_url";
+            # Next.js allows 5 minutes (s-maxage=300): keep 2 s. The key above already holds every header
+            # a page varies on (Vary).
+            proxy_ignore_headers Cache-Control Expires Vary;
             proxy_cache_valid 200 301 302 307 308 404 2s;
             proxy_cache_lock on;                          # one request per page goes to Next.js; the rest wait
             proxy_cache_use_stale updating error timeout http_500 http_502 http_503 http_504;

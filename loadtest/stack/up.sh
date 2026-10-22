@@ -35,6 +35,12 @@ case "$PROFILE" in
   *) echo "Unknown NGINX_PROFILE: $PROFILE" >&2; exit 2 ;;
 esac
 
+if [[ "$PROFILE" == tuned ]]; then
+  # gzipped copies of the build files, which the tuned nginx serves as they are (gzip_static). In
+  # production this is a deploy step after `npm run build`.
+  find "$ROOT/.next/static" -type f \( -name '*.js' -o -name '*.css' \) -exec gzip -9 -k -f {} +
+fi
+
 rm -rf "$RUN/cache"
 mkdir -p "$RUN"/{logs,tls,tmp,cache}
 [[ -f .next/BUILD_ID ]] || { echo "No production build: run NEXT_PUBLIC_SITE_URL=https://localhost npm run build first." >&2; exit 1; }
