@@ -3,11 +3,11 @@ import { stripMarkdown } from "@/components/ui/RichText";
 import { getFaqs, getSessions, getSettings, getSpeakers, getTutorials } from "./queries";
 
 const PAGES: AssistantEntry[] = [
-  { kind: "Page", title: "Home", href: "/", keywords: "overview countdown announcements news highlights" },
+  { kind: "Page", title: "Home", href: "/", keywords: "overview announcements news highlights themes" },
   { kind: "Page", title: "Programme", subtitle: "Day-wise schedule for 15 & 16 Dec", href: "/programme", keywords: "schedule agenda timetable sessions keynote talk panel pdf download calendar kiosks exhibitors hackathon" },
   { kind: "Page", title: "Speakers", subtitle: "Academic & industry speakers, panelists", href: "/speakers", keywords: "keynote panel panelists bio talk abstract" },
   { kind: "Page", title: "Tutorials & Demos", subtitle: "Hands-on tutorials and live demos", href: "/tutorials", keywords: "tutorial workshop hands on prerequisites laptop github material demo" },
-  { kind: "Page", title: "Hackathon", subtitle: "One hackathon, three themes: prizes, timeline and rules", href: "/hackathon", keywords: "hackathon team prize prizes theme themes track judging criteria mentors judges rules code of conduct timeline" },
+  { kind: "Page", title: "Hackathon", subtitle: "One track, one question: prizes, timeline and rules", href: "/hackathon", keywords: "hackathon team prize prizes question challenge problem statement track judging criteria mentors judges rules code of conduct timeline" },
   { kind: "Page", title: "Registration", subtitle: "Register for the workshop", href: "/register", keywords: "register registration sign up ticket fee fees deadline seat" },
   { kind: "Page", title: "About the workshop", subtitle: "Why agentic AI, who should attend, what happens", href: "/about", keywords: "about motivation what is agentic ai who should attend audience activities" },
   { kind: "Page", title: "Venue & travel", subtitle: "Directions, campus entry, stays and local tips", href: "/venue", keywords: "venue travel directions airport flight railway station train metro road cab taxi hotel accommodation stay guest house campus entry gate id tips weather" },
@@ -17,7 +17,8 @@ const PAGES: AssistantEntry[] = [
 ];
 
 const SECTIONS: AssistantEntry[] = [
-  { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Entrepreneurship", href: "/#themes", keywords: "themes healthcare science discovery entrepreneurship startups" },
+  { kind: "Section", title: "Themes", subtitle: "Healthcare · Scientific discovery · Enterprise", href: "/#themes", keywords: "themes healthcare science discovery enterprise business startups" },
+  { kind: "Section", title: "The hackathon question", subtitle: "One track, one question for every team", href: "/hackathon#challenge", keywords: "hackathon question challenge problem statement track theme ideas" },
   { kind: "Section", title: "Announcements", href: "/#news", keywords: "news updates announcements" },
   { kind: "Section", title: "Hackathon registration", subtitle: "Register your team on the Hackathon page", href: "/hackathon#register", keywords: "hackathon register team sign up apply" },
   { kind: "Section", title: "Industry kiosks", subtitle: "On the programme page", href: "/programme#kiosks", keywords: "industry kiosk exhibit exhibitor booth companies" },

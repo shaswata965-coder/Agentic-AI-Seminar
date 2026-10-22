@@ -15,15 +15,16 @@ type Theme = SiteSettings["themes"][number];
 const THEME_PHOTOS: Record<Theme["key"], string> = {
   healthcare: "/themes/healthcare.webp",
   science: "/themes/science.webp",
-  entrepreneurship: "/themes/entrepreneurship.webp",
+  enterprise: "/themes/enterprise.webp",
 };
 
 /** A theme card's photo: the one uploaded for it, or the built-in one. */
 export const themePhoto = (t: Theme): string | undefined => t.image || THEME_PHOTOS[t.key];
 
 /**
- * The three themes as cards, each with its photo across the top and Aura, dressed for the theme, stepping out
- * of its lower edge across from the theme's number. A theme without a photo shows Aura on her own.
+ * The workshop's three themes as cards, each with its photo across the top and Aura, dressed for the theme, stepping
+ * out of its lower edge across from the theme's number. A theme without a photo shows Aura on her own. Under them, a
+ * note sets the hackathon apart: it doesn't split into themes, every team answers one question.
  */
 export function Themes({ s }: { s: SiteSettings }) {
   const c = copy(s, "homeThemes");
@@ -84,7 +85,6 @@ export function Themes({ s }: { s: SiteSettings }) {
                       {[
                         { href: `/programme?theme=${t.key}`, label: c.talks },
                         { href: `/tutorials?theme=${t.key}`, label: c.tutorials },
-                        { href: `/hackathon#theme-${t.key}`, label: c.track },
                       ]
                         .filter((l) => l.label)
                         .map((l) => (
@@ -103,6 +103,20 @@ export function Themes({ s }: { s: SiteSettings }) {
           );
         })}
       </ul>
+      {c.hackathonNote ? (
+        <p className="tone-aqua mx-auto mt-10 flex w-fit max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl bg-surface/80 px-4 py-3 text-center text-[15px] text-muted ring-1 ring-border backdrop-blur sm:px-5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-soft font-display text-lg leading-none font-black text-accent-ink" aria-hidden>
+            1
+          </span>
+          <span>{c.hackathonNote}</span>
+          {c.hackathonLink ? (
+            <Link href="/hackathon#challenge" className="group/link inline-flex items-center gap-1 font-semibold text-accent-ink">
+              <span className="mi-underline">{c.hackathonLink}</span>
+              <ArrowRight size={15} aria-hidden className="transition-transform group-hover/link:translate-x-1" />
+            </Link>
+          ) : null}
+        </p>
+      ) : null}
     </Section>
   );
 }

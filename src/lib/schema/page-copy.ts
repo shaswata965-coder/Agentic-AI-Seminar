@@ -48,6 +48,16 @@ const note = (l: string, d: string): CopyField => ({ kind: "note", label: l, def
 const text = (l: string, d: string, help?: string): CopyField => ({ kind: "text", label: l, default: d, help });
 const long = (l: string, d: string, help?: string): CopyField => ({ kind: "long", label: l, default: d, help });
 
+/** The words around the hackathon's one question, wherever it is shown: three large 1s, then the question. */
+const ONE_QUESTION = {
+  one1: label("Under the first 1", "hackathon"),
+  one2: label("Under the second 1", "track"),
+  one3: label("Under the third 1", "question"),
+  questionLabel: short("Above the question", "The question every team answers"),
+};
+/** …and, away from the Hackathon page, a link to the question there. */
+const ONE_QUESTION_LINKED = { ...ONE_QUESTION, questionLink: label("Link to the question on the Hackathon page", "Read the full challenge") };
+
 export const PAGE_COPY = {
   /* ------------------------------------------------------- Site-wide -- */
   siteNav: {
@@ -59,7 +69,7 @@ export const PAGE_COPY = {
     tutorials: label("Tutorials & Demos", "Tutorials & Demos"),
     tutorialsText: note("Tutorials & Demos: description", "Hands-on sessions and live agent demos"),
     hackathon: label("Hackathon", "Hackathon"),
-    hackathonText: note("Hackathon: description", "One hackathon on three themes, with team registration"),
+    hackathonText: note("Hackathon: description", "One track, one question, with team registration"),
     venue: label("Venue & travel", "Venue & travel"),
     venueText: note("Venue & travel: description", "Directions, campus entry, stays and local tips"),
     partners: label("Partners & sponsors", "Partners & sponsors"),
@@ -67,7 +77,7 @@ export const PAGE_COPY = {
     organisers: label("Organisers", "Organisers"),
     organisersText: note("Organisers: description", "Faculty, student organisers and volunteers"),
     themes: label("Home: Themes", "Themes"),
-    themesText: note("Themes: description", "Healthcare, scientific discovery and entrepreneurship"),
+    themesText: note("Themes: description", "Healthcare, scientific discovery and enterprise"),
     routeMap: label("Home: Route map", "Route map"),
     routeMapText: note("Route map: description", "Follow the route to campus on the map"),
     faq: label("Home: FAQ", "FAQ"),
@@ -117,7 +127,6 @@ export const PAGE_COPY = {
     school: note("Under the institute's name", "Yardi School of Artificial Intelligence (ScAI)"),
     when: label("Fact: when", "When"),
     where: label("Fact: where", "Where"),
-    countdown: label("Countdown label", "Starts"),
   },
   homePlacard: {
     text: short("Placard 1: workshop", "Workshop registration {status}", `What the first sign Aura holds up says; about 35 characters fit. ${STATUS}`),
@@ -162,11 +171,12 @@ export const PAGE_COPY = {
     background: bg("band"),
     eyebrow: eyebrow("Themes"),
     title: title("Three themes, one question: what can agents do for us?"),
-    description: intro("Talks, tutorials and the hackathon are organised around three themes."),
+    description: intro("The workshop's talks, panels and tutorials are organised around three themes."),
     theme: label("Card label", "Theme"),
     talks: label("Link: talks", "Related talks & panels"),
     tutorials: label("Link: tutorials", "Tutorials & demos"),
-    track: label("Link: the theme in the hackathon", "This theme in the hackathon"),
+    hackathonNote: text("Note under the cards: the hackathon", "The hackathon doesn't split into themes: one track and one question for every team."),
+    hackathonLink: label("Note under the cards: link", "See the question"),
   },
   homeAbout: {
     tone: tone("mint"),
@@ -200,7 +210,7 @@ export const PAGE_COPY = {
   homeHackathon: {
     tone: tone("aqua"),
     eyebrow: eyebrow("Hackathon"),
-    themes: label("Above the themes", "One hackathon, three themes"),
+    ...ONE_QUESTION_LINKED,
     button: label("Button: register", "Register your team"),
     details: label("Button: hackathon page", "Hackathon details"),
     teamSize: label("Fact: team size", "Team size"),
@@ -312,7 +322,7 @@ export const PAGE_COPY = {
   programmeHackathon: {
     tone: tone("aqua"),
     eyebrow: eyebrow("Hackathon"),
-    themes: label("Above the themes", "One hackathon, three themes"),
+    ...ONE_QUESTION_LINKED,
     button: label("Button", "Register your team"),
     portalTitle: heading("Link card: title", "Rules, prizes and judging"),
     teamSize: label("Fact: team size", "Team size"),
@@ -397,16 +407,20 @@ export const PAGE_COPY = {
     mode: label("Fact: mode", "Mode"),
     eligibility: heading("Eligibility title", "Eligibility"),
   },
+  // The key is from when the hackathon had a track per theme; it now holds the one question.
   hackathonTracks: {
     tone: tone("lilac"),
     background: bg("plain"),
-    eyebrow: eyebrow("Themes"),
-    title: title("One hackathon, three themes"),
-    description: intro(
-      "Every team takes part in the same hackathon, with one timeline, one set of rules and one prize pool. Pick the theme your idea fits; the problems below are examples to get you thinking.",
+    eyebrow: eyebrow("The challenge"),
+    title: title("One hackathon, one track, one question"),
+    description: intro("Every team takes part in the same hackathon and answers the same question, with one timeline, one set of rules and one prize pool."),
+    frame: short("Under the hackathon's name", "A single track for every team"),
+    ...ONE_QUESTION,
+    ideas: heading("Example ideas: title", "Ideas to get you thinking"),
+    themesNote: text(
+      "Note about the workshop's themes",
+      "The workshop's three themes shape its talks, panels and tutorials. The hackathon doesn't split into themes: your answer to the question can come from any field.",
     ),
-    frame: short("Under the hackathon's name", "One hackathon · {count} themes", "{count} is the number of themes."),
-    theme: label("Card label (before its number)", "Theme"),
   },
   hackathonTimeline: {
     tone: tone("mint"),
@@ -419,7 +433,7 @@ export const PAGE_COPY = {
     tone: tone("butter"),
     eyebrow: eyebrow("Prize money"),
     title: title("Prizes & recognition"),
-    intro: intro("Prizes for the top three teams, and awards for the best agent in each theme."),
+    intro: intro("Prizes for the top three teams, and special awards."),
     pool: label("Prize pool label", "Total prize pool"),
     awards: heading("Other prizes: title", "Special awards"),
   },
@@ -466,17 +480,18 @@ export const PAGE_COPY = {
     eyebrow: eyebrow("Registration"),
     title: title("Register your team"),
     needTitle: heading("Checklist: title", "What you'll need"),
-    need1: note("Checklist: first item", "A team name and a theme"),
+    need1: note("Checklist: first item", "A team name"),
     need2: note("Checklist: second item", "Each member's name, e-mail and institution"),
     need3: note("Checklist: third item", "A few lines on your idea"),
-    tracksLink: short("Link to the themes", "Not sure which theme? See the themes"),
+    tracksLink: short("Link to the question", "Read the question before you register"),
+    formQuestion: short("Form, first step: before the question", "One track for every team: you'll answer"),
     externalTitle: heading("External platform: title", "Registration happens on {platform}", "{platform} is the platform name from Event → Registration."),
     externalText: text("External platform: text", "Create your team and submit your details on the platform. It opens in a new tab."),
     externalButton: label("External platform: button", "Go to {platform}"),
     soonTitle: heading("Opening soon: title", "Hackathon registration opens soon"),
     soonText: text(
       "Opening soon: text",
-      "Start forming your team! When registration opens you will need a team name, the theme you'll work on, member details and a short idea summary.",
+      "Start forming your team! When registration opens you will need a team name, member details and a short idea summary.",
     ),
     closedTitle: heading("Closed: title", "Hackathon registration is closed"),
     closedText: text("Closed: text", "Thanks to everyone who registered! Shortlisted teams will be contacted by e-mail."),

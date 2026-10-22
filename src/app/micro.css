@@ -161,9 +161,6 @@
   /* Fields that fail validation give a short shake */
   [aria-invalid="true"] { animation: mi-shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
 
-  /* Countdown digits roll in when they change (keyed span) */
-  .mi-tick { display: inline-block; animation: mi-tick 0.45s cubic-bezier(0.2, 0.8, 0.2, 1); }
-
   /* Menus: items cascade in (set --i on each item) */
   .mi-stagger > * { animation: mi-rise 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) both; animation-delay: calc(var(--i, 0) * 32ms); }
 
@@ -197,7 +194,6 @@ dialog[open]::backdrop { animation: mi-fade 0.25s ease-out; }
 @keyframes mi-star { 0% { rotate: 0deg; scale: 0.6; } 60% { rotate: 160deg; scale: 1.35; } 100% { rotate: 144deg; scale: 1; } }
 @keyframes mi-burst { 0% { opacity: 0.9; scale: 0.6; } 100% { opacity: 0; scale: 1.9; } }
 @keyframes mi-shake { 0%, 100% { translate: 0 0; } 20% { translate: -6px 0; } 40% { translate: 5px 0; } 60% { translate: -3px 0; } 80% { translate: 2px 0; } }
-@keyframes mi-tick { from { opacity: 0; translate: 0 -45%; } to { opacity: 1; translate: 0 0; } }
 @keyframes mi-rise { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
 @keyframes mi-fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes mi-toast-in { from { opacity: 0; translate: 0 18px; scale: 0.92; } to { opacity: 1; translate: 0 0; scale: 1; } }

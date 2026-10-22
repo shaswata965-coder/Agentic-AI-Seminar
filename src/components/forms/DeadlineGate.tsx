@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useNow } from "@/components/home/Countdown";
+import { useNow } from "@/lib/client-hooks";
 import { deadlinePassed } from "@/lib/event";
 
 /**

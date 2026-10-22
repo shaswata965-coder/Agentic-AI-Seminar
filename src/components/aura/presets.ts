@@ -75,8 +75,8 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
       "Hypothesis → experiment → insight, on a loop!",
     ],
   },
-  entrepreneurship: {
-    label: "Aura as a founder launching a rocket with a bright idea",
+  enterprise: {
+    label: "Aura launching an enterprise rocket with a bright idea",
     expression: "determined",
     pose: "raise",
     prop: "rocket",
@@ -84,7 +84,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     effects: ["bulb"],
     eyeColor: AURA_EYES.amber,
     tips: [
-      "From prototype to product: agentic startups are taking off.",
+      "From prototype to product: agents are taking off in enterprise.",
       "Investors and founders, meet at the industry kiosks!",
     ],
   },
@@ -102,13 +102,13 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     ],
   },
   countdown: {
-    label: "Aura holding a stopwatch, counting down to the workshop",
+    label: "Aura holding a stopwatch, waiting for registration to open",
     expression: "focus",
     pose: "hold",
     prop: "stopwatch",
     emblem: "clock",
     eyeColor: AURA_EYES.azure,
-    tips: ["Tick tock! The countdown to 15 December is on.", "Add the dates to your calendar so you don't miss it."],
+    tips: ["Tick tock! It opens soon: check back here.", "Add the dates to your calendar so you don't miss it."],
   },
   speakers: {
     label: "Aura on stage with a microphone",
@@ -150,7 +150,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     effects: ["code"],
     eyeColor: AURA_EYES.mint,
     tips: [
-      "Form a team, pick a theme, build an agent!",
+      "Form a team, answer the question, build an agent!",
       "Final round happens live at the workshop, 15–16 Dec.",
       "Read the judging criteria before you start building.",
     ],

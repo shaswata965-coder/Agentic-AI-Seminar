@@ -2,7 +2,7 @@
 
 import { Check } from "lucide-react";
 import { AuraHead } from "@/components/aura/AuraHead";
-import { useNow } from "@/components/home/Countdown";
+import { useNow } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
 import type { HackathonInfo } from "@/lib/content/types";
 import { formatDate } from "@/lib/format";

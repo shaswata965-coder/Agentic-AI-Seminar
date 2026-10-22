@@ -72,7 +72,7 @@ const SPEAKERS: Record<SpeakerKey, Record<string, unknown>> = {
     designation: "Co-founder & CTO (sample profile)",
     affiliation: "DemoStack (sample start-up)",
     category: "industry",
-    theme: "entrepreneurship",
+    theme: "enterprise",
     keynote: true,
     featured: true,
     bio: `**Sample profile.** Rohan co-founded a start-up that turns agent prototypes into products used by thousands of small businesses.\n\n${NOTE}`,
@@ -93,7 +93,7 @@ const SPEAKERS: Record<SpeakerKey, Record<string, unknown>> = {
     designation: "Partner (sample profile)",
     affiliation: "Example Ventures",
     category: "panelist",
-    theme: "entrepreneurship",
+    theme: "enterprise",
     bio: `**Sample profile.** Katherine invests in early-stage AI companies.\n\n${NOTE}`,
   },
   arjun: {
@@ -138,7 +138,7 @@ const SESSIONS: SessionSeed[] = [
   { day: "1", start: "14:00", end: "15:30", type: "tutorial", theme: "general", title: "Tutorial: build your first tool-using agent", speakers: ["grace", "ishaan"], room: "Lab 1" },
   { day: "1", start: "15:30", end: "16:30", type: "demo", theme: "general", title: "Live demos: agents in action", speakerNote: "Demo teams", room: "Exhibition area" },
   { day: "1", start: "16:30", end: "17:30", type: "hackathon", title: "Hackathon final round: team presentations (part 1)", speakerNote: "Shortlisted teams", room: "Hackathon arena" },
-  { day: "2", start: "09:30", end: "10:15", type: "keynote", theme: "entrepreneurship", title: "From demo to product: shipping agentic AI to real customers", speakers: ["rohan"], room: "Main hall" },
+  { day: "2", start: "09:30", end: "10:15", type: "keynote", theme: "enterprise", title: "From demo to product: shipping agentic AI to real customers", speakers: ["rohan"], room: "Main hall" },
   { day: "2", start: "10:15", end: "11:00", type: "talk", theme: "science", title: "The autonomous lab: agents that design, run and learn from experiments", speakers: ["alan"], room: "Main hall" },
   { day: "2", start: "11:00", end: "11:30", type: "break", title: "Tea break & industry kiosks", room: "Exhibition area" },
   {
@@ -146,7 +146,7 @@ const SESSIONS: SessionSeed[] = [
     start: "11:30",
     end: "12:30",
     type: "panel",
-    theme: "entrepreneurship",
+    theme: "enterprise",
     title: "Panel: building agentic AI start-ups in India",
     moderator: "rohan",
     panelists: ["katherine", "arjun", "ishaan"],
@@ -207,13 +207,13 @@ const TUTORIALS = [
 const DEMOS = [
   { title: "Clinical notes summariser", team: "Sample Health Lab", theme: "healthcare", description: `An agent that reads discharge notes, flags missing information and drafts a patient-friendly summary for a clinician to approve.\n\n${NOTE_PLAIN}` },
   { title: "Self-driving lab assistant", team: "Example University, Materials Lab", theme: "science", description: `An agent that proposes the next experiment, schedules the instruments and updates its model after every measurement.\n\n${NOTE_PLAIN}` },
-  { title: "Founder's research co-pilot", team: "DemoStack (sample start-up)", theme: "entrepreneurship", description: `An agent that researches a market, compares competitors and drafts an investor memo with sources.\n\n${NOTE_PLAIN}` },
+  { title: "Founder's research co-pilot", team: "DemoStack (sample start-up)", theme: "enterprise", description: `An agent that researches a market, compares competitors and drafts an investor memo with sources.\n\n${NOTE_PLAIN}` },
 ];
 
 const KIOSKS = [
   { company: "Placeholder AI Labs", booth: "Kiosk 1", theme: "general", website: "https://example.com", description: "Sample exhibitor showing an agent platform for enterprise workflows. Replace with a real exhibitor in the admin panel." },
   { company: "Sample Health Systems", booth: "Kiosk 2", theme: "healthcare", website: "https://example.com", description: "Sample exhibitor demonstrating AI assistants for hospital operations." },
-  { company: "DemoStack", booth: "Kiosk 3", theme: "entrepreneurship", website: "https://example.com", description: "Sample start-up exhibiting no-code tools for building customer-support agents." },
+  { company: "DemoStack", booth: "Kiosk 3", theme: "enterprise", website: "https://example.com", description: "Sample start-up exhibiting no-code tools for building customer-support agents." },
 ];
 
 const SPONSORS = [
@@ -234,7 +234,7 @@ const PEOPLE = [
 
 const ANNOUNCEMENTS = [
   { title: "Sample announcement: first speakers revealed", body: "This is sample content added by the demo seed to preview the announcements box.", tone: "info", linkUrl: "/speakers", linkLabel: "Meet the speakers", pinned: true },
-  { title: "Sample announcement: hackathon themes published", body: "One hackathon, three themes: teams can explore healthcare, scientific discovery and entrepreneurship.", tone: "success", linkUrl: "/hackathon", linkLabel: "Hackathon details" },
+  { title: "Sample announcement: the hackathon question is out", body: "One hackathon, one track, one question: every team answers the same question, with ideas from any field.", tone: "success", linkUrl: "/hackathon#challenge", linkLabel: "Read the question" },
 ];
 
 /* ------------------------------------------------------------- Helpers -- */

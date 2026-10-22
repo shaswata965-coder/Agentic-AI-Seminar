@@ -153,7 +153,7 @@ export function RegistrationForm({ calendar, shareUrl, eventName }: { calendar: 
             <fieldset>
               <legend className="text-sm font-semibold text-fg">Which themes interest you most?</legend>
               <div className="mt-2 grid gap-3 sm:grid-cols-3">
-                {(["healthcare", "science", "entrepreneurship"] as const).map((t) => {
+                {(["healthcare", "science", "enterprise"] as const).map((t) => {
                   const list = (values.interests as string[]) ?? [];
                   return (
                     <CheckboxField

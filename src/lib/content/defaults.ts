@@ -13,7 +13,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   ...SECTION_ORDER_DEFAULTS,
   eventName: "Agentic AI Workshop 2026",
   shortName: "AAIW 2026",
-  tagline: "Where autonomous AI agents meet healthcare, science and entrepreneurship.",
+  tagline: "Where autonomous AI agents meet healthcare, science and enterprise.",
   description:
     "A two-day workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a hackathon. 15–16 December 2026.",
   organisedBy: "Indian Institute of Technology Delhi and Yardi School of Artificial Intelligence (ScAI), IIT Delhi",
@@ -39,6 +39,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   hackathonPlatform: "",
 
   showLoader: true,
+  showHeroPhoto: true,
+  heroPhoto: "",
   highlights: [
     { label: "Speakers", value: "TBA", icon: "mic" },
     { label: "Tutorials", value: "TBA", icon: "graduation" },
@@ -46,21 +48,20 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { label: "Industry kiosks", value: "TBA", icon: "store" },
     { label: "Prize pool", value: "TBA", icon: "trophy" },
   ],
-  showCountdown: true,
   featuredSpeakers: 8,
 
   motivation:
-    "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
+    "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **enterprise**.",
   agenticAI:
     "Agentic AI refers to systems that pursue goals with a degree of autonomy. Instead of producing a single response, an agent **perceives** its environment, **reasons** about what to do, **plans** a sequence of steps, **acts** using tools, APIs or other agents, and **reflects** on the outcome to improve. Large language models often act as the reasoning engine, combined with memory, tool use and human oversight.",
   aboutPoints: [
     { title: "Why now", icon: "rocket", description: "AI is moving from answering questions to taking actions: big opportunities, and hard questions about reliability, safety and accountability." },
     { title: "Agentic AI", icon: "sparkles", description: "Systems that pursue goals with a degree of autonomy, using tools, other agents and human oversight to get things done." },
     { title: "The agent loop", icon: "code", description: "Perceive, reason, plan, act, reflect: the cycle an agent repeats, often with a large language model as its engine." },
-    { title: "Three themes", icon: "heart", description: "Healthcare, scientific discovery and entrepreneurship: where agents can create real impact." },
+    { title: "Three themes", icon: "heart", description: "Healthcare, scientific discovery and enterprise: where agents can create real impact." },
     { title: "Who it is for", icon: "users", description: "Researchers, students, industry practitioners, founders and investors." },
     { title: "Two full days", icon: "calendar", description: "{dates}: invited talks, panel discussions, hands-on tutorials, live demos and industry kiosks." },
-    { title: "Hackathon", icon: "trophy", description: "Teams build agents for health, science or startups, with the finals live at the workshop." },
+    { title: "Hackathon", icon: "trophy", description: "One track and one question for every team, with the finals live at the workshop." },
   ],
   audience: [
     { title: "Researchers & faculty", icon: "landmark", description: "Share and discover the latest advances in agents, planning and multi-agent systems." },
@@ -75,7 +76,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     { title: "Tutorials", icon: "graduation", description: "Hands-on sessions on building and evaluating agents." },
     { title: "Live demos", icon: "monitor", description: "Agents in action, from research labs and companies." },
     { title: "Industry kiosks", icon: "store", description: "Meet companies showcasing agentic technology." },
-    { title: "Hackathon", icon: "trophy", description: "Build agents for health, science and startups, with the finals at the workshop." },
+    { title: "Hackathon", icon: "trophy", description: "One hackathon, one track, one question, with the finals at the workshop." },
   ],
   themes: [
     {
@@ -91,8 +92,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
         "AI scientists that read the literature, generate hypotheses, design and run experiments and analyse results, closing the loop from idea to insight.",
     },
     {
-      key: "entrepreneurship",
-      title: "Agentic AI and Entrepreneurship",
+      key: "enterprise",
+      title: "Agentic AI and Enterprise",
       description:
         "From prototype to product: building, funding and scaling agentic AI ventures, and the new business models that agents make possible.",
     },
@@ -152,7 +153,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     {
       name: "Title partner",
       price: "On request",
-      perks: ["Prominent branding across the venue and website", "Speaking slot in the opening session", "Premium kiosk space", "Hackathon theme sponsorship"],
+      perks: ["Prominent branding across the venue and website", "Speaking slot in the opening session", "Premium kiosk space", "Hackathon sponsorship"],
     },
     {
       name: "Platinum",
@@ -201,15 +202,15 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     "hackathon",
     "AI in healthcare",
     "AI for science",
-    "AI entrepreneurship",
+    "AI in enterprise",
   ],
 };
 
 export const DEFAULT_HACKATHON: HackathonInfo = {
   title: "Agentic AI Hackathon 2026",
-  tagline: "Build agents that matter for health, science and startups.",
+  tagline: "One track, one question: build the agent that answers it.",
   overview:
-    "One hackathon, three themes: teams design and build agentic AI systems that tackle real problems in healthcare, scientific discovery or entrepreneurship. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
+    "One hackathon, one track, one question: every team designs and builds an agentic AI system that answers the same question, with one timeline, one set of rules and one prize pool. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
   mode: "To be announced (on-site / hybrid)",
   teamSize: "To be announced",
   teamType: "Students, researchers and early-career professionals; teams may mix institutions",
@@ -222,37 +223,13 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
     "Each participant can be part of only one team.",
   ],
   registrationNote: "Registration is per team: one member registers on behalf of the whole team.",
-  tracks: [
-    {
-      theme: "healthcare",
-      title: "Agents for Healthcare",
-      description: "Build agents that help patients, clinicians or health systems, safely and responsibly.",
-      problems: [
-        "A triage assistant that gathers symptoms and routes patients to the right care",
-        "An agent that summarises patient records for busy clinicians",
-        "A companion agent that supports medication adherence",
-      ],
-    },
-    {
-      theme: "science",
-      title: "Agents for Scientific Discovery",
-      description: "Agents that accelerate the research loop, from literature to experiment to insight.",
-      problems: [
-        "A literature agent that maps a field and proposes testable hypotheses",
-        "A lab-assistant agent that plans experiments and analyses the data",
-        "An agent that reproduces the key result of a published paper",
-      ],
-    },
-    {
-      theme: "entrepreneurship",
-      title: "Agents for Startups & Enterprise",
-      description: "Agentic products that create real value for businesses and their users.",
-      problems: [
-        "An operations agent that automates a real business workflow end to end",
-        "A customer-support agent with tool use and human escalation",
-        "A market-research agent that helps founders validate an idea",
-      ],
-    },
+  question: "What can agents do for us?",
+  challenge:
+    "Pick a real task, from any field, and build an agent that plans, uses tools and acts on it, safely and with people in the loop. The full problem statement is published when registration opens.",
+  ideas: [
+    "Hand a slow, multi-step task that people do by hand today to an agent, with a person signing off",
+    "Build an agent that plans, uses real tools and APIs, and explains each step it takes",
+    "Make agents work together: split a job, check each other's work and report back",
   ],
   rules: [
     "Build during the hackathon; existing open-source libraries, models and APIs are allowed with attribution.",
@@ -275,10 +252,10 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
     { place: "Winner", reward: "TBA", description: "" },
     { place: "Runner-up", reward: "TBA", description: "" },
     { place: "Second runner-up", reward: "TBA", description: "" },
-    { place: "Best agent in each theme", reward: "TBA", description: "" },
+    { place: "Special mention", reward: "TBA", description: "" },
   ],
   judgingCriteria: [
-    { name: "Impact & relevance", weight: 25, description: "Does it address a real problem in one of the themes?" },
+    { name: "Impact & relevance", weight: 25, description: "Does it answer the question for a real problem and real people?" },
     { name: "Agentic design & technical depth", weight: 25, description: "Planning, tool use, memory and robustness of the agent." },
     { name: "Innovation", weight: 20, description: "Novelty of the idea and the approach." },
     { name: "Demo & user experience", weight: 20, description: "A working demo that is clear and usable." },
@@ -330,7 +307,105 @@ const RETIRED_ABOUT_POINTS = [
   "What is agentic AI?|When and where?|Why now?|Which themes?|Who is speaking?|Can I get hands-on?|Is there a hackathon?|Industry presence?|Who should come?|Who organises it?",
 ];
 
-export function withCurrentAboutPoints<T extends { aboutPoints?: { title: string }[] }>(settings: T): T {
+function withCurrentAboutPoints<T extends { aboutPoints?: { title: string }[] }>(settings: T): T {
   const titles = settings.aboutPoints?.map((p) => p.title).join("|");
   return titles && RETIRED_ABOUT_POINTS.includes(titles) ? { ...settings, aboutPoints: DEFAULT_SETTINGS.aboutPoints } : settings;
+}
+
+/*
+ * Earlier defaults. A site stores the defaults of its day when it is set up, so these are still in the
+ * databases of sites set up before the defaults changed (the third theme was Entrepreneurship, now
+ * Enterprise; the hackathon had a track per theme, now one track and one question; the home page
+ * opened with the highlights and announcements). As they are read, a stored value that is still one of
+ * these, never edited, becomes the current default; anything an organiser has changed is kept. The
+ * database itself is not changed.
+ */
+interface Retired {
+  /** By field, or "section.text" for a section's texts: earlier defaults, each replaced by the current default there. */
+  values: Record<string, unknown[]>;
+  /** By list: earlier default texts inside its items (or the list's own strings), each with the text that replaces it. */
+  texts: Record<string, Record<string, string>>;
+}
+
+const RETIRED: { settings: Retired; hackathon: Retired } = {
+  settings: {
+    values: {
+      tagline: ["Where autonomous AI agents meet healthcare, science and entrepreneurship."],
+      motivation: [
+        "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
+      ],
+      homeOrder: [["highlights", "news", "themes", "about", "speakers", "hackathon", "venue", "partners", "faq"]],
+      "siteNav.hackathonText": ["One hackathon on three themes, with team registration"],
+      "siteNav.themesText": ["Healthcare, scientific discovery and entrepreneurship"],
+      "homeThemes.description": ["Talks, tutorials and the hackathon are organised around three themes."],
+      "hackathonTracks.eyebrow": ["Themes"],
+      "hackathonTracks.title": ["One hackathon, three themes"],
+      "hackathonTracks.description": [
+        "Every team takes part in the same hackathon, with one timeline, one set of rules and one prize pool. Pick the theme your idea fits; the problems below are examples to get you thinking.",
+      ],
+      "hackathonTracks.frame": ["One hackathon · {count} themes"],
+      "hackathonPrizes.intro": ["Prizes for the top three teams, and awards for the best agent in each theme."],
+      "hackathonRegisterForm.need1": ["A team name and a theme"],
+      "hackathonRegisterForm.tracksLink": ["Not sure which theme? See the themes"],
+      "hackathonRegisterForm.soonText": [
+        "Start forming your team! When registration opens you will need a team name, the theme you'll work on, member details and a short idea summary.",
+      ],
+    },
+    texts: {
+      themes: { entrepreneurship: "enterprise", "Agentic AI and Entrepreneurship": "Agentic AI and Enterprise" },
+      aboutPoints: {
+        "Healthcare, scientific discovery and entrepreneurship: where agents can create real impact.": "Healthcare, scientific discovery and enterprise: where agents can create real impact.",
+        "Teams build agents for health, science or startups, with the finals live at the workshop.": "One track and one question for every team, with the finals live at the workshop.",
+      },
+      activities: { "Build agents for health, science and startups, with the finals at the workshop.": "One hackathon, one track, one question, with the finals at the workshop." },
+      sponsorTiers: { "Hackathon theme sponsorship": "Hackathon sponsorship" },
+      keywords: { "AI entrepreneurship": "AI in enterprise" },
+    },
+  },
+  hackathon: {
+    values: {
+      tagline: ["Build agents that matter for health, science and startups."],
+      overview: [
+        "One hackathon, three themes: teams design and build agentic AI systems that tackle real problems in healthcare, scientific discovery or entrepreneurship. After the idea round, shortlisted teams compete in the **final round live at the workshop** at IIT Delhi on 15–16 December 2026.",
+      ],
+    },
+    texts: {
+      prizes: { "Best agent in each theme": "Special mention" },
+      judgingCriteria: { "Does it address a real problem in one of the themes?": "Does it answer the question for a real problem and real people?" },
+    },
+  },
+};
+
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+
+function withoutRetired<T extends object>(data: T, defaults: T, { values, texts }: Retired): T {
+  const out = { ...data } as Record<string, unknown>;
+  const def = defaults as Record<string, unknown>;
+  for (const [path, was] of Object.entries(values)) {
+    const [key, name] = path.split(".");
+    const group = out[key] as Record<string, unknown> | undefined;
+    if (name === undefined) {
+      if (was.some((w) => same(w, out[key]))) out[key] = def[key];
+    } else if (group && typeof group === "object" && was.some((w) => same(w, group[name]))) {
+      out[key] = { ...group, [name]: (def[key] as Record<string, unknown>)[name] };
+    }
+  }
+  for (const [key, swaps] of Object.entries(texts)) {
+    const swap = (v: unknown): unknown =>
+      typeof v === "string"
+        ? (Object.hasOwn(swaps, v) ? swaps[v] : v)
+        : Array.isArray(v)
+          ? v.map(swap)
+          : v && typeof v === "object"
+            ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, swap(x)]))
+            : v;
+    if (Array.isArray(out[key])) out[key] = swap(out[key]);
+  }
+  return out as T;
+}
+
+/** Stored settings or hackathon details (merged over the defaults) with any earlier, unedited default replaced by the current one. */
+export function withCurrentDefaults<T extends object>(key: "settings" | "hackathon", data: T): T {
+  if (key === "hackathon") return withoutRetired(data, DEFAULT_HACKATHON as T, RETIRED.hackathon);
+  return withoutRetired(withCurrentAboutPoints(data as T & { aboutPoints?: { title: string }[] }), DEFAULT_SETTINGS as T, RETIRED.settings);
 }

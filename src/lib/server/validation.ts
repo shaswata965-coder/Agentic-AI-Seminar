@@ -1,6 +1,6 @@
 import "server-only";
 import { z } from "zod";
-import { ATTENDEE_CATEGORIES, ENQUIRY_TYPES } from "@/lib/content/constants";
+import { ATTENDEE_CATEGORIES, currentThemeKey, ENQUIRY_TYPES } from "@/lib/content/constants";
 import { cleanLine, cleanText } from "@/lib/safe-text";
 
 /*
@@ -36,7 +36,8 @@ export const registrationSchema = z.object({
   category: z.enum(ATTENDEE_CATEGORIES, { message: "Please choose a category." }),
   city: line(80).optional().default(""),
   country: line(80).optional().default("India"),
-  interests: z.array(z.enum(["healthcare", "science", "entrepreneurship"])).max(3).optional().default([]),
+  // A theme's earlier key (from a page opened before it was renamed) counts as its current one.
+  interests: z.array(z.string(TYPE).transform(currentThemeKey).pipe(z.enum(["healthcare", "science", "enterprise"]))).max(3).optional().default([]),
   tutorials: z.boolean(TYPE).optional().default(false),
   hackathonInterest: z.boolean(TYPE).optional().default(false),
   dietary: line(40).optional().default(""),
@@ -56,7 +57,6 @@ const member = z.object({
 
 export const hackathonSchema = z.object({
   teamName: z.string(TYPE).overwrite(cleanLine).trim().min(2, "Please choose a team name.").max(60, "Team name is too long."),
-  track: z.string(TYPE).trim().max(40).regex(/^[a-z0-9-]*$/, "Please choose a theme."),
   members: z
     .array(member)
     .min(1, "Add at least the team lead.")

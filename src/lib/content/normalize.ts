@@ -1,3 +1,4 @@
+import { currentThemeKey } from "@/lib/content/constants";
 import type { FieldDef } from "@/lib/schema/fields";
 
 /** Mongo document → plain JSON object with `id` instead of `_id`. */
@@ -33,12 +34,16 @@ export function emptyValue(f: FieldDef): unknown {
   }
 }
 
-/** Fill in missing fields so rendering code can rely on every key existing. */
+/**
+ * Fill in missing fields so rendering code can rely on every key existing. A choice stored under a theme's
+ * earlier key ("entrepreneurship") is read as its current one ("enterprise"), so it still matches an option.
+ */
 export function fillDefaults<T>(fields: FieldDef[], obj: Record<string, unknown>): T {
   const out: Record<string, unknown> = { ...obj };
   for (const f of fields) {
     if (out[f.name] === undefined || out[f.name] === null) out[f.name] = emptyValue(f);
     if (f.type === "ref" && out[f.name] === null) out[f.name] = "";
+    if (f.type === "select" && typeof out[f.name] === "string") out[f.name] = currentThemeKey(out[f.name] as string);
   }
   return out as T;
 }

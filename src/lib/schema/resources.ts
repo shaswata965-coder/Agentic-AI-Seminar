@@ -536,7 +536,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
           text("tagline", "Tagline"),
           textarea("description", "Short description", { help: "Used for search engines and social media previews.", maxLength: 300 }),
           text("organisedBy", "Organised by"),
-          datetime("startDate", "Starts", { required: true, width: "half", help: "Indian Standard Time. The countdown counts down to this." }),
+          datetime("startDate", "Starts", { required: true, width: "half", help: "Indian Standard Time. The programme's days and calendar invites follow it." }),
           datetime("endDate", "Ends", { required: true, width: "half" }),
           text("venueName", "Venue", { width: "half" }),
           text("venueHall", "Hall / building", { width: "half", help: "Leave blank to show “to be announced”." }),
@@ -635,7 +635,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         description:
           "The first time someone opens the home page (and after the site is updated), the pages, scripts, styles and images are fetched and cached behind a loading screen, so the rest of the visit is quick. Aura's ship tries to take off as small Auras work on it and the ring around the window fills; once everything is cached she lifts off and the smoke clears to show the page. Visitors who ask for reduced motion get the caching without the screen. It isn't shown in this preview: open the home page in a private window to see it.",
       }),
-      section("hero", "Hero", "homeHero", [bool("showCountdown", "Show the countdown timer")], {
+      section("hero", "Hero", "homeHero", [
+        bool("showHeroPhoto", "Show the photo of the IIT Delhi building behind the hero"),
+        image("heroPhoto", "Hero photo", { help: "A landscape photo (16:9 works best). It sits at the top right and fades into the background towards the title. Leave it empty for the built-in photo of the IIT Delhi main building." }),
+      ], {
         description: "The event name, tagline, dates and venue come from Site-wide → Event details.",
       }),
       section("placard", "Hero announcements", "homePlacard", [], {
@@ -672,7 +675,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         num("featuredSpeakers", "Featured speakers on the home page", { min: 0, max: 12, width: "half" }),
         bool("showMoreSpeakers", "Show the “More speakers to be announced” card"),
       ], { description: "Speakers are added under Speakers; tick “Feature on the home page” to show them here." }),
-      section("hackathon", "Hackathon", "homeHackathon", [], { description: "The hackathon's title, tagline, themes, team size, mode and prize pool are edited under Hackathon." }),
+      section("hackathon", "Hackathon", "homeHackathon", [], { description: "The hackathon's title, tagline, question, team size, mode and prize pool are edited under Hackathon." }),
       section("venue", "Venue & travel", "homeVenue", [], { description: "The routes on the map are edited in the Venue tab → Getting here." }),
       section("partners", "Partners", "homePartners", [], { description: "The logos come from Partners & sponsors." }),
       section("faq", "FAQ & contact", "homeFaq", [], { description: "Questions are added under FAQs; the e-mail and phone under Site-wide → Contact & social." }),
@@ -717,7 +720,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         textarea("programmeNote", "Note above the schedule"),
       ], { description: "Sessions are added under Programme." }),
       section("kiosks", "Industry kiosks", "programmeKiosks", [textarea("kioskIntro", "Introduction")], { description: "Kiosks are added under Industry kiosks." }),
-      section("hackathon", "Hackathon", "programmeHackathon", [], { description: "The title, tagline, themes and dates come from the Hackathon page in the menu." }),
+      section("hackathon", "Hackathon", "programmeHackathon", [], { description: "The title, tagline, question and dates come from the Hackathon page in the menu." }),
       section("plan", "Plan your visit", "programmePlan"),
     ],
   },
@@ -737,7 +740,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     key: "hackathon",
     title: "Hackathon",
     path: "/hackathon",
-    description: "Headings, labels and colours of the Hackathon page, team registration included. Its title, themes, rules, timeline, prizes and results are edited under Hackathon in the menu.",
+    description: "Headings, labels and colours of the Hackathon page, team registration included. Its title, question, rules, timeline, prizes and results are edited under Hackathon in the menu.",
     sections: [
       section("hero", "Hero", "hackathonHero"),
       section("overview", "At a glance", "hackathonOverview", [], { description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview." }),
@@ -749,7 +752,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("register", "Registration form", "hackathonRegisterForm", [], {
         description: "Whether registration is open, its deadline and an external platform link are set under Site-wide → Registration.",
       }),
-      section("tracks", "Themes", "hackathonTracks", [], { description: "The three themes of the one hackathon. They are edited under Hackathon → Themes." }),
+      section("tracks", "The challenge", "hackathonTracks", [], { description: "The hackathon's one track and one question, with the ideas under it. The question itself is edited under Hackathon → The question." }),
       section("judging", "Judging", "hackathonJudging"),
       section("people", "Mentors & judges", "hackathonPeople", [], { description: "Mentors and judges are added under Organisers & volunteers." }),
       section("rules", "Rules & FAQ", "hackathonRules"),
@@ -852,14 +855,14 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     key: "gallery",
     title: "Photo gallery",
     path: "/gallery",
-    description: "Shown once “Post-event: show the photo gallery” is on (Site-wide → Features). Photos are added under Photo gallery.",
+    description: "Shown once “Post-event: show the photo gallery” is on (Site-wide → Features); the preview here shows it before that. Photos are added under Photo gallery.",
     sections: [section("hero", "Page", "galleryHero")],
   },
   {
     key: "talks",
     title: "Slides & recordings",
     path: "/talks",
-    description: "Shown once “Post-event: show talk slides & recordings” is on (Site-wide → Features). Talks are added under Slides & recordings.",
+    description: "Shown once “Post-event: show talk slides & recordings” is on (Site-wide → Features); the preview here shows it before that. Talks are added under Slides & recordings.",
     sections: [section("hero", "Page", "talksHero")],
   },
   {
@@ -924,16 +927,13 @@ export const HACKATHON_DEF: SingletonDef = {
       ],
     },
     {
-      key: "tracks",
-      title: "Themes",
-      description: "One hackathon with three themes: every team takes part in the same hackathon and picks the theme its idea fits.",
+      key: "challenge",
+      title: "The question",
+      description: "One hackathon, one track, one question: every team answers the same question, so there are no themes or tracks to pick from. (The three themes are the workshop's, for its talks and tutorials.)",
       fields: [
-        objects("tracks", "Themes", "Theme", [
-          select("theme", "Theme", themeOptions, { width: "half" }),
-          text("title", "Title", { required: true, width: "half" }),
-          textarea("description", "Description"),
-          list("problems", "Example problem statements", { itemLabel: "Problem" }),
-        ], { titleKey: "title" }),
+        text("question", "The question", { required: true, maxLength: 160, help: "The one question every team answers, in a line. It is shown large on the Hackathon page and on the home page." }),
+        richtext("challenge", "The challenge", { help: "What answering the question involves, in a few lines." }),
+        list("ideas", "Ideas to get teams thinking", { itemLabel: "Idea", help: "Example directions, not separate tracks. Leave empty to show none." }),
       ],
     },
     {

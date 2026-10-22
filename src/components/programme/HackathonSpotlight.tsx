@@ -1,6 +1,6 @@
 import { CalendarClock, Clock, Trophy, Users } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
-import { ThemePoints } from "@/components/hackathon/ThemePoints";
+import { OneQuestion } from "@/components/hackathon/OneQuestion";
 import { TrophyArt } from "@/components/portals/PortalArt";
 import { ButtonLink } from "@/components/ui/Button";
 import { Portal } from "@/components/ui/Portal";
@@ -10,7 +10,7 @@ import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
 import { eventDayLabel, timeRange } from "@/lib/format";
 
-/** The hackathon on the programme page: the pitch, its three themes and facts, when it sits in the schedule and its key dates. */
+/** The hackathon on the programme page: the pitch, its one question and facts, when it sits in the schedule and its key dates. */
 export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: HackathonInfo; sessions: Session[] }) {
   const c = copy(s, "programmeHackathon");
   const facts = [
@@ -35,7 +35,7 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
                 {h.title}
               </h2>
               <p className="mt-4 max-w-xl text-lg text-muted">{h.tagline}</p>
-              <ThemePoints tracks={h.tracks} label={c.themes} className="mt-6" />
+              <OneQuestion question={h.question} ones={[c.one1, c.one2, c.one3]} label={c.questionLabel} link={c.questionLink} className="mt-6 max-w-xl" />
               <dl className="mt-7 grid gap-3 sm:grid-cols-3">
                 {facts.map(({ Icon, label, value }) => (
                   <div key={label} className="rounded-2xl bg-surface/80 p-4 ring-1 ring-border backdrop-blur">

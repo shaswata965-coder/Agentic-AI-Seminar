@@ -2,8 +2,12 @@ import type { AuraVariant } from "@/components/aura/types";
 
 export type Tone = "azure" | "lilac" | "mint" | "peach" | "blush" | "butter" | "aqua";
 
-export const THEME_KEYS = ["healthcare", "science", "entrepreneurship", "general"] as const;
+export const THEME_KEYS = ["healthcare", "science", "enterprise", "general"] as const;
 export type ThemeKey = (typeof THEME_KEYS)[number];
+
+/** Theme keys of earlier versions of the site, still found in stored content: read as their current keys. */
+const RENAMED_THEMES: Record<string, ThemeKey> = { entrepreneurship: "enterprise" };
+export const currentThemeKey = (key: string): string => (Object.hasOwn(RENAMED_THEMES, key) ? RENAMED_THEMES[key] : key);
 
 export const THEME_META: Record<
   ThemeKey,
@@ -11,7 +15,7 @@ export const THEME_META: Record<
 > = {
   healthcare: { label: "Agentic AI in Healthcare", short: "Healthcare", tone: "blush", aura: "healthcare", icon: "heart" },
   science: { label: "Agentic AI for Scientific Discovery", short: "Scientific Discovery", tone: "lilac", aura: "science", icon: "atom" },
-  entrepreneurship: { label: "Agentic AI and Entrepreneurship", short: "Entrepreneurship", tone: "peach", aura: "entrepreneurship", icon: "rocket" },
+  enterprise: { label: "Agentic AI and Enterprise", short: "Enterprise", tone: "peach", aura: "enterprise", icon: "rocket" },
   general: { label: "Cross-cutting", short: "General", tone: "azure", aura: "guide", icon: "spark" },
 };
 

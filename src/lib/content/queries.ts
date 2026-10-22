@@ -4,7 +4,7 @@ import { connectDb, isDbConfigured, once } from "@/lib/db";
 import { getCollectionModel, Singleton } from "@/lib/models";
 import { COLLECTION_MAP } from "@/lib/schema/resources";
 import { ensureDefaultContent } from "./bootstrap";
-import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS, withCurrentAboutPoints } from "./defaults";
+import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS, withCurrentDefaults } from "./defaults";
 import { fillDefaults, mergeDefaults, stripEmDashes, toPlain } from "./normalize";
 import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from "./types";
 
@@ -13,7 +13,8 @@ import type { CollectionKey, CollectionTypes, HackathonInfo, SiteSettings } from
  * `use cache` and tagged; saving in the admin expires the tag immediately.
  * If the database is not configured or unreachable, defaults are returned
  * with a short cache life so real content replaces them as soon as possible.
- * Stored text is passed through `stripEmDashes`: the site shows no em dashes.
+ * Stored text is passed through `stripEmDashes`: the site shows no em dashes. Settings and hackathon details
+ * still holding an earlier default get the current one (`withCurrentDefaults`).
  */
 
 /** Added to every cached query, so "Refresh website" can expire everything at once. */
@@ -46,6 +47,14 @@ export async function getSettings(): Promise<SiteSettings> {
   return readSettings(preview);
 }
 
+/** Whether this is the admin's live preview (Draft Mode), which shows pages hidden from visitors so their texts can be edited. */
+export async function inPreview(): Promise<boolean> {
+  "use cache";
+  cacheTag("settings", CONTENT_TAG);
+  // Like getSettings: cached as false for visitors, run on every request in Draft Mode.
+  return (await draftMode()).isEnabled;
+}
+
 /**
  * The saved settings, never the preview draft: for the API routes that act on
  * them (registration status and deadlines, where notifications go), so a
@@ -70,7 +79,7 @@ async function readSettings(preview: boolean): Promise<SiteSettings> {
     return DEFAULT_SETTINGS;
   }
   cacheLife("cms");
-  return stripEmDashes(withCurrentAboutPoints(mergeDefaults(DEFAULT_SETTINGS, toPlain<{ data?: unknown }>(res.data ?? {}).data)));
+  return stripEmDashes(withCurrentDefaults("settings", mergeDefaults(DEFAULT_SETTINGS, toPlain<{ data?: unknown }>(res.data ?? {}).data)));
 }
 
 export async function getHackathon(): Promise<HackathonInfo> {
@@ -82,7 +91,7 @@ export async function getHackathon(): Promise<HackathonInfo> {
     return DEFAULT_HACKATHON;
   }
   cacheLife("cms");
-  return stripEmDashes(mergeDefaults(DEFAULT_HACKATHON, toPlain<{ data?: unknown }>(res.data ?? {}).data));
+  return stripEmDashes(withCurrentDefaults("hackathon", mergeDefaults(DEFAULT_HACKATHON, toPlain<{ data?: unknown }>(res.data ?? {}).data)));
 }
 
 const FALLBACKS: Partial<Record<CollectionKey, object[]>> = {

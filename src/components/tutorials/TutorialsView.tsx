@@ -10,7 +10,7 @@ import { RichText } from "@/components/ui/RichText";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { cn } from "@/lib/cn";
 import { replaceQuery, useUrlParam } from "@/lib/client-hooks";
-import { LEVEL_META, THEME_KEYS, THEME_META, type ThemeKey } from "@/lib/content/constants";
+import { currentThemeKey, LEVEL_META, THEME_KEYS, THEME_META, type ThemeKey } from "@/lib/content/constants";
 import type { Demo, Tutorial } from "@/lib/content/types";
 
 function prereqIcon(text: string) {
@@ -27,7 +27,8 @@ function materialIcon(url: string, label: string) {
 }
 
 export function TutorialsView({ tutorials, demos }: { tutorials: Tutorial[]; demos: Demo[] }) {
-  const urlTheme = useUrlParam("theme");
+  // An old link's earlier theme key ("entrepreneurship") filters by the current one.
+  const urlTheme = currentThemeKey(useUrlParam("theme") ?? "");
   const [choice, setTheme] = useState<ThemeKey | "all" | null>(null);
   const theme = choice ?? (urlTheme && (THEME_KEYS as readonly string[]).includes(urlTheme) ? (urlTheme as ThemeKey) : "all");
   const choose = (t: ThemeKey | "all") => {

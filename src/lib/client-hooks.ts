@@ -14,6 +14,41 @@ export function useMounted() {
   return useSyncExternalStore(noopSubscribe, () => true, () => false);
 }
 
+// A shared 1-second clock. The server snapshot is null so nothing renders a
+// server time (no hydration mismatch, no prerender clock access).
+let now = 0;
+const clockListeners = new Set<() => void>();
+let clock: ReturnType<typeof setInterval> | undefined;
+function subscribeClock(cb: () => void) {
+  clockListeners.add(cb);
+  if (!clock) {
+    now = Date.now();
+    clock = setInterval(() => {
+      now = Date.now();
+      clockListeners.forEach((l) => l());
+    }, 1000);
+  }
+  return () => {
+    clockListeners.delete(cb);
+    if (!clockListeners.size && clock) {
+      clearInterval(clock);
+      clock = undefined;
+    }
+  };
+}
+
+/** The time now, in milliseconds, ticking every second; null on the server and while hydrating. */
+export function useNow(): number | null {
+  return useSyncExternalStore(
+    subscribeClock,
+    () => {
+      if (!now) now = Date.now();
+      return now;
+    },
+    () => null,
+  );
+}
+
 /** A query-string parameter as it was when the page loaded. */
 export function useUrlParam(name: string): string | null {
   return useSyncExternalStore(

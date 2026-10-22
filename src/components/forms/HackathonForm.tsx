@@ -7,12 +7,12 @@ import type { AuraVariant } from "@/components/aura/types";
 import { Confetti } from "@/components/effects/Confetti";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
-import { CheckboxField, Honeypot, SelectField, TextAreaField, TextField } from "./fields";
+import { CheckboxField, Honeypot, TextAreaField, TextField } from "./fields";
 import { Stepper } from "./Stepper";
 import { postJson } from "./submit";
 
 const STEPS = ["Team", "Members", "Idea"];
-const STEP_AURA: AuraVariant[] = ["hackathon", "organisers", "entrepreneurship"];
+const STEP_AURA: AuraVariant[] = ["hackathon", "organisers", "answer"];
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const MAX_MEMBERS = 6;
 
@@ -25,10 +25,11 @@ interface Member {
 }
 const blank = (): Member => ({ name: "", email: "", phone: "", organisation: "", role: "" });
 
-export function HackathonForm({ tracks }: { tracks: { value: string; label: string }[] }) {
+/** Team registration in three steps. There is one track, so a team only names itself: every team answers `question` (after `questionNote`). */
+export function HackathonForm({ question, questionNote }: { question: string; questionNote: string }) {
   const toast = useToast();
   const [step, setStep] = useState(0);
-  const [team, setTeam] = useState({ teamName: "", track: "" });
+  const [team, setTeam] = useState({ teamName: "" });
   const [members, setMembers] = useState<Member[]>([blank(), blank()]);
   const [idea, setIdea] = useState({ ideaTitle: "", ideaSummary: "", githubUrl: "", consent: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -42,7 +43,6 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
     const e: Record<string, string> = {};
     if (i === 0) {
       if (team.teamName.trim().length < 2) e.teamName = "Please choose a team name.";
-      if (!team.track) e.track = "Please pick a theme (you can choose “Undecided”).";
     }
     if (i === 1) {
       members.forEach((m, j) => {
@@ -130,9 +130,13 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
       <form onSubmit={onSubmit} noValidate className="relative grid gap-5 p-5 sm:p-8">
         <Honeypot />
         {step === 0 ? (
-          <div className="grid animate-fade-up gap-5 sm:grid-cols-2">
+          <div className="grid animate-fade-up gap-5">
             <TextField label="Team name" required value={team.teamName} onChange={(e) => setTeam({ ...team, teamName: e.target.value })} error={errors.teamName} maxLength={60} />
-            <SelectField label="Theme" required placeholder="Choose a theme" value={team.track} onChange={(e) => setTeam({ ...team, track: e.target.value })} error={errors.track} options={[...tracks, { value: "undecided", label: "Undecided, we'll pick later" }]} />
+            {question ? (
+              <p className="rounded-2xl bg-accent-soft p-4 text-sm text-muted">
+                {questionNote} <strong className="font-display text-base font-bold text-fg">“{question}”</strong>
+              </p>
+            ) : null}
           </div>
         ) : null}
 
@@ -171,7 +175,7 @@ export function HackathonForm({ tracks }: { tracks: { value: string; label: stri
         {step === 2 ? (
           <div className="grid animate-fade-up gap-5">
             <TextField label="Idea title" value={idea.ideaTitle} onChange={(e) => setIdea({ ...idea, ideaTitle: e.target.value })} maxLength={120} />
-            <TextAreaField label="Idea summary" rows={5} value={idea.ideaSummary} onChange={(e) => setIdea({ ...idea, ideaSummary: e.target.value })} hint="A few lines on the problem and your agent. You can refine it at the idea-submission stage." maxLength={1500} />
+            <TextAreaField label="Idea summary" rows={5} value={idea.ideaSummary} onChange={(e) => setIdea({ ...idea, ideaSummary: e.target.value })} hint="A few lines on how your agent answers the question. You can refine it at the idea-submission stage." maxLength={1500} />
             <TextField label="GitHub / project link" type="url" value={idea.githubUrl} onChange={(e) => setIdea({ ...idea, githubUrl: e.target.value })} error={errors.githubUrl} placeholder="https://github.com/…" maxLength={300} />
             <CheckboxField
               label="We accept the hackathon rules and code of conduct"

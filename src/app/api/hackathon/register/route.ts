@@ -1,5 +1,4 @@
 import { after, type NextRequest } from "next/server";
-import { THEME_META } from "@/lib/content/constants";
 import { getHackathon, getSavedSettings } from "@/lib/content/queries";
 import { connectDb, isDuplicateKeyError } from "@/lib/db";
 import { deadlinePassed } from "@/lib/event";
@@ -33,9 +32,6 @@ export async function POST(req: NextRequest) {
     return error(422, "Please check the highlighted fields.", { fieldErrors: Object.fromEntries(Object.entries(fe).map(([k, v]) => [k.replace(/^members\.(\d+)/, "members.$1"), v])) });
   }
   const d = parsed.data;
-  if (d.track && d.track !== "undecided" && !h.tracks.some((t) => t.theme === d.track) && !Object.hasOwn(THEME_META, d.track)) {
-    return error(422, "Please check the highlighted fields.", { fieldErrors: { track: "Please choose one of the themes." } });
-  }
   const key = teamKey(d.teamName);
   if (key.length < 2) return error(422, "Please choose a team name with letters or numbers.", { fieldErrors: { teamName: "Invalid team name" } });
 
@@ -50,14 +46,12 @@ export async function POST(req: NextRequest) {
   const clash = await HackathonRegistration.exists({ "members.email": { $in: emails }, status: { $ne: "withdrawn" } });
   if (clash) return error(409, "Someone in this team is already part of a registered team. Each participant can be in only one team: check the e-mail addresses, or contact the organisers.");
 
-  const trackLabel = h.tracks.find((t) => t.theme === d.track)?.title ?? (d.track === "undecided" ? "Undecided" : (Object.hasOwn(THEME_META, d.track) ? THEME_META[d.track as keyof typeof THEME_META].short : d.track));
-
   for (let attempt = 0; attempt < 5; attempt++) {
     const regId = makeRegId("HACK26");
     try {
       const doc = await HackathonRegistration.create({ ...d, teamKey: key, regId, leaderEmail: d.members[0].email });
       after(async () => {
-        const sent = await sendMail(hackathonEmail(s, h, { teamName: d.teamName, regId, leaderName: d.members[0].name, leaderEmail: d.members[0].email, members: d.members, track: trackLabel }));
+        const sent = await sendMail(hackathonEmail(s, h, { teamName: d.teamName, regId, leaderName: d.members[0].name, leaderEmail: d.members[0].email, members: d.members }));
         if (sent) await HackathonRegistration.updateOne({ _id: doc._id }, { emailSent: true });
         const to = notifyAddress(s);
         if (to) {
@@ -65,7 +59,6 @@ export async function POST(req: NextRequest) {
             organiserNotice(s, to, `New hackathon team: ${d.teamName}`, [
               ["Team", d.teamName],
               ["ID", regId],
-              ["Theme", trackLabel],
               ["Lead", `${d.members[0].name} <${d.members[0].email}>`],
               ["Members", String(d.members.length)],
               ["Idea", d.ideaTitle || "-"],

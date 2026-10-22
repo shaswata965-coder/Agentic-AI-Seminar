@@ -1,13 +1,13 @@
 import { ArrowRight, Clock, Trophy, Users } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
-import { ThemePoints } from "@/components/hackathon/ThemePoints";
+import { OneQuestion } from "@/components/hackathon/OneQuestion";
 import { ButtonLink } from "@/components/ui/Button";
 import { Eyebrow } from "@/components/ui/Section";
 import type { HackathonInfo, SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { hackathonRegistrationHref } from "@/lib/event";
 
-/** The hackathon on the home page: its pitch, its three themes and facts, with team registration and a button to the full hackathon page. */
+/** The hackathon on the home page: its pitch, its one question (a single track for every team) and facts, with team registration and a button to the full hackathon page. */
 export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo }) {
   const c = copy(s, "homeHackathon");
   const facts = [
@@ -30,7 +30,7 @@ export function HackathonTeaser({ s, h }: { s: SiteSettings; h: HackathonInfo })
                 {h.title}
               </h2>
               <p className="mt-4 max-w-xl text-lg text-muted">{h.tagline}</p>
-              <ThemePoints tracks={h.tracks} label={c.themes} className="mt-6" />
+              <OneQuestion question={h.question} ones={[c.one1, c.one2, c.one3]} label={c.questionLabel} link={c.questionLink} className="mt-6 max-w-xl" />
               <dl className="mt-7 grid gap-3 sm:grid-cols-3">
                 {facts.map(({ Icon, label, value }) => (
                   <div key={label} className="rounded-2xl bg-surface/80 p-4 ring-1 ring-border backdrop-blur">

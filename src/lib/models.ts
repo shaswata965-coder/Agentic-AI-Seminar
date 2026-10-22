@@ -138,6 +138,7 @@ export interface HackathonRegistrationDoc {
   regId: string;
   teamName: string;
   teamKey: string;
+  /** The theme picked by teams that registered while the hackathon had one track per theme; empty since. */
   track: string;
   members: TeamMember[];
   leaderEmail: string;

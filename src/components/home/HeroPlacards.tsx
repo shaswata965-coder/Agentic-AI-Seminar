@@ -4,10 +4,10 @@ import { Ticket, Trophy } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
+import { useNow } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
 import type { RegistrationStatus, Tone } from "@/lib/content/constants";
 import { deadlinePassed } from "@/lib/event";
-import { useNow } from "./Countdown";
 
 export type PlacardKey = "workshop" | "hackathon";
 

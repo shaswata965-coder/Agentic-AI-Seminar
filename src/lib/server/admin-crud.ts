@@ -1,6 +1,6 @@
 import "server-only";
 import mongoose from "mongoose";
-import { DEFAULT_HACKATHON, DEFAULT_SETTINGS, withCurrentAboutPoints } from "@/lib/content/defaults";
+import { DEFAULT_HACKATHON, DEFAULT_SETTINGS, withCurrentDefaults } from "@/lib/content/defaults";
 import { fillDefaults, mergeDefaults, toPlain } from "@/lib/content/normalize";
 import { connectDb } from "@/lib/db";
 import { slugify } from "@/lib/format";
@@ -111,8 +111,7 @@ export function isSingletonKey(key: string): key is SingletonKey {
 export async function getSingleton(key: SingletonKey) {
   await connectDb();
   const doc = await Singleton.findOne({ key }).lean();
-  const data = mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data);
-  return { data: key === "settings" ? withCurrentAboutPoints(data) : data, updatedAt: doc?.updatedAt ?? null };
+  return { data: withCurrentDefaults(key, mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data)), updatedAt: doc?.updatedAt ?? null };
 }
 
 export async function saveSingleton(key: SingletonKey, input: unknown) {
@@ -122,5 +121,5 @@ export async function saveSingleton(key: SingletonKey, input: unknown) {
   await connectDb();
   const doc = await Singleton.findOneAndUpdate({ key }, { $set: { data: parsed.data } }, { upsert: true, returnDocument: "after" }).lean();
   expireTags(def.tags);
-  return { data: mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data), updatedAt: doc?.updatedAt ?? null };
+  return { data: withCurrentDefaults(key, mergeDefaults(SINGLETON_DEFAULTS[key] as object, doc?.data)), updatedAt: doc?.updatedAt ?? null };
 }

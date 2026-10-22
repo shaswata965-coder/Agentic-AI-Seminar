@@ -46,8 +46,10 @@ export interface SiteSettings extends PageCopy, SectionOrders {
 
   /** Cache the site's files behind a loading screen on the home page (components/loading). */
   showLoader: boolean;
+  /** The photo of the IIT Delhi building behind the home hero: an upload, or empty for the built-in one. */
+  showHeroPhoto: boolean;
+  heroPhoto: string;
   highlights: { label: string; value: string; icon: string }[];
-  showCountdown: boolean;
   featuredSpeakers: number;
 
   motivation: string;
@@ -117,7 +119,12 @@ export interface HackathonInfo {
   prizePool: string;
   eligibility: string[];
   registrationNote: string;
-  tracks: { theme: ThemeKey; title: string; description: string; problems: string[] }[];
+  /** The one question every team answers: the hackathon has a single track (the workshop's themes are for its talks). */
+  question: string;
+  /** What answering it involves, in a few lines. */
+  challenge: string;
+  /** Example directions, to get teams thinking. */
+  ideas: string[];
   rules: string[];
   codeOfConduct: string;
   timeline: { label: string; date: string; dateLabel: string; description: string }[];

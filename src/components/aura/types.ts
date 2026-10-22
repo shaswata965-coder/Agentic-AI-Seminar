@@ -98,7 +98,7 @@ export type AuraVariant =
   | "thinker"
   | "healthcare"
   | "science"
-  | "entrepreneurship"
+  | "enterprise"
   | "programme"
   | "countdown"
   | "speakers"

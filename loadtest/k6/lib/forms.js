@@ -20,7 +20,7 @@ const FIRST = ["Aarav", "Priya", "Rohan", "Ananya", "Vikram", "Meera", "Kabir", 
 const LAST = ["Sharma", "Iyer", "Gupta", "Reddy", "Singh", "Nair", "Banerjee", "Khan", "Das", "Patel", "Menon", "Joshi", "Bhat", "Kaur"];
 const ORGS = ["IIT Delhi", "IIT Bombay", "IIIT Hyderabad", "University of Delhi", "Delhi Technological University", "NSUT", "Jamia Millia Islamia", "IIT Kanpur", "Ashoka University", "AIIMS New Delhi", "A healthcare start-up", "Microsoft Research India", "TCS Research"];
 const CATEGORIES = ["student", "student", "student", "researcher", "faculty", "industry", "startup", "investor", "other"];
-const THEMES = ["healthcare", "science", "entrepreneurship"];
+const THEMES = ["healthcare", "science", "enterprise"];
 const CITIES = ["New Delhi", "Gurugram", "Noida", "Mumbai", "Bengaluru", "Hyderabad", "Kolkata", "Chennai", "Pune"];
 
 const digits = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join("");

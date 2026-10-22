@@ -1,10 +1,12 @@
 import { ArrowDown, ArrowUp, ArrowUpRight, CalendarDays, CircleCheck, ExternalLink, GraduationCap, Laptop, MapPin, ScrollText, ShieldCheck, Trophy, Users } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Aura } from "@/components/aura/Aura";
 import { Deadline } from "@/components/forms/Deadline";
 import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { HackathonForm } from "@/components/forms/HackathonForm";
 import { HackathonPrizes } from "@/components/hackathon/Prizes";
+import { Ones } from "@/components/hackathon/OneQuestion";
 import { HackathonTimeline } from "@/components/hackathon/Timeline";
 import { FaqList } from "@/components/home/FaqList";
 import { InOrder } from "@/components/layout/InOrder";
@@ -29,7 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const h = await getHackathon();
   return {
     title: "Hackathon",
-    description: `${h.title}: ${h.tagline} Who can join, dates, location, prize money, timeline and team registration.`,
+    description: `${h.title}: ${h.tagline} The question, who can join, dates, location, prize money, timeline and team registration.`,
     alternates: { canonical: absoluteUrl("/hackathon") },
   };
 }
@@ -41,13 +43,12 @@ export default async function HackathonPage() {
   const mentors = people.filter((p) => p.group === "mentor");
   const judges = people.filter((p) => p.group === "judge");
   const hackFaqs = faqs.filter((f) => f.category === "hackathon");
-  const tracks = h.tracks.map((t) => ({ value: t.theme, label: `${t.title} (${(THEME_META[t.theme] ?? THEME_META.general).short})` }));
   // Teams register in the Registration section below, or on an external platform when one is set.
   const external = Boolean(s.hackathonUrl);
   const registerHref = s.hackathonUrl || "#register";
   const hero = copy(s, "hackathonHero", { platform: s.hackathonPlatform || "the platform" });
   const ov = copy(s, "hackathonOverview");
-  const tr = copy(s, "hackathonTracks", { count: h.tracks.length });
+  const tr = copy(s, "hackathonTracks");
   const tl = copy(s, "hackathonTimeline");
   const pr = copy(s, "hackathonPrizes");
   const rf = copy(s, "hackathonRegisterForm", { platform: s.hackathonPlatform || "our hackathon platform" });
@@ -58,7 +59,7 @@ export default async function HackathonPage() {
   const cta = copy(s, "hackathonCta");
   const registerLabel = external ? hero.registerOn : hero.register;
   const needs = [rf.need1, rf.need2, rf.need3].filter(Boolean);
-  // The link from the form to the themes points the way they lie on the page.
+  // The link from the form to the question points the way it lies on the page.
   const order = sectionOrder(s, "hackathon");
   const TracksArrow = order.indexOf("tracks") < order.indexOf("register") ? ArrowUp : ArrowDown;
   const closedBadge = (
@@ -182,8 +183,8 @@ export default async function HackathonPage() {
                       </ul>
                     </div>
                   ) : null}
-                  {rf.tracksLink && h.tracks.length ? (
-                    <a href="#themes" className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
+                  {rf.tracksLink && h.question ? (
+                    <a href="#challenge" className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
                       <span className="mi-underline">{rf.tracksLink}</span>
                       <TracksArrow size={15} aria-hidden className={`transition-transform duration-300 ${TracksArrow === ArrowUp ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}`} />
                     </a>
@@ -205,7 +206,7 @@ export default async function HackathonPage() {
                     </div>
                   ) : s.hackathonStatus === "open" ? (
                     <DeadlineGate deadline={s.hackathonDeadline} closed={<StatusCard s={s} closed />}>
-                      <HackathonForm tracks={tracks} />
+                      <HackathonForm question={h.question} questionNote={rf.formQuestion} />
                     </DeadlineGate>
                   ) : (
                     <StatusCard s={s} closed={s.hackathonStatus === "closed"} />
@@ -215,9 +216,9 @@ export default async function HackathonPage() {
             </Section>
           ),
           tracks: (
-            <Section id="themes" edit="hackathon.tracks" tone={tr.tone} bg={tr.background} labelledBy="tracks-title">
-              <SectionHeading id="tracks-title" eyebrow={tr.eyebrow} title={tr.title} description={tr.description} align="center" />
-              {/* One frame for the one hackathon: its name at the top, branching to its themes. */}
+            <Section id="challenge" edit="hackathon.tracks" tone={tr.tone} bg={tr.background} labelledBy="challenge-title">
+              <SectionHeading id="challenge-title" eyebrow={tr.eyebrow} title={tr.title} description={tr.description} align="center" />
+              {/* One frame for the one hackathon: its name at the top, one line down to its one question. */}
               <div className="relative rounded-[2rem] border border-border bg-[color-mix(in_oklab,var(--surface)_70%,transparent)] p-4 shadow-card-lg sm:p-7">
                 <div className="tone-aqua mx-auto flex w-fit max-w-full items-center gap-3 rounded-2xl bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft))] px-4 py-3 ring-1 ring-border sm:px-5">
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface text-accent-ink shadow-card">
@@ -228,46 +229,54 @@ export default async function HackathonPage() {
                     {tr.frame ? <span className="block text-sm text-muted">{tr.frame}</span> : null}
                   </span>
                 </div>
-                {/* Wide screens: a line down from the hackathon, branching to the middle of each of the three columns (gap-5 between them). */}
-                {h.tracks.length === 3 ? (
-                  <div aria-hidden className="relative hidden h-10 lg:block">
-                    <span className="absolute top-0 left-1/2 h-5 w-0.5 -translate-x-1/2 bg-border-strong" />
-                    <span className="absolute top-5 right-[calc((100%-2.5rem)/6)] left-[calc((100%-2.5rem)/6)] h-0.5 bg-border-strong" />
-                    {["left-[calc((100%-2.5rem)/6)]", "left-1/2", "left-[calc(100%-(100%-2.5rem)/6)]"].map((x) => (
-                      <span key={x} className={`absolute top-5 h-5 w-0.5 -translate-x-1/2 bg-border-strong ${x}`} />
-                    ))}
+                <span aria-hidden className="mx-auto block h-6 w-0.5 bg-border-strong" />
+                <Ones words={[tr.one1, tr.one2, tr.one3]} className="mx-auto max-w-md" />
+                <span aria-hidden className="mx-auto block h-6 w-0.5 bg-border-strong" />
+                {h.question ? (
+                  <div data-glow="" className="card relative mx-auto max-w-4xl overflow-hidden p-6 sm:p-10">
+                    <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_70%_at_0%_0%,color-mix(in_oklab,var(--accent)_22%,transparent),transparent_70%)]" />
+                    <div className="relative flex flex-col items-center gap-6 text-center sm:flex-row sm:items-start sm:text-left">
+                      <Aura variant="faq" size={130} interactive className="shrink-0" />
+                      <div className="min-w-0">
+                        {tr.questionLabel ? <p className="text-xs font-bold tracking-[0.14em] text-accent-ink uppercase">{tr.questionLabel}</p> : null}
+                        <p className="mt-2 font-display text-3xl leading-tight font-extrabold text-fg sm:text-[2.6rem]">“{h.question}”</p>
+                        {h.challenge ? <RichText text={h.challenge} className="mt-4 text-[15.5px] leading-relaxed text-muted sm:text-base" /> : null}
+                      </div>
+                    </div>
                   </div>
                 ) : null}
-                <ul className="mt-5 grid gap-5 lg:mt-0 lg:grid-cols-3">
-                  {h.tracks.map((t, i) => {
-                    const meta = THEME_META[t.theme] ?? THEME_META.general;
-                    return (
-                      <li key={t.title} id={`theme-${t.theme}`} className={`tone-${meta.tone} card scroll-mt-28 p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg`} data-reveal data-glow="">
-                        <div className="flex items-center gap-3">
-                          <Aura variant={meta.aura} size={76} lite />
-                          <div>
-                            <Badge tone={meta.tone} size="xs">
-                              {tr.theme ? `${tr.theme} ${i + 1}` : meta.short}
-                            </Badge>
-                            <h3 className="mt-1 font-display text-xl font-semibold text-fg">{t.title}</h3>
-                          </div>
-                        </div>
-                        <p className="mt-4 text-[15px] text-muted">{t.description}</p>
-                        {t.problems.length ? (
-                          <ul className="mt-4 grid gap-2">
-                            {t.problems.map((p, j) => (
-                              <li key={j} className="flex gap-2 rounded-xl bg-accent-soft p-3 text-sm text-fg">
-                                <span className="font-display font-bold text-accent-ink">{j + 1}.</span>
-                                {p}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : null}
-                      </li>
-                    );
-                  })}
-                </ul>
+                {h.ideas.length ? (
+                  <div className="mx-auto mt-8 max-w-4xl">
+                    {tr.ideas ? <h3 className="text-center font-display text-lg font-semibold text-fg">{tr.ideas}</h3> : null}
+                    <ul className="mt-4 grid gap-3 md:grid-cols-3">
+                      {h.ideas.map((idea, i) => (
+                        <li key={i} className="flex gap-2.5 rounded-xl bg-accent-soft p-4 text-sm text-fg">
+                          <span className="font-display font-bold text-accent-ink">{i + 1}.</span>
+                          {idea}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
+              {/* The workshop's themes, set apart: they belong to the talks and tutorials, not to the hackathon. */}
+              {tr.themesNote ? (
+                <div className="mx-auto mt-8 flex max-w-4xl flex-col items-center gap-3 text-center text-sm text-muted sm:flex-row sm:text-left">
+                  <ul className="flex shrink-0 flex-wrap justify-center gap-1.5">
+                    {s.themes.map((t) => {
+                      const meta = THEME_META[t.key] ?? THEME_META.general;
+                      return (
+                        <li key={t.key}>
+                          <Link href={`/programme?theme=${t.key}`} className={`tone-${meta.tone} inline-flex rounded-lg bg-accent-soft px-2.5 py-1 text-xs font-semibold text-accent-ink transition-colors hover:bg-[color-mix(in_oklab,var(--accent)_35%,var(--surface))]`}>
+                            {meta.short}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <p>{tr.themesNote}</p>
+                </div>
+              ) : null}
             </Section>
           ),
           judging: h.judgingCriteria.length ? (

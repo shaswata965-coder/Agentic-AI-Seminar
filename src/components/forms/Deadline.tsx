@@ -1,7 +1,7 @@
 "use client";
 
 import { Clock } from "lucide-react";
-import { useNow } from "@/components/home/Countdown";
+import { useNow } from "@/lib/client-hooks";
 
 /** "Closes in 12 days", computed in the browser so the page can be cached. */
 export function Deadline({ iso, label = "Registration closes" }: { iso: string; label?: string }) {

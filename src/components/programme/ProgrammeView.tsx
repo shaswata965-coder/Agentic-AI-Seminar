@@ -4,15 +4,14 @@ import { CalendarPlus, ChevronDown, Search, Star, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Aura } from "@/components/aura/Aura";
-import { useNow } from "@/components/home/Countdown";
 import { Badge } from "@/components/ui/Badge";
 import { RichText } from "@/components/ui/RichText";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
-import { SESSION_TYPE_META, SESSION_TYPES, THEME_KEYS, THEME_META, type SessionType, type ThemeKey } from "@/lib/content/constants";
+import { currentThemeKey, SESSION_TYPE_META, SESSION_TYPES, THEME_KEYS, THEME_META, type SessionType, type ThemeKey } from "@/lib/content/constants";
 import type { Session } from "@/lib/content/types";
 import { timeRange } from "@/lib/format";
-import { replaceQuery, useLocalStorage, useUrlHash, useUrlParam } from "@/lib/client-hooks";
+import { replaceQuery, useLocalStorage, useNow, useUrlHash, useUrlParam } from "@/lib/client-hooks";
 import { withBase } from "@/lib/paths";
 import { SessionBadges, SessionRoom } from "./SessionMeta";
 
@@ -73,7 +72,8 @@ export function ProgrammeView({
   // Initial filters come from the URL (?day=2&theme=science&type=panel or #session-id);
   // once the visitor changes something, local state takes over.
   const urlDay = useUrlParam("day");
-  const urlTheme = useUrlParam("theme");
+  // An old link's earlier theme key ("entrepreneurship") filters by the current one.
+  const urlTheme = useUrlParam("theme")?.replace(/[^,]+/g, currentThemeKey) ?? null;
   const urlType = useUrlParam("type");
   const hash = useUrlHash();
   const hashDay = hash.startsWith("session-") ? sessions.find((x) => `session-${x.id}` === hash)?.day : undefined;

@@ -9,7 +9,7 @@ import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { useToast } from "@/components/ui/Toast";
 import { useUrlParam } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
-import { ATTENDEE_CATEGORY_META } from "@/lib/content/constants";
+import { ATTENDEE_CATEGORY_META, currentThemeKey, THEME_META } from "@/lib/content/constants";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
 import { PageTitle, useMe } from "./AdminShell";
@@ -57,6 +57,9 @@ const STATUS = {
   workshop: ["registered", "confirmed", "waitlisted", "cancelled"],
   hackathon: ["registered", "shortlisted", "not-shortlisted", "withdrawn"],
 } as const;
+/** A theme's name, from its key (or an earlier key) as stored. */
+const themeName = (key: string) => THEME_META[currentThemeKey(key) as keyof typeof THEME_META]?.short ?? key;
+
 const TONE: Record<string, "azure" | "mint" | "butter" | "blush" | "lilac"> = { registered: "azure", confirmed: "mint", shortlisted: "mint", waitlisted: "butter", cancelled: "blush", withdrawn: "blush", "not-shortlisted": "lilac" };
 
 export function RegistrationsManager() {
@@ -159,7 +162,7 @@ export function RegistrationsManager() {
                 <th className="px-4 py-3">ID</th>
                 <th className="px-4 py-3">{type === "workshop" ? "Name" : "Team"}</th>
                 <th className="px-4 py-3">{type === "workshop" ? "Organisation" : "Lead"}</th>
-                <th className="px-4 py-3">{type === "workshop" ? "Category" : "Theme"}</th>
+                <th className="px-4 py-3">{type === "workshop" ? "Category" : "Idea"}</th>
                 <th className="px-4 py-3">Registered</th>
                 <th className="px-4 py-3">Status</th>
               </tr>
@@ -175,7 +178,7 @@ export function RegistrationsManager() {
                     {!isTeam(r) ? <span className="block text-xs text-subtle">{r.email}</span> : null}
                   </td>
                   <td className="px-4 py-3 text-muted">{isTeam(r) ? `${r.members[0]?.name ?? ""} (${r.members.length})` : r.organisation}</td>
-                  <td className="px-4 py-3 text-muted">{isTeam(r) ? r.track : (ATTENDEE_CATEGORY_META[r.category as keyof typeof ATTENDEE_CATEGORY_META] ?? r.category)}</td>
+                  <td className="px-4 py-3 text-muted">{isTeam(r) ? r.ideaTitle : (ATTENDEE_CATEGORY_META[r.category as keyof typeof ATTENDEE_CATEGORY_META] ?? r.category)}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-muted">{formatDateTime(r.createdAt)}</td>
                   <td className="px-4 py-3">
                     <Badge tone={TONE[r.status] ?? "azure"} size="xs" dot>
@@ -199,7 +202,8 @@ export function RegistrationsManager() {
             <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
               {(isTeam(open)
                 ? [
-                    ["Theme", open.track],
+                    // Only teams that registered while the hackathon had a track per theme picked one.
+                    ...(open.track ? [["Theme (earlier registration)", themeName(open.track)]] : []),
                     ["Idea", open.ideaTitle],
                     ["GitHub", open.githubUrl],
                     ["Confirmation e-mail", open.emailSent ? "Sent" : "Not sent"],
@@ -211,7 +215,7 @@ export function RegistrationsManager() {
                     ["Designation", open.designation],
                     ["Category", ATTENDEE_CATEGORY_META[open.category as keyof typeof ATTENDEE_CATEGORY_META] ?? open.category],
                     ["Location", [open.city, open.country].filter(Boolean).join(", ")],
-                    ["Interests", open.interests.join(", ")],
+                    ["Interests", open.interests.map(themeName).join(", ")],
                     ["Tutorials / hackathon", `${open.tutorials ? "Tutorials" : "-"} · ${open.hackathonInterest ? "Hackathon" : "-"}`],
                     ["Dietary", open.dietary],
                     ["Accessibility", open.accessibility],

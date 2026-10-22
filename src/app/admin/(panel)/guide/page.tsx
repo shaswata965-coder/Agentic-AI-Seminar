@@ -30,7 +30,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "event",
     title: "Event details, dates & registration",
     steps: [
-      ["Site settings → Site-wide → Event details", "Name, tagline, dates (the countdown uses the start date), venue and hall."],
+      ["Site settings → Site-wide → Event details", "Name, tagline, dates, venue and hall."],
       ["Site settings → Site-wide → Registration", "Open or close workshop and hackathon registration, set deadlines (forms close automatically once a deadline passes) and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
       ["Site settings → Site-wide → Colours and Logos", "Set the brand colour and the accent colours, and replace the built-in IIT Delhi and ScAI logos if ever needed."],
       ["Site settings → Site-wide → Contact & social", "Official e-mail, phone and social links shown in the footer and contact section."],
@@ -72,7 +72,8 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "hackathon",
     title: "Hackathon",
     steps: [
-      "Hackathon → Overview, themes, rules, timeline, prizes and judging criteria.",
+      "Hackathon → Overview, the question, rules, timeline, prizes and judging criteria.",
+      "There is one hackathon with one track: every team answers the same question (Hackathon → The question), so teams don't pick a theme. The three themes are the workshop's, for its talks, panels and tutorials.",
       "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",
       "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Site-wide → Features & post-event.",
     ],

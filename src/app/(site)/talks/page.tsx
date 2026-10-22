@@ -6,7 +6,7 @@ import { PageHero } from "@/components/layout/PageHero";
 import { ButtonLink } from "@/components/ui/Button";
 import { VideoEmbed } from "@/components/ui/VideoEmbed";
 import { TagScope } from "@/components/ui/Tag";
-import { getSettings, getTalks } from "@/lib/content/queries";
+import { getSettings, getTalks, inPreview } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
 import { eventDayLabel } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
@@ -14,8 +14,9 @@ import { absoluteUrl } from "@/lib/paths";
 export const metadata: Metadata = { title: "Slides & recordings", alternates: { canonical: absoluteUrl("/talks") } };
 
 export default async function TalksPage() {
-  const [s, talks] = await Promise.all([getSettings(), getTalks()]);
-  if (!s.showTalks) notFound();
+  const [s, talks, preview] = await Promise.all([getSettings(), getTalks(), inPreview()]);
+  // Hidden until switched on after the event; the admin's live preview shows it anyway.
+  if (!s.showTalks && !preview) notFound();
   const c = copy(s, "talksHero");
   return (
     <TagScope style="bracket">
