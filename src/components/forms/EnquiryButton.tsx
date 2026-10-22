@@ -6,11 +6,14 @@ import type { AuraVariant } from "@/components/aura/types";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import type { EnquiryType } from "@/lib/content/constants";
-import { EnquiryForm } from "./EnquiryForm";
+import type { FormField } from "@/lib/forms";
+import { EnquiryForm, type EnquiryText } from "./EnquiryForm";
 
 /** A button that opens the enquiry form in a dialog (Exhibit with us / Become a partner). */
 export function EnquiryButton({
   type,
+  fields,
+  text,
   label,
   title,
   description,
@@ -19,6 +22,8 @@ export function EnquiryButton({
   icon,
 }: {
   type: EnquiryType;
+  fields: FormField[];
+  text: EnquiryText;
   label: string;
   title: string;
   description?: string;
@@ -45,7 +50,7 @@ export function EnquiryButton({
             </div>
           </div>
           <div className="mt-6">
-            <EnquiryForm type={type} onDone={() => setOpen(false)} />
+            <EnquiryForm type={type} fields={fields} text={text} onDone={() => setOpen(false)} />
           </div>
         </div>
       </Modal>

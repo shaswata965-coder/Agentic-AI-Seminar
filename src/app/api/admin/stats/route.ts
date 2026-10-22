@@ -1,11 +1,22 @@
 import type { NextRequest } from "next/server";
 import { toPlain } from "@/lib/content/normalize";
 import { demoItemCount } from "@/lib/demo-content";
+import { storedText } from "@/lib/forms";
 import { Activity, Enquiry, getCollectionModel, HackathonRegistration, Registration } from "@/lib/models";
 import { COLLECTIONS } from "@/lib/schema/resources";
 import { requireAdmin } from "@/lib/server/admin-auth";
 import { json } from "@/lib/server/http";
 import { mailConfigured } from "@/lib/server/mail";
+
+// Counted by the category's name: registrations from before the form became editable hold its key ("researcher").
+function byName(groups: { _id: unknown; n: number }[]) {
+  const counts = new Map<string, number>();
+  for (const g of groups) {
+    const name = storedText({ category: g._id }, "category") || "Not given";
+    counts.set(name, (counts.get(name) ?? 0) + g.n);
+  }
+  return [...counts].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
+}
 
 export async function GET(req: NextRequest) {
   const user = await requireAdmin(req);
@@ -31,7 +42,7 @@ export async function GET(req: NextRequest) {
       teams,
       enquiriesNew,
       enquiriesTotal,
-      byCategory: byCategory.map((c) => ({ category: c._id, count: c.n })),
+      byCategory: byName(byCategory),
       recentRegs: recentRegs.map((r) => toPlain(r)),
       recentEnquiries: recentEnquiries.map((r) => toPlain(r)),
       counts: Object.fromEntries(counts),

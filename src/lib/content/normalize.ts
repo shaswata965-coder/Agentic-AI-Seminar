@@ -22,6 +22,7 @@ export function emptyValue(f: FieldDef): unknown {
     case "stringList":
     case "objectList":
     case "refList":
+    case "formFields":
       return [];
     case "group":
       return {};

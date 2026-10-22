@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { emptyValue } from "@/lib/content/normalize";
 import { isoToLocalInput, localInputToIso } from "@/lib/format";
 import type { FieldDef } from "@/lib/schema/fields";
+import { FormFieldsInput } from "./FormFieldsInput";
 import { MediaPicker } from "./MediaPicker";
 import { OrderInput } from "./OrderInput";
 import { RefListSelect, RefSelect } from "./RefSelect";
@@ -22,7 +23,7 @@ export function RecordForm({ fields, value, onChange, errors = {}, path = "" }: 
   return (
     <div className="grid grid-cols-6 gap-x-4 gap-y-5">
       {fields.map((f) => (
-        <div key={f.name} className={span(f)}>
+        <div key={f.name} className={cn("min-w-0", span(f))}>
           <FieldInput field={f} value={value?.[f.name]} onChange={(v) => onChange({ ...value, [f.name]: v })} errors={errors} path={path ? `${path}.${f.name}` : f.name} />
         </div>
       ))}
@@ -236,6 +237,8 @@ function FieldInput({ field: f, value, onChange, errors, path }: { field: FieldD
     }
     case "order":
       return <OrderInput field={f} value={value} onChange={onChange} error={error} />;
+    case "formFields":
+      return <FormFieldsInput field={f} value={value} onChange={onChange} error={error} />;
     case "objectList":
       return <ObjectListInput field={f} value={Array.isArray(value) ? (value as Values[]) : []} onChange={onChange} errors={errors} path={path} help={help} err={err} />;
     case "group":

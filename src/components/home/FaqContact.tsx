@@ -40,7 +40,7 @@ export function FaqContact({ s, faqs }: { s: SiteSettings; faqs: Faq[] }) {
             </ul>
             <SocialLinks s={s} className="mt-4 flex gap-2" />
             <div className="mt-6 border-t border-border pt-6">
-              <EnquiryForm type="contact" />
+              <EnquiryForm type="contact" fields={s.contactFields} text={copy(s, "contactFormText")} />
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ import { RichText } from "@/components/ui/RichText";
 import { Eyebrow, Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
 import { THEME_META } from "@/lib/content/constants";
-import { getFaqs, getHackathon, getPeople, getSettings } from "@/lib/content/queries";
+import { getFaqs, getHackathon, getPeople, getSettings, inPreview } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { venueLine } from "@/lib/event";
@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const PRIZE_TONES = ["butter", "azure", "peach", "lilac", "mint", "blush"] as const;
 
 export default async function HackathonPage() {
-  const [s, h, people, faqs] = await Promise.all([getSettings(), getHackathon(), getPeople(), getFaqs()]);
+  const [s, h, people, faqs, preview] = await Promise.all([getSettings(), getHackathon(), getPeople(), getFaqs(), inPreview()]);
   const mentors = people.filter((p) => p.group === "mentor");
   const judges = people.filter((p) => p.group === "judge");
   const hackFaqs = faqs.filter((f) => f.category === "hackathon");
@@ -59,6 +59,7 @@ export default async function HackathonPage() {
   const cta = copy(s, "hackathonCta");
   const registerLabel = external ? hero.registerOn : hero.register;
   const needs = [rf.need1, rf.need2, rf.need3].filter(Boolean);
+  const teamForm = <HackathonForm question={h.question} questionNote={rf.formQuestion} teamFields={s.hackathonFields} memberFields={s.hackathonMemberFields} text={copy(s, "hackathonFormText")} />;
   // The link from the form to the question points the way it lies on the page.
   const order = sectionOrder(s, "hackathon");
   const TracksArrow = order.indexOf("tracks") < order.indexOf("register") ? ArrowUp : ArrowDown;
@@ -204,9 +205,12 @@ export default async function HackathonPage() {
                         </div>
                       </div>
                     </div>
+                  ) : preview ? (
+                    // The admin's live preview shows the form whatever the status, so its fields can be edited.
+                    teamForm
                   ) : s.hackathonStatus === "open" ? (
                     <DeadlineGate deadline={s.hackathonDeadline} closed={<StatusCard s={s} closed />}>
-                      <HackathonForm question={h.question} questionNote={rf.formQuestion} />
+                      {teamForm}
                     </DeadlineGate>
                   ) : (
                     <StatusCard s={s} closed={s.hackathonStatus === "closed"} />

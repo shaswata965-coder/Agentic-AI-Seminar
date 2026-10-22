@@ -16,6 +16,8 @@ export function Kiosks({ s, kiosks }: { s: SiteSettings; kiosks: Kiosk[] }) {
           <div className="flex flex-wrap items-center gap-3">
             <EnquiryButton
               type="exhibitor"
+              fields={s.exhibitFields}
+              text={copy(s, "exhibitFormText")}
               label={c.button}
               title={c.formTitle}
               description={c.formText}

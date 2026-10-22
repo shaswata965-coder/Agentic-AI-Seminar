@@ -1,4 +1,5 @@
 import { z, type ZodType } from "zod";
+import { fieldListProblems, formFields } from "@/lib/forms";
 import { cleanLine, cleanText, harmlessLink, SAFE_LINK } from "@/lib/safe-text";
 import type { FieldDef } from "@/lib/schema/fields";
 import { arrange } from "@/lib/schema/section-order";
@@ -114,6 +115,14 @@ function fieldSchema(f: FieldDef): ZodType {
         .array(z.string().regex(OBJECT_ID, msg(f, "invalid reference")))
         .max(MAX_ITEMS, msg(f, `at most ${MAX_ITEMS} items`))
         .default([]);
+    case "formFields":
+      // Made whole as it is saved (src/lib/forms.ts): built-in fields kept to what they may be.
+      return z
+        .unknown()
+        .transform((v) => formFields(f.form, v))
+        .superRefine((list, ctx) => {
+          if (!f.draft) for (const problem of fieldListProblems(list)) ctx.addIssue({ code: "custom", message: msg(f, problem) });
+        });
     case "order": {
       // Every option once: unknown items are dropped and missing ones put back in their default place.
       const values = f.options.map((o) => o.value);
@@ -148,6 +157,8 @@ function loosen(f: FieldDef): FieldDef {
     case "objectList":
     case "group":
       return { ...f, required: false, fields: f.fields.map(loosen) };
+    case "formFields":
+      return { ...f, draft: true };
     default:
       return { ...f, required: false };
   }

@@ -28,6 +28,7 @@ import {
   date,
   email,
   file,
+  formFieldList,
   image,
   list,
   num,
@@ -519,6 +520,9 @@ export const PALETTE_DEFAULTS: Record<Tone, string> = { azure: "#8cc8ff", lilac:
 
 const section = (key: string, title: string, copy: CopyKey | undefined, fields: FieldDef[] = [], extra: Partial<SettingsSection> = {}): SettingsSection => ({ key, title, copy, fields, ...extra });
 
+const FIELDS_HELP =
+  "Open a field to change its name, its guide (the line under it, and the example inside it), the type of answer and its choices, and whether it is required or shown; the arrows change the order. Built-in fields (with a padlock) can be hidden but not deleted, and the ones the site needs stay required. Add your own questions at the end: their answers appear with each response and in the CSV download.";
+
 export const SETTINGS_PAGES: SettingsPage[] = [
   {
     key: "site",
@@ -637,7 +641,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       }),
       section("hero", "Hero", "homeHero", [
         bool("showHeroPhoto", "Show the photo of the IIT Delhi building behind the hero"),
-        image("heroPhoto", "Hero photo", { help: "A landscape photo (16:9 works best). It sits at the top right and fades into the background towards the title. Leave it empty for the built-in photo of the IIT Delhi main building." }),
+        image("heroPhoto", "Hero photo", { help: "Leave it empty for the built-in photo of the IIT Delhi main building, framed so that its sign, in Hindi and English, shows above Aura. An uploaded landscape photo (16:9 works best) sits at the top right instead and fades into the background towards the title." }),
       ], {
         description: "The event name, tagline, dates and venue come from Site-wide → Event details.",
       }),
@@ -679,6 +683,11 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("venue", "Venue & travel", "homeVenue", [], { description: "The routes on the map are edited in the Venue tab → Getting here." }),
       section("partners", "Partners", "homePartners", [], { description: "The logos come from Partners & sponsors." }),
       section("faq", "FAQ & contact", "homeFaq", [], { description: "Questions are added under FAQs; the e-mail and phone under Site-wide → Contact & social." }),
+      section("contactForm", "Contact form", "contactFormText", [formFieldList("contactFields", "Fields of the contact form", "contact", { help: FIELDS_HELP })], {
+        description: "The contact form beside the FAQ: its fields and texts. Messages arrive under Enquiries.",
+        within: "faq",
+        anchor: "home.faq",
+      }),
     ],
   },
   {
@@ -720,6 +729,11 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         textarea("programmeNote", "Note above the schedule"),
       ], { description: "Sessions are added under Programme." }),
       section("kiosks", "Industry kiosks", "programmeKiosks", [textarea("kioskIntro", "Introduction")], { description: "Kiosks are added under Industry kiosks." }),
+      section("exhibitForm", "Exhibit form", "exhibitFormText", [formFieldList("exhibitFields", "Fields of the “Exhibit with us” form", "exhibitor", { help: FIELDS_HELP })], {
+        description: "The form behind the “Exhibit with us” button: its fields and texts. Enquiries arrive under Enquiries.",
+        within: "kiosks",
+        anchor: "programme.kiosks",
+      }),
       section("hackathon", "Hackathon", "programmeHackathon", [], { description: "The title, tagline, question and dates come from the Hackathon page in the menu." }),
       section("plan", "Plan your visit", "programmePlan"),
     ],
@@ -752,6 +766,16 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("register", "Registration form", "hackathonRegisterForm", [], {
         description: "Whether registration is open, its deadline and an external platform link are set under Site-wide → Registration.",
       }),
+      section(
+        "form",
+        "Team form",
+        "hackathonFormText",
+        [
+          formFieldList("hackathonFields", "Team fields", "hackathonTeam", { help: `${FIELDS_HELP} Team fields go on the first step (before the members) or the last one (after them).` }),
+          formFieldList("hackathonMemberFields", "Fields for each member", "hackathonMember", { help: "Asked for every member of the team. “Required” means for each member being entered; the team lead always is." }),
+        ],
+        { description: "The team registration form's fields and texts. The preview shows the form even while registration isn't open.", within: "register", anchor: "hackathon.register" },
+      ),
       section("tracks", "The challenge", "hackathonTracks", [], { description: "The hackathon's one track and one question, with the ideas under it. The question itself is edited under Hackathon → The question." }),
       section("judging", "Judging", "hackathonJudging"),
       section("people", "Mentors & judges", "hackathonPeople", [], { description: "Mentors and judges are added under Organisers & volunteers." }),
@@ -767,6 +791,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     sections: [
       section("hero", "Hero", "registerHero"),
       section("form", "Form & status", "registerForm", [], { description: "Whether registration is open, and an external form link, are set under Site-wide → Registration." }),
+      section("fields", "Form fields", "registerFormText", [formFieldList("registerFields", "Fields", "register", { help: FIELDS_HELP })], {
+        description: "The workshop registration form's fields, in three steps, and its texts. The preview shows the form even while registration isn't open.",
+        anchor: "register.form",
+      }),
       section("fees", "Fees", "registerFees", [
         objects("fees", "Fees", "Fee", [
           text("category", "Category", { required: true, width: "half", placeholder: "Students" }),
@@ -787,6 +815,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         textarea("sponsorshipIntro", "Introduction"),
         file("sponsorBrochure", "Sponsorship brochure (PDF)", { accept: "application/pdf" }),
       ]),
+      section("partnerForm", "Partner form", "partnerFormText", [formFieldList("partnerFields", "Fields of the “Become a partner” form", "sponsor", { help: FIELDS_HELP })], {
+        description: "The form behind the “Become a partner” button: its fields and texts. Enquiries arrive under Enquiries.",
+        anchor: "partners.hero",
+      }),
       section("list", "Our partners", "partnersList", [], { description: "Partners are added under Partners & sponsors." }),
       section("reach", "Who you'll meet", "partnersReach", [], { description: "The list comes from About → Who should attend." }),
       section("ways", "Ways to take part", "partnersWays"),

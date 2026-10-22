@@ -9,7 +9,8 @@ import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { useToast } from "@/components/ui/Toast";
 import { useUrlParam } from "@/lib/client-hooks";
 import { cn } from "@/lib/cn";
-import { ATTENDEE_CATEGORY_META, currentThemeKey, THEME_META } from "@/lib/content/constants";
+import { currentThemeKey, THEME_META } from "@/lib/content/constants";
+import { FORM_DEFAULTS, FORM_SETTINGS, responseRows, storedText, type FormField, type FormKey } from "@/lib/forms";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
 import { PageTitle, useMe } from "./AdminShell";
@@ -57,6 +58,8 @@ const STATUS = {
   workshop: ["registered", "confirmed", "waitlisted", "cancelled"],
   hackathon: ["registered", "shortlisted", "not-shortlisted", "withdrawn"],
 } as const;
+const DEFAULT_FORMS = Object.fromEntries((Object.keys(FORM_SETTINGS) as FormKey[]).map((k) => [k, FORM_DEFAULTS[FORM_SETTINGS[k]]])) as Record<FormKey, FormField[]>;
+
 /** A theme's name, from its key (or an earlier key) as stored. */
 const themeName = (key: string) => THEME_META[currentThemeKey(key) as keyof typeof THEME_META]?.short ?? key;
 
@@ -70,6 +73,8 @@ export function RegistrationsManager() {
   const type = typeChoice ?? (urlType === "hackathon" ? "hackathon" : "workshop");
   const { listRef, pillRef } = useSlidingPill(type);
   const { data, loading, reload, setData } = useApi<(Workshop | Team)[]>(`/registrations?type=${type}`);
+  // The forms' questions, to show each answer by; the built-in ones until they have loaded.
+  const forms = useApi<Record<FormKey, FormField[]>>("/forms").data ?? DEFAULT_FORMS;
   const [q, setQ] = useState("");
   const [status, setStatus] = useState("all");
   const [open, setOpen] = useState<Workshop | Team | null>(null);
@@ -178,7 +183,7 @@ export function RegistrationsManager() {
                     {!isTeam(r) ? <span className="block text-xs text-subtle">{r.email}</span> : null}
                   </td>
                   <td className="px-4 py-3 text-muted">{isTeam(r) ? `${r.members[0]?.name ?? ""} (${r.members.length})` : r.organisation}</td>
-                  <td className="px-4 py-3 text-muted">{isTeam(r) ? r.ideaTitle : (ATTENDEE_CATEGORY_META[r.category as keyof typeof ATTENDEE_CATEGORY_META] ?? r.category)}</td>
+                  <td className="px-4 py-3 text-muted">{isTeam(r) ? r.ideaTitle : storedText(r as unknown as Record<string, unknown>, "category")}</td>
                   <td className="px-4 py-3 whitespace-nowrap text-muted">{formatDateTime(r.createdAt)}</td>
                   <td className="px-4 py-3">
                     <Badge tone={TONE[r.status] ?? "azure"} size="xs" dot>
@@ -199,33 +204,17 @@ export function RegistrationsManager() {
             <h2 id="reg-title" className="mt-1 font-display text-2xl font-bold text-fg">
               {isTeam(open) ? open.teamName : open.name}
             </h2>
+            {/* Every answer, by the question it answered on the form (Site settings), long ones across the width. */}
             <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
-              {(isTeam(open)
-                ? [
-                    // Only teams that registered while the hackathon had a track per theme picked one.
-                    ...(open.track ? [["Theme (earlier registration)", themeName(open.track)]] : []),
-                    ["Idea", open.ideaTitle],
-                    ["GitHub", open.githubUrl],
-                    ["Confirmation e-mail", open.emailSent ? "Sent" : "Not sent"],
-                  ]
-                : [
-                    ["E-mail", open.email],
-                    ["Phone", open.phone],
-                    ["Organisation", open.organisation],
-                    ["Designation", open.designation],
-                    ["Category", ATTENDEE_CATEGORY_META[open.category as keyof typeof ATTENDEE_CATEGORY_META] ?? open.category],
-                    ["Location", [open.city, open.country].filter(Boolean).join(", ")],
-                    ["Interests", open.interests.map(themeName).join(", ")],
-                    ["Tutorials / hackathon", `${open.tutorials ? "Tutorials" : "-"} · ${open.hackathonInterest ? "Hackathon" : "-"}`],
-                    ["Dietary", open.dietary],
-                    ["Accessibility", open.accessibility],
-                    ["Heard from", open.heardFrom],
-                    ["Confirmation e-mail", open.emailSent ? "Sent" : "Not sent"],
-                  ]
-              ).map(([k, v]) => (
-                <div key={k}>
-                  <dt className="text-xs font-bold tracking-[0.1em] text-subtle uppercase">{k}</dt>
-                  <dd className="mt-0.5 break-words text-fg">{v || "-"}</dd>
+              {[
+                ...responseRows(open as unknown as Record<string, unknown>, isTeam(open) ? forms.hackathonTeam : forms.register).filter((r) => r.key !== "teamName" && r.key !== "name"),
+                // Only teams that registered while the hackathon had a track per theme picked one.
+                ...(isTeam(open) && open.track ? [{ key: "track", label: "Theme (earlier registration)", text: themeName(open.track) }] : []),
+                { key: "emailSent", label: "Confirmation e-mail", text: open.emailSent ? "Sent" : "Not sent" },
+              ].map((r) => (
+                <div key={r.key} className={cn(r.text.length > 60 && "sm:col-span-2")}>
+                  <dt className="text-xs font-bold tracking-[0.1em] text-subtle uppercase">{r.label}</dt>
+                  <dd className="mt-0.5 break-words whitespace-pre-wrap text-fg">{r.text || "-"}</dd>
                 </div>
               ))}
             </dl>
@@ -237,15 +226,15 @@ export function RegistrationsManager() {
                     <li key={i} className="rounded-xl bg-surface-2 p-3">
                       <span className="font-semibold text-fg">{m.name}</span> {i === 0 ? <Badge tone="lilac" size="xs">Lead</Badge> : null}
                       <span className="block text-muted">
-                        {m.email} {m.phone ? `· ${m.phone}` : ""} · {m.organisation}
+                        {responseRows(m as unknown as Record<string, unknown>, forms.hackathonMember)
+                          .filter((r) => r.key !== "name" && r.text)
+                          .map((r) => (r.key === "email" || r.key === "phone" || r.key === "organisation" ? r.text : `${r.label}: ${r.text}`))
+                          .join(" · ")}
                       </span>
                     </li>
                   ))}
                 </ul>
-                {open.ideaSummary ? <p className="mt-3 rounded-xl bg-surface-2 p-3 text-sm whitespace-pre-wrap text-muted">{open.ideaSummary}</p> : null}
               </div>
-            ) : open.message ? (
-              <p className="mt-4 rounded-xl bg-surface-2 p-3 text-sm whitespace-pre-wrap text-muted">{open.message}</p>
             ) : null}
             <div className="mt-6 grid gap-3">
               <label className="text-sm font-semibold text-fg" htmlFor="reg-status">

@@ -760,8 +760,3 @@ dialog::backdrop { background: rgb(10 15 30 / 0.45); }
   }
 }
 
-/* Live preview in Admin → Site settings: the section being edited. */
-[data-preview] [data-edit-focus] {
-  outline: 3px dashed var(--brand);
-  outline-offset: -6px;
-}

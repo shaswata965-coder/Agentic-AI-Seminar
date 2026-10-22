@@ -5,11 +5,11 @@ import { deadlinePassed } from "@/lib/event";
 import { Registration } from "@/lib/models";
 import { registrationEmail } from "@/lib/server/emails";
 import { formLimit } from "@/lib/server/form-limits";
-import { error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { error, isRecord, isSameOrigin, json, readJson } from "@/lib/server/http";
 import { makeRegId } from "@/lib/server/ids";
 import { mailConfigured, sendMail } from "@/lib/server/mail";
 import { rateLimit } from "@/lib/server/rate-limit";
-import { registrationSchema } from "@/lib/server/validation";
+import { checkRegistration } from "@/lib/server/validation";
 
 // With e-mail set up, every successful submission gets this answer: the registration ID is in the e-mail.
 const accepted = () => json({ data: { regId: null, emailSent: true } }, { status: 201 });
@@ -34,8 +34,8 @@ export async function POST(req: NextRequest) {
   if (s.workshopStatus !== "open") return error(403, s.workshopStatus === "closed" ? "Registration is closed." : "Registration has not opened yet.");
   if (deadlinePassed(s.workshopDeadline)) return error(403, "Registration is closed: the deadline has passed.");
 
-  const parsed = registrationSchema.safeParse(body);
-  if (!parsed.success) return error(422, "Please check the highlighted fields.", { fieldErrors: zodFieldErrors(parsed.error) });
+  const parsed = checkRegistration(s, body);
+  if (!parsed.ok) return error(422, "Please check the highlighted fields.", { fieldErrors: parsed.fieldErrors });
   const data = parsed.data;
 
   try {

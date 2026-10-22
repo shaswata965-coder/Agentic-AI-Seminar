@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { isPreviewMessage, PREVIEW_SOURCE, type FromFrame, type LayoutIssue, type ToFrame } from "@/lib/preview";
 
 /*
@@ -85,12 +85,9 @@ function measure(anchor: string | null): Extract<FromFrame, { type: "report" }> 
   };
 }
 
-function focus(anchor: string | null, scroll: boolean) {
-  document.querySelectorAll("[data-edit-focus]").forEach((n) => n.removeAttribute("data-edit-focus"));
+function scrollToSection(anchor: string | null) {
   const el = findSection(anchor);
-  if (!el) return;
-  el.setAttribute("data-edit-focus", "");
-  if (scroll) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 80), behavior: "instant" });
+  if (el) window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - 80), behavior: "instant" });
 }
 
 export function PreviewBridge() {
@@ -98,6 +95,9 @@ export function PreviewBridge() {
   const [pending, startTransition] = useTransition();
   const anchor = useRef<string | null>(null);
   const refreshing = useRef(false);
+  // The outline is a rule rendered here rather than an attribute set on the section, which React would find
+  // on a part of the page it hasn't hydrated yet and report as a mismatch.
+  const [outlined, setOutlined] = useState<string | null>(null);
 
   useEffect(() => {
     if (window.parent === window) return;
@@ -107,11 +107,12 @@ export function PreviewBridge() {
       if (e.origin !== window.location.origin || e.source !== window.parent || !isPreviewMessage(e.data)) return;
       const msg = e.data as unknown as ToFrame;
       anchor.current = msg.anchor;
+      setOutlined(msg.anchor);
       if (msg.type === "refresh") {
         refreshing.current = true;
         startTransition(() => router.refresh());
       } else if (msg.type === "focus") {
-        focus(anchor.current, true);
+        scrollToSection(anchor.current);
         report();
       }
     };
@@ -137,11 +138,11 @@ export function PreviewBridge() {
     requestAnimationFrame(() =>
       requestAnimationFrame(() => {
         const box = findSection(anchor.current)?.getBoundingClientRect();
-        focus(anchor.current, Boolean(box && (box.bottom < 0 || box.top > window.innerHeight)));
+        if (box && (box.bottom < 0 || box.top > window.innerHeight)) scrollToSection(anchor.current);
         window.parent.postMessage(measure(anchor.current), window.location.origin);
       }),
     );
   }, [pending]);
 
-  return null;
+  return outlined ? <style>{`[data-preview] [data-edit="${CSS.escape(outlined)}"]{outline:3px dashed var(--brand);outline-offset:-6px}`}</style> : null;
 }

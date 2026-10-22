@@ -6,6 +6,8 @@
  * This file is shared by client and server code, so it must stay dependency-free.
  */
 
+import type { FormKey } from "@/lib/forms";
+
 export interface Option {
   value: string;
   label: string;
@@ -78,6 +80,14 @@ export interface OrderField extends Base {
   pinned?: string[];
 }
 
+/** A public form's fields (src/lib/forms.ts): their names, guides, types of answer and choices, and added questions. */
+export interface FormFieldsField extends Base {
+  type: "formFields";
+  form: FormKey;
+  /** Validation only: a preview, where a list still without choices is fine. */
+  draft?: boolean;
+}
+
 export type FieldDef =
   | TextField
   | NumberField
@@ -89,7 +99,8 @@ export type FieldDef =
   | ObjectListField
   | GroupField
   | RefField
-  | OrderField;
+  | OrderField
+  | FormFieldsField;
 
 /** A tab of fields inside a singleton editor (Settings, Hackathon). */
 export interface FieldSection {
@@ -135,3 +146,4 @@ export const ref = (name: string, label: string, resource: string, extra: Partia
 export const refList = (name: string, label: string, resource: string, extra: Partial<RefField> = {}): RefField => ({ name, label, type: "refList", resource, ...extra });
 export const color = (name: string, label: string, extra: Partial<TextField> = {}): TextField => ({ name, label, type: "color", ...extra });
 export const order = (name: string, label: string, options: Option[], extra: Partial<OrderField> = {}): OrderField => ({ name, label, type: "order", options, ...extra });
+export const formFieldList = (name: string, label: string, form: FormKey, extra: Partial<FormFieldsField> = {}): FormFieldsField => ({ name, label, type: "formFields", form, ...extra });

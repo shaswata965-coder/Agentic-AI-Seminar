@@ -48,6 +48,20 @@ const note = (l: string, d: string): CopyField => ({ kind: "note", label: l, def
 const text = (l: string, d: string, help?: string): CopyField => ({ kind: "text", label: l, default: d, help });
 const long = (l: string, d: string, help?: string): CopyField => ({ kind: "long", label: l, default: d, help });
 
+const EMAIL_HELP = "{email} is the address they typed.";
+/** The texts of an enquiry form (its fields are edited beside them). */
+const enquiryText = (button: string) => ({
+  button: label("Send button", button),
+  sending: label("Send button while sending", "Sending…"),
+  note: note("Line beside the button", "We only use your details to respond to this enquiry."),
+  optional: label("Word beside optional fields", "optional"),
+  sentTitle: heading("Once sent: title", "Message sent!"),
+  sentText: text("Once sent: text", "Thanks for reaching out. The organisers will reply to {email}.", EMAIL_HELP),
+  another: label("Once sent: button to write again", "Send another"),
+  close: label("Once sent: button to close (in a pop-up)", "Close"),
+  toast: short("Once sent: short notice", "Message sent. Thank you!"),
+});
+
 /** The words around the hackathon's one question, wherever it is shown: three large 1s, then the question. */
 const ONE_QUESTION = {
   one1: label("Under the first 1", "hackathon"),
@@ -230,6 +244,7 @@ export const PAGE_COPY = {
     portalText: text("Link card: text", "Campus entry, every route in detail, places to stay and local tips."),
   },
   homePartners: { tone: tone("butter"), title: heading("Heading (for screen readers)", "Partners and sponsors") },
+  contactFormText: enquiryText("Send message"),
   homeFaq: {
     tone: tone("lilac"),
     background: bg("wash"),
@@ -305,6 +320,7 @@ export const PAGE_COPY = {
     tbaCalendar: label("Before the schedule: calendar button", "Add the dates to your calendar"),
     tbaRegister: label("Before the schedule: register button", "Register to get updates"),
   },
+  exhibitFormText: enquiryText("Send exhibitor enquiry"),
   programmeKiosks: {
     tone: tone("peach"),
     background: bg("plain"),
@@ -474,6 +490,29 @@ export const PAGE_COPY = {
   },
   hackathonCta: { tone: tone("aqua"), title: title("Ready to build?") },
 
+  hackathonFormText: {
+    step1: label("Step 1 name", "Team"),
+    step2: label("Step 2 name (the members)", "Members"),
+    step3: label("Step 3 name", "Idea"),
+    progress: short("Under the steps", "Step {step} of {steps}", "{step} and {steps} are filled in as they go."),
+    lead: label("First member", "Team lead"),
+    member: label("Other members", "Member {n}", "{n} is the member's number."),
+    addMember: label("Button: add a member", "Add a member"),
+    removeMember: label("Button: remove a member", "Remove member"),
+    membersNote: text("Under the members", "Final team-size limits will be announced with the rules. Members other than the lead are optional for now."),
+    required: note("Note on the first step", "Fields marked * are required."),
+    optional: label("Word beside optional fields", "optional"),
+    back: label("Button: back", "Back"),
+    next: label("Button: next step", "Continue"),
+    submit: label("Button: send", "Register team"),
+    sending: label("Button while sending", "Registering…"),
+    doneTitle: heading("Once registered: title", "Team registered!"),
+    doneId: short("Once registered: before the team ID", "Your team registration ID is"),
+    doneMailed: text("Once registered: e-mail sent", "We've e-mailed a confirmation to the team lead."),
+    doneNoMail: text("Once registered: no e-mail", "Please note this ID. The organisers will contact your team lead."),
+    doneNext: text("Once registered: what next", "Watch the Hackathon page for the idea-submission date."),
+    doneButton: label("Once registered: button", "See what happens next"),
+  },
   hackathonRegisterForm: {
     tone: tone("aqua"),
     background: bg("band"),
@@ -524,6 +563,29 @@ export const PAGE_COPY = {
     announcements: label("Button: announcements", "See announcements"),
     contact: label("Button: contact", "Contact us"),
   },
+  registerFormText: {
+    step1: label("Step 1 name", "About you"),
+    step2: label("Step 2 name", "Interests"),
+    step3: label("Step 3 name", "Logistics"),
+    progress: short("Under the steps", "Step {step} of {steps}", "{step} and {steps} are filled in as they go."),
+    required: note("Note on the first step", "Fields marked * are required."),
+    optional: label("Word beside optional fields", "optional"),
+    back: label("Button: back", "Back"),
+    next: label("Button: next step", "Continue"),
+    submit: label("Button: send", "Complete registration"),
+    sending: label("Button while sending", "Registering…"),
+    doneTitle: heading("Once registered: title", "You're registered!"),
+    doneId: short("Once registered: before the ID", "Your registration ID is"),
+    doneMailed: text("Once registered: e-mail sent", "A confirmation e-mail is on its way to {email}.", EMAIL_HELP),
+    doneQueued: text(
+      "Once registered: ID sent by e-mail",
+      "Your registration ID and details are on their way to {email}. If this address was already registered, your earlier registration stands and we've sent its confirmation again.",
+      EMAIL_HELP,
+    ),
+    doneNoMail: text("Once registered: no e-mail", "Please note your registration ID. The organisers will contact you at {email}.", EMAIL_HELP),
+    share: label("Once registered: share label", "Tell your friends"),
+    shareText: note("Once registered: shared message", "I'm attending the {event} at IIT Delhi!"),
+  },
   registerFees: {
     title: heading("Title", "Fees"),
     category: label("Column: category", "Category"),
@@ -540,6 +602,7 @@ export const PAGE_COPY = {
   },
 
   /* -------------------------------------------------------- Partners -- */
+  partnerFormText: enquiryText("Send sponsorship enquiry"),
   partnersHero: {
     tone: tone("butter"),
     crumb: crumb("Partners & sponsors"),

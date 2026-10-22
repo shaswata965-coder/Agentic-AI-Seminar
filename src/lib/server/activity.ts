@@ -1,8 +1,9 @@
 import "server-only";
 import type { ActivityAction, ActivityChange } from "@/lib/activity";
 import { formatDateTime } from "@/lib/format";
+import { ANSWER_TYPE_LABELS, ANSWER_TYPES } from "@/lib/forms";
 import { Activity, getCollectionModel } from "@/lib/models";
-import type { FieldDef } from "@/lib/schema/fields";
+import { bool, list, num, select, text, type FieldDef } from "@/lib/schema/fields";
 import { COLLECTION_MAP, type CollectionDef } from "@/lib/schema/resources";
 import type { AdminUser } from "./admin-auth";
 
@@ -51,13 +52,36 @@ interface Leaf {
   label: string;
   raw: unknown;
   def?: FieldDef;
+  /** Shown in place of the value, when that is compared by something else (a form's order, by its fields' keys). */
+  shown?: string;
 }
 
 const isRecord = (v: unknown): v is Record<string, unknown> => typeof v === "object" && v !== null && !Array.isArray(v);
 
+/** What a form's field is described by in the tracker. */
+const FORM_FIELD_PARTS: FieldDef[] = [
+  text("label", "Field name"),
+  select("type", "Type of answer", ANSWER_TYPES.map((t) => ({ value: t, label: ANSWER_TYPE_LABELS[t] }))),
+  text("help", "Guide"),
+  text("placeholder", "Example"),
+  list("options", "Choices"),
+  bool("required", "Required"),
+  bool("leadOnly", "Required for the team lead only"),
+  bool("hidden", "Hidden"),
+  num("step", "Step"),
+];
+
 // Flatten a record into labelled leaves ("Fees › Fee 2 › Amount"), following the admin form's field definitions when there are any.
 function collect(value: unknown, def: FieldDef | undefined, path: string, label: string, out: Map<string, Leaf>) {
-  if (def?.type === "objectList" || (!def && Array.isArray(value) && value.some(isRecord))) {
+  if (def?.type === "formFields") {
+    // By each field's key, so moving a field doesn't read as every field changing.
+    for (const item of Array.isArray(value) ? value : []) {
+      if (!isRecord(item)) continue;
+      collectObject(item, FORM_FIELD_PARTS, `${path}.${String(item.key)}`, `${label} › ${String(item.label ?? item.key)}`, out);
+    }
+    const items = (Array.isArray(value) ? value : []).filter(isRecord);
+    out.set(`${path}.#order`, { label: `${label} › Order`, raw: items.map((x) => String(x.key)), shown: items.map((x) => String(x.label ?? x.key)).join(", ") });
+  } else if (def?.type === "objectList" || (!def && Array.isArray(value) && value.some(isRecord))) {
     const fields = def?.type === "objectList" ? def.fields : undefined;
     const item = def?.type === "objectList" ? def.itemLabel : "Item";
     (Array.isArray(value) ? value : []).forEach((v, i) => collectObject(v, fields, `${path}.${i}`, `${label} › ${item} ${i + 1}`, out));
@@ -123,7 +147,7 @@ export async function describeChanges(fields: FieldDef[] | undefined, before: un
   const plain = (l?: Leaf) => (l ? format(l.raw, l.def, none) : "");
   const changed = [...new Set([...was.keys(), ...now.keys()])].filter((p) => plain(was.get(p)) !== plain(now.get(p))).slice(0, MAX_CHANGES);
   const titles = await refTitles(changed.flatMap((p) => [was.get(p), now.get(p)]).filter((l): l is Leaf => l !== undefined));
-  const text = (l?: Leaf) => (l ? clip(format(l.raw, l.def, titles)) : "");
+  const text = (l?: Leaf) => (l ? clip(l.shown ?? format(l.raw, l.def, titles)) : "");
   return changed.map((p) => ({ field: (now.get(p) ?? was.get(p))!.label, from: text(was.get(p)), to: text(now.get(p)) }));
 }
 

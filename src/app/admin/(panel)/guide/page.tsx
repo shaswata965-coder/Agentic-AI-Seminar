@@ -32,6 +32,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     steps: [
       ["Site settings → Site-wide → Event details", "Name, tagline, dates, venue and hall."],
       ["Site settings → Site-wide → Registration", "Open or close workshop and hackathon registration, set deadlines (forms close automatically once a deadline passes) and fees. Paste a Google Form / Unstop / Devfolio link to use an external form instead of the built-in one."],
+      ["The forms' fields", "Registration → Form fields, Hackathon → Team form, Home → Contact form, Programme → Exhibitor form and Partners → Sponsor form. Click a field to change its name, guide, example and type of answer (text, e-mail, phone, number, link, date, a drop-down list, choices or a tick box), its choices, whether it is required, or to hide it. Add questions of your own with “Add a question”. Fields with a lock came with the site and can't be deleted."],
       ["Site settings → Site-wide → Colours and Logos", "Set the brand colour and the accent colours, and replace the built-in IIT Delhi and ScAI logos if ever needed."],
       ["Site settings → Site-wide → Contact & social", "Official e-mail, phone and social links shown in the footer and contact section."],
     ],

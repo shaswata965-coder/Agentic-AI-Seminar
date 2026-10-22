@@ -94,6 +94,8 @@ export interface RegistrationDoc {
   heardFrom: string;
   message: string;
   consent: boolean;
+  /** Answers to the questions added in Site settings (src/lib/forms.ts), by their keys. */
+  answers: Record<string, unknown>;
   status: "registered" | "confirmed" | "waitlisted" | "cancelled";
   emailSent: boolean;
   notes: string;
@@ -118,6 +120,7 @@ const registrationSchema = new Schema<RegistrationDoc>(
     heardFrom: { type: String, default: "" },
     message: { type: String, default: "" },
     consent: { type: Boolean, default: false },
+    answers: { type: Schema.Types.Mixed, default: {} },
     status: { type: String, enum: ["registered", "confirmed", "waitlisted", "cancelled"], default: "registered" },
     emailSent: { type: Boolean, default: false },
     notes: { type: String, default: "" },
@@ -133,6 +136,7 @@ export interface TeamMember {
   phone: string;
   organisation: string;
   role: string;
+  answers: Record<string, unknown>;
 }
 export interface HackathonRegistrationDoc {
   regId: string;
@@ -146,6 +150,7 @@ export interface HackathonRegistrationDoc {
   ideaSummary: string;
   githubUrl: string;
   consent: boolean;
+  answers: Record<string, unknown>;
   status: "registered" | "shortlisted" | "not-shortlisted" | "withdrawn";
   emailSent: boolean;
   notes: string;
@@ -166,6 +171,7 @@ const hackathonRegistrationSchema = new Schema<HackathonRegistrationDoc>(
             phone: { type: String, default: "" },
             organisation: { type: String, default: "" },
             role: { type: String, default: "" },
+            answers: { type: Schema.Types.Mixed, default: {} },
           },
           { _id: false },
         ),
@@ -177,6 +183,7 @@ const hackathonRegistrationSchema = new Schema<HackathonRegistrationDoc>(
     ideaSummary: { type: String, default: "" },
     githubUrl: { type: String, default: "" },
     consent: { type: Boolean, default: false },
+    answers: { type: Schema.Types.Mixed, default: {} },
     status: { type: String, enum: ["registered", "shortlisted", "not-shortlisted", "withdrawn"], default: "registered" },
     emailSent: { type: Boolean, default: false },
     notes: { type: String, default: "" },
@@ -197,6 +204,7 @@ export interface EnquiryDoc {
   phone: string;
   subject: string;
   message: string;
+  answers: Record<string, unknown>;
   status: "new" | "in-progress" | "closed";
   notes: string;
   createdAt?: Date;
@@ -210,6 +218,7 @@ const enquirySchema = new Schema<EnquiryDoc>(
     phone: { type: String, default: "" },
     subject: { type: String, default: "" },
     message: { type: String, required: true },
+    answers: { type: Schema.Types.Mixed, default: {} },
     status: { type: String, enum: ["new", "in-progress", "closed"], default: "new" },
     notes: { type: String, default: "" },
   },

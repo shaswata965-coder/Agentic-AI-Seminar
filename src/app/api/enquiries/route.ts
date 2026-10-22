@@ -4,9 +4,10 @@ import { connectDb } from "@/lib/db";
 import { Enquiry } from "@/lib/models";
 import { enquiryAckEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
 import { formLimit } from "@/lib/server/form-limits";
-import { error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { error, isRecord, isSameOrigin, json, readJson } from "@/lib/server/http";
 import { sendMail } from "@/lib/server/mail";
-import { enquirySchema } from "@/lib/server/validation";
+import { answerText, ENQUIRY_FORMS, FORM_SETTINGS } from "@/lib/forms";
+import { checkEnquiry } from "@/lib/server/validation";
 
 const LABEL = { contact: "Contact message", exhibitor: "Exhibitor enquiry", sponsor: "Sponsorship enquiry" } as const;
 
@@ -19,8 +20,9 @@ export async function POST(req: NextRequest) {
   if (!isRecord(body)) return error(400, "Invalid request.");
   if ((body as { website?: string }).website) return json({ message: "Thanks!" }, { status: 201 });
 
-  const parsed = enquirySchema.safeParse(body);
-  if (!parsed.success) return error(422, "Please check the highlighted fields.", { fieldErrors: zodFieldErrors(parsed.error) });
+  const s = await getSavedSettings();
+  const parsed = checkEnquiry(s, body);
+  if (!parsed.ok) return error(422, "Please check the highlighted fields.", { fieldErrors: parsed.fieldErrors });
   const d = parsed.data;
 
   try {
@@ -31,7 +33,8 @@ export async function POST(req: NextRequest) {
     return error(503, "We couldn't send your message right now. Please try again shortly.");
   }
 
-  const s = await getSavedSettings();
+  // The notice lists every field shown on the form, by its name there.
+  const fields = s[FORM_SETTINGS[ENQUIRY_FORMS[d.type]]].filter((f) => !f.hidden);
   after(async () => {
     await sendMail(enquiryAckEmail(s, { email: d.email, type: d.type }));
     const to = notifyAddress(s);
@@ -41,14 +44,7 @@ export async function POST(req: NextRequest) {
           s,
           to,
           `${LABEL[d.type]} from ${d.name}`,
-          [
-            ["Name", d.name],
-            ["E-mail", d.email],
-            ["Organisation", d.organisation || "-"],
-            ["Phone", d.phone || "-"],
-            ["Subject", d.subject || "-"],
-            ["Message", d.message],
-          ],
+          fields.map((f) => [f.label, answerText(f.key in d.answers ? d.answers[f.key] : d[f.key]) || "-"]),
           d.email,
         ),
       );

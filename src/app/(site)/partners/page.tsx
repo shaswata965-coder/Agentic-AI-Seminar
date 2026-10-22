@@ -39,7 +39,7 @@ export default async function PartnersPage() {
     { title: ways.hackathonTitle, text: ways.hackathonText, href: "/hackathon", icon: <Trophy size={21} aria-hidden />, tone: "tone-aqua" },
     { title: ways.communityTitle, text: ways.communityText, href: "#become-a-partner", icon: <Megaphone size={21} aria-hidden />, tone: "tone-lilac" },
   ].filter((w) => w.title);
-  const enquire = <EnquiryButton type="sponsor" label={hero.button} title={hero.formTitle} description={hero.formText} aura="sponsors" icon={<Handshake size={18} aria-hidden />} />;
+  const enquire = <EnquiryButton type="sponsor" fields={s.partnerFields} text={copy(s, "partnerFormText")} label={hero.button} title={hero.formTitle} description={hero.formText} aura="sponsors" icon={<Handshake size={18} aria-hidden />} />;
   const brochure = s.sponsorBrochure ? (
     <ButtonLink href={s.sponsorBrochure} variant="outline" download icon={<Download size={17} aria-hidden />}>
       {hero.brochure}

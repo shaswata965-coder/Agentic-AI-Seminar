@@ -199,7 +199,7 @@ function StaffDashboard({ me, data, error }: { me: AdminMe; data: Stats | null; 
                 {data.byCategory.map((c) => (
                   <li key={c.category}>
                     <div className="flex justify-between text-sm">
-                      <span className="text-fg">{ATTENDEE_CATEGORY_META[c.category as keyof typeof ATTENDEE_CATEGORY_META] ?? c.category}</span>
+                      <span className="text-fg">{c.category}</span>
                       <span className="font-semibold text-fg tabular">{c.count}</span>
                     </div>
                     <div className="mt-1 h-2 overflow-hidden rounded-full bg-surface-2">

@@ -7,6 +7,7 @@ import type {
   SponsorTier,
   ThemeKey,
 } from "./constants";
+import type { FormSettings } from "@/lib/forms";
 import type { PageCopy } from "@/lib/schema/page-copy";
 import type { SectionOrders } from "@/lib/schema/section-order";
 import type { Tone } from "./constants";
@@ -20,8 +21,8 @@ export interface IconItem {
 /** Accent colours chosen in Site settings → Site-wide → Colours; empty means the built-in shade. */
 export type Palette = Record<Tone, string>;
 
-/** Everything in Admin → Site settings, including every section's texts and colours (PageCopy). */
-export interface SiteSettings extends PageCopy, SectionOrders {
+/** Everything in Admin → Site settings, including every section's texts and colours (PageCopy) and the forms' fields. */
+export interface SiteSettings extends PageCopy, SectionOrders, FormSettings {
   eventName: string;
   shortName: string;
   tagline: string;

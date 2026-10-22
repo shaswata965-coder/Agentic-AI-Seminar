@@ -8,6 +8,7 @@ import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
 import { SlidingPill, useSlidingPill } from "@/components/ui/SlidingPill";
 import { formatDateTime } from "@/lib/format";
+import { ENQUIRY_FORMS, FORM_DEFAULTS, FORM_SETTINGS, isBuiltIn, responseRows, type FormField, type FormKey } from "@/lib/forms";
 import { withBase } from "@/lib/paths";
 import { PageTitle, useEventName, useMe } from "./AdminShell";
 import { api, useApi } from "./api";
@@ -21,6 +22,7 @@ interface Enquiry {
   phone: string;
   subject: string;
   message: string;
+  answers?: Record<string, unknown>;
   status: "new" | "in-progress" | "closed";
   notes: string;
   createdAt: string;
@@ -33,6 +35,12 @@ export function EnquiriesManager() {
   const eventName = useEventName();
   const toast = useToast();
   const { data, loading, setData, reload } = useApi<Enquiry[]>("/enquiries");
+  // The forms' questions, for the answers to questions added in Site settings.
+  const forms = useApi<Record<FormKey, FormField[]>>("/forms").data;
+  const extra = (e: Enquiry) => {
+    const form = ENQUIRY_FORMS[e.type];
+    return responseRows(e as unknown as Record<string, unknown>, forms?.[form] ?? FORM_DEFAULTS[FORM_SETTINGS[form]]).filter((r) => !isBuiltIn(form, r.key) && r.text);
+  };
   const [type, setType] = useState<"all" | Enquiry["type"]>("all");
   const { listRef, pillRef } = useSlidingPill(type);
   const rows = (data ?? []).filter((e) => type === "all" || e.type === type);
@@ -95,6 +103,15 @@ export function EnquiriesManager() {
                 </p>
                 {e.subject ? <p className="mt-2 text-sm font-semibold text-fg">{e.subject}</p> : null}
                 <p className="mt-2 text-sm whitespace-pre-wrap text-muted">{e.message}</p>
+                {extra(e).length ? (
+                  <dl className="mt-3 grid gap-1.5 text-sm">
+                    {extra(e).map((r) => (
+                      <div key={r.key}>
+                        <dt className="inline font-semibold text-fg">{r.label}:</dt> <dd className="inline whitespace-pre-wrap text-muted">{r.text}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                ) : null}
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 <a href={`mailto:${e.email}?subject=${encodeURIComponent(`Re: ${e.subject || "your enquiry"} · ${eventName}`)}`} onClick={() => e.status === "new" && setStatus(e, "in-progress")} className="inline-flex h-9 items-center gap-1.5 rounded-full border border-border px-3 text-sm font-semibold hover:border-brand hover:text-brand">

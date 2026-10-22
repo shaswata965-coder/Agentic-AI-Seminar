@@ -1,3 +1,4 @@
+import { FORM_DEFAULTS, FORM_SETTINGS, formFields, type FormKey } from "@/lib/forms";
 import { PAGE_COPY_DEFAULTS } from "@/lib/schema/page-copy";
 import { SECTION_ORDER_DEFAULTS } from "@/lib/schema/section-order";
 import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
@@ -11,6 +12,7 @@ import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
 export const DEFAULT_SETTINGS: SiteSettings = {
   ...PAGE_COPY_DEFAULTS,
   ...SECTION_ORDER_DEFAULTS,
+  ...FORM_DEFAULTS,
   eventName: "Agentic AI Workshop 2026",
   shortName: "AAIW 2026",
   tagline: "Where autonomous AI agents meet healthcare, science and enterprise.",
@@ -404,8 +406,18 @@ function withoutRetired<T extends object>(data: T, defaults: T, { values, texts 
   return out as T;
 }
 
-/** Stored settings or hackathon details (merged over the defaults) with any earlier, unedited default replaced by the current one. */
+/** Each form's fields made whole (src/lib/forms.ts), as they are read. */
+function withWholeForms<T extends object>(settings: T): T {
+  const out = { ...settings } as Record<string, unknown>;
+  for (const form of Object.keys(FORM_SETTINGS) as FormKey[]) out[FORM_SETTINGS[form]] = formFields(form, out[FORM_SETTINGS[form]]);
+  return out as T;
+}
+
+/**
+ * Stored settings or hackathon details (merged over the defaults) with any earlier, unedited default replaced
+ * by the current one, and the forms' fields made whole.
+ */
 export function withCurrentDefaults<T extends object>(key: "settings" | "hackathon", data: T): T {
   if (key === "hackathon") return withoutRetired(data, DEFAULT_HACKATHON as T, RETIRED.hackathon);
-  return withoutRetired(withCurrentAboutPoints(data as T & { aboutPoints?: { title: string }[] }), DEFAULT_SETTINGS as T, RETIRED.settings);
+  return withWholeForms(withoutRetired(withCurrentAboutPoints(data as T & { aboutPoints?: { title: string }[] }), DEFAULT_SETTINGS as T, RETIRED.settings));
 }

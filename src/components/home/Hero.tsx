@@ -10,8 +10,32 @@ import { formatDateRange } from "@/lib/format";
 import { HeroPlacards, type HeroPlacard } from "./HeroPlacards";
 import { RegisterChooser } from "./RegisterChooser";
 
-/** The hero's photo of the IIT Delhi building: the one uploaded in Site settings → Home → Hero, or the built-in one (public/hero). */
-export const heroPhoto = (s: SiteSettings): string | undefined => (s.showHeroPhoto ? s.heroPhoto || "/hero/iit-delhi.webp" : undefined);
+/** The built-in photo of the IIT Delhi main building (public/hero), 1280×712. */
+const BUILDING = "/hero/iit-delhi.webp";
+
+/** The hero's photo: the one uploaded in Site settings → Home → Hero, or the built-in one. */
+export const heroPhoto = (s: SiteSettings): string | undefined => (s.showHeroPhoto ? s.heroPhoto || BUILDING : undefined);
+
+/**
+ * The built-in photo behind Aura, placed so that the building's sign, "भारतीय प्रौद्योगिकी संस्थान दिल्ली" over
+ * "INDIAN INSTITUTE OF TECHNOLOGY DELHI", sits just above her head and clear of the text: --w is the photo's width,
+ * and the sign (at 30.7% across and 62.5% down the photo) is centred on her column, its top --y from the column's
+ * top. The photo fades in from the left and out below the sign, behind her; while the text is above her (below lg)
+ * it starts at the emblem over the sign, and her column leaves room for the sign above her. The agent network keeps
+ * off the sign.
+ */
+function BuildingSign() {
+  return (
+    <div
+      aria-hidden
+      className="pointer-events-none absolute -z-20 aspect-[1280/712] [--w:860px] [--y:1.75rem] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent,black_14%),linear-gradient(to_bottom,transparent_50%,black_54.5%,black_76%,transparent_96%)] sm:[--w:960px] lg:[--w:1100px] lg:[--y:-1.25rem] lg:[mask-image:linear-gradient(to_right,transparent,black_14%),linear-gradient(to_bottom,black_76%,transparent_96%)]"
+      style={{ width: "var(--w)", left: "calc(50% - var(--w) * 0.307)", top: "calc(var(--y) - var(--w) * 0.3477)" }}
+    >
+      <Img src={BUILDING} alt="" width={1280} height={712} loading="eager" className="h-full w-full object-cover opacity-95 dark:opacity-60 dark:brightness-90" />
+      <span data-graph-avoid="" className="absolute top-[52%] left-[15%] h-[24%] w-[32%]" />
+    </div>
+  );
+}
 
 /** One fact under the title: a coloured rule, a small label and the value. */
 function Fact({ label, icon, tone, children }: { label: string; icon: ReactNode; tone: string; children: ReactNode }) {
@@ -44,8 +68,8 @@ export function Hero({ s }: { s: SiteSettings }) {
     <section data-edit="home.hero" className="relative isolate overflow-hidden" aria-labelledby="hero-title">
       {/* Background: pastel mesh, dotted grid and the live agent network, which keeps clear of every [data-graph-avoid] text block. */}
       <div aria-hidden className="absolute inset-0 -z-20 bg-[radial-gradient(70%_60%_at_15%_10%,color-mix(in_oklab,var(--azure)_38%,transparent),transparent_70%),radial-gradient(50%_55%_at_85%_20%,color-mix(in_oklab,var(--lilac)_34%,transparent),transparent_70%),radial-gradient(45%_50%_at_60%_95%,color-mix(in_oklab,var(--mint)_26%,transparent),transparent_70%)] dark:opacity-50" />
-      {photo ? (
-        // The IIT Delhi building at the top right, melting into the background to the left and downwards. While the
+      {photo && photo !== BUILDING ? (
+        // An uploaded photo at the top right, melting into the background to the left and downwards. While the
         // text spans the whole width (below lg) it stays faint behind it; beside the text it shows in full.
         <div aria-hidden className="pointer-events-none absolute top-0 right-0 -z-20 h-[55%] w-full [mask-image:radial-gradient(90%_80%_at_100%_0%,black_20%,transparent_75%)] sm:h-[60%] lg:h-[80%] lg:w-[64%] lg:[mask-image:radial-gradient(115%_100%_at_100%_0%,black_42%,transparent_80%)]">
           <Img src={photo} alt="" width={1280} height={712} loading="eager" className="h-full w-full object-cover object-[65%_35%] opacity-35 lg:opacity-90 dark:opacity-25 dark:brightness-75 lg:dark:opacity-40" />
@@ -106,7 +130,8 @@ export function Hero({ s }: { s: SiteSettings }) {
 
         {/* data-launch-land: after the loading screen, Aura flies down into place from where her ship went up (loading.css).
             She holds up the placards from Home → Hero announcements in turn. */}
-        <div data-launch-land="" data-edit="home.placard" className="relative mx-auto flex w-full max-w-[460px] flex-col items-center pt-6 lg:pt-0">
+        <div data-launch-land="" data-edit="home.placard" className={`relative mx-auto flex w-full max-w-[460px] flex-col items-center lg:pt-0 ${photo === BUILDING ? "pt-20" : "pt-6"}`}>
+          {photo === BUILDING ? <BuildingSign /> : null}
           <div aria-hidden className="absolute inset-[8%] -z-10 rounded-full bg-[conic-gradient(from_200deg,var(--azure-soft),var(--lilac-soft),var(--blush-soft),var(--mint-soft),var(--azure-soft))] blur-2xl" />
           <div aria-hidden className="absolute inset-[16%] -z-10 rounded-full border border-dashed border-border-strong opacity-60 animate-spin-slow" />
           <HeroPlacards placards={placards} words={{ open: p.open, soon: p.soon, closed: p.closed }} />

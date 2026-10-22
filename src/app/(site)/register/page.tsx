@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/Badge";
 import { ButtonLink } from "@/components/ui/Button";
 import { Portal } from "@/components/ui/Portal";
 import { TagScope } from "@/components/ui/Tag";
-import { getSettings } from "@/lib/content/queries";
+import { getSettings, inPreview } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { eventCalendarLinks, hackathonRegistrationHref } from "@/lib/event";
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RegisterPage() {
-  const s = await getSettings();
+  const [s, preview] = await Promise.all([getSettings(), inPreview()]);
   const hero = copy(s, "registerHero");
   const form = copy(s, "registerForm");
   const fees = copy(s, "registerFees");
@@ -97,9 +97,12 @@ export default async function RegisterPage() {
                   </div>
                 </div>
               </div>
+            ) : preview ? (
+              // The admin's live preview shows the form whatever the status, so its fields can be edited.
+              <RegistrationForm fields={s.registerFields} text={copy(s, "registerFormText")} calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
             ) : s.workshopStatus === "open" ? (
               <DeadlineGate deadline={s.workshopDeadline} closed={<StatusCard s={s} closed />}>
-                <RegistrationForm calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
+                <RegistrationForm fields={s.registerFields} text={copy(s, "registerFormText")} calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
               </DeadlineGate>
             ) : (
               <StatusCard s={s} closed={s.workshopStatus === "closed"} />

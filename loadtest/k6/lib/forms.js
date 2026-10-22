@@ -1,7 +1,8 @@
 /*
  * The three public forms: workshop registration, hackathon team registration and enquiries. Payloads
- * are what the site's own forms send (src/components/forms), with made-up people whose addresses are
- * unique to the run, and every answer is sorted into an outcome (see `thresholds` in config.js).
+ * are what the site's own forms send with their built-in fields (src/lib/forms.ts; choices must be among
+ * a field's options), with made-up people whose addresses are unique to the run, and every answer is
+ * sorted into an outcome (see `thresholds` in config.js).
  */
 import { check } from "k6";
 import http from "k6/http";
@@ -19,8 +20,8 @@ export const submitTime = new Trend("submit_time", true);
 const FIRST = ["Aarav", "Priya", "Rohan", "Ananya", "Vikram", "Meera", "Kabir", "Isha", "Arjun", "Diya", "Sahil", "Nisha", "Farhan", "Lakshmi", "Tenzin", "Grace"];
 const LAST = ["Sharma", "Iyer", "Gupta", "Reddy", "Singh", "Nair", "Banerjee", "Khan", "Das", "Patel", "Menon", "Joshi", "Bhat", "Kaur"];
 const ORGS = ["IIT Delhi", "IIT Bombay", "IIIT Hyderabad", "University of Delhi", "Delhi Technological University", "NSUT", "Jamia Millia Islamia", "IIT Kanpur", "Ashoka University", "AIIMS New Delhi", "A healthcare start-up", "Microsoft Research India", "TCS Research"];
-const CATEGORIES = ["student", "student", "student", "researcher", "faculty", "industry", "startup", "investor", "other"];
-const THEMES = ["healthcare", "science", "enterprise"];
+const CATEGORIES = ["Student", "Student", "Student", "Researcher / postdoc", "Faculty", "Industry practitioner", "Startup founder / team", "Investor", "Other"];
+const THEMES = ["Healthcare", "Scientific Discovery", "Enterprise"];
 const CITIES = ["New Delhi", "Gurugram", "Noida", "Mumbai", "Bengaluru", "Hyderabad", "Kolkata", "Chennai", "Pune"];
 
 const digits = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 10)).join("");
@@ -44,7 +45,7 @@ export function workshopPayload(id) {
     hackathonInterest: Math.random() < 0.3,
     dietary: pick(["", "Vegetarian", "Vegan", "Jain"]),
     accessibility: "",
-    heardFrom: pick(["WhatsApp", "LinkedIn", "Professor", "Friend", "IIT Delhi website"]),
+    heardFrom: pick(["Social media", "E-mail", "Colleague or friend", "IIT Delhi / ScAI website", "Other"]),
     message: Math.random() < 0.2 ? "Looking forward to the sessions on agents in healthcare." : "",
     consent: true,
     website: "", // the honeypot the real form leaves empty
@@ -56,7 +57,6 @@ export function hackathonPayload(id) {
   const members = Array.from({ length: size }, (_, i) => ({ ...person(`${id}-m${i}`), role: i === 0 ? "Team lead" : pick(["Developer", "Designer", "ML engineer", "Domain expert"]) }));
   return {
     teamName: `LT ${RUN_ID} ${id}`.slice(0, 60),
-    track: pick([...THEMES, "undecided"]),
     members,
     ideaTitle: "Agents that triage clinic queues",
     ideaSummary: "A multi-agent assistant that reads intake forms, checks history and books follow-ups, with a clinician in the loop.",

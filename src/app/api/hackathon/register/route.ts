@@ -2,13 +2,14 @@ import { after, type NextRequest } from "next/server";
 import { getHackathon, getSavedSettings } from "@/lib/content/queries";
 import { connectDb, isDuplicateKeyError } from "@/lib/db";
 import { deadlinePassed } from "@/lib/event";
+import { answerText } from "@/lib/forms";
 import { HackathonRegistration } from "@/lib/models";
 import { hackathonEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
 import { formLimit } from "@/lib/server/form-limits";
-import { error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { error, isRecord, isSameOrigin, json, readJson } from "@/lib/server/http";
 import { makeRegId } from "@/lib/server/ids";
 import { mailConfigured, sendMail } from "@/lib/server/mail";
-import { hackathonSchema } from "@/lib/server/validation";
+import { checkTeam } from "@/lib/server/validation";
 
 const teamKey = (name: string) => name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "");
 
@@ -26,11 +27,8 @@ export async function POST(req: NextRequest) {
   if (s.hackathonStatus !== "open") return error(403, s.hackathonStatus === "closed" ? "Hackathon registration is closed." : "Hackathon registration has not opened yet.");
   if (deadlinePassed(s.hackathonDeadline)) return error(403, "Hackathon registration is closed: the deadline has passed.");
 
-  const parsed = hackathonSchema.safeParse(body);
-  if (!parsed.success) {
-    const fe = zodFieldErrors(parsed.error);
-    return error(422, "Please check the highlighted fields.", { fieldErrors: Object.fromEntries(Object.entries(fe).map(([k, v]) => [k.replace(/^members\.(\d+)/, "members.$1"), v])) });
-  }
+  const parsed = checkTeam(s, body);
+  if (!parsed.ok) return error(422, "Please check the highlighted fields.", { fieldErrors: parsed.fieldErrors });
   const d = parsed.data;
   const key = teamKey(d.teamName);
   if (key.length < 2) return error(422, "Please choose a team name with letters or numbers.", { fieldErrors: { teamName: "Invalid team name" } });
@@ -61,7 +59,7 @@ export async function POST(req: NextRequest) {
               ["ID", regId],
               ["Lead", `${d.members[0].name} <${d.members[0].email}>`],
               ["Members", String(d.members.length)],
-              ["Idea", d.ideaTitle || "-"],
+              ["Idea", answerText(d.ideaTitle) || "-"],
             ]),
           );
         }
