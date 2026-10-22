@@ -49,12 +49,17 @@ export async function POST(req: NextRequest) {
   return json({ ok: true });
 }
 
-/** Leave the preview: forget the draft and turn Draft Mode off. */
+/**
+ * Leave the preview: forget the draft and turn Draft Mode off. With ?keep=1 (after a save or a discard, while
+ * the editor stays open) only the draft goes, so the preview shows the saved settings and Draft Mode stays on
+ * for the next change: turning it off and on again between two changes let the frame's re-render go out
+ * without the cookie and show the saved page instead of the new draft.
+ */
 export async function DELETE(req: NextRequest) {
   const user = await requireAdmin(req, { permission: SETTINGS_PERMISSIONS });
   if (user instanceof Response) return user;
   await connectDb();
   await Singleton.deleteOne({ key: SETTINGS_DRAFT_KEY });
-  (await draftMode()).disable();
+  if (req.nextUrl.searchParams.get("keep") !== "1") (await draftMode()).disable();
   return json({ ok: true });
 }

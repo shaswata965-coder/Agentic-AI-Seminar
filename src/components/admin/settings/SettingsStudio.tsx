@@ -132,12 +132,12 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
-  /** Back to the saved settings in the preview. */
+  /** Back to the saved settings in the preview, which stays in Draft Mode for the next change. */
   const clearPreview = useCallback(async () => {
     setSyncing(false); // a change still waiting to be sent is dropped with the draft
     if (!hadDraft.current) return;
     hadDraft.current = false;
-    await api("/preview", { method: "DELETE" }).catch(() => {});
+    await api("/preview?keep=1", { method: "DELETE" }).catch(() => {});
     setRevision((r) => r + 1);
   }, []);
 
