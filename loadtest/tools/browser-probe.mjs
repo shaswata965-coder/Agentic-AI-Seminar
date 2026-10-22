@@ -61,26 +61,10 @@ async function attempt(browser, n) {
     if (submits >= MAX_SUBMITS) {
       row.ok = true;
       row.outcome = "filled in (not sent: probe's own limit)";
-      return row;
+    } else {
+      submits += 1;
+      await send(page, row);
     }
-    submits += 1;
-    const sent = Date.now();
-    await page.getByRole("button", { name: "Complete registration" }).click();
-    // Either the confirmation, or a refusal or error in a toast (both sit in status regions).
-    const outcome = await page
-      .waitForFunction(
-        () => {
-          if ([...document.querySelectorAll("h2")].some((h) => h.textContent?.includes("registered!"))) return "registered";
-          const toast = [...document.querySelectorAll('[role="status"]')].map((e) => e.textContent?.trim()).find(Boolean);
-          return toast ? `refused: ${toast.slice(0, 120)}` : null;
-        },
-        null,
-        { timeout: 60_000 },
-      )
-      .then((handle) => handle.jsonValue());
-    row.submit = Date.now() - sent;
-    row.outcome = outcome;
-    row.ok = outcome === "registered";
   } catch (err) {
     row.error = String(err.message ?? err).split("\n")[0];
   } finally {
@@ -88,6 +72,27 @@ async function attempt(browser, n) {
   }
   appendFileSync(OUT, `${JSON.stringify(row)}\n`);
   return row;
+}
+
+/** Send the form and wait for the confirmation, or a refusal or error. */
+async function send(page, row) {
+  const sent = Date.now();
+  await page.getByRole("button", { name: "Complete registration" }).click();
+  // Either the confirmation, or a refusal or error in a toast (both sit in status regions).
+  const outcome = await page
+    .waitForFunction(
+      () => {
+        if ([...document.querySelectorAll("h2")].some((h) => h.textContent?.includes("registered!"))) return "registered";
+        const toast = [...document.querySelectorAll('[role="status"]')].map((e) => e.textContent?.trim()).find(Boolean);
+        return toast ? `refused: ${toast.slice(0, 120)}` : null;
+      },
+      null,
+      { timeout: 60_000 },
+    )
+    .then((handle) => handle.jsonValue());
+  row.submit = Date.now() - sent;
+  row.outcome = outcome;
+  row.ok = outcome === "registered";
 }
 
 const { chromium } = await loadPlaywright();
