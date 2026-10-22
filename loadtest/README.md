@@ -86,6 +86,8 @@ NEXT_PUBLIC_SITE_URL=https://localhost npm run build
 SERVER_CPUS=0,1 K6_CPUS=2,3 loadtest/run.sh                                 # everything, about 70 minutes
 SERVER_CPUS=0,1 K6_CPUS=2,3 loadtest/run.sh submission:distinct submission:shared
 SCALE=0.05 PACE=0.2 loadtest/run.sh daily:distinct                         # quick smoke run
+NGINX_PROFILE=tuned LABEL=tuned loadtest/run.sh submission:distinct         # with the tuned nginx
+ARRIVAL=600 LABEL=10min loadtest/run.sh submission:distinct                 # the 2,000 arrive over 10 minutes
 ```
 
 `run.sh` starts a fresh stack for every run ([`stack/up.sh`](stack/up.sh): nginx, `next start`, the SMTP sink),
@@ -101,8 +103,12 @@ monitor, and writes everything to `loadtest/results/<time>/<scenario>-<mode>/`:
 | `nginx-access.log`, `nginx-error.log`, `next.log`, `k6.log`, `probe.jsonl`, `monitor.jsonl` | the raw material |
 
 `SERVER_CPUS` and `K6_CPUS` keep the load generator from taking CPU from the server (`taskset`): with `0,1`
-the server side has two cores, like a small VM. `NGINX_CONNECTIONS` (default 768, Ubuntu's stock value) and
-`NGINX_WORKERS` change nginx; `SMTP_SINK_DELAY_MS` slows the SMTP sink down like a real mail server.
+the server side has two cores, like a small VM. `NGINX_PROFILE=tuned` swaps the README's nginx server block
+for [`stack/nginx.tuned.conf.template`](stack/nginx.tuned.conf.template) (build files from disk, more
+connections, a 2-second micro-cache, nothing compressed per request; see the report's finding 2).
+`NGINX_CONNECTIONS` (default 768, Ubuntu's stock value) and `NGINX_WORKERS` change the README profile's nginx;
+`ARRIVAL` spreads the submission rush over that many seconds (default 60); `LABEL` is added to the result
+folder's name; `SMTP_SINK_DELAY_MS` slows the SMTP sink down like a real mail server.
 
 To test another deployment, run a script directly against it with k6, e.g.
 `k6 run -e BASE_URL=https://staging.example.org loadtest/k6/daily.js` (sign-in details for the organiser

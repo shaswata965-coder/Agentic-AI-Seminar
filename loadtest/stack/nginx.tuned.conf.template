@@ -5,7 +5,7 @@
 #   2. 4,096 connections per worker, and kept-alive connections to Next.js;
 #   3. a 2-second micro-cache for anonymous page and router-prefetch requests, so a rush of identical
 #      requests reaches Next.js about once per page every 2 seconds. Signed-in organisers and the admin's
-#      live preview (Draft Mode) bypass it, and an edit saved in the admin reaches visitors within 2 s;
+#      live preview (Draft Mode) bypass it, and an edit saved in the admin reaches visitors after about 2 s;
 #   4. nothing is compressed per request: pages are cached already gzipped (Next.js compresses each once
 #      per cache fill), and build files are served from gzipped copies made after the build
 #      (gzip_static; up.sh makes them, as a deploy step would after `npm run build`).

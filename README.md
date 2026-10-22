@@ -11,6 +11,7 @@ It's a fast, accessible, mobile-first site with light and dark modes, a light pa
 | This README | Developers and whoever hosts the site |
 | [`docs/ADMIN_GUIDE.md`](docs/ADMIN_GUIDE.md) | Organisers updating content (also inside the admin at **/admin/guide**) |
 | [`docs/REQUIREMENTS_CHECKLIST.md`](docs/REQUIREMENTS_CHECKLIST.md) | How each item of the website brief is met |
+| [`docs/LOAD_TEST_REPORT.md`](docs/LOAD_TEST_REPORT.md) | How the site holds up with 100, 2,000 and 300+ people at once, and what a registration rush needs (tests in [`loadtest/`](loadtest/README.md)) |
 
 ---
 
@@ -154,7 +155,9 @@ server {
 server { listen 80; server_name agenticai.iitd.ac.in; return 301 https://$host$request_uri; }
 ```
 
-`Host` must be passed through: the admin API rejects cross-site requests by comparing the browser's `Origin` with it. For a sub-path, build with `NEXT_PUBLIC_BASE_PATH` set to the same path and proxy that location without stripping the prefix.
+`Host` must be passed through: the admin API rejects cross-site requests by comparing the browser's `Origin` with it.
+
+Expecting a rush, such as thousands registering within minutes of a deadline? This configuration serves every request through the one Node.js process: on a 2-core server it handled 200 new visitors a minute but not 2,000 arriving within one minute. See [`docs/LOAD_TEST_REPORT.md`](docs/LOAD_TEST_REPORT.md) for a tested configuration that handles it. For a sub-path, build with `NEXT_PUBLIC_BASE_PATH` set to the same path and proxy that location without stripping the prefix.
 
 ### After deploying
 
