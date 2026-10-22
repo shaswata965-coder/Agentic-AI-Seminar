@@ -11,3 +11,4 @@ next-env.d.ts
 !.env.example
 Dockerfile
 docker-compose*.yml
+loadtest

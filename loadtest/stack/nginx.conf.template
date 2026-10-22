@@ -1,0 +1,51 @@
+# Reverse proxy for the load test: the README's production server block, inside the main context of
+# Ubuntu's stock /etc/nginx/nginx.conf (worker_processes auto, 768 connections per worker), so the test
+# runs through what a server set up from the README would run. up.sh fills in the @...@ values.
+
+worker_processes @WORKERS@;
+pid @RUN@/nginx.pid;
+error_log @RUN@/logs/nginx-error.log warn;
+worker_rlimit_nofile 65535;
+
+events {
+    worker_connections @WORKER_CONNECTIONS@;
+}
+
+http {
+    sendfile on;
+    tcp_nopush on;
+    types_hash_max_size 2048;
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+    gzip on;
+
+    client_body_temp_path @RUN@/tmp/body;
+    proxy_temp_path @RUN@/tmp/proxy;
+    fastcgi_temp_path @RUN@/tmp/fastcgi;
+    uwsgi_temp_path @RUN@/tmp/uwsgi;
+    scgi_temp_path @RUN@/tmp/scgi;
+
+    # One line per request with the client address the site will see and the time Next.js took,
+    # read by tools/report.mjs.
+    log_format loadtest '$remote_addr $status $request_method "$uri" $request_time $upstream_response_time $body_bytes_sent';
+    access_log @RUN@/logs/nginx-access.log loadtest buffer=256k flush=2s;
+
+    # ---- From README.md, "Reverse proxy with HTTPS (Nginx)" -----------------------------------------
+    server {
+        listen 443 ssl http2;
+        server_name localhost;
+        ssl_certificate     @RUN@/tls/cert.pem;
+        ssl_certificate_key @RUN@/tls/key.pem;
+        client_max_body_size 10m;
+
+        location / {
+            proxy_pass http://127.0.0.1:@APP_PORT@;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-For $remote_addr; # overwrite (not append) so clients can't spoof their IP
+        }
+    }
+    server { listen 80; server_name localhost; return 301 https://$host$request_uri; }
+}
