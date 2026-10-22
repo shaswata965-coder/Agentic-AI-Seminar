@@ -3,9 +3,9 @@ import { getSavedSettings } from "@/lib/content/queries";
 import { connectDb } from "@/lib/db";
 import { Enquiry } from "@/lib/models";
 import { enquiryAckEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
-import { clientIp, error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { formLimit } from "@/lib/server/form-limits";
+import { error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
 import { sendMail } from "@/lib/server/mail";
-import { rateLimit } from "@/lib/server/rate-limit";
 import { enquirySchema } from "@/lib/server/validation";
 
 const LABEL = { contact: "Contact message", exhibitor: "Exhibitor enquiry", sponsor: "Sponsorship enquiry" } as const;
@@ -13,10 +13,9 @@ const LABEL = { contact: "Contact message", exhibitor: "Exhibitor enquiry", spon
 /** Contact form, "Exhibit with us" and "Become a partner" enquiries. */
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return error(403, "Cross-site requests are not allowed.");
-  const limit = rateLimit(`enquiry:${clientIp(req)}`, 5, 10 * 60_000);
-  if (!limit.ok) return error(429, "You've sent several messages already. Please wait a few minutes.", { retryAfter: limit.retryAfter });
-
   const body = await readJson(req);
+  const limit = formLimit(req, "enquiry", body);
+  if (!limit.ok) return error(429, "You've sent several messages already. Please wait a few minutes.", { retryAfter: limit.retryAfter });
   if (!isRecord(body)) return error(400, "Invalid request.");
   if ((body as { website?: string }).website) return json({ message: "Thanks!" }, { status: 201 });
 

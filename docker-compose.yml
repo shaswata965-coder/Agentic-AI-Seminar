@@ -50,8 +50,11 @@ services:
       SMTP_USER: ${SMTP_USER:-}
       SMTP_PASS: ${SMTP_PASS:-}
       MAIL_FROM: ${MAIL_FROM:-}
+      SMTP_MAX_CONNECTIONS: ${SMTP_MAX_CONNECTIONS:-}
+      SMTP_MAX_PER_MINUTE: ${SMTP_MAX_PER_MINUTE:-}
       NOTIFY_EMAIL: ${NOTIFY_EMAIL:-}
       MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-8}
+      RATE_LIMIT_EXEMPT: ${RATE_LIMIT_EXEMPT:-}
     depends_on:
       mongo:
         condition: service_healthy

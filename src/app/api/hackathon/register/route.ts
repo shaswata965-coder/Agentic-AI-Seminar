@@ -5,10 +5,10 @@ import { connectDb, isDuplicateKeyError } from "@/lib/db";
 import { deadlinePassed } from "@/lib/event";
 import { HackathonRegistration } from "@/lib/models";
 import { hackathonEmail, notifyAddress, organiserNotice } from "@/lib/server/emails";
-import { clientIp, error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { formLimit } from "@/lib/server/form-limits";
+import { error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
 import { makeRegId } from "@/lib/server/ids";
 import { mailConfigured, sendMail } from "@/lib/server/mail";
-import { rateLimit } from "@/lib/server/rate-limit";
 import { hackathonSchema } from "@/lib/server/validation";
 
 const teamKey = (name: string) => name.toLowerCase().normalize("NFKD").replace(/[^a-z0-9]+/g, "");
@@ -16,10 +16,9 @@ const teamKey = (name: string) => name.toLowerCase().normalize("NFKD").replace(/
 /** Hackathon team registration (built-in form). */
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return error(403, "Cross-site requests are not allowed.");
-  const limit = rateLimit(`hackathon:${clientIp(req)}`, 6, 15 * 60_000);
-  if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
-
   const body = await readJson(req);
+  const limit = formLimit(req, "hackathon", body);
+  if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
   if (!isRecord(body)) return error(400, "Invalid request.");
   if ((body as { website?: string }).website) return json({ data: { regId: "HACK26-THANKS", emailSent: false } }, { status: 201 });
 

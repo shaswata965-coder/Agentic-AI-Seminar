@@ -4,7 +4,8 @@ import { connectDb, isDuplicateKeyError } from "@/lib/db";
 import { deadlinePassed } from "@/lib/event";
 import { Registration } from "@/lib/models";
 import { registrationEmail } from "@/lib/server/emails";
-import { clientIp, error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
+import { formLimit } from "@/lib/server/form-limits";
+import { error, isRecord, isSameOrigin, json, readJson, zodFieldErrors } from "@/lib/server/http";
 import { makeRegId } from "@/lib/server/ids";
 import { mailConfigured, sendMail } from "@/lib/server/mail";
 import { rateLimit } from "@/lib/server/rate-limit";
@@ -21,10 +22,9 @@ const accepted = () => json({ data: { regId: null, emailSent: true } }, { status
  */
 export async function POST(req: NextRequest) {
   if (!isSameOrigin(req)) return error(403, "Cross-site requests are not allowed.");
-  const limit = rateLimit(`register:${clientIp(req)}`, 8, 15 * 60_000);
-  if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
-
   const body = await readJson(req);
+  const limit = formLimit(req, "register", body);
+  if (!limit.ok) return error(429, "Too many attempts. Please wait a few minutes and try again.", { retryAfter: limit.retryAfter });
   if (!isRecord(body)) return error(400, "Invalid request.");
   // Honeypot: bots fill the hidden "website" field. Pretend success, store nothing.
   if ((body as { website?: string }).website) return mailConfigured() ? accepted() : json({ data: { regId: "AAIW26-THANKS", emailSent: false } }, { status: 201 });
