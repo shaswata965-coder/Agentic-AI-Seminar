@@ -95,6 +95,14 @@ const upstreamStats = Object.fromEntries(Object.entries(upstream).map(([k, xs]) 
   const s = sortNum(xs);
   return [k, { count: xs.length, p50: Math.round(pct(s, 50)), p95: Math.round(pct(s, 95)), p99: Math.round(pct(s, 99)), max: Math.round(s.at(-1) ?? 0) }];
 }));
+// Time from nginx receiving a request to sending its last byte: what the server side took, including
+// waiting on Next.js, but not the load generator's own delays (which grow when its CPUs are saturated).
+const atNginx = {};
+for (const r of access) (atNginx[classify(r)] ??= []).push(r.rt);
+const nginxStats = Object.fromEntries(Object.entries(atNginx).map(([k, xs]) => {
+  const s = sortNum(xs);
+  return [k, { count: xs.length, p50: Math.round(pct(s, 50)), p95: Math.round(pct(s, 95)), p99: Math.round(pct(s, 99)), max: Math.round(s.at(-1) ?? 0) }];
+}));
 const errorLog = lines("nginx-error.log");
 const nginxErrors = {
   workerConnections: errorLog.filter((l) => l.includes("worker_connections are not enough")).length,
@@ -170,7 +178,7 @@ const report = {
   expected,
   stored,
   emails: { ...smtp.byKind, total: smtp.messages ?? 0, peakSmtpConnections: smtp.peakOpen ?? 0, smtpConnections: smtp.connections ?? 0, visitorMax },
-  nginx: { requests: access.length, distinctClientIps: Object.keys(perIp).length, maxRequestsFromOneIp: Math.max(0, ...Object.values(perIp)), statuses, upstreamMs: upstreamStats, errors: nginxErrors, cacheStatus },
+  nginx: { requests: access.length, distinctClientIps: Object.keys(perIp).length, maxRequestsFromOneIp: Math.max(0, ...Object.values(perIp)), statuses, requestMs: nginxStats, upstreamMs: upstreamStats, errors: nginxErrors, cacheStatus },
   next: nextErrors,
   resources,
   peakConnections: conns,
@@ -190,6 +198,7 @@ const md = [
   "",
   `nginx: ${access.length} requests from ${report.nginx.distinctClientIps} client IPs (max ${report.nginx.maxRequestsFromOneIp} from one); statuses ${Object.entries(statuses).map(([s, n]) => `${s}×${n}`).join(", ")}.`,
   Object.keys(cacheStatus).length ? `nginx micro-cache: ${Object.entries(cacheStatus).map(([k, n]) => `${k === "-" ? "not cached (disk, API)" : k}×${n}`).join(", ")}.` : "",
+  `Time at nginx, request to last byte (ms): ${Object.entries(nginxStats).map(([k, v]) => `${k} p50 ${v.p50} / p95 ${v.p95} / p99 ${v.p99}`).join("; ")}.`,
   `Time in Next.js (nginx upstream, ms): ${Object.entries(upstreamStats).map(([k, v]) => `${k} p50 ${v.p50} / p95 ${v.p95} / p99 ${v.p99} / max ${v.max}`).join("; ")}.`,
   `CPU % (avg / peak, 100 = one core): ${Object.entries(resources).map(([k, v]) => `${k} ${v.cpuAvg}/${v.cpuPeak}`).join(", ")}. Peak memory MB: ${Object.entries(resources).map(([k, v]) => `${k} ${v.rssPeakMb}`).join(", ")}.`,
   `Peak connections: nginx ${conns.nginx}, Next.js ${conns.next}, MongoDB ${conns.mongod}. SMTP: ${report.emails.total} e-mails over ${report.emails.smtpConnections} connections (peak ${report.emails.peakSmtpConnections} open at once).`,
