@@ -685,7 +685,7 @@ dialog::backdrop { background: rgb(10 15 30 / 0.45); }
   [data-placard]:has([data-launch-land]:hover, [data-launch-land]:focus-within, [data-placard-key]:hover, [data-placard-key]:focus-visible) .placard-timer { animation-play-state: paused; }
 }
 
-/* Home registration cards (RegisterChooser.tsx): the edge spins on the card whose placard Aura is holding up,
+/* Home registration tickets (RegisterChooser.tsx): the edge spins on the ticket whose placard Aura is holding up,
    and on the one under the pointer; the other rests, dimmed. */
 .reg-choice-ring { transition: opacity 0.5s ease; }
 @media (prefers-reduced-motion: no-preference) {
@@ -696,7 +696,59 @@ dialog::backdrop { background: rgb(10 15 30 / 0.45); }
 [data-placard="hackathon"] .reg-choice[data-placard-key="hackathon"] .reg-choice-ring { opacity: 1; animation-play-state: running; }
 [data-placard="workshop"] .reg-choice[data-placard-key="workshop"],
 [data-placard="hackathon"] .reg-choice[data-placard-key="hackathon"] {
-  box-shadow: 0 26px 60px -28px color-mix(in oklab, var(--accent) 85%, transparent), var(--card-shadow-lg);
+  box-shadow: 0 18px 40px -22px color-mix(in oklab, var(--accent) 85%, transparent), var(--card-shadow);
+}
+
+/* Home speakers (SpeakerCarousel.tsx): a cover flow. Every slide shares one grid cell and is moved out to its
+   place (--off: 0 in front, ±1, ±2…; --abs its distance) and turned to face the front; --drag follows a swipe.
+   Two cards either side on wide screens, one on narrower ones. The front card's edge spins; the others are
+   dimmed by a veil that lifts a little under the pointer. */
+.sp-stage {
+  --card: min(18.5rem, 74vw);
+  --step: calc(var(--card) * 0.8);
+  perspective: 1400px;
+}
+@media (width >= 64rem) {
+  .sp-stage { --step: calc(var(--card) * 0.76); }
+}
+.sp-slide {
+  width: var(--card);
+  z-index: calc(10 - var(--abs));
+  transform: translateX(calc(var(--off) * var(--step) + var(--drag, 0px))) translateZ(calc(var(--abs) * -70px)) rotateY(calc(var(--off) * -14deg)) scale(calc(1 - var(--abs) * 0.07));
+  transition: transform 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.45s ease;
+  animation: sp-in 0.5s ease backwards;
+}
+.sp-slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 1.75rem;
+  background: var(--bg);
+  opacity: calc(var(--abs) * 0.24);
+  pointer-events: none;
+  transition: opacity 0.45s ease;
+}
+.sp-slide:not([data-front]):hover::after { opacity: calc(var(--abs) * 0.12); }
+.sp-slide[data-abs="3"] { opacity: 0; pointer-events: none; }
+@media (width < 64rem) {
+  .sp-slide[data-abs="2"] { opacity: 0; pointer-events: none; }
+}
+.sp-stage[data-dragging] .sp-slide { transition: none; }
+@keyframes sp-in { from { opacity: 0; } }
+
+.sp-card { transition: translate 0.35s ease, box-shadow 0.45s ease; }
+.sp-slide[data-front] .sp-card {
+  box-shadow: 0 30px 60px -30px color-mix(in oklab, var(--accent) 90%, transparent), var(--card-shadow-lg);
+}
+.sp-slide[data-front]:hover .sp-card { translate: 0 -6px; }
+.sp-card-ring { opacity: 0; transition: opacity 0.5s ease; }
+.sp-slide[data-front] .sp-card-ring { opacity: 1; }
+@media (prefers-reduced-motion: no-preference) {
+  .sp-slide[data-front] .sp-card-ring { animation: spin-slow 6s linear infinite; will-change: transform; }
+  /* How long each card stays in front, shown as a bar filling the front card's dot. */
+  .sp-timer { transform-origin: left; animation: grow-x 6s linear both; }
+  .sp-carousel:is([data-hold], :hover, :has(:focus-visible)) .sp-timer { animation-play-state: paused; }
 }
 
 /* Bars that grow as they scroll into view (judging criteria) */

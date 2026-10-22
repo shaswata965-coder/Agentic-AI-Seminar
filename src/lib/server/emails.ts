@@ -83,7 +83,7 @@ export function hackathonEmail(s: SiteSettings, h: HackathonInfo, t: { teamName:
 ${box(`<p style="margin:0;font-size:13px;color:#64748b">Team registration ID</p><p style="margin:4px 0 0;font-size:22px;font-weight:700;letter-spacing:.06em;color:#3b5bdb">${esc(t.regId)}</p>`)}
 <p><strong>Theme:</strong> ${esc(t.track || "Undecided")}</p>
 <p><strong>Team members</strong></p><ul>${list}</ul>
-<p>Keep an eye on the hackathon page for the idea-submission date, rules and resources.</p>
+<p>Keep an eye on the hackathon page for the idea-submission date, rules and timeline.</p>
 <p>${button(absoluteUrl("/hackathon"), "Hackathon details")}</p>
 <p style="margin-top:24px">Happy building!<br/>The organising team</p>`;
   const text = `Hi ${t.leaderName},

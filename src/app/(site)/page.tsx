@@ -43,7 +43,7 @@ export default async function HomePage() {
     <>
       {s.showLoader ? <LoadingScreen eventName={s.eventName} routes={routes} files={files} text={copy(s, "homeLoader")} /> : null}
       <JsonLd data={eventJsonLd(s)} />
-      <Hero s={s} h={h} />
+      <Hero s={s} />
       <InOrder
         s={s}
         page="home"

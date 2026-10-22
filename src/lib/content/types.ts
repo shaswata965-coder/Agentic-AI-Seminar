@@ -123,7 +123,6 @@ export interface HackathonInfo {
   timeline: { label: string; date: string; dateLabel: string; description: string }[];
   prizes: { place: string; reward: string; description: string }[];
   judgingCriteria: { name: string; weight: number | null; description: string }[];
-  resources: { kind: string; title: string; description: string; url: string }[];
   resultsNote: string;
   winners: { position: string; team: string; project: string; members: string; description: string; link: string }[];
 }

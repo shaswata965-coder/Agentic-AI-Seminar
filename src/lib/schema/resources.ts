@@ -495,6 +495,8 @@ export interface SettingsSection extends FieldSection {
   anchor?: string;
   /** The page to preview, when it isn't the tab's own page. */
   path?: string;
+  /** For a part of a movable section with a tab of its own: that section's key, so the tab moves with it. */
+  within?: string;
 }
 
 /** A tab of Site settings: one page of the site, or the parts shared by every page. */
@@ -641,7 +643,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
           "Aura holds up two placards in turn in the hero: one for workshop registration, one for hackathon registration. {status} in a placard becomes that registration's status (Site-wide → Registration) in the words below, and turns to closed by itself at the deadline. Clear one placard to show only the other.",
       }),
       section("register", "Registration choice", "homeRegister", [], {
-        description: "The two large cards under the hero, one for each registration. Their status comes from Site-wide → Registration; the hackathon card's team size and prize pool from Hackathon.",
+        description: "The heading and two compact cards along the foot of the hero, one for each registration. Their status comes from Site-wide → Registration.",
       }),
       section("highlights", "Highlight strip", "homeHighlights", [
         objects("highlights", "Highlights", "Highlight", [
@@ -738,7 +740,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     sections: [
       section("hero", "Hero", "hackathonHero"),
       section("overview", "At a glance", "hackathonOverview", [], { description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview." }),
-      section("prizes", "Prize money", "hackathonPrizes", [], { description: "The first three prizes stand on a podium; any others are listed below it as special awards." }),
+      section("prizes", "Prize money", "hackathonPrizes", [], {
+        description: "Part of At a glance, under its facts. The first three prizes stand on a podium; any others are listed below it as special awards.",
+        within: "overview",
+      }),
       section("timeline", "Timeline", "hackathonTimeline"),
       section("register", "Registration form", "hackathonRegisterForm", [], {
         description: "Whether registration is open, its deadline and an external platform link are set under Site-wide → Registration.",
@@ -746,7 +751,6 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("tracks", "Themes", "hackathonTracks", [], { description: "The three themes of the one hackathon. They are edited under Hackathon → Themes." }),
       section("judging", "Judging", "hackathonJudging"),
       section("people", "Mentors & judges", "hackathonPeople", [], { description: "Mentors and judges are added under Organisers & volunteers." }),
-      section("resources", "Resources", "hackathonResources"),
       section("rules", "Rules & FAQ", "hackathonRules"),
       section("results", "Results", "hackathonResults", [], { description: "Shown once “Post-event: show hackathon winners” is on (Site-wide → Features)." }),
       section("cta", "Closing call to action", "hackathonCta"),
@@ -962,24 +966,6 @@ export const HACKATHON_DEF: SingletonDef = {
           num("weight", "Weight (%)", { min: 0, max: 100, width: "half" }),
           textarea("description", "Description", { rows: 2 }),
         ], { titleKey: "name" }),
-      ],
-    },
-    {
-      key: "resources",
-      title: "Resources",
-      fields: [
-        objects("resources", "Resources", "Resource", [
-          select("kind", "Type", [
-            { value: "api", label: "API / model access" },
-            { value: "dataset", label: "Dataset" },
-            { value: "compute", label: "Compute credits" },
-            { value: "tool", label: "Tool / framework" },
-            { value: "other", label: "Other" },
-          ], { width: "half" }),
-          text("title", "Title", { required: true, width: "half" }),
-          textarea("description", "Description", { rows: 2 }),
-          url("url", "Link"),
-        ], { titleKey: "title" }),
       ],
     },
     {

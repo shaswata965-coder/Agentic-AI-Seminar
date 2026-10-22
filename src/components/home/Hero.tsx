@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Aura } from "@/components/aura/Aura";
 import { NetworkCanvas } from "@/components/effects/NetworkCanvas";
 import { InstituteLogo } from "@/components/layout/InstituteLogo";
-import type { HackathonInfo, SiteSettings } from "@/lib/content/types";
+import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { splitEventName, venueLine } from "@/lib/event";
 import { formatDate, formatDateRange } from "@/lib/format";
@@ -24,7 +24,7 @@ function Fact({ label, icon, tone, children }: { label: string; icon: ReactNode;
   );
 }
 
-export function Hero({ s, h }: { s: SiteSettings; h: HackathonInfo }) {
+export function Hero({ s }: { s: SiteSettings }) {
   const c = copy(s, "homeHero");
   const p = copy(s, "homePlacard");
   const tones = copy(s, "homeRegister");
@@ -102,7 +102,7 @@ export function Hero({ s, h }: { s: SiteSettings; h: HackathonInfo }) {
           <HeroPlacards placards={placards} words={{ open: p.open, soon: p.soon, closed: p.closed }} />
         </div>
 
-        <RegisterChooser s={s} h={h} className="lg:col-span-2" />
+        <RegisterChooser s={s} className="lg:col-span-2" />
       </div>
 
       {s.showCountdown ? (

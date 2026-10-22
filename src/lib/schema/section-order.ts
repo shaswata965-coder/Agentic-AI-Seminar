@@ -10,7 +10,7 @@ export const SECTION_ORDER = {
   home: ["highlights", "news", "themes", "about", "speakers", "hackathon", "venue", "partners", "faq"],
   about: ["motivation", "audience", "activities"],
   programme: ["overview", "schedule", "kiosks", "hackathon", "plan"],
-  hackathon: ["overview", "prizes", "timeline", "register", "tracks", "judging", "people", "resources", "rules", "results", "cta"],
+  hackathon: ["overview", "timeline", "tracks", "register", "judging", "people", "rules", "results", "cta"],
   partners: ["list", "reach", "ways", "tiers"],
   venue: ["place", "routes", "stay"],
   organisers: ["faculty", "students", "volunteers"],

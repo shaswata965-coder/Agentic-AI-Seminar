@@ -284,11 +284,6 @@ export const DEFAULT_HACKATHON: HackathonInfo = {
     { name: "Demo & user experience", weight: 20, description: "A working demo that is clear and usable." },
     { name: "Responsible AI", weight: 10, description: "Safety, privacy, fairness and transparency considerations." },
   ],
-  resources: [
-    { kind: "api", title: "Model & API access", description: "Details of API credits and model access will be shared with registered teams.", url: "" },
-    { kind: "dataset", title: "Datasets", description: "Curated datasets for each theme, to be announced.", url: "" },
-    { kind: "compute", title: "Compute credits", description: "Cloud / GPU credits, if available, will be announced.", url: "" },
-  ],
   resultsNote: "Congratulations to all the teams who took part!",
   winners: [],
 };

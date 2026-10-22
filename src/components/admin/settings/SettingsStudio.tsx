@@ -40,7 +40,8 @@ const orderOf = (s: SettingsSection) => (s.fields[0]?.type === "order" ? (s.fiel
 function inPageOrder(page: SettingsPage, value: Values | null): SettingsSection[] {
   if (!isOrderPage(page.key)) return page.sections;
   const keys: readonly string[] = arrange(SECTION_ORDER[page.key], value?.[orderField(page.key)]);
-  const rank = (s: SettingsSection) => (orderOf(s) ? keys.length : keys.indexOf(s.key));
+  // A part of a movable section (s.within) comes straight after it.
+  const rank = (s: SettingsSection) => (orderOf(s) ? keys.length : s.within ? keys.indexOf(s.within) + 0.5 : keys.indexOf(s.key));
   return [...page.sections].sort((a, b) => rank(a) - rank(b)); // the fixed ones rank -1 and keep their places (stable sort)
 }
 

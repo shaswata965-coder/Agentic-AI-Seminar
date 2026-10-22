@@ -72,7 +72,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "hackathon",
     title: "Hackathon",
     steps: [
-      "Hackathon → Overview, themes, rules, timeline, prizes, judging criteria and resources.",
+      "Hackathon → Overview, themes, rules, timeline, prizes and judging criteria.",
       "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",
       "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Site-wide → Features & post-event.",
     ],

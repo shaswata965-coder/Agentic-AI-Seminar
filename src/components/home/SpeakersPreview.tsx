@@ -1,13 +1,12 @@
-import { Star } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
 import { FacesArt } from "@/components/portals/PortalArt";
 import { ButtonLink } from "@/components/ui/Button";
-import { PersonCard } from "@/components/ui/PersonCard";
 import { Portal } from "@/components/ui/Portal";
 import { Section, SectionHeading } from "@/components/ui/Section";
-import { SPEAKER_CATEGORY_META } from "@/lib/content/constants";
+import { SPEAKER_CATEGORY_META, THEME_META } from "@/lib/content/constants";
 import type { SiteSettings, Speaker } from "@/lib/content/types";
 import { copy, plural } from "@/lib/copy";
+import { SpeakerCarousel, type SpeakerSlide } from "./SpeakerCarousel";
 
 export function MoreSpeakersCard({ className, title, text }: { className?: string; title: string; text: string }) {
   return (
@@ -24,47 +23,42 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
   const featured = speakers.filter((sp) => sp.featured);
   const list = (featured.length ? featured : speakers).slice(0, limit);
   const c = copy(s, "homeSpeakers", { count: plural(speakers.length, "speaker") });
+  // Only what the cards show goes to the browser.
+  const slides: SpeakerSlide[] = list.map((sp) => {
+    const cat = SPEAKER_CATEGORY_META[sp.category] ?? SPEAKER_CATEGORY_META.academia;
+    const theme = sp.theme && sp.theme !== "general" ? THEME_META[sp.theme] : undefined;
+    return {
+      id: sp.id,
+      href: `/speakers?speaker=${encodeURIComponent(sp.slug)}`,
+      name: sp.name,
+      photo: sp.photo,
+      designation: sp.designation,
+      affiliation: sp.affiliation,
+      keynote: sp.keynote,
+      label: sp.keynote ? "Keynote" : cat.label,
+      labelTone: sp.keynote ? "butter" : cat.tone,
+      tone: cat.tone,
+      theme: theme ? { label: theme.short, tone: theme.tone } : undefined,
+      talkTitle: sp.talkTitle,
+    };
+  });
   return (
     <Section edit="home.speakers" tone={c.tone} bg={c.background} labelledBy="speakers-preview-title" tags="ribbon">
-      <SectionHeading
-        id="speakers-preview-title"
-        eyebrow={c.eyebrow}
-        title={c.title}
-        description={c.description}
-      />
-      {list.length ? (
-        <ul className="grid grid-cols-1 gap-5 min-[480px]:grid-cols-2 lg:grid-cols-4">
-          {list.map((sp, i) => {
-            const cat = SPEAKER_CATEGORY_META[sp.category] ?? SPEAKER_CATEGORY_META.academia;
-            return (
-              <li key={sp.id} data-reveal style={{ ["--reveal-delay" as string]: `${(i % 4) * 80}ms` }}>
-                <PersonCard
-                  action={{ href: `/speakers?speaker=${encodeURIComponent(sp.slug)}` }}
-                  name={sp.name}
-                  photo={sp.photo}
-                  title={sp.designation}
-                  subtitle={sp.affiliation}
-                  label={sp.keynote ? "Keynote" : cat.label}
-                  labelTone={sp.keynote ? "butter" : cat.tone}
-                  className={`tone-${cat.tone}`}
-                  highlight={
-                    sp.keynote ? (
-                      <span className="grid h-8 w-8 place-items-center rounded-full bg-butter text-[#5b3d00] shadow-card ring-2 ring-surface">
-                        <Star size={15} aria-hidden fill="currentColor" />
-                      </span>
-                    ) : null
-                  }
-                  footer={sp.talkTitle ? <p className="line-clamp-2 text-sm font-medium text-accent-ink">“{sp.talkTitle}”</p> : null}
-                />
-              </li>
-            );
-          })}
-          {s.showMoreSpeakers ? (
-            <li>
-              <MoreSpeakersCard title={c.moreTitle} text={c.moreText} />
-            </li>
-          ) : null}
-        </ul>
+      <SectionHeading id="speakers-preview-title" eyebrow={c.eyebrow} title={c.title} description={c.description} align="center" className="sm:mb-8" />
+      {slides.length ? (
+        <SpeakerCarousel
+          speakers={slides}
+          label={c.eyebrow || "Speakers"}
+          link={c.profile}
+          more={
+            s.showMoreSpeakers ? (
+              // Opaque, so the cards it passes in front of don't show through.
+              <div className="h-full overflow-hidden rounded-[1.75rem] bg-surface">
+                <MoreSpeakersCard title={c.moreTitle} text={c.moreText} />
+              </div>
+            ) : undefined
+          }
+        />
       ) : (
         <div className="card flex flex-col items-center gap-6 p-8 text-center sm:flex-row sm:text-left">
           <Aura variant="speakers" size={170} interactive />

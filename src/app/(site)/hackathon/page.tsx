@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUpRight, BookOpen, CalendarDays, CircleCheck, Cpu, Database, ExternalLink, GraduationCap, KeyRound, Laptop, MapPin, ScrollText, ShieldCheck, Trophy, Users, Wrench } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpRight, CalendarDays, CircleCheck, ExternalLink, GraduationCap, Laptop, MapPin, ScrollText, ShieldCheck, Trophy, Users } from "lucide-react";
 import type { Metadata } from "next";
 import { Aura } from "@/components/aura/Aura";
 import { Deadline } from "@/components/forms/Deadline";
@@ -23,6 +23,7 @@ import { venueLine } from "@/lib/event";
 import { formatDateRange, formatDateTime } from "@/lib/format";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/paths";
+import { sectionOrder } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await getHackathon();
@@ -33,7 +34,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const RESOURCE_ICON = { api: KeyRound, dataset: Database, compute: Cpu, tool: Wrench, other: BookOpen } as const;
 const PRIZE_TONES = ["butter", "azure", "peach", "lilac", "mint", "blush"] as const;
 
 export default async function HackathonPage() {
@@ -53,12 +53,14 @@ export default async function HackathonPage() {
   const rf = copy(s, "hackathonRegisterForm", { platform: s.hackathonPlatform || "our hackathon platform" });
   const jd = copy(s, "hackathonJudging");
   const pe = copy(s, "hackathonPeople");
-  const rs = copy(s, "hackathonResources");
   const ru = copy(s, "hackathonRules");
   const re = copy(s, "hackathonResults");
   const cta = copy(s, "hackathonCta");
   const registerLabel = external ? hero.registerOn : hero.register;
   const needs = [rf.need1, rf.need2, rf.need3].filter(Boolean);
+  // The link from the form to the themes points the way they lie on the page.
+  const order = sectionOrder(s, "hackathon");
+  const TracksArrow = order.indexOf("tracks") < order.indexOf("register") ? ArrowUp : ArrowDown;
   const closedBadge = (
     <Badge tone="blush" dot>
       {hero.closed}
@@ -138,12 +140,17 @@ export default async function HackathonPage() {
                   </ul>
                 </div>
               ) : null}
-            </Section>
-          ),
-          prizes: (
-            <Section id="prizes" edit="hackathon.prizes" tone={pr.tone} bg={pr.background} labelledBy="prizes-title">
-              <SectionHeading id="prizes-title" eyebrow={pr.eyebrow} title={pr.title} description={pr.intro} align="center" />
-              <HackathonPrizes prizes={h.prizes} pool={h.prizePool} poolLabel={pr.pool} awardsTitle={pr.awards} />
+              {/* The prize money, as part of the overview. */}
+              <div id="prizes" data-edit="hackathon.prizes" className={`tone-${pr.tone} mt-16 scroll-mt-24 sm:mt-20`}>
+                <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
+                  {pr.eyebrow ? <Eyebrow centered>{pr.eyebrow}</Eyebrow> : null}
+                  <h3 id="prizes-title" className="mt-4 font-display text-2xl font-bold text-fg sm:text-3xl">
+                    {pr.title}
+                  </h3>
+                  {pr.intro ? <p className="mt-3 text-base text-muted sm:text-lg">{pr.intro}</p> : null}
+                </div>
+                <HackathonPrizes prizes={h.prizes} pool={h.prizePool} poolLabel={pr.pool} awardsTitle={pr.awards} />
+              </div>
             </Section>
           ),
           timeline: (
@@ -179,7 +186,7 @@ export default async function HackathonPage() {
                   {rf.tracksLink && h.tracks.length ? (
                     <a href="#themes" className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
                       <span className="mi-underline">{rf.tracksLink}</span>
-                      <ArrowDown size={15} aria-hidden className="transition-transform duration-300 group-hover:translate-y-0.5" />
+                      <TracksArrow size={15} aria-hidden className={`transition-transform duration-300 ${TracksArrow === ArrowUp ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}`} />
                     </a>
                   ) : null}
                 </div>
@@ -317,31 +324,6 @@ export default async function HackathonPage() {
                   </div>
                 </div>
               )}
-            </Section>
-          ),
-          resources: (
-            <Section edit="hackathon.resources" tone={rs.tone} bg={rs.background} labelledBy="resources-title">
-              <SectionHeading id="resources-title" eyebrow={rs.eyebrow} title={rs.title} description={rs.description} />
-              <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {h.resources.map((r, i) => {
-                  const Icon = RESOURCE_ICON[r.kind as keyof typeof RESOURCE_ICON] ?? BookOpen;
-                  return (
-                    <li key={`${r.title}-${i}`} data-glow="" className="card group flex flex-col p-6 transition-[translate,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-card-lg">
-                      <span className="grid h-12 w-12 place-items-center rounded-2xl bg-accent-soft text-accent-ink transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:scale-110 group-hover:rotate-6">
-                        <Icon size={22} aria-hidden />
-                      </span>
-                      <p className="mt-4 font-display text-lg font-semibold text-fg">{r.title}</p>
-                      <p className="mt-1 text-sm text-muted">{r.description}</p>
-                      {r.url ? (
-                        <a href={r.url} target="_blank" rel="noopener noreferrer" className="group/visit mt-auto inline-flex items-center gap-1 self-start pt-4 text-sm font-semibold text-accent-ink">
-                          <span className="mi-underline">{rs.open}</span>
-                          <ArrowUpRight size={15} aria-hidden className="transition-transform duration-300 group-hover/visit:translate-x-0.5 group-hover/visit:-translate-y-0.5" />
-                        </a>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ul>
             </Section>
           ),
           rules: (
