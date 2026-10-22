@@ -6,6 +6,8 @@
 #   loadtest/run.sh                                   # every scenario in every IP mode
 #   loadtest/run.sh submission:distinct contest:shared
 #   SCALE=0.05 PACE=0.2 loadtest/run.sh daily:distinct   # quick smoke run
+#   NGINX_PROFILE=tuned LABEL=tuned loadtest/run.sh submission:distinct   # the tuned nginx (stack/up.sh)
+#   ARRIVAL=600 LABEL=10min loadtest/run.sh submission:distinct          # the 2,000 arrive over 10 minutes
 #
 # Scenarios: daily (100 users), submission (2,000), contest (300 → 400). IP modes:
 #   distinct  every user has an address of their own (127.10.0.0/20)
@@ -35,7 +37,10 @@ export SERVER_CPUS
 RUNS=("$@")
 [[ ${#RUNS[@]} -gt 0 ]] || RUNS=(daily:distinct daily:shared submission:distinct submission:shared submission:campus contest:distinct contest:shared)
 
-pin() { if [[ -n "$K6_CPUS" ]]; then taskset -c "$K6_CPUS" "$@"; else "$@"; fi; }
+# Prefix for commands on the load generator's CPUs. An array, not a function, so that `$!` of a command
+# started in the background is the command itself (taskset execs it), and killing it stops it.
+PIN=()
+[[ -n "$K6_CPUS" ]] && PIN=(taskset -c "$K6_CPUS")
 scaled() { node -e "console.log(Math.max(1, Math.round($1 * $PACE)))"; }
 ulimit -n "$(ulimit -Hn)" 2>/dev/null || true
 
@@ -78,7 +83,7 @@ echo "Results: $RESULTS"
 for spec in "${RUNS[@]}"; do
   scenario="${spec%%:*}"
   mode="${spec#*:}"
-  out="$RESULTS/$scenario-$mode"
+  out="$RESULTS/$scenario-$mode${LABEL:+-$LABEL}"
   mkdir -p "$out"
   echo "=== $scenario · $mode ==="
 
@@ -91,7 +96,7 @@ for spec in "${RUNS[@]}"; do
   nginx -p "$RUN_DIR" -c "$RUN_DIR/nginx.conf" -s reopen
   next_from=$(wc -l <"$RUN_DIR/logs/next.log")
 
-  MONITOR_OUT="$out/monitor.jsonl" pin node loadtest/tools/monitor.mjs &
+  MONITOR_OUT="$out/monitor.jsonl" "${PIN[@]}" node loadtest/tools/monitor.mjs &
   monitor=$!
   probe=""
   if [[ "$PROBE" == 1 ]]; then
@@ -99,14 +104,15 @@ for spec in "${RUNS[@]}"; do
     (
       sleep "$(scaled "$p_at")"
       BASE_URL=https://localhost RUN_ID="probe$RANDOM" PROBE_SECONDS="$(scaled "$p_len")" PROBE_WORKERS=2 PROBE_OUT="$out/probe.jsonl" \
-        pin node loadtest/tools/browser-probe.mjs >"$out/probe.log" 2>&1
+        "${PIN[@]}" node loadtest/tools/browser-probe.mjs >"$out/probe.log" 2>&1
     ) &
     probe=$!
   fi
 
   set +e
-  pin k6 run --no-color --quiet \
+  "${PIN[@]}" k6 run --no-color --quiet \
     -e IP_MODE="$mode" -e RUN_ID="$(date +%s)" -e SCALE="$SCALE" -e PACE="$PACE" -e OUT_DIR="$out" \
+    ${ARRIVAL:+-e ARRIVAL="$ARRIVAL"} ${USERS:+-e USERS="$USERS"} \
     --local-ips "$(local_ips "$mode")" \
     "loadtest/k6/$scenario.js" 2>&1 | tee "$out/k6.log" | grep -v '^\s*$' | grep -v 'level=warning' || true
   set -e

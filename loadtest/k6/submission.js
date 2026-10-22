@@ -1,6 +1,7 @@
 /*
  * Submission rush: 2,000 people register within about a minute (a deadline, or the link going round on
- * WhatsApp), so all 2,000 are on the site at once. Each is one virtual user doing one thing:
+ * WhatsApp), so all 2,000 are on the site at once (ARRIVAL, in seconds, spreads them out). Each is one
+ * virtual user doing one thing:
  *   - opens the form page directly (60 %) or comes through the home page (40 %), with nothing cached;
  *   - spends 20 to 60 s filling it in;
  *   - sends it: workshop registration 75 %, hackathon team (1 to 6 members) 20 %, contact form 5 %;
@@ -18,14 +19,14 @@ import { enquiryPayload, hackathonPayload, settle, submit, submitTwice, workshop
 import { summarise } from "./lib/summary.js";
 
 const USERS = users(Number(__ENV.USERS || 2000));
-const ARRIVAL = 60; // seconds over which they arrive
+const ARRIVAL = Number(__ENV.ARRIVAL || 60); // seconds over which they arrive
 
 export const options = {
   ...baseOptions,
   setupTimeout: "2m",
   thresholds: { ...thresholds, "submissions{form:enquiry,outcome:ok}": ["count>=0"] },
   scenarios: {
-    applicants: { executor: "per-vu-iterations", vus: USERS, iterations: 1, maxDuration: dur(600), exec: "applicant" },
+    applicants: { executor: "per-vu-iterations", vus: USERS, iterations: 1, maxDuration: dur(ARRIVAL + 540), exec: "applicant" },
     organisers: { executor: "constant-vus", vus: 3, duration: dur(ARRIVAL + 150), exec: "organiser" },
   },
 };
