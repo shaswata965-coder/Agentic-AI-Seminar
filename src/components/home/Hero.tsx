@@ -64,7 +64,7 @@ export function Hero({ s }: { s: SiteSettings }) {
   const last = lead.pop();
   const photo = heroPhoto(s);
   return (
-    <section data-edit="home.hero" className="relative isolate overflow-hidden" aria-labelledby="hero-title">
+    <section data-edit="home.hero" className="fit-reset relative isolate overflow-hidden" aria-labelledby="hero-title">
       {/* Background: pastel mesh, dotted grid and the live agent network, which keeps clear of every [data-graph-avoid] text block. */}
       <div aria-hidden className="absolute inset-0 -z-20 bg-[radial-gradient(70%_60%_at_15%_10%,color-mix(in_oklab,var(--azure)_38%,transparent),transparent_70%),radial-gradient(50%_55%_at_85%_20%,color-mix(in_oklab,var(--lilac)_34%,transparent),transparent_70%),radial-gradient(45%_50%_at_60%_95%,color-mix(in_oklab,var(--mint)_26%,transparent),transparent_70%)] dark:opacity-50" />
       {photo && photo !== BUILDING ? (
@@ -77,7 +77,7 @@ export function Hero({ s }: { s: SiteSettings }) {
       <div aria-hidden className="bg-dots absolute inset-0 -z-20 [mask-image:radial-gradient(80%_70%_at_50%_40%,black,transparent)]" />
       <NetworkCanvas className="absolute inset-0 -z-10" avoid="[data-graph-avoid]" />
 
-      <div className="container-site grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-x-6 lg:gap-y-10 lg:pt-14 lg:pb-12">
+      <div className="container-hero grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-x-6 lg:gap-y-10 lg:pt-14 lg:pb-12">
         {/* hero-copy makes the text as tall as Aura beside it; the space is shared evenly around the text. */}
         <div className="hero-copy flex flex-col justify-evenly gap-8">
           <div>

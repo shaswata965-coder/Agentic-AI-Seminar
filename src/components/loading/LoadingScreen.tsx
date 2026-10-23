@@ -122,7 +122,7 @@ export function LoadingScreen({ eventName, routes, files, text }: { eventName: s
     stage === "done" ? text.ready : stage === "page" ? text.page : count(stage === "pages" ? text.pages : text.files, progress.done, progress.total);
 
   return (
-    <div className="launch" data-phase={phase} data-edit="home.loader">
+    <div className="launch fit-reset" data-phase={phase} data-edit="home.loader">
       <div className="launch-sky" aria-hidden />
       <div className="launch-stage">
         <div className="launch-scene" aria-hidden>

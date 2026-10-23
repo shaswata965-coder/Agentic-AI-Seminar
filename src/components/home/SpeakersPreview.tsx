@@ -64,7 +64,7 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
           <Aura variant="speakers" size={170} interactive />
           <div>
             <p className="font-display text-2xl font-bold text-fg">{c.emptyTitle}</p>
-            {c.emptyText ? <p className="mt-2 max-w-xl text-muted">{c.emptyText}</p> : null}
+            {c.emptyText ? <p className="mt-2 max-w-2xl text-muted">{c.emptyText}</p> : null}
             {c.emptyButton ? (
               <div className="mt-5">
                 <ButtonLink href="/#news" variant="soft">
@@ -83,7 +83,7 @@ export function SpeakersPreview({ s, speakers }: { s: SiteSettings; speakers: Sp
           title={speakers.length ? c.portalTitle : c.portalEmptyTitle}
           text={speakers.length ? c.portalText : c.portalEmptyText}
           art={<FacesArt people={speakers.slice(0, 3)} total={speakers.length} />}
-          className="w-full max-w-xl"
+          className="w-full max-w-xl lg:max-w-2xl"
         />
       </div>
     </Section>

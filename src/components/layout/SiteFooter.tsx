@@ -57,7 +57,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
     ...(isShown(s, "home", "faq") ? [{ href: "/#contact", label: c.contact }] : []),
   ];
   return (
-    <footer data-site-footer data-edit="site.footer" className="relative mt-10 overflow-hidden border-t border-border bg-bg-soft">
+    <footer data-site-footer data-edit="site.footer" className="fit-screen relative mt-10 overflow-hidden border-t border-border bg-bg-soft">
       <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-50 [mask-image:linear-gradient(to_bottom,black,transparent_70%)]" />
       <div className="container-site relative grid gap-12 py-14 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
         <div>

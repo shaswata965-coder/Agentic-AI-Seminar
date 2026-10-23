@@ -40,7 +40,7 @@ export function About({ s }: { s: SiteSettings }) {
           title={c.portalTitle}
           text={c.portalText}
           art={<LoopArt />}
-          className="w-full max-w-xl"
+          className="w-full max-w-xl lg:max-w-2xl"
         />
       </div>
     </Section>

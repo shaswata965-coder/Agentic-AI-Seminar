@@ -40,7 +40,7 @@ export function Section({
       data-tags={tags}
       data-edit={edit}
       className={cn(
-        `tone-${tone} relative isolate scroll-mt-24 py-16 sm:py-24`,
+        `tone-${tone} relative isolate scroll-mt-24 py-14 sm:py-20`,
         band && "bg-[color-mix(in_oklab,var(--accent-soft)_70%,var(--bg))]",
         className,
       )}
@@ -84,13 +84,13 @@ export function SectionHeading({
   return (
     <div
       className={cn(
-        "mb-10 flex flex-col gap-6 sm:mb-14",
+        "mb-8 flex flex-col gap-6 sm:mb-12",
         aside ? "md:flex-row md:items-end md:justify-between" : null,
         align === "center" && "items-center text-center",
         className,
       )}
     >
-      <div className={cn("max-w-2xl", align === "center" && "mx-auto")}>
+      <div className={cn("max-w-2xl xl:max-w-3xl", align === "center" && "mx-auto")}>
         {eyebrow ? <Eyebrow centered={align === "center"}>{eyebrow}</Eyebrow> : null}
         <Tag
           id={id}

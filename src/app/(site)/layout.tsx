@@ -31,7 +31,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
           </a>
           {s.bannerText ? <SiteBanner text={s.bannerText} link={s.bannerLink} tone={s.siteBanner.tone} /> : null}
           <SiteHeader logos={{ iitd: s.logoIITD, scai: s.logoScAI }} registerHref={registrationHref(s)} extraNav={postEventNav(s, s.siteNav)} nav={s.siteNav} text={s.siteHeader} homeHidden={s.homeHidden} />
-          <main id="main" tabIndex={-1} className="outline-none">
+          <main id="main" tabIndex={-1} className="fit-screen outline-none">
             {children}
           </main>
           <SiteFooter s={s} />

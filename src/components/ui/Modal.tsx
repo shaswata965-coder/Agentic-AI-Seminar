@@ -47,7 +47,7 @@ export function Modal({
         if (e.target === ref.current) onClose();
       }}
       className={cn(
-        "m-auto max-h-[min(92dvh,56rem)] w-[calc(100%-1.5rem)] overflow-visible rounded-[1.75rem] border border-border bg-surface p-0 text-fg shadow-card-lg backdrop:bg-[rgb(10_15_30/0.45)] backdrop:backdrop-blur-sm open:animate-pop",
+        "m-auto max-h-[min(calc(92dvh/var(--fit-zoom)),56rem)] w-[calc(100%-1.5rem)] overflow-visible rounded-[1.75rem] border border-border bg-surface p-0 text-fg shadow-card-lg backdrop:bg-[rgb(10_15_30/0.45)] backdrop:backdrop-blur-sm open:animate-pop",
         size === "md" && "max-w-lg",
         size === "lg" && "max-w-2xl",
         size === "xl" && "max-w-4xl",
@@ -55,7 +55,7 @@ export function Modal({
       )}
     >
       {open ? (
-        <div className="relative max-h-[min(92dvh,56rem)] overflow-y-auto overscroll-contain rounded-[1.75rem]">
+        <div className="relative max-h-[min(calc(92dvh/var(--fit-zoom)),56rem)] overflow-y-auto overscroll-contain rounded-[1.75rem]">
           <button
             type="button"
             onClick={onClose}

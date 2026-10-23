@@ -21,7 +21,7 @@ export function HackathonSpotlight({ s, h, sessions }: { s: SiteSettings; h: Hac
   const slots = sessions.filter((x) => x.type === "hackathon");
   const dates = h.timeline.slice(0, 4);
   return (
-    <section id="hackathon" data-edit="programme.hackathon" aria-labelledby="hackathon-title" data-tags="tab" className={`tone-${c.tone} scroll-mt-24 py-16 sm:py-24`}>
+    <section id="hackathon" data-edit="programme.hackathon" aria-labelledby="hackathon-title" data-tags="tab" className={`tone-${c.tone} scroll-mt-24 py-14 sm:py-20`}>
       <div className="container-site">
         <div className="relative overflow-hidden rounded-[2rem] border border-border bg-[linear-gradient(135deg,var(--aqua-soft),var(--lilac-soft)_55%,var(--blush-soft))] p-6 shadow-card-lg sm:p-12">
           <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_left,black,transparent)]" />
