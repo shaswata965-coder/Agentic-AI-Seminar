@@ -24,6 +24,8 @@ export interface SiteHeaderProps {
   text: PageCopy["siteHeader"];
   /** The home page's sections switched off in Site settings → Home, left out of the Explore menu. */
   homeHidden: string[];
+  /** Whether the hackathon is on the site (its link and the phone menu's button). */
+  hackathon: boolean;
 }
 
 function isActive(pathname: string, href: string) {
@@ -31,7 +33,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidden }: SiteHeaderProps) {
+export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidden, hackathon }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -42,7 +44,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidde
   const explorePages = [...explorePagesOf(nav), ...extraNav];
   const homeSections = sectionNav(nav, homeHidden);
   const exploreItems = [...explorePages, ...homeSections];
-  const pages = [homeNav(nav), ...primaryNav(nav), registrationNav(nav)];
+  const pages = [homeNav(nav), ...primaryNav(nav, hackathon), registrationNav(nav)];
   const exploreActive = explorePages.some((item) => isActive(pathname, item.href));
   // Phones: logo, then the buttons pushed right. Desktop: three columns, so the links and Register sit centred between the logos.
   const barCls = "flex h-16 items-center gap-2 px-4 sm:gap-3 sm:px-6 lg:grid lg:h-[72px] lg:grid-cols-[1fr_auto_1fr] xl:px-8";
@@ -147,7 +149,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidde
 
         <div className="ml-auto flex items-center gap-2 lg:ml-0">
         <nav aria-label="Main" className="hidden items-center gap-0.5 lg:flex">
-          {[homeNav(nav), ...primaryNav(nav)].map((item) => {
+          {[homeNav(nav), ...primaryNav(nav, hackathon)].map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <Link
@@ -299,9 +301,11 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidde
                 <ButtonLink href={registerHref} size="lg" onClick={() => setMenuOpen(false)} icon={<Ticket size={18} aria-hidden />}>
                   {text.registerNow}
                 </ButtonLink>
-                <ButtonLink href="/hackathon" variant="outline" size="lg" onClick={() => setMenuOpen(false)}>
-                  {text.joinHackathon}
-                </ButtonLink>
+                {hackathon ? (
+                  <ButtonLink href="/hackathon" variant="outline" size="lg" onClick={() => setMenuOpen(false)}>
+                    {text.joinHackathon}
+                  </ButtonLink>
+                ) : null}
               </div>
             </nav>
             <div className="mt-auto flex justify-center pb-6">

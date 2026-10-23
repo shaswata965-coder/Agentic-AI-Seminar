@@ -676,7 +676,7 @@
    Print (programme / schedule)
    ------------------------------------------------------------------------- */
 @media print {
-  .no-print, header[data-site-header], footer[data-site-footer], [data-aura-assistant] { display: none !important; }
+  .no-print, header[data-site-header], footer[data-site-footer] { display: none !important; }
   /* Scroll-driven reveals never "enter" on paper: show everything in its final state. */
   [data-reveal], .grow-bar { animation: none !important; opacity: 1 !important; transform: none !important; }
   body { background: #fff; color: #000; }

@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 import type { RegistrationStatus, Tone } from "@/lib/content/constants";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
-import { hackathonRegistrationHref, registrationHref } from "@/lib/event";
+import { hackathonRegistrationHref, hackathonShown, registrationHref } from "@/lib/event";
 import { formatDate } from "@/lib/format";
 import type { PageCopy } from "@/lib/schema/page-copy";
 import type { PlacardKey } from "./HeroPlacards";
@@ -77,26 +77,34 @@ export function RegisterChooser({ s, className }: { s: SiteSettings; className?:
       status: s.workshopStatus,
       deadline: s.workshopDeadline,
     },
-    {
-      key: "hackathon",
-      tone: c.hackathonTone,
-      icon: <Trophy size={22} aria-hidden />,
-      kicker: c.hackathonKicker,
-      title: c.hackathonTitle,
-      href: hackathonRegistrationHref(s),
-      status: s.hackathonStatus,
-      deadline: s.hackathonDeadline,
-    },
+    // The hackathon's ticket only while it is shown; the workshop's alone gets its own heading.
+    ...(hackathonShown(s)
+      ? [
+          {
+            key: "hackathon" as const,
+            tone: c.hackathonTone,
+            icon: <Trophy size={22} aria-hidden />,
+            kicker: c.hackathonKicker,
+            title: c.hackathonTitle,
+            href: hackathonRegistrationHref(s),
+            status: s.hackathonStatus,
+            deadline: s.hackathonDeadline,
+          },
+        ]
+      : []),
   ];
+  const solo = choices.length === 1;
+  const title = solo ? c.soloTitle : c.title;
+  const description = solo ? c.soloDescription : c.description;
   return (
     <div data-edit="home.register" data-graph-avoid="" className={cn("grid gap-4 lg:grid-cols-[15.5rem_1fr] lg:items-center lg:gap-6", className)}>
       <div>
         <h2 id="register-choice-title" className="font-display text-xl font-bold text-fg">
-          {c.title}
+          {title}
         </h2>
-        {c.description ? <p className="mt-1 text-sm text-muted">{c.description}</p> : null}
+        {description ? <p className="mt-1 text-sm text-muted">{description}</p> : null}
       </div>
-      <ul aria-labelledby="register-choice-title" className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+      <ul aria-labelledby="register-choice-title" className={cn("grid gap-3 sm:gap-4", solo ? "sm:max-w-xl" : "sm:grid-cols-2")}>
         {choices.map((x) => {
           const external = /^https?:/.test(x.href);
           const body = (

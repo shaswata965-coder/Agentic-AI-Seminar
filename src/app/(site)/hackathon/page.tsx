@@ -5,6 +5,7 @@ import { Aura } from "@/components/aura/Aura";
 import { Deadline } from "@/components/forms/Deadline";
 import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { HackathonForm } from "@/components/forms/HackathonForm";
+import { HackathonComingSoon } from "@/components/hackathon/ComingSoon";
 import { HackathonPrizes } from "@/components/hackathon/Prizes";
 import { Ones } from "@/components/hackathon/OneQuestion";
 import { HackathonTimeline } from "@/components/hackathon/Timeline";
@@ -21,14 +22,18 @@ import { THEME_META } from "@/lib/content/constants";
 import { getFaqs, getHackathon, getPeople, getSettings, inPreview } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
-import { venueLine } from "@/lib/event";
+import { hackathonShown, venueLine } from "@/lib/event";
 import { formatDateRange, formatDateTime } from "@/lib/format";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/paths";
 import { isShown, sectionOrder } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const h = await getHackathon();
+  const [s, h] = await Promise.all([getSettings(), getHackathon()]);
+  if (!hackathonShown(s)) {
+    const c = copy(s, "hackathonPoster", { hackathon: h.title });
+    return { title: "Hackathon", description: `${h.title}: ${c.title}. ${c.text}`, alternates: { canonical: absoluteUrl("/hackathon") } };
+  }
   return {
     title: "Hackathon",
     description: `${h.title}: ${h.tagline} The question, who can join, dates, location, prize money, timeline and team registration.`,
@@ -40,6 +45,9 @@ const PRIZE_TONES = ["butter", "azure", "peach", "lilac", "mint", "blush"] as co
 
 export default async function HackathonPage() {
   const [s, h, people, faqs, preview] = await Promise.all([getSettings(), getHackathon(), getPeople(), getFaqs(), inPreview()]);
+  // While the hackathon is hidden, visitors see only its poster; the admin's preview shows the poster above the page, to edit both.
+  const comingSoon = !hackathonShown(s);
+  if (comingSoon && !preview) return <HackathonComingSoon s={s} h={h} />;
   const mentors = people.filter((p) => p.group === "mentor");
   const judges = people.filter((p) => p.group === "judge");
   const hackFaqs = faqs.filter((f) => f.category === "hackathon");
@@ -88,6 +96,7 @@ export default async function HackathonPage() {
 
   return (
     <TagScope style="tab">
+      {comingSoon ? <HackathonComingSoon s={s} h={h} /> : null}
       <JsonLd data={eventJsonLd(s, { "@type": "Event", name: h.title, description: h.tagline, url: absoluteUrl("/hackathon") })} />
       <PageHero edit="hackathon.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={h.title} aura="hackathon" description={h.tagline}>
         {canRegister ? (

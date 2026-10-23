@@ -2,6 +2,7 @@ import { ExternalLink, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import { Aura } from "@/components/aura/Aura";
 import { Deadline } from "@/components/forms/Deadline";
+import { CallForPosters } from "@/components/forms/CallForPosters";
 import { DeadlineGate } from "@/components/forms/DeadlineGate";
 import { RegistrationForm } from "@/components/forms/RegistrationForm";
 import { PageHero } from "@/components/layout/PageHero";
@@ -14,7 +15,7 @@ import { cn } from "@/lib/cn";
 import { getSettings, inPreview } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
-import { eventCalendarLinks, hackathonRegistrationHref } from "@/lib/event";
+import { eventCalendarLinks, hackathonRegistrationHref, hackathonShown } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 import { isShown } from "@/lib/schema/section-order";
@@ -38,6 +39,8 @@ export default async function RegisterPage() {
   const showFees = isShown(s, "register", "fees");
   const showDeadlines = isShown(s, "register", "deadlines");
   const showAside = showFees || showDeadlines;
+  // While the hackathon is hidden, so is the form's "interested in the hackathon" box.
+  const fields = hackathonShown(s) ? s.registerFields : s.registerFields.map((f) => (f.key === "hackathonInterest" ? { ...f, hidden: true } : f));
   const closedBadge = (
     <Badge tone="blush" dot>
       {hero.closed}
@@ -71,7 +74,7 @@ export default async function RegisterPage() {
         description={
           <p>
             {hero.description}
-            {hero.hackathonLink && showDeadlines ? (
+            {hero.hackathonLink && showDeadlines && hackathonShown(s) ? (
               <>
                 {" "}
                 {hero.hackathonBefore}{" "}
@@ -88,7 +91,7 @@ export default async function RegisterPage() {
       </PageHero>
 
       {showForm || showAside ? (
-        <section data-edit={showForm ? "register.form" : undefined} className={`tone-${hero.tone} py-12 sm:py-16`}>
+        <section id="register-form" data-edit={showForm ? "register.form" : undefined} className={`tone-${hero.tone} scroll-mt-24 py-12 sm:py-16`}>
           <div className={cn("container-site grid gap-8", showForm && showAside && "lg:grid-cols-[1.35fr_0.65fr]")}>
             {showForm ? (
               <div>
@@ -107,10 +110,10 @@ export default async function RegisterPage() {
                   </div>
                 ) : preview ? (
                   // The admin's live preview shows the form whatever the status, so its fields can be edited.
-                  <RegistrationForm fields={s.registerFields} text={copy(s, "registerFormText")} calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
+                  <RegistrationForm fields={fields} text={copy(s, "registerFormText")} calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
                 ) : s.workshopStatus === "open" ? (
                   <DeadlineGate deadline={s.workshopDeadline} closed={<StatusCard s={s} closed />}>
-                    <RegistrationForm fields={s.registerFields} text={copy(s, "registerFormText")} calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
+                    <RegistrationForm fields={fields} text={copy(s, "registerFormText")} calendar={eventCalendarLinks(s)} shareUrl={absoluteUrl("/")} eventName={s.eventName} />
                   </DeadlineGate>
                 ) : (
                   <StatusCard s={s} closed={s.workshopStatus === "closed"} />
@@ -159,10 +162,12 @@ export default async function RegisterPage() {
                       <h2 className="font-display text-xl font-bold text-fg">{dl.title}</h2>
                       {s.workshopDeadline ? <Deadline iso={s.workshopDeadline} label={dl.workshop} /> : <p className="text-sm text-muted">{dl.workshopTba}</p>}
                     </div>
-                    <div id="hackathon-note" className="scroll-mt-28">
-                      <h2 className="sr-only">{dl.portalKicker}</h2>
-                      <Portal href={hackathonRegistrationHref(s)} tone="aqua" compact kicker={dl.portalKicker} title={dl.portalTitle} text={dl.portalText} art={<TrophyArt />} />
-                    </div>
+                    {hackathonShown(s) ? (
+                      <div id="hackathon-note" className="scroll-mt-28">
+                        <h2 className="sr-only">{dl.portalKicker}</h2>
+                        <Portal href={hackathonRegistrationHref(s)} tone="aqua" compact kicker={dl.portalKicker} title={dl.portalTitle} text={dl.portalText} art={<TrophyArt />} />
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
               </aside>
@@ -170,6 +175,7 @@ export default async function RegisterPage() {
           </div>
         </section>
       ) : null}
+      {isShown(s, "register", "posters") ? <CallForPosters s={s} formShown={showForm} /> : null}
     </TagScope>
   );
 }

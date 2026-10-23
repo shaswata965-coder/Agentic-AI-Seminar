@@ -4,6 +4,7 @@ import { FaqContact } from "@/components/home/FaqContact";
 import { HackathonTeaser } from "@/components/home/HackathonTeaser";
 import { Hero, heroPhoto } from "@/components/home/Hero";
 import { Highlights } from "@/components/home/Highlights";
+import { Invite } from "@/components/home/Invite";
 import { Partners } from "@/components/home/Partners";
 import { SpeakersPreview } from "@/components/home/SpeakersPreview";
 import { themePhoto, Themes } from "@/components/home/Themes";
@@ -14,6 +15,7 @@ import { getAnnouncements, getDemos, getFaqs, getHackathon, getKiosks, getPeople
 import { copy } from "@/lib/copy";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
 import { explorePages, postEventNav, primaryNav, registrationNav } from "@/lib/nav";
+import { hackathonShown, withoutHackathon } from "@/lib/event";
 
 export default async function HomePage() {
   const [s, h, announcements, speakers, sponsors, faqs, demos, kiosks, people] = await Promise.all([
@@ -29,7 +31,7 @@ export default async function HomePage() {
   ]);
   // What the loading screen loads behind it: the main pages, and the uploaded images they show (the
   // gallery, which can be large, is left to load when visited).
-  const routes = [...primaryNav(s.siteNav), registrationNav(s.siteNav), ...explorePages(s.siteNav), ...postEventNav(s, s.siteNav)]
+  const routes = [...primaryNav(s.siteNav, hackathonShown(s)), registrationNav(s.siteNav), ...explorePages(s.siteNav), ...postEventNav(s, s.siteNav)]
     .map((n) => n.href)
     .filter((href) => href.startsWith("/"));
   const files = [
@@ -48,15 +50,16 @@ export default async function HomePage() {
         s={s}
         page="home"
         sections={{
+          invite: <Invite s={s} />,
           highlights: <Highlights s={s} />,
           news: <Announcements s={s} items={announcements} />,
           themes: <Themes s={s} />,
           about: <About s={s} />,
           speakers: <SpeakersPreview s={s} speakers={speakers} />,
-          hackathon: <HackathonTeaser s={s} h={h} />,
+          hackathon: hackathonShown(s) ? <HackathonTeaser s={s} h={h} /> : null,
           venue: <Venue s={s} />,
           partners: <Partners s={s} sponsors={sponsors} />,
-          faq: <FaqContact s={s} faqs={faqs} />,
+          faq: <FaqContact s={s} faqs={withoutHackathon(s, faqs, (f) => `${f.category} ${f.question}`)} />,
         }}
       />
     </>

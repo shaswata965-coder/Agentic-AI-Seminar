@@ -36,7 +36,7 @@ const HEART_PATH =
 const SPARK_PATH = "M0 -11 Q1.8 -1.8 11 0 Q1.8 1.8 0 11 Q-1.8 1.8 -11 0 Q-1.8 -1.8 0 -11 Z";
 
 const FRONT_PROPS = new Set<PropKind>([
-  "clipboard", "book", "tablet", "laptop", "camera", "bigHeart", "heartPulse", "ticket", "stopwatch",
+  "clipboard", "book", "tablet", "laptop", "camera", "bigHeart", "heartPulse", "ticket", "stopwatch", "poster",
 ]);
 
 type ArmPose = { l: number; r: number; wave?: "r" | "both"; sway?: boolean; tap?: boolean };
@@ -55,6 +55,8 @@ export const POSES: Record<Pose, ArmPose> = {
   think: { l: -150, r: -7 },
   cheer: { l: 150, r: -150, wave: "both" },
   type: { l: -48, r: 48, tap: true },
+  /** Left fin up at her side, holding a poster open; right fin across her, aiming a laser pointer at it. */
+  lecture: { l: 115, r: 70 },
 };
 
 function armTip(pivot: { x: number; y: number }, deg: number) {
@@ -259,7 +261,9 @@ export function AuraArt({
 
           {showEmblem ? <ChestEmblem kind={emblem} eye={C.eye} glow={url("glow")} /> : null}
           {wear === "stethoscope" ? <Stethoscope silver={url("silver")} /> : null}
-          {badge ? <Badge href={badge} edge={C.line} /> : null}
+          {wear === "professor" ? <BowTie fill={url("pink")} /> : null}
+          {/* Lecturing, her fin with the laser pointer goes where the badge would be. */}
+          {badge && prop !== "poster" ? <Badge href={badge} edge={C.line} /> : null}
 
           {/* Levitation glow between head and body */}
           <ellipse cx="130" cy="147.5" rx="24" ry="2.6" fill={C.eye} opacity="0.35" />
@@ -299,6 +303,7 @@ export function AuraArt({
                   <rect className="aura-scan" x="80" y="70" width="100" height="3" rx="1.5" fill={C.eye} opacity="0.75" />
                 </g>
               ) : null}
+              {wear === "professor" ? <Spectacles /> : null}
               {headwear ? <HeadwearArt kind={headwear} eye={C.eye} party={url("party")} /> : null}
             </g>
           </g>
@@ -320,6 +325,7 @@ export function AuraArt({
           {/* Arms */}
           <Arm pivot={PIVOT_L} deg={arms.l} side="l" fill={url("body")} edge={C.edge} anim={armAnim(arms, "l")} />
           <Arm pivot={PIVOT_R} deg={arms.r} side="r" fill={url("body")} edge={C.edge} anim={armAnim(arms, "r")} />
+          {prop === "poster" ? <PosterSheet gripL={gripL} gripR={gripR} line={C.line} screen={url("screen")} /> : null}
         </g>
       </g>
 
@@ -600,6 +606,29 @@ function Stethoscope({ silver }: { silver: string }) {
   );
 }
 
+/** The professor's round spectacles, gold-rimmed over her visor. */
+function Spectacles() {
+  return (
+    <g fill="none" stroke="#ffd166" strokeWidth="2.4" strokeLinecap="round">
+      <circle cx={EYE_L.x} cy={EYE_L.y} r="15" fill="#ffffff" fillOpacity="0.07" />
+      <circle cx={EYE_R.x} cy={EYE_R.y} r="15" fill="#ffffff" fillOpacity="0.07" />
+      <path d="M124.6 99 Q130 95 135.4 99" />
+      <path d="M95 99 L82 95 M165 99 L178 95" />
+      <path d="M100 92 Q104 89 108 89" stroke="#ffffff" strokeOpacity="0.5" strokeWidth="1.6" />
+    </g>
+  );
+}
+
+/** The professor's bow tie, just under her floating head. */
+function BowTie({ fill }: { fill: string }) {
+  return (
+    <g transform="translate(130 160)">
+      <path d="M-3 0 L-19 -9 Q-22 0 -19 9 Z M3 0 L19 -9 Q22 0 19 9 Z" fill={fill} stroke="#d94f7f" strokeWidth="1.2" strokeLinejoin="round" />
+      <rect x="-4.5" y="-5" width="9" height="10" rx="3" fill="#d94f7f" />
+    </g>
+  );
+}
+
 /* ------------------------------------------------------------- Headwear -- */
 
 function HeadwearArt({ kind, eye, party }: { kind: Headwear; eye: string; party: string }) {
@@ -649,6 +678,51 @@ function HeadwearArt({ kind, eye, party }: { kind: Headwear; eye: string; party:
 }
 
 /* ---------------------------------------------------------------- Props -- */
+
+/** Where the laser pointer's beam lands on the poster, and the pointer's tip, for a grip. */
+const LASER_TARGET = { x: 44, y: 214 };
+function laser(grip: { x: number; y: number }) {
+  const dx = LASER_TARGET.x - grip.x;
+  const dy = LASER_TARGET.y - grip.y;
+  const len = Math.hypot(dx, dy) || 1;
+  return { tip: { x: grip.x + (dx / len) * 16, y: grip.y + (dy / len) * 16 } };
+}
+
+/**
+ * A research poster unrolling from a rod held up in her left fin (its foot still rolled up), in front of
+ * her, with the laser pointer's beam landing on its chart.
+ */
+function PosterSheet({ gripL, gripR, line, screen }: { gripL: { x: number; y: number }; gripR: { x: number; y: number }; line: string; screen: string }) {
+  const { tip } = laser(gripR);
+  return (
+    <g>
+      <g transform={`translate(${gripL.x.toFixed(1)} ${(gripL.y + 1).toFixed(1)}) rotate(-4)`}>
+        <path d="M-2 4 L84 4 L85 104 L-3 104 Z" fill="#ffffff" stroke={line} strokeWidth="1.6" strokeLinejoin="round" />
+        <rect x="6" y="11" width="72" height="11" rx="3" fill={screen} />
+        <rect x="6" y="27" width="50" height="3.4" rx="1.7" fill="#cbd5e1" />
+        <rect x="6" y="33" width="64" height="3.4" rx="1.7" fill="#cbd5e1" />
+        <rect x="6" y="39" width="40" height="3.4" rx="1.7" fill="#cbd5e1" />
+        <rect x="8" y="70" width="7" height="16" rx="1.5" fill="#b9a3ff" />
+        <rect x="18" y="62" width="7" height="24" rx="1.5" fill="#7cc3ff" />
+        <rect x="28" y="55" width="7" height="31" rx="1.5" fill="#5ef0b8" />
+        <path d="M42 84 L52 70 L60 75 L74 54" fill="none" stroke="#ff8fb8" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+        <rect x="42" y="90" width="34" height="3" rx="1.5" fill="#e2e8f0" />
+        <rect x="-8" y="-5" width="98" height="10" rx="5" fill="#5b6b86" />
+        <circle cx="-8" cy="0" r="5.5" fill="#ffd166" />
+        <circle cx="90" cy="0" r="5.5" fill="#ffd166" />
+        <rect x="-5" y="101" width="94" height="13" rx="6.5" fill="#e8e1ff" stroke={line} strokeWidth="1.4" />
+        <path d="M0 105 Q44 103 86 105" fill="none" stroke="#ffffff" strokeWidth="2" strokeLinecap="round" />
+      </g>
+      <g className="aura-laser">
+        <line x1={tip.x} y1={tip.y} x2={LASER_TARGET.x} y2={LASER_TARGET.y} stroke="#ff4d6d" strokeOpacity="0.22" strokeWidth="5" strokeLinecap="round" />
+        <line x1={tip.x} y1={tip.y} x2={LASER_TARGET.x} y2={LASER_TARGET.y} stroke="#ff4d6d" strokeWidth="1.5" strokeLinecap="round" />
+        <circle cx={LASER_TARGET.x} cy={LASER_TARGET.y} r="6.5" fill="#ff4d6d" fillOpacity="0.25" />
+        <circle cx={LASER_TARGET.x} cy={LASER_TARGET.y} r="2.8" fill="#ff4d6d" />
+        <circle cx={tip.x} cy={tip.y} r="2.2" fill="#ff4d6d" />
+      </g>
+    </g>
+  );
+}
 
 type Pt = { x: number; y: number };
 
@@ -703,6 +777,11 @@ function PropArt({
           <path d="M-11 -26 L-19 -9 L-11 -12 Z M11 -26 L19 -9 L11 -12 Z" fill="#ffab7a" />
         </g>
       );
+    case "poster": {
+      // The laser pointer in her right fin; the poster it points at, and the beam, go in front of her fins.
+      const { tip } = laser(gripR);
+      return <line x1={gripR.x - (tip.x - gripR.x) * 0.4} y1={gripR.y - (tip.y - gripR.y) * 0.4} x2={tip.x} y2={tip.y} stroke="#2b3550" strokeWidth="5" strokeLinecap="round" />;
+    }
     case "clipboard":
       return (
         <g transform={at(mid, 0, 6)}>

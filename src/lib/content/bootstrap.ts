@@ -13,8 +13,19 @@ import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SESSIONS, DEFA
 
 /** Marks that the tentative programme was offered to this site, so it is added at most once. */
 const PROGRAMME_PLAN_KEY = "programme-plan";
+/** Marks that the FAQ answers below were brought up to date once. */
+const INVITE_FAQS_KEY = "faqs-invitation";
 
-async function insertSingleton(key: "settings" | "hackathon" | typeof PROGRAMME_PLAN_KEY, data: object): Promise<boolean> {
+/** FAQ answers stored by sites set up earlier: updated once where never edited (invitation-only, free registration). */
+const RETIRED_FAQ_ANSWERS: { question: string; answer: string }[] = [
+  {
+    question: "Who can attend the workshop?",
+    answer: "The workshop is open to researchers, faculty, students, industry practitioners, startups and investors interested in agentic AI. Registration is required.",
+  },
+  { question: "Is there a registration fee?", answer: "Fee details (if any) will be announced on the Registration page. Register early: seats may be limited." },
+];
+
+async function insertSingleton(key: "settings" | "hackathon" | typeof PROGRAMME_PLAN_KEY | typeof INVITE_FAQS_KEY, data: object): Promise<boolean> {
   try {
     const res = await Singleton.updateOne({ key }, { $setOnInsert: { key, data } }, { upsert: true });
     return res.upsertedCount > 0;
@@ -42,6 +53,14 @@ export async function ensureDefaultContent({ fillEmpty = false }: { fillEmpty?: 
       // The plan is shown as a draft ("subject to change") instead of "to be announced".
       await Singleton.updateOne({ key: "settings", "data.programmeStatus": "tba" }, { $set: { "data.programmeStatus": "draft" } });
       created.push(`the tentative programme (${DEFAULT_SESSIONS.length} sessions)`);
+    }
+  }
+
+  if (await insertSingleton(INVITE_FAQS_KEY, { at: new Date().toISOString() })) {
+    const Faqs = getCollectionModel("faqs");
+    for (const old of RETIRED_FAQ_ANSWERS) {
+      const current = DEFAULT_FAQS.find((f) => f.question === old.question);
+      if (current) await Faqs.updateMany({ question: old.question, answer: old.answer }, { $set: { answer: current.answer } });
     }
   }
 

@@ -10,12 +10,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { path: "/programme", priority: 0.9, freq: "daily" },
     { path: "/speakers", priority: 0.9, freq: "daily" },
     { path: "/register", priority: 0.9, freq: "weekly" },
-    { path: "/hackathon", priority: 0.9, freq: "weekly" },
     { path: "/tutorials", priority: 0.8, freq: "weekly" },
     { path: "/venue", priority: 0.7, freq: "monthly" },
     { path: "/partners", priority: 0.6, freq: "weekly" },
     { path: "/organisers", priority: 0.6, freq: "monthly" },
     { path: "/meet-aura", priority: 0.3, freq: "monthly" },
+    ...(s.showHackathon ? [{ path: "/hackathon", priority: 0.9, freq: "weekly" as const }] : []),
     ...(s.showGallery ? [{ path: "/gallery", priority: 0.6, freq: "weekly" as const }] : []),
     ...(s.showTalks ? [{ path: "/talks", priority: 0.6, freq: "weekly" as const }] : []),
   ];

@@ -89,6 +89,8 @@ export interface RegistrationDoc {
   interests: string[];
   tutorials: boolean;
   hackathonInterest: boolean;
+  /** "Yes" or "No": whether they would like to present a poster at the poster session. */
+  presentPoster: string;
   dietary: string;
   accessibility: string;
   heardFrom: string;
@@ -115,6 +117,7 @@ const registrationSchema = new Schema<RegistrationDoc>(
     interests: { type: [String], default: [] },
     tutorials: { type: Boolean, default: false },
     hackathonInterest: { type: Boolean, default: false },
+    presentPoster: { type: String, default: "" },
     dietary: { type: String, default: "" },
     accessibility: { type: String, default: "" },
     heardFrom: { type: String, default: "" },

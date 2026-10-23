@@ -81,6 +81,8 @@
 .aura-svg .aura-bubble-3 { animation-delay: -1.5s; }
 .aura-svg .aura-flame { transform-origin: 50% 0%; animation: aura-flame 0.35s ease-in-out infinite alternate; }
 .aura-svg .aura-cursor { animation: aura-cursor 1s steps(1) infinite; }
+/* The laser pointer's beam flickers gently, as a real one does on a screen. */
+.aura-svg .aura-laser { animation: aura-laser 1.8s ease-in-out infinite; }
 .aura-svg .aura-tick { transform-origin: 50% 100%; animation: aura-tick 6s steps(12) infinite; }
 .aura-svg .aura-waves { animation: aura-fade 1.2s ease-in-out infinite; }
 .aura-svg .aura-wave-2 { animation: aura-fade 1.2s ease-in-out infinite; animation-delay: -0.4s; }
@@ -105,6 +107,7 @@
   transform-origin: var(--bubble-origin, 20% 100%);
 }
 
+@keyframes aura-laser { 0%, 100% { opacity: 1; } 45% { opacity: 0.7; } 55% { opacity: 0.95; } }
 @keyframes aura-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
 @keyframes aura-shadow { 0%, 100% { transform: scaleX(1); opacity: 1; } 50% { transform: scaleX(0.82); opacity: 0.6; } }
 @keyframes aura-head-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3.5px); } }

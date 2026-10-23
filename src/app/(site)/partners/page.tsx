@@ -14,6 +14,7 @@ import { TagScope } from "@/components/ui/Tag";
 import { getSettings, getSponsors } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
+import { hackathonShown } from "@/lib/event";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -36,7 +37,7 @@ export default async function PartnersPage() {
   const WAYS: { title: string; text: string; href: string; icon: ReactNode; tone: string }[] = [
     { title: ways.sponsorTitle, text: ways.sponsorText, href: "#become-a-partner", icon: <Handshake size={21} aria-hidden />, tone: "tone-butter" },
     { title: ways.kioskTitle, text: ways.kioskText, href: "/programme#kiosks", icon: <Store size={21} aria-hidden />, tone: "tone-peach" },
-    { title: ways.hackathonTitle, text: ways.hackathonText, href: "/hackathon", icon: <Trophy size={21} aria-hidden />, tone: "tone-aqua" },
+    ...(hackathonShown(s) ? [{ title: ways.hackathonTitle, text: ways.hackathonText, href: "/hackathon", icon: <Trophy size={21} aria-hidden />, tone: "tone-aqua" }] : []),
     { title: ways.communityTitle, text: ways.communityText, href: "#become-a-partner", icon: <Megaphone size={21} aria-hidden />, tone: "tone-lilac" },
   ].filter((w) => w.title);
   const enquire = <EnquiryButton type="sponsor" fields={s.partnerFields} text={copy(s, "partnerFormText")} label={hero.button} title={hero.formTitle} description={hero.formText} aura="sponsors" icon={<Handshake size={18} aria-hidden />} />;

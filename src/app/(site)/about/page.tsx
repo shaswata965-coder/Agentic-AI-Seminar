@@ -13,7 +13,7 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { TagScope } from "@/components/ui/Tag";
 import { getSettings } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
-import { eventCalendarLinks } from "@/lib/event";
+import { eventCalendarLinks, withoutHackathon } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 
@@ -99,7 +99,7 @@ export default async function AboutPage() {
             <Section edit="about.activities" tone={ac.tone} bg={ac.background} labelledBy="activities-title">
               <SectionHeading id="activities-title" eyebrow={ac.eyebrow} title={ac.title} className="mb-8 sm:mb-10" />
               <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {s.activities.map((a, i) => (
+                {withoutHackathon(s, s.activities, (x) => x.title).map((a, i) => (
                   <li key={a.title} data-reveal style={{ "--reveal-delay": `${i * 60}ms` } as CSSProperties}>
                     <Link
                       href={activityHref(a.title)}

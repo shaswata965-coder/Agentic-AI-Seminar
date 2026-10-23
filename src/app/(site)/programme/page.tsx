@@ -17,7 +17,7 @@ import { TagScope } from "@/components/ui/Tag";
 import { getHackathon, getKiosks, getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
-import { eventCalendarLinks, eventDays, registrationHref } from "@/lib/event";
+import { eventCalendarLinks, eventDays, hackathonShown, registrationHref } from "@/lib/event";
 import { eventDayDate, eventDayLabel, formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
 import { shownSections } from "@/lib/schema/section-order";
@@ -56,7 +56,7 @@ export default async function ProgrammePage() {
     overview: { href: "#overview", label: s.programmeOverview.eyebrow },
     schedule: { href: "#schedule", label: sc.eyebrow },
     kiosks: { href: "#kiosks", label: s.programmeKiosks.eyebrow },
-    hackathon: { href: "#hackathon", label: s.programmeHackathon.eyebrow },
+    hackathon: { href: "#hackathon", label: hackathonShown(s) ? s.programmeHackathon.eyebrow : "" },
     plan: { href: "#plan", label: pl.eyebrow },
   };
   const jumps = shownSections(s, "programme")
@@ -129,7 +129,7 @@ export default async function ProgrammePage() {
             </Section>
           ),
           kiosks: <Kiosks s={s} kiosks={kiosks} />,
-          hackathon: <HackathonSpotlight s={s} h={h} sessions={tba ? [] : sessions} />,
+          hackathon: hackathonShown(s) ? <HackathonSpotlight s={s} h={h} sessions={tba ? [] : sessions} /> : null,
           plan: (
             <Section id="plan" edit="programme.plan" tone={pl.tone} bg={pl.background} labelledBy="plan-title">
               <SectionHeading id="plan-title" eyebrow={pl.eyebrow} title={pl.title} className="mb-8 sm:mb-10" />

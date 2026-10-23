@@ -650,10 +650,12 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         { anchor: "site.footer" },
       ),
       section("features", "Features & post-event", undefined, [
-        bool("showAssistant", "Show the “Ask Aura” helper button"),
         bool("showGallery", "Post-event: show the photo gallery"),
         bool("showTalks", "Post-event: show talk slides & recordings"),
         bool("showWinners", "Post-event: show hackathon winners"),
+        bool("showHackathon", "Show the hackathon", {
+          help: "Its page, its sections on the home and programme pages, Aura's hackathon placard and registration card, links in the menus, its FAQs and team registration. While it's off, the Hackathon page shows only a “details coming soon” poster (Hackathon → Coming-soon poster), and nothing links to it.",
+        }),
       ]),
       section("seo", "SEO & analytics", undefined, [
         text("gaId", "Google Analytics measurement ID", { placeholder: "G-XXXXXXXXXX", width: "half" }),
@@ -682,6 +684,9 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       }),
       section("register", "Registration choice", "homeRegister", [], {
         description: "The heading and two compact cards along the foot of the hero, one for each registration. Their status comes from Site-wide → Registration.",
+      }),
+      section("invite", "Invitation", "homeInvite", [], {
+        description: "The invitation, under the hero: that the workshop is by invitation, that registering is free but required for entry, and the invitation poster with Aura. Its dates and venue come from Site-wide → Event details.",
       }),
       section("highlights", "Highlight strip", "homeHighlights", [
         objects("highlights", "Highlights", "Highlight", [
@@ -787,6 +792,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     path: "/hackathon",
     description: "Headings, labels and colours of the Hackathon page, team registration included, and its tagline, overview and prizes. Its title, question, rules, timeline and results are edited under Hackathon in the menu.",
     sections: [
+      section("poster", "Coming-soon poster", "hackathonPoster", [], {
+        description:
+          "While the hackathon is hidden (Site-wide → Features → Show the hackathon is off), its page shows only this poster, and nothing else on the site links to it. The preview shows the poster above the full page, so both can be edited.",
+      }),
       section("hero", "Hero", "hackathonHero", [], {
         hackathon: [{ ...hackathonTagline, help: "The line under the title. It also shows with the hackathon on the home page and the Programme page, and is the same text as Hackathon → Overview → Tagline." }],
       }),
@@ -845,6 +854,9 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         textarea("feeNote", "Fee note", { placeholder: "Fee details will be announced soon." }),
       ]),
       section("deadlines", "Deadlines", "registerDeadlines"),
+      section("posters", "Call for posters", "registerPosters", [], {
+        description: "Under the form: arXiv preprints and submitted or accepted papers are welcome as posters at the poster session. Registrants say whether they'd like to present one with the form's “Would you like to present a poster?” (Form fields).",
+      }),
     ],
   },
   {

@@ -5,7 +5,7 @@ import { AddToCalendar } from "@/components/share/AddToCalendar";
 import { ShareButtons } from "@/components/share/ShareButtons";
 import { InstagramIcon, LinkedInIcon, XIcon, YouTubeIcon } from "@/components/ui/BrandIcons";
 import type { SiteSettings } from "@/lib/content/types";
-import { brandName, eventCalendarLinks, hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
+import { brandName, eventCalendarLinks, hackathonRegistrationHref, hackathonShown, registrationHref, venueLine } from "@/lib/event";
 import { copy } from "@/lib/copy";
 import { formatDateRange } from "@/lib/format";
 import { explorePages, homeNav, postEventNav, primaryNav, registrationNav, sectionNav } from "@/lib/nav";
@@ -50,7 +50,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
   const nav = s.siteNav;
   const involve = [
     { href: registrationHref(s), label: c.register },
-    { href: hackathonRegistrationHref(s), label: c.hackathon },
+    ...(hackathonShown(s) ? [{ href: hackathonRegistrationHref(s), label: c.hackathon }] : []),
     { href: "/programme#kiosks", label: c.exhibit },
     { href: "/partners#become-a-partner", label: c.partner },
     // The contact form is in the home page's FAQ section.
@@ -98,7 +98,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
         <nav aria-label="Pages">
           <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">{c.pagesHeading}</h2>
           <ul className="mt-4 space-y-2.5">
-            {[homeNav(nav), ...primaryNav(nav), ...explorePages(nav), registrationNav(nav)].map((i) => (
+            {[homeNav(nav), ...primaryNav(nav, hackathonShown(s)), ...explorePages(nav), registrationNav(nav)].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}

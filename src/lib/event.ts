@@ -79,6 +79,15 @@ export function deadlinePassed(iso: string | null | undefined, now = Date.now())
 export function registrationHref(s: SiteSettings) {
   return s.workshopUrl || "/register";
 }
+/** Whether the hackathon is on the site (Site settings → Site-wide → Features); while it isn't, its page shows only a poster. */
+export const hackathonShown = (s: Pick<SiteSettings, "showHackathon">) => s.showHackathon;
+
+/** A list item about the hackathon (an About topic, an activity, a FAQ, the prize pool highlight), left out while it is hidden. */
+const ABOUT_HACKATHON = /hackathon|prize pool/i;
+export function withoutHackathon<T>(s: Pick<SiteSettings, "showHackathon">, items: T[], text: (item: T) => string): T[] {
+  return s.showHackathon ? items : items.filter((item) => !ABOUT_HACKATHON.test(text(item)));
+}
+
 /** Team registration: an external platform, or the form at the foot of the Hackathon page. */
 export function hackathonRegistrationHref(s: SiteSettings) {
   return s.hackathonUrl || "/hackathon#register";

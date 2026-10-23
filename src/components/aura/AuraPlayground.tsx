@@ -8,8 +8,8 @@ import { AURA_EYES } from "./presets";
 import type { Effect, Emblem, Expression, Headwear, Pose, PropKind } from "./types";
 
 const EXPRESSIONS: Expression[] = ["neutral", "happy", "love", "star", "surprised", "wink", "focus", "code", "determined", "curious", "confused", "sleepy"];
-const POSES: Pose[] = ["idle", "wave", "hold", "holdBoth", "holdSide", "raise", "toFace", "point", "think", "cheer", "type"];
-const PROPS: (PropKind | "none")[] = ["none", "heartPulse", "flask", "rocket", "clipboard", "mic", "book", "tablet", "laptop", "trophy", "ticket", "megaphone", "mapPin", "suitcase", "magnifier", "paperPlane", "wrench", "camera", "clapper", "bigHeart", "stopwatch", "signboard"];
+const POSES: Pose[] = ["idle", "wave", "hold", "holdBoth", "holdSide", "raise", "toFace", "point", "think", "cheer", "type", "lecture"];
+const PROPS: (PropKind | "none")[] = ["none", "heartPulse", "flask", "rocket", "clipboard", "mic", "book", "tablet", "laptop", "trophy", "ticket", "megaphone", "mapPin", "suitcase", "magnifier", "paperPlane", "wrench", "camera", "clapper", "bigHeart", "stopwatch", "signboard", "poster"];
 const POSE_FOR_PROP: Partial<Record<PropKind, Pose>> = {
   heartPulse: "hold", flask: "holdSide", rocket: "raise", clipboard: "holdBoth", mic: "toFace", book: "holdBoth", tablet: "holdBoth", laptop: "type", trophy: "raise", ticket: "hold",
   megaphone: "toFace", mapPin: "raise", suitcase: "holdSide", magnifier: "toFace", paperPlane: "raise", wrench: "raise", camera: "holdBoth", clapper: "raise", bigHeart: "holdBoth", stopwatch: "hold", signboard: "raise",

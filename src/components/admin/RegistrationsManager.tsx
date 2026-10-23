@@ -30,6 +30,7 @@ interface Workshop {
   interests: string[];
   tutorials: boolean;
   hackathonInterest: boolean;
+  presentPoster: string;
   dietary: string;
   accessibility: string;
   heardFrom: string;

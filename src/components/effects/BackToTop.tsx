@@ -18,7 +18,7 @@ export function BackToTop() {
       aria-label="Back to top"
       onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })}
       className={cn(
-        "group key key-line no-print fixed right-5 bottom-[5.25rem] z-30 grid h-11 w-11 place-items-center rounded-xl border border-border-strong bg-surface text-fg transition-all duration-300 hover:border-brand hover:text-brand sm:right-7 sm:bottom-24",
+        "group key key-line no-print fixed right-5 bottom-5 z-30 grid h-11 w-11 place-items-center rounded-xl border border-border-strong bg-surface text-fg transition-all duration-300 hover:border-brand hover:text-brand sm:right-7 sm:bottom-7",
         show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0",
       )}
       tabIndex={show ? 0 : -1}

@@ -24,9 +24,9 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     effects: ["orbit", "sparkles"],
     tips: [
       "Hi! I'm Aura, your agentic guide to the workshop.",
-      "Two days of talks, tutorials, demos and a hackathon, 15–16 Dec at IIT Delhi.",
+      "Two days of talks, tutorials, demos and a poster session, 15–16 Dec at IIT Delhi.",
+      "It's by invitation: registering is free, and you need it to get in.",
       "Tap Register to save your seat. I'll keep it warm!",
-      "Psst… press Ctrl/⌘ + K any time to ask me something.",
     ],
   },
   guide: {
@@ -35,7 +35,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     pose: "point",
     emblem: "spark",
     effects: ["sparkles"],
-    tips: ["Over here! This bit is important.", "Need help? Tap the little Aura in the corner."],
+    tips: ["Over here! This bit is important.", "Still stuck? The FAQ at the bottom of the home page has answers."],
   },
   thinker: {
     label: "Aura thinking, surrounded by a network of agents",
@@ -331,12 +331,16 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     eyeColor: AURA_EYES.lilac,
     tips: ["Missed a talk? Catch the recording here."],
   },
-  assistant: {
-    label: "Ask Aura, the site assistant",
-    expression: "neutral",
-    pose: "idle",
-    emblem: "spark",
-    tips: ["Need help? Ask me!"],
+  lecturer: {
+    label: "Aura as a professor in a mortarboard and spectacles, unfurling a poster and pointing at it with a laser pointer",
+    expression: "happy",
+    pose: "lecture",
+    prop: "poster",
+    headwear: "gradCap",
+    wear: "professor",
+    emblem: "bulb",
+    eyeColor: AURA_EYES.amber,
+    tips: ["Ahem! As you can see on this poster…", "Bring your arXiv preprint or submitted paper: I'll point the laser at it!", "Posters are up all through lunch on Day 1."],
   },
   error: {
     label: "Aura looking puzzled after an error",

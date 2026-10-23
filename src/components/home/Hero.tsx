@@ -4,7 +4,7 @@ import { NetworkCanvas } from "@/components/effects/NetworkCanvas";
 import { Img } from "@/components/ui/Img";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
-import { splitEventName, venueLine } from "@/lib/event";
+import { hackathonShown, splitEventName, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { HeroPlacards, type HeroPlacard } from "./HeroPlacards";
 import { RegisterChooser } from "./RegisterChooser";
@@ -53,11 +53,11 @@ export function Hero({ s }: { s: SiteSettings }) {
   const c = copy(s, "homeHero");
   const p = copy(s, "homePlacard");
   const tones = copy(s, "homeRegister");
-  // Aura's two placards, in turn: workshop and hackathon registration ({status} is filled in as they show).
+  // Aura's two placards, in turn: workshop and hackathon registration ({status} is filled in as they show); the hackathon's only while it is shown.
   const placards: HeroPlacard[] = [
     { key: "workshop" as const, text: p.text, tab: p.workshopTab, tone: tones.workshopTone, status: s.workshopStatus, deadline: s.workshopDeadline },
     { key: "hackathon" as const, text: p.hackathon, tab: p.hackathonTab, tone: tones.hackathonTone, status: s.hackathonStatus, deadline: s.hackathonDeadline },
-  ].filter((x) => x.text.trim());
+  ].filter((x) => x.text.trim() && (x.key !== "hackathon" || hackathonShown(s)));
   // "Agentic AI Workshop 2026" → highlighted "Agentic AI", then "Workshop", then a muted "2026".
   const { title, year } = splitEventName(s.eventName);
   const lead = title.split(/\s+/);

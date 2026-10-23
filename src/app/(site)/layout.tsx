@@ -1,5 +1,4 @@
 import { AccountProvider } from "@/components/account/Account";
-import { AuraAssistant } from "@/components/aura/AuraAssistant";
 import { BackToTop } from "@/components/effects/BackToTop";
 import { AuraBadgeByPage } from "@/components/layout/AuraBadgeByPage";
 import { PreviewBridge } from "@/components/layout/PreviewBridge";
@@ -11,17 +10,15 @@ import { ServiceWorker } from "@/components/loading/ServiceWorker";
 import { ToastProvider } from "@/components/ui/Toast";
 import { getSettings } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
-import { buildAssistantIndex } from "@/lib/content/search";
-import { hackathonRegistrationHref, registrationHref, venueLine } from "@/lib/event";
-import { formatDateRange } from "@/lib/format";
+import { hackathonShown, registrationHref } from "@/lib/event";
 import { postEventNav } from "@/lib/nav";
 
 export default async function SiteLayout({ children }: LayoutProps<"/">) {
   const s = await getSettings();
-  const index = s.showAssistant ? await buildAssistantIndex() : [];
   return (
     <ToastProvider>
-      <AccountProvider text={copy(s, "siteAccount")}>
+      {/* While the hackathon is hidden, the sign-in window doesn't mention hackathon teams. */}
+      <AccountProvider text={{ ...copy(s, "siteAccount"), ...(hackathonShown(s) ? null : { whoHackathon: "" }) }}>
         <AuraBadgeByPage>
           <a
             href="#main"
@@ -30,23 +27,11 @@ export default async function SiteLayout({ children }: LayoutProps<"/">) {
             Skip to content
           </a>
           {s.bannerText ? <SiteBanner text={s.bannerText} link={s.bannerLink} tone={s.siteBanner.tone} /> : null}
-          <SiteHeader logos={{ iitd: s.logoIITD, scai: s.logoScAI }} registerHref={registrationHref(s)} extraNav={postEventNav(s, s.siteNav)} nav={s.siteNav} text={s.siteHeader} homeHidden={s.homeHidden} />
+          <SiteHeader logos={{ iitd: s.logoIITD, scai: s.logoScAI }} registerHref={registrationHref(s)} extraNav={postEventNav(s, s.siteNav)} nav={s.siteNav} text={s.siteHeader} homeHidden={s.homeHidden} hackathon={hackathonShown(s)} />
           <main id="main" tabIndex={-1} className="fit-screen outline-none">
             {children}
           </main>
           <SiteFooter s={s} />
-          {s.showAssistant ? (
-            <AuraAssistant
-              entries={index}
-              facts={{
-                eventName: s.eventName,
-                dates: formatDateRange(s.startDate, s.endDate),
-                venue: venueLine(s),
-                registerHref: registrationHref(s),
-                hackathonHref: hackathonRegistrationHref(s),
-              }}
-            />
-          ) : null}
           <BackToTop />
           <PreviewBridge />
           <ServiceWorker />

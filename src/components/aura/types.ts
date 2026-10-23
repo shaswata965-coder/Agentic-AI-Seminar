@@ -24,7 +24,8 @@ export type Pose =
   | "point"
   | "think"
   | "cheer"
-  | "type";
+  | "type"
+  | "lecture";
 
 export type PropKind =
   | "heartPulse"
@@ -47,10 +48,11 @@ export type PropKind =
   | "clapper"
   | "bigHeart"
   | "stopwatch"
-  | "signboard";
+  | "signboard"
+  | "poster";
 
 export type Headwear = "gradCap" | "hardHat" | "partyHat" | "headset";
-export type Wear = "stethoscope";
+export type Wear = "stethoscope" | "professor";
 export type Emblem =
   | "spark"
   | "cross"
@@ -124,7 +126,7 @@ export type AuraVariant =
   | "admin"
   | "gallery"
   | "recordings"
-  | "assistant"
+  | "lecturer"
   | "error";
 
 export interface AuraPreset extends AuraLook {

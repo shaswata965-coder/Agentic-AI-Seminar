@@ -94,10 +94,11 @@ export interface SiteSettings extends PageCopy, SectionOrders, HiddenSections, F
   ogImage: string;
 
   showMoreSpeakers: boolean;
-  showAssistant: boolean;
   showGallery: boolean;
   showTalks: boolean;
   showWinners: boolean;
+  /** The hackathon on the site; while off, its page shows only a "details coming soon" poster. */
+  showHackathon: boolean;
   bannerText: string;
   bannerLink: string;
 

@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
 
   const [s, h] = await Promise.all([getSavedSettings(), getHackathon()]);
   if (s.hackathonUrl) return error(409, `Hackathon registration happens on ${s.hackathonPlatform || "the external platform"}.`);
+  if (!s.showHackathon) return error(403, "Hackathon registration has not opened yet.");
   if (s.hackathonStatus !== "open") return error(403, s.hackathonStatus === "closed" ? "Hackathon registration is closed." : "Hackathon registration has not opened yet.");
   if (deadlinePassed(s.hackathonDeadline)) return error(403, "Hackathon registration is closed: the deadline has passed.");
 

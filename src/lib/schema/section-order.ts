@@ -8,7 +8,7 @@
  */
 
 export const SECTION_ORDER = {
-  home: ["themes", "speakers", "hackathon", "news", "about", "highlights", "venue", "partners", "faq"],
+  home: ["invite", "themes", "speakers", "hackathon", "news", "about", "highlights", "venue", "partners", "faq"],
   about: ["motivation", "audience", "activities"],
   programme: ["overview", "schedule", "kiosks", "hackathon", "plan"],
   hackathon: ["overview", "timeline", "tracks", "register", "judging", "people", "rules", "results", "cta"],
@@ -64,7 +64,7 @@ export const HIDEABLE_SECTIONS = {
   ...SECTION_ORDER,
   speakers: ["list"],
   tutorials: ["list"],
-  register: ["form", "fees", "deadlines"],
+  register: ["form", "fees", "deadlines", "posters"],
 } as const;
 
 export type HidePage = keyof typeof HIDEABLE_SECTIONS;

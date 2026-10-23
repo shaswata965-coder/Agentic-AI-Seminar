@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   shortName: "AAIW 2026",
   tagline: "Where autonomous AI agents meet healthcare, science and enterprise.",
   description:
-    "A two-day workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a hackathon. 15–16 December 2026.",
+    "A two-day, invitation-only workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a poster session. 15–16 December 2026.",
   organisedBy: "Indian Institute of Technology Delhi and Yardi School of Artificial Intelligence (ScAI), IIT Delhi",
   startDate: "2026-12-15T09:00:00+05:30",
   endDate: "2026-12-16T18:00:00+05:30",
@@ -29,12 +29,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   workshopStatus: "open",
   workshopDeadline: "",
   workshopUrl: "",
-  fees: [
-    { category: "Students", amount: "To be announced", note: "" },
-    { category: "Academia & researchers", amount: "To be announced", note: "" },
-    { category: "Industry & startups", amount: "To be announced", note: "" },
-  ],
-  feeNote: "Registration fees (if any) and deadlines will be announced soon.",
+  fees: [{ category: "Every invitee", amount: "Free", note: "Registration is mandatory for entry" }],
+  feeNote: "The workshop is by invitation. Registration is free but mandatory: invitees need it to get entry.",
   confirmationNote: "",
   hackathonStatus: "soon",
   hackathonDeadline: "",
@@ -68,7 +64,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   ],
   audience: [
     { title: "Researchers & faculty", icon: "landmark", description: "Share and discover the latest advances in agents, planning and multi-agent systems." },
-    { title: "Students", icon: "graduation", description: "Learn hands-on in tutorials, meet mentors and build in the hackathon." },
+    { title: "Students", icon: "graduation", description: "Learn hands-on in tutorials, present your work at the poster session and meet researchers." },
     { title: "Industry practitioners", icon: "briefcase", description: "See what works in production and connect with research teams." },
     { title: "Startups & founders", icon: "rocket", description: "Showcase your product at the kiosks and meet collaborators." },
     { title: "Investors", icon: "sparkles", description: "Spot emerging agentic AI ventures and the talent behind them." },
@@ -155,12 +151,12 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     {
       name: "Title partner",
       price: "On request",
-      perks: ["Prominent branding across the venue and website", "Speaking slot in the opening session", "Premium kiosk space", "Hackathon sponsorship"],
+      perks: ["Prominent branding across the venue and website", "Speaking slot in the opening session", "Premium kiosk space", "Poster session sponsorship"],
     },
     {
       name: "Platinum",
       price: "On request",
-      perks: ["Logo on the website, banners and schedule", "Kiosk space at the venue", "Access to hackathon talent"],
+      perks: ["Logo on the website, banners and schedule", "Kiosk space at the venue", "Access to student and research talent"],
     },
     { name: "Gold", price: "On request", perks: ["Logo on the website and banners", "Kiosk space in the shared zone"] },
     { name: "Academic & community partners", price: "On request", perks: ["Logo on the website", "Outreach to your community"] },
@@ -186,10 +182,10 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   ogImage: "",
 
   showMoreSpeakers: true,
-  showAssistant: true,
   showGallery: false,
   showTalks: false,
   showWinners: false,
+  showHackathon: false,
   bannerText: "",
   bannerLink: "",
 
@@ -290,8 +286,8 @@ export const DEFAULT_PEOPLE: NewDoc<Person>[] = [
 ];
 
 export const DEFAULT_FAQS: NewDoc<Faq>[] = [
-  { category: "general", question: "Who can attend the workshop?", answer: "The workshop is open to researchers, faculty, students, industry practitioners, startups and investors interested in agentic AI. Registration is required." },
-  { category: "registration", question: "Is there a registration fee?", answer: "Fee details (if any) will be announced on the Registration page. Register early: seats may be limited." },
+  { category: "general", question: "Who can attend the workshop?", answer: "The workshop is by invitation, for researchers, faculty, students, industry practitioners, startups and investors working on agentic AI. Every invitee must register to get entry." },
+  { category: "registration", question: "Is there a registration fee?", answer: "No. Registration is free, but it is mandatory: invitees need to register to get entry." },
   { category: "registration", question: "Do I need to register separately for the hackathon?", answer: "Yes. Workshop registration and hackathon registration are separate. Hackathon registration is done per team on the Hackathon page." },
   { category: "programme", question: "When will the detailed programme be available?", answer: "The schedule is published on the Programme page as sessions are confirmed. You can download it as a PDF and add sessions to your calendar." },
   { category: "programme", question: "What should I bring to the tutorials?", answer: "Most tutorials need a laptop. Check each tutorial's prerequisites (software, accounts) on the Tutorials & Demos page." },
@@ -384,6 +380,26 @@ const RETIRED: { settings: Retired; hackathon: Retired } = {
       ],
       homeOrder: [["highlights", "news", "themes", "about", "speakers", "hackathon", "venue", "partners", "faq"]],
       "siteNav.themesText": ["Healthcare, scientific discovery and entrepreneurship"],
+      // Texts that mentioned the hackathon in passing, from before it was hidden until announced.
+      description: [
+        "A two-day workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a hackathon. 15–16 December 2026.",
+      ],
+      "siteNav.faqText": ["Registration, travel, the hackathon and more"],
+      // Registration became invitation-only, free but mandatory.
+      fees: [
+        [
+          { category: "Students", amount: "To be announced", note: "" },
+          { category: "Academia & researchers", amount: "To be announced", note: "" },
+          { category: "Industry & startups", amount: "To be announced", note: "" },
+        ],
+      ],
+      feeNote: ["Registration fees (if any) and deadlines will be announced soon."],
+      "registerHero.description": ["{dates} · {venue}. Registering takes about two minutes."],
+      "homeNews.description": ["Updates about registration, speakers, the programme and the hackathon appear here first."],
+      "programmeHero.description": [
+        "{dates} at {venueName}. Keynotes, talks, panels, hands-on tutorials and live demos, with industry kiosks and the hackathon final alongside.",
+      ],
+      "venueStay.portalText": ["Answers on registration, travel, the hackathon and more."],
       "homeThemes.description": ["Talks, tutorials and the hackathon are organised around three themes."],
       "hackathonTracks.eyebrow": ["Themes"],
       "hackathonTracks.title": ["One hackathon, three themes"],
@@ -405,7 +421,12 @@ const RETIRED: { settings: Retired; hackathon: Retired } = {
         "Teams build agents for health, science or startups, with the finals live at the workshop.": "One track and one question for every team, with the finals live at the workshop.",
       },
       activities: { "Build agents for health, science and startups, with the finals at the workshop.": "One hackathon, one track, one question, with the finals at the workshop." },
-      sponsorTiers: { "Hackathon theme sponsorship": "Hackathon sponsorship" },
+      sponsorTiers: {
+        "Hackathon theme sponsorship": "Poster session sponsorship",
+        "Hackathon sponsorship": "Poster session sponsorship",
+        "Access to hackathon talent": "Access to student and research talent",
+      },
+      audience: { "Learn hands-on in tutorials, meet mentors and build in the hackathon.": "Learn hands-on in tutorials, present your work at the poster session and meet researchers." },
       keywords: { "AI entrepreneurship": "AI in enterprise" },
     },
   },

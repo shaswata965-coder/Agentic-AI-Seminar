@@ -23,7 +23,7 @@ const WHERE: Partial<Record<AuraVariant, string>> = {
   programme: "Programme", speakers: "Speakers", tutorials: "Tutorials", demos: "Live demos", hackathon: "Hackathon", trophy: "Prizes & winners",
   registration: "Registration", success: "Registration complete", kiosks: "Industry kiosks", venue: "Venue", travel: "Travel tips",
   sponsors: "Partners & sponsors", organisers: "Organisers", volunteers: "Volunteers (coming soon)", faq: "FAQ", answer: "FAQ: answer found",
-  contact: "Contact form", notFound: "Page not found", sleep: "Footer", gallery: "Photo gallery", recordings: "Recordings", admin: "Admin panel", error: "Error page",
+  contact: "Contact form", notFound: "Page not found", sleep: "Footer", gallery: "Photo gallery", recordings: "Recordings", admin: "Admin panel", lecturer: "Posters and invitations", error: "Error page",
 };
 
 export default async function MeetAuraPage() {

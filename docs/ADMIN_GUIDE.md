@@ -98,6 +98,10 @@ The newest announcements appear in the box on the home page.
 - **Keynote speaker** adds a keynote badge. **Feature on the home page** adds the speaker to the home page grid.
 - The "More speakers to be announced" card can be switched off in **Site settings → Home → Speakers** once the line-up is complete.
 
+**Invitation and registration.** The workshop is by invitation; every invitee must register to get entry, and registration is free but mandatory. The home page says so in its **Invitation** section, under the hero (**Site settings → Home → Invitation**: the heading, three points and the invitation poster with Aura), the Registration page's introduction and fees say so (**Registration → Hero** and **→ Fees**), and so do two FAQs (updated once, on sites that hadn't edited them). While the hackathon is hidden, the strip along the foot of the home hero has the workshop registration card alone (**Home → Registration choice**: its heading and text while the hackathon is hidden).
+
+**Posters.** The registration form asks every registrant **Would you like to present a poster?** (Yes or No, on its second step; reword it or move it under **Registration → Form fields**). Answers show with each registration and in the CSV download. Under the form, the **Call for posters** section (**Registration → Call for posters**) invites arXiv preprints and submitted or accepted papers to the poster session (Day 1, over lunch).
+
 **The tentative programme** is built in: both days of talks, panels, tutorials and demos, and the breaks, from the organisers' plan, with every speaker, panelist and room still "to be announced". It is added once, by itself, to a site that has no sessions yet, and the programme status goes from *To be announced* to *Draft*. Day 1 (15 Dec): inauguration at 9:00, three invited talks, tea, three more talks, lunch with the poster session (1:15 to 3:00 pm), panel discussion 1, three talks, panel discussion 2 (five or six panelists, 6:00 to 7:30 pm) and the networking dinner until 9:30 pm. Day 2 (16 Dec): breakfast at 8:00, five talks, tea, three talks, then five tutorials or demos side by side from 1:15 to 2:30 pm. Open a session under **Programme** to give it its title, speakers, room and description as they are confirmed, delete the ones you don't need and add the hackathon final when its time is set. (A site that already had sessions keeps them; `npm run seed` adds the plan to one whose programme is empty.)
 
 **Programme → New session**
@@ -137,6 +141,8 @@ Fill in name, role (e.g. "PhD scholar"), department, affiliation, profile link a
 
 ## 9. Hackathon
 
+**Hidden until announced.** The hackathon is off the site until you switch on **Site settings → Site-wide → Features & post-event → Show the hackathon**. While it is off, the Hackathon page shows only a "details coming soon" poster, with Aura as a professor unfurling a poster and pointing at it with a laser pointer, and a few reasons to join (its texts are under **Site settings → Hackathon → Coming-soon poster**; the preview shows the poster above the full page, so both can be prepared). Nothing else mentions it: no Hackathon link in the navigation bar, the phone menu or the footer, no hackathon section on the home page or the Programme page, no hackathon placard or registration card in the home hero, no hackathon card on the Partners and Registration pages, no "interested in the hackathon" box on the registration form, and no About topics, activities, highlights (the prize pool) or FAQs about it. Team registration is refused. Switch it on to bring all of it back.
+
 **Hackathon** (left menu) has tabs:
 - **Overview:** title, tagline, description, team size, who can join, dates and location (leave these two blank to show the workshop's), mode (on-site / hybrid), prize pool, eligibility and the registration note. The first section of the Hackathon page, *At a glance*, shows them. The tagline (under the title, at the top of the Hackathon page, and with the hackathon on the home page and the Programme page) and the overview (the text under *At a glance*'s title) can also be changed beside the live preview, in **Site settings → Hackathon → Hero** and **→ At a glance**, and the prize pool and the prizes (below) in **→ Prize money**: it is the same text, saved here, by whoever may open both.
 - **The question:** there is one hackathon with one track and one question: every team answers the same question, with one timeline, one set of rules and one prize pool, so teams don't pick a theme or track when they register. Set the question (a line, shown large on the Hackathon page and the home page), the challenge (what answering it involves) and a few example ideas. The three themes (Healthcare, Scientific Discovery, Enterprise) are the workshop's, for its talks, panels and tutorials.
@@ -167,7 +173,7 @@ All under **Site settings → Site-wide**.
 - **Colours:** the **brand colour** (e.g. `#3b5bdb`) for buttons and highlights, and the seven accent colours the sections use (see section 3).
 - **SEO & analytics:** the Google Analytics ID (`G-…`) and search keywords.
 - **Banner:** a site-wide notice (e.g. "Registration closes on 30 November"), its link and colour.
-- **Features & post-event:** the *Ask Aura* helper and the post-event switches. (The *More speakers* card is under *Home → Speakers*.)
+- **Features & post-event:** **Show the hackathon**, and the post-event switches. (The *More speakers* card is under *Home → Speakers*.)
 
 ## 12. FAQs
 

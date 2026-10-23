@@ -6,7 +6,7 @@ import { Section, SectionHeading } from "@/components/ui/Section";
 import { SESSION_TYPE_META, THEME_META, type SessionType } from "@/lib/content/constants";
 import type { Session, SiteSettings } from "@/lib/content/types";
 import { copy, plural } from "@/lib/copy";
-import { eventDays } from "@/lib/event";
+import { eventDays, hackathonShown } from "@/lib/event";
 import { eventDayLabel, formatDate, timeRange } from "@/lib/format";
 
 /** The session formats explained on the page, and where to read more about each. */
@@ -85,7 +85,7 @@ export function ProgrammeOverview({ s, sessions, tba }: { s: SiteSettings; sessi
         <div>
           <h3 className="font-mono text-[11px] font-bold tracking-[0.16em] text-subtle uppercase">{c.formats}</h3>
           <ul className="mt-3 divide-y divide-border overflow-hidden rounded-3xl border border-border bg-surface">
-            {FORMATS.map((f) => {
+            {FORMATS.filter((f) => f.type !== "hackathon" || hackathonShown(s)).map((f) => {
               const meta = SESSION_TYPE_META[f.type];
               const n = count(f.type);
               const body = (

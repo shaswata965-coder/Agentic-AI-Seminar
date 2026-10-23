@@ -74,6 +74,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "hackathon",
     title: "Hackathon",
     steps: [
+      "The hackathon is hidden until you switch on Site settings → Site-wide → Features → Show the hackathon; until then its page shows only the coming-soon poster (Site settings → Hackathon → Coming-soon poster).",
       "Hackathon → Overview, the question, rules, timeline, prizes and judging criteria. The tagline, the overview and the prizes can also be changed beside the live preview, in Site settings → Hackathon → Hero, At a glance and Prize money.",
       "There is one hackathon with one track: every team answers the same question (Hackathon → The question), so teams don't pick a theme. The three themes are the workshop's, for its talks, panels and tutorials.",
       "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",

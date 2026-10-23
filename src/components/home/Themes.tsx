@@ -8,6 +8,7 @@ import { cn } from "@/lib/cn";
 import { THEME_META } from "@/lib/content/constants";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
+import { hackathonShown } from "@/lib/event";
 
 type Theme = SiteSettings["themes"][number];
 
@@ -103,7 +104,7 @@ export function Themes({ s }: { s: SiteSettings }) {
           );
         })}
       </ul>
-      {c.hackathonNote ? (
+      {c.hackathonNote && hackathonShown(s) ? (
         <p className="tone-aqua mx-auto mt-10 flex w-fit max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 rounded-2xl bg-surface/80 px-4 py-3 text-center text-[15px] text-muted ring-1 ring-border backdrop-blur sm:px-5">
           <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-accent-soft font-display text-lg leading-none font-black text-accent-ink" aria-hidden>
             1

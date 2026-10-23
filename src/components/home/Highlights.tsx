@@ -3,13 +3,15 @@ import { CmsIcon } from "@/components/ui/Icon";
 import { cn } from "@/lib/cn";
 import type { SiteSettings } from "@/lib/content/types";
 import { StatValue } from "./StatValue";
+import { withoutHackathon } from "@/lib/event";
 
 const TONES = ["azure", "lilac", "mint", "peach", "butter", "blush"] as const;
 
 /** The highlight figures as one tear-off ticket: notched stubs joined by perforated seams. */
 export function Highlights({ s }: { s: SiteSettings }) {
-  if (!s.highlights.length) return null;
-  const odd = s.highlights.length % 2 === 1;
+  const highlights = withoutHackathon(s, s.highlights, (h) => h.label);
+  if (!highlights.length) return null;
+  const odd = highlights.length % 2 === 1;
   return (
     <section data-edit="home.highlights" aria-label="Workshop highlights" className="container-site relative z-10 py-8 sm:py-10">
       <div className="drop-shadow-[0_16px_22px_rgb(30_41_59/0.12)] dark:drop-shadow-[0_16px_26px_rgb(0_0_0/0.55)]">
@@ -17,7 +19,7 @@ export function Highlights({ s }: { s: SiteSettings }) {
           <li aria-hidden className="ticket-stub hidden w-16 shrink-0 items-center justify-center bg-[linear-gradient(180deg,var(--brand),color-mix(in_oklab,var(--brand)_55%,var(--lilac)))] lg:flex">
             <span className="font-mono text-[11px] font-bold tracking-[0.3em] whitespace-nowrap text-brand-fg uppercase [writing-mode:vertical-rl] rotate-180">{s.homeHighlights.stub}</span>
           </li>
-          {s.highlights.map((h, i) => (
+          {highlights.map((h, i) => (
             <li
               key={`${h.label}-${i}`}
               data-reveal
@@ -25,7 +27,7 @@ export function Highlights({ s }: { s: SiteSettings }) {
               className={cn(
                 `tone-${TONES[i % TONES.length]}`,
                 "ticket-stub group relative min-w-0 bg-[linear-gradient(160deg,color-mix(in_oklab,var(--accent-soft)_85%,var(--surface)),var(--surface)_65%)] px-5 pt-4 pb-5 ring-1 ring-border ring-inset lg:flex-1",
-                i === s.highlights.length - 1 && odd && "col-span-2 sm:col-span-1",
+                i === highlights.length - 1 && odd && "col-span-2 sm:col-span-1",
               )}
             >
               {/* Tear line between stubs. */}
