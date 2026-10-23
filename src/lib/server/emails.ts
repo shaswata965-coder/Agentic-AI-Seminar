@@ -49,7 +49,7 @@ ${box(`<p style="margin:0;font-size:13px;color:#64748b">Your registration ID</p>
 <p><strong>When:</strong> ${esc(dates)}<br/><strong>Where:</strong> ${esc(venueLine(s))}</p>
 <p>Please carry a valid photo ID and this registration ID for campus entry. The exact hall and any updates will be shared on the website and by e-mail.</p>
 ${s.confirmationNote ? `<p>${esc(s.confirmationNote)}</p>` : ""}
-<p>We've attached a calendar file so you can add the workshop to your calendar.</p>
+<p>We've attached a calendar file so you can add the workshop to your calendar. To build your own agenda of sessions, sign in on the website with this e-mail address and your registration ID.</p>
 <p>${button(absoluteUrl("/programme"), "View the programme")}</p>
 <p style="margin-top:24px">See you at IIT Delhi!<br/>The organising team</p>`;
   const text = `Hi ${r.name},
@@ -62,6 +62,7 @@ Where: ${venueLine(s)}
 
 Please carry a valid photo ID and this registration ID for campus entry.
 ${s.confirmationNote ? `\n${s.confirmationNote}\n` : ""}
+To build your own agenda, sign in on the website with this e-mail address and your registration ID.
 Programme: ${absoluteUrl("/programme")}
 
 The organising team`;
@@ -83,7 +84,7 @@ export function hackathonEmail(s: SiteSettings, h: HackathonInfo, t: { teamName:
 ${box(`<p style="margin:0;font-size:13px;color:#64748b">Team registration ID</p><p style="margin:4px 0 0;font-size:22px;font-weight:700;letter-spacing:.06em;color:#3b5bdb">${esc(t.regId)}</p>`)}
 ${h.question ? `<p><strong>The question every team answers:</strong> ${esc(h.question)}</p>
 ` : ""}<p><strong>Team members</strong></p><ul>${list}</ul>
-<p>Keep an eye on the hackathon page for the idea-submission date, rules and timeline.</p>
+<p>Keep an eye on the hackathon page for the idea-submission date, rules and timeline. Each member can sign in on the website with their own e-mail address and this team ID to build an agenda of workshop sessions.</p>
 <p>${button(absoluteUrl("/hackathon"), "Hackathon details")}</p>
 <p style="margin-top:24px">Happy building!<br/>The organising team</p>`;
   const text = `Hi ${t.leaderName},
@@ -94,6 +95,7 @@ ${h.question ? `The question every team answers: ${h.question}\n` : ""}Members:
 ${t.members.map((m) => `- ${m.name} <${m.email}>`).join("\n")}
 
 Details: ${absoluteUrl("/hackathon")}
+Each member can sign in on the website with their own e-mail address and this team ID to build an agenda of workshop sessions.
 
 The organising team`;
   // Every member gets a copy, so the whole team has the team ID.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 
 /*
  * Browser-only values read through useSyncExternalStore: the server (and the
@@ -64,40 +64,6 @@ function subscribeHash(cb: () => void) {
 }
 export function useUrlHash(): string {
   return useSyncExternalStore(subscribeHash, () => window.location.hash.slice(1), () => "");
-}
-
-const LOCAL_EVENT = "aaiw-local-storage";
-
-function subscribeStorage(cb: () => void) {
-  window.addEventListener("storage", cb);
-  window.addEventListener(LOCAL_EVENT, cb);
-  return () => {
-    window.removeEventListener("storage", cb);
-    window.removeEventListener(LOCAL_EVENT, cb);
-  };
-}
-
-function readStorage(key: string): string | null {
-  try {
-    return window.localStorage.getItem(key);
-  } catch {
-    return null;
-  }
-}
-
-/** A raw localStorage string plus a setter that notifies every subscriber. */
-export function useLocalStorage(key: string): [string | null, (value: string) => void] {
-  const value = useSyncExternalStore(subscribeStorage, () => readStorage(key), () => null);
-  const set = useCallback(
-    (next: string) => {
-      try {
-        window.localStorage.setItem(key, next);
-      } catch {}
-      window.dispatchEvent(new Event(LOCAL_EVENT));
-    },
-    [key],
-  );
-  return [value, set];
 }
 
 let scrollLocks = 0;

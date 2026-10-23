@@ -371,6 +371,17 @@ export const COLLECTIONS: CollectionDef[] = [
       url("profileUrl", "Profile page", { width: "half" }),
       image("photo", "Photo"),
       textarea("bio", "Short bio (mentors & judges)", { maxLength: 600 }),
+      email("loginEmail", "Sign-in e-mail (optional, never shown)", {
+        width: "half",
+        private: true,
+        help: "With a sign-in code, lets them sign in on the website (to save their agenda). Mentors and judges need this: they have no registration.",
+      }),
+      text("loginCode", "Sign-in code", {
+        width: "half",
+        maxLength: 100,
+        private: true,
+        help: "At least 8 characters. Send it to them with the e-mail above; change it to sign them out.",
+      }),
       order,
       published,
     ],
@@ -609,6 +620,11 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       ),
       section("nav", "Navigation", "siteNav", [], { description: "Names of the pages and home sections in the navigation bar, its Explore menu and the footer.", anchor: "site.header" }),
       section("header", "Header", "siteHeader", [], { anchor: "site.header" }),
+      section("account", "Sign-in", "siteAccount", [], {
+        description:
+          "Visitors sign in (Sign in in the navigation bar, or by starring a programme session) to keep their agenda. There is no sign-up: workshop attendees use their registration ID, hackathon teams their team's, volunteers their admin panel password, and mentors and judges the sign-in e-mail and code set on their entry under Organisers & volunteers.",
+        anchor: "site.header",
+      }),
       section("footer", "Footer", "siteFooter", [], { anchor: "site.footer" }),
       section(
         "banner",

@@ -21,6 +21,8 @@ interface Base {
   placeholder?: string;
   /** Layout hint for the admin form grid. */
   width?: "full" | "half" | "third";
+  /** Kept out of everything the public pages read (a sign-in e-mail or code): only the admin panel sees it. */
+  private?: boolean;
 }
 
 export interface TextField extends Base {

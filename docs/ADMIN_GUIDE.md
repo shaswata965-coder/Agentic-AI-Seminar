@@ -121,6 +121,8 @@ The **PDF schedule** is generated automatically from the programme. To use your 
 
 ## 8. Organisers, volunteers, mentors and judges
 
+**Signing in on the website.** Visitors need to sign in to star sessions and keep their agenda (*My agenda* on the Programme page); it is saved with their account, by e-mail, so it follows them to every device. There is no sign-up: everyone the event knows signs in with their e-mail and what they already have. Workshop attendees use their **registration ID** and hackathon participants (any member of a team) the **team's registration ID**, both in their confirmation e-mails, which now say so. Volunteers, editors and administrators use their **admin panel password** (this never opens the admin panel to anyone else). Mentors, judges and anyone else in **Organisers & volunteers** need a **Sign-in e-mail** and a **Sign-in code** (at least 8 characters) on their entry; send them both, and change the code to sign them out. These two fields are never shown on the website. A cancelled registration or a withdrawn team can't sign in. The texts of the *Sign in* button and window are under **Site settings → Site-wide → Sign-in**. Agendas starred in a browser before this change are moved into the account the first time that browser signs in.
+
 **Organisers & volunteers → New person.** Choose the **group**:
 
 | Group | Shown on |

@@ -113,12 +113,14 @@ async function listPublished(key: CollectionKey): Promise<object[]> {
   cacheTag(key, CONTENT_TAG);
   const def = COLLECTION_MAP[key];
   const res = await load(async () => {
-    const docs = await getCollectionModel(key).find({ published: true }).sort(def.sort).lean();
-    return docs.map((d) => fillDefaults<object>(def.fields, toPlain<Record<string, unknown>>(d)));
+    // Private fields (sign-in e-mails and codes) never reach the public pages.
+    const hidden = Object.fromEntries(def.fields.filter((f) => f.private).map((f) => [f.name, 0]));
+    const docs = await getCollectionModel(key).find({ published: true }, Object.keys(hidden).length ? hidden : undefined).sort(def.sort).lean();
+    return docs.map((d) => fillDefaults<object>(def.fields.filter((f) => !f.private), toPlain<Record<string, unknown>>(d)));
   });
   if (!res.ok) {
     cacheLife("fallback");
-    return (FALLBACKS[key] ?? []).map((d) => fillDefaults<object>(def.fields, d as Record<string, unknown>));
+    return (FALLBACKS[key] ?? []).map((d) => fillDefaults<object>(def.fields.filter((f) => !f.private), d as Record<string, unknown>));
   }
   cacheLife("cms");
   return stripEmDashes(res.data);

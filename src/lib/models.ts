@@ -285,6 +285,50 @@ const sessionSchema = new Schema<SessionDoc>(
 sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 export const AdminSession = (mongoose.models.AdminSession as Model<SessionDoc>) ?? mongoose.model<SessionDoc>("AdminSession", sessionSchema);
 
+/* ------------------------------------------------------ Visitor accounts -- */
+
+/**
+ * A browser signed in on the public site (to keep an agenda): anyone the event knows, by e-mail. The cookie
+ * holds a random token; only its SHA-256 is stored, as the id. Expired ones are removed by MongoDB (TTL).
+ */
+export interface VisitorSessionDoc {
+  _id: string;
+  email: string;
+  name: string;
+  /** How they signed in: "team" (admin panel account), "workshop", "hackathon" or a people group (judge, mentor…). */
+  kind: string;
+  expiresAt: Date;
+  createdAt?: Date;
+}
+const visitorSessionSchema = new Schema<VisitorSessionDoc>(
+  {
+    _id: { type: String, required: true },
+    email: { type: String, required: true, lowercase: true, index: true },
+    name: { type: String, default: "" },
+    kind: { type: String, default: "" },
+    expiresAt: { type: Date, required: true },
+  },
+  { timestamps: { createdAt: true, updatedAt: false }, collection: "visitor_sessions" },
+);
+visitorSessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+export const VisitorSession =
+  (mongoose.models.VisitorSession as Model<VisitorSessionDoc>) ?? mongoose.model<VisitorSessionDoc>("VisitorSession", visitorSessionSchema);
+
+/** A person's agenda: the programme sessions they starred, by e-mail, so every way they sign in shares it. */
+export interface AgendaDoc {
+  email: string;
+  sessions: string[];
+  updatedAt?: Date;
+}
+const agendaSchema = new Schema<AgendaDoc>(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true },
+    sessions: { type: [String], default: [] },
+  },
+  { timestamps: true },
+);
+export const Agenda = (mongoose.models.Agenda as Model<AgendaDoc>) ?? mongoose.model<AgendaDoc>("Agenda", agendaSchema);
+
 /* -------------------------------------------------------------- Activity -- */
 
 /** What a volunteer did, for the task tracker. Name and e-mail are copied so entries outlive the account. */

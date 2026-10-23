@@ -130,6 +130,8 @@ How each kind of injection is closed off:
 
 **Cookie.** `aaiw_admin`, `HttpOnly`, `SameSite=Lax`, `Secure` in production (over HTTPS), 7 days, limited to the site's path.
 
+**Visitor sign-in (the public site's agenda).** A separate cookie, `aaiw_visitor` (same flags, 30 days), holds a random 256-bit token; only its SHA-256 is stored (`visitor_sessions`, removed by a TTL index), and signing out deletes it. It never grants the admin panel or its API. Visitors prove who they are with an admin account's password (bcrypt, checked even for unknown e-mails so the timing doesn't reveal accounts), a workshop or team registration ID, or a person's sign-in code (8+ characters, compared in constant time); failed attempts are rate-limited per address, per e-mail from one address and per e-mail overall, as for the admin sign-in. People's sign-in e-mails and codes are `private` fields, left out of every public query. All state-changing routes check the origin.
+
 **Sessions.**
 - Every request to the admin API checks the token, then its session in the database, then the account (it must exist and be active).
 - Role and permissions are read from the database each time, so changes apply at once.

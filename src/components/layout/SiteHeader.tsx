@@ -4,6 +4,7 @@ import { ChevronDown, Menu, Ticket, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { AccountButton } from "@/components/account/Account";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { useScrollLock } from "@/lib/client-hooks";
@@ -205,6 +206,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidde
           <span aria-hidden className="mx-1 hidden h-6 w-px bg-border lg:block" />
           {/* On phones the theme switch lives in the menu, and Register shrinks to its icon. */}
           <ThemeToggle className="max-sm:hidden" />
+          <AccountButton className="max-sm:hidden" />
           <ButtonLink href={registerHref} size="sm" className="max-sm:w-9 max-sm:px-0" icon={<Ticket size={16} aria-hidden />}>
             <span className="max-sm:sr-only">{text.register}</span>
           </ButtonLink>
@@ -292,6 +294,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidde
                   ))}
                 </ul>
               </div>
+              <AccountButton wide onNavigate={() => setMenuOpen(false)} className="sm:hidden" />
               <div className="flex flex-wrap items-center gap-3">
                 <ButtonLink href={registerHref} size="lg" onClick={() => setMenuOpen(false)} icon={<Ticket size={18} aria-hidden />}>
                   {text.registerNow}

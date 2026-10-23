@@ -3,6 +3,7 @@
 import { CalendarPlus, ChevronDown, Search, Star, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useAccount } from "@/components/account/Account";
 import { Aura } from "@/components/aura/Aura";
 import { Badge } from "@/components/ui/Badge";
 import { RichText } from "@/components/ui/RichText";
@@ -11,7 +12,7 @@ import { cn } from "@/lib/cn";
 import { currentThemeKey, SESSION_TYPE_META, SESSION_TYPES, THEME_KEYS, THEME_META, type SessionType, type ThemeKey } from "@/lib/content/constants";
 import type { Session } from "@/lib/content/types";
 import { timeRange } from "@/lib/format";
-import { replaceQuery, useLocalStorage, useNow, useUrlHash, useUrlParam } from "@/lib/client-hooks";
+import { replaceQuery, useNow, useUrlHash, useUrlParam } from "@/lib/client-hooks";
 import { withBase } from "@/lib/paths";
 import { SessionBadges, SessionRoom } from "./SessionMeta";
 
@@ -26,16 +27,7 @@ export interface MiniSpeaker {
   affiliation: string;
 }
 
-const STORAGE_KEY = "aaiw-agenda";
-
-function parseAgenda(raw: string | null): Set<string> {
-  try {
-    const list = JSON.parse(raw || "[]");
-    return new Set(Array.isArray(list) ? list.filter((x): x is string => typeof x === "string") : []);
-  } catch {
-    return new Set();
-  }
-}
+const EMPTY = new Set<string>();
 
 const parseList = <T extends string>(raw: string | null, allowed: readonly T[]) =>
   new Set((raw ?? "").split(",").filter((t): t is T => (allowed as readonly string[]).includes(t)));
@@ -84,13 +76,24 @@ export function ProgrammeView({
   const [themeChoice, setThemes] = useState<Set<ThemeKey> | null>(null);
   const [typeChoice, setTypes] = useState<Set<SessionType> | null>(null);
   const [q, setQ] = useState("");
-  const [agendaOnly, setAgendaOnly] = useState(false);
-  const [agendaRaw, saveAgenda] = useLocalStorage(STORAGE_KEY);
+  // ?agenda=1 (the account menu's "My agenda") opens on the visitor's own sessions.
+  const [agendaChoice, setAgendaOnly] = useState<boolean | null>(null);
+  // The agenda is kept with the visitor's account: starring needs one (components/account/Account.tsx).
+  const { account, agenda: saved, saveAgenda, signIn, agendaRequests, text: accountText } = useAccount();
+  // Only sessions still in the programme count (one starred before it was deleted is left out).
+  const agenda = useMemo(() => (account ? new Set(sessions.filter((x) => saved.has(x.id)).map((x) => x.id)) : EMPTY), [account, saved, sessions]);
+  // The account menu's "My agenda", clicked while the programme is open.
+  const [seenRequests, setSeenRequests] = useState(agendaRequests);
+  if (seenRequests !== agendaRequests) {
+    setSeenRequests(agendaRequests);
+    setAgendaOnly(true);
+  }
+  const urlAgenda = useUrlParam("agenda") === "1";
+  const agendaOnly = Boolean(account) && (agendaChoice ?? urlAgenda);
 
   const day = dayChoice ?? (days.some((d) => d.day === linkedDay) ? linkedDay : defaultDay);
   const themes = useMemo(() => themeChoice ?? parseList(urlTheme, THEME_KEYS), [themeChoice, urlTheme]);
   const types = useMemo(() => typeChoice ?? parseList(urlType, SESSION_TYPES), [typeChoice, urlType]);
-  const agenda = useMemo(() => parseAgenda(agendaRaw), [agendaRaw]);
 
   // Scroll to a linked session (#session-id).
   useEffect(() => {
@@ -124,9 +127,19 @@ export function ProgrammeView({
   };
 
   function star(id: string, title: string) {
-    const next = toggle(agenda, id);
-    saveAgenda(JSON.stringify([...next]));
-    toast(next.has(id) ? `Added “${title}” to your agenda` : "Removed from your agenda", next.has(id) ? "success" : "info");
+    const apply = (current: Set<string>) => {
+      const next = toggle(current, id);
+      saveAgenda(next);
+      toast(next.has(id) ? `Added “${title}” to your agenda` : "Removed from your agenda", next.has(id) ? "success" : "info");
+    };
+    // Signed out: sign in first, then star it (unless it was already in the agenda kept with the account).
+    if (!account) signIn({ reason: accountText.needSignIn, then: (current) => (current.has(id) ? undefined : apply(current)) });
+    else apply(agenda);
+  }
+
+  function showAgenda() {
+    if (account) setAgendaOnly(!agendaOnly);
+    else signIn({ reason: accountText.needSignIn, then: () => setAgendaOnly(true) });
   }
 
   const filtered = useMemo(() => {
@@ -214,7 +227,7 @@ export function ProgrammeView({
           <button
             type="button"
             aria-pressed={agendaOnly}
-            onClick={() => setAgendaOnly((v) => !v)}
+            onClick={showAgenda}
             data-ripple=""
             className={cn(
               "tone-butter key key-sm inline-flex h-11 items-center gap-2 rounded-[0.75rem] border px-4 text-sm font-semibold",
