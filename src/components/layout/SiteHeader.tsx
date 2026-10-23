@@ -138,7 +138,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidde
       data-site-header
       data-edit="site.header"
       className={cn(
-        "sticky top-0 z-40 transition-[background-color,box-shadow,border-color] duration-300",
+        "fit-header sticky top-0 z-40 transition-[background-color,box-shadow,border-color] duration-300",
         scrolled ? "border-b border-border bg-[var(--header-bg)] shadow-[0_8px_30px_-20px_rgb(15_23_42/0.35)] backdrop-blur-xl" : "border-b border-transparent",
       )}
     >

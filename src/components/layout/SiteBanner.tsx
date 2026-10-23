@@ -11,7 +11,7 @@ export function SiteBanner({ text, link, tone = "lilac" }: { text: string; link?
     </span>
   );
   return (
-    <div data-edit="site.banner" className={`tone-${tone} bg-accent-soft text-center text-sm font-semibold text-accent-ink`}>
+    <div data-edit="site.banner" className={`fit-screen tone-${tone} bg-accent-soft text-center text-sm font-semibold text-accent-ink`}>
       <div className="container-site py-2">
         {link ? (
           <Link href={link} className="group mi-link">

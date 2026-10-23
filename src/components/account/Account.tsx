@@ -149,6 +149,7 @@ export function AccountProvider({ text, children }: { text: PageCopy["siteAccoun
         }}
         labelledBy="sign-in-title"
         size="md"
+        className="fit-screen"
       >
         {dialog ? (
           <SignInForm

@@ -77,7 +77,7 @@ export function Hero({ s }: { s: SiteSettings }) {
       <div aria-hidden className="bg-dots absolute inset-0 -z-20 [mask-image:radial-gradient(80%_70%_at_50%_40%,black,transparent)]" />
       <NetworkCanvas className="absolute inset-0 -z-10" avoid="[data-graph-avoid]" />
 
-      <div className="container-hero grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-x-6 lg:gap-y-10 lg:pt-14 lg:pb-12">
+      <div className="container-site grid items-center gap-8 pt-8 pb-10 sm:pt-12 lg:grid-cols-[1.12fr_0.88fr] lg:gap-x-6 lg:gap-y-10 lg:pt-14 lg:pb-12">
         {/* hero-copy makes the text as tall as Aura beside it; the space is shared evenly around the text. */}
         <div className="hero-copy flex flex-col justify-evenly gap-8">
           <div>
