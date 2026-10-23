@@ -18,7 +18,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 | Menu item | Implemented as |
 | --- | --- |
 | Home | `/`: single scroll with sticky top navigation and reading-progress bar |
-| About | Page `/about` (in the navigation bar; topics around Aura on home at `/#about`) |
+| About | Page `/about` (under *Explore* in the navigation bar, changed on request; topics around Aura on home at `/#about`) |
 | Themes | Section `/#themes` |
 | Programme | Page `/programme` with an overview, the schedule, industry kiosks and the hackathon |
 | Speakers | Page `/speakers` (featured speakers on home) |
@@ -35,7 +35,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Section | Requirement | Status |
 | --- | --- | --- |
-| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the countdown was taken out, and a photo of the IIT Delhi main building sits behind Aura, its sign in Hindi and English (*भारतीय प्रौद्योगिकी संस्थान दिल्ली* / *Indian Institute of Technology Delhi*) readable above her head, fading into the background (Site settings → Home → Hero switches it off or replaces it). The IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register and the Programme are in the navigation bar, and the hackathon is under *Explore*. Under the hero, two large cards lead to workshop registration and hackathon team registration. Add to calendar and share are in About and the footer |
+| Hero | Title, tagline, dates, venue, IIT Delhi + ScAI logos, live countdown to 15 Dec 2026, Register / Join the Hackathon / View Programme buttons | ✅ Changed on request: the countdown was taken out, and a photo of the IIT Delhi main building sits behind Aura, its sign in Hindi and English (*भारतीय प्रौद्योगिकी संस्थान दिल्ली* / *Indian Institute of Technology Delhi*) readable above her head, fading into the background (Site settings → Home → Hero switches it off or replaces it). The IIT Delhi emblem and the ScAI logo sit at the left and right corners of the navigation bar; Register, the Programme and the Hackathon are in the navigation bar, and About is under *Explore* (changed on request). Under the hero, two large cards lead to workshop registration and hackathon team registration. Add to calendar and share are in About and the footer |
 | | Highlight strip (speakers, tutorials, demos, kiosks, prize pool; TBA) | ✅ Editable, up to 6 items |
 | | Announcements / News box updated by organisers | ✅ Admin → Announcements (pin, tone, link) |
 | | Hackathon announcement on home | ✅ Title, tagline, its one question under three large 1s (*1 hackathon · 1 track · 1 question*), team size, mode and prize pool, with *Register your team* and *Hackathon details* (`/hackathon`) buttons |

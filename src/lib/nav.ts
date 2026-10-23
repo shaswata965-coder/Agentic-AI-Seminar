@@ -13,17 +13,17 @@ export const homeNav = (n: NavCopy): NavItem => ({ href: "/", label: n.home });
 
 /** Dedicated pages shown as links in the navigation bar (after Home). */
 export const primaryNav = (n: NavCopy): NavItem[] => [
-  { href: "/about", label: n.about },
   { href: "/programme", label: n.programme },
   { href: "/speakers", label: n.speakers },
+  { href: "/hackathon", label: n.hackathon },
 ];
 
 export const registrationNav = (n: NavCopy): NavItem => ({ href: "/register", label: n.registration });
 
 /** Dedicated pages listed under Explore, next to the home page sections. */
 export const explorePages = (n: NavCopy): NavItem[] => [
+  { href: "/about", label: n.about, description: n.aboutText },
   { href: "/tutorials", label: n.tutorials, description: n.tutorialsText },
-  { href: "/hackathon", label: n.hackathon, description: n.hackathonText },
   { href: "/venue", label: n.venue, description: n.venueText },
   { href: "/partners", label: n.partners, description: n.partnersText },
   { href: "/organisers", label: n.organisers, description: n.organisersText },

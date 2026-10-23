@@ -338,7 +338,6 @@ const RETIRED: { settings: Retired; hackathon: Retired } = {
         "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
       ],
       homeOrder: [["highlights", "news", "themes", "about", "speakers", "hackathon", "venue", "partners", "faq"]],
-      "siteNav.hackathonText": ["One hackathon on three themes, with team registration"],
       "siteNav.themesText": ["Healthcare, scientific discovery and entrepreneurship"],
       "homeThemes.description": ["Talks, tutorials and the hackathon are organised around three themes."],
       "hackathonTracks.eyebrow": ["Themes"],
