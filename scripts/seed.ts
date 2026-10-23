@@ -1,6 +1,6 @@
 /**
  * Store the default content from the website brief: event details, hackathon
- * outline, organisers and FAQs. Safe to run any number of times: it only adds
+ * outline, organisers, FAQs and the tentative programme. Safe to run any number of times: it only adds
  * what is missing and never overwrites edits made in the admin panel.
  *
  *   npm run seed
@@ -12,7 +12,7 @@ import { cliArgs, connect, RESTART_HINT, run } from "./lib/cli";
 run(async () => {
   const args = cliArgs({});
   if (args.help) {
-    console.log("Usage: npm run seed\n\nAdds the default event content (settings, hackathon, organisers, FAQs) where it is missing.");
+    console.log("Usage: npm run seed\n\nAdds the default event content (settings, hackathon, organisers, FAQs, the tentative programme) where it is missing.");
     return;
   }
   await connect();

@@ -1,7 +1,7 @@
 import { FORM_DEFAULTS, FORM_SETTINGS, formFields, type FormKey } from "@/lib/forms";
 import { PAGE_COPY_DEFAULTS } from "@/lib/schema/page-copy";
 import { HIDDEN_SECTIONS_DEFAULTS, SECTION_ORDER_DEFAULTS } from "@/lib/schema/section-order";
-import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
+import type { Faq, HackathonInfo, Person, Session, SiteSettings } from "./types";
 
 /*
  * Default content. Used when the database is not configured/reachable and to
@@ -102,9 +102,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
     },
   ],
 
-  programmeStatus: "tba",
-  programmeNote:
-    "The detailed programme will be published soon. Sessions span invited talks, panel discussions, tutorials, live demos and the hackathon final.",
+  programmeStatus: "draft",
+  programmeNote: "A tentative plan: speakers, panelists and rooms will be announced as they are confirmed, and times may still change.",
   schedulePdf: "",
 
   mapQuery: "Indian Institute of Technology Delhi, Hauz Khas, New Delhi",
@@ -304,6 +303,49 @@ export const DEFAULT_FAQS: NewDoc<Faq>[] = [
   { category: "hackathon", question: "Where does the hackathon final take place?", answer: "The final round takes place live at the workshop at IIT Delhi on 15–16 December 2026." },
 ].map((f, i) => ({ ...f, order: i + 1, published: true }));
 
+/*
+ * The tentative programme: the organisers' plan of talks, panels and breaks for both days, with speakers,
+ * panelists and rooms still to be announced. Added once to a site without sessions (bootstrap.ts), shown
+ * as a draft ("subject to change"); every session is then edited under Programme in the admin panel.
+ */
+const TALK = { type: "talk", title: "Invited talk", speakerNote: "Speaker to be announced" } as const;
+const TUTORIAL = {
+  type: "tutorial",
+  title: "Tutorial or demo",
+  speakerNote: "Instructors to be announced",
+  description: "Five hands-on tutorials and live demos run side by side in this slot. Pick the one you want once the line-up is announced.",
+} as const;
+const slot = (day: "1" | "2", start: string, end: string, session: { type: Session["type"]; title: string; speakerNote?: string; description?: string }) => ({ day, start, end, ...session });
+
+export const DEFAULT_SESSIONS: NewDoc<Session>[] = [
+  slot("1", "09:00", "10:00", { type: "other", title: "Inauguration" }),
+  slot("1", "10:00", "10:30", TALK),
+  slot("1", "10:30", "11:00", TALK),
+  slot("1", "11:00", "11:30", TALK),
+  slot("1", "11:30", "11:45", { type: "break", title: "Tea break" }),
+  slot("1", "11:45", "12:15", TALK),
+  slot("1", "12:15", "12:45", TALK),
+  slot("1", "12:45", "13:15", TALK),
+  slot("1", "13:15", "15:00", { type: "break", title: "Lunch & poster session", description: "Posters are on display through lunch, with their authors beside them." }),
+  slot("1", "15:00", "16:30", { type: "panel", title: "Panel discussion 1", speakerNote: "Panelists to be announced" }),
+  slot("1", "16:30", "17:00", TALK),
+  slot("1", "17:00", "17:30", TALK),
+  slot("1", "17:30", "18:00", TALK),
+  slot("1", "18:00", "19:30", { type: "panel", title: "Panel discussion 2", speakerNote: "Five or six panelists, to be announced" }),
+  slot("1", "19:30", "21:30", { type: "break", title: "Networking dinner" }),
+  slot("2", "08:00", "09:00", { type: "break", title: "Breakfast" }),
+  slot("2", "09:00", "09:30", TALK),
+  slot("2", "09:30", "10:00", TALK),
+  slot("2", "10:00", "10:30", TALK),
+  slot("2", "10:30", "11:00", TALK),
+  slot("2", "11:00", "11:30", TALK),
+  slot("2", "11:30", "11:45", { type: "break", title: "Tea break" }),
+  slot("2", "11:45", "12:15", TALK),
+  slot("2", "12:15", "12:45", TALK),
+  slot("2", "12:45", "13:15", TALK),
+  ...[1, 2, 3, 4, 5].map(() => slot("2", "13:15", "14:30", TUTORIAL)),
+].map((x, i) => ({ speakerNote: "", description: "", ...x, theme: "general", room: "", speakers: [], moderator: "", panelists: [], order: i + 1, published: true }));
+
 /** Earlier default About point sets. Stored but never edited, they are replaced by the current topics. */
 const RETIRED_ABOUT_POINTS = [
   "Agents that act|Three themes|Talks and panels|Learn by doing|Build and compete|Open to all",
@@ -336,6 +378,9 @@ const RETIRED: { settings: Retired; hackathon: Retired } = {
       tagline: ["Where autonomous AI agents meet healthcare, science and entrepreneurship."],
       motivation: [
         "AI systems are moving from answering questions to **taking actions**: planning multi-step tasks, using tools, collaborating with people and other agents, and learning from feedback. This shift opens remarkable opportunities and raises hard questions about reliability, safety and accountability.\n\nThe Agentic AI Workshop 2026 brings together researchers, practitioners, founders and investors at IIT Delhi to take stock of where agentic AI stands, where it is heading, and how it can create real impact in **healthcare**, **scientific discovery** and **entrepreneurship**.",
+      ],
+      programmeNote: [
+        "The detailed programme will be published soon. Sessions span invited talks, panel discussions, tutorials, live demos and the hackathon final.",
       ],
       homeOrder: [["highlights", "news", "themes", "about", "speakers", "hackathon", "venue", "partners", "faq"]],
       "siteNav.themesText": ["Healthcare, scientific discovery and entrepreneurship"],

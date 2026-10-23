@@ -1,6 +1,8 @@
 import { isDuplicateKeyError } from "@/lib/db";
 import { getCollectionModel, Singleton } from "@/lib/models";
-import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS } from "./defaults";
+import { objectSchema } from "@/lib/schema/field-validation";
+import { COLLECTION_MAP } from "@/lib/schema/resources";
+import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SESSIONS, DEFAULT_SETTINGS } from "./defaults";
 
 /*
  * Default content from the website brief (event facts, organisers, FAQs).
@@ -9,7 +11,10 @@ import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SETTINGS } fro
  * Free of Next.js imports so the CLI scripts in /scripts can use it.
  */
 
-async function insertSingleton(key: "settings" | "hackathon", data: object): Promise<boolean> {
+/** Marks that the tentative programme was offered to this site, so it is added at most once. */
+const PROGRAMME_PLAN_KEY = "programme-plan";
+
+async function insertSingleton(key: "settings" | "hackathon" | typeof PROGRAMME_PLAN_KEY, data: object): Promise<boolean> {
   try {
     const res = await Singleton.updateOne({ key }, { $setOnInsert: { key, data } }, { upsert: true });
     return res.upsertedCount > 0;
@@ -25,6 +30,20 @@ export async function ensureDefaultContent({ fillEmpty = false }: { fillEmpty?: 
   const freshSite = await insertSingleton("settings", DEFAULT_SETTINGS);
   if (freshSite) created.push("site settings");
   if (await insertSingleton("hackathon", DEFAULT_HACKATHON)) created.push("hackathon details");
+
+  // The tentative programme goes to a site without sessions: once (sites set up before it existed get it on
+  // their next start), or whenever asked for. Deleting it in the admin doesn't bring it back after a restart.
+  const planOffered = await insertSingleton(PROGRAMME_PLAN_KEY, { at: new Date().toISOString() });
+  if (planOffered || fillEmpty) {
+    const Sessions = getCollectionModel("sessions");
+    if ((await Sessions.countDocuments()) === 0) {
+      const def = COLLECTION_MAP.sessions;
+      await Sessions.insertMany(DEFAULT_SESSIONS.map((s) => objectSchema(def.fields).parse({ ...def.defaults, ...s })));
+      // The plan is shown as a draft ("subject to change") instead of "to be announced".
+      await Singleton.updateOne({ key: "settings", "data.programmeStatus": "tba" }, { $set: { "data.programmeStatus": "draft" } });
+      created.push(`the tentative programme (${DEFAULT_SESSIONS.length} sessions)`);
+    }
+  }
 
   // Organisers and FAQs are only added to a brand-new site (or when asked for),
   // so deleting them in the admin doesn't bring them back after a restart.

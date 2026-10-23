@@ -98,14 +98,16 @@ The newest announcements appear in the box on the home page.
 - **Keynote speaker** adds a keynote badge. **Feature on the home page** adds the speaker to the home page grid.
 - The "More speakers to be announced" card can be switched off in **Site settings → Home → Speakers** once the line-up is complete.
 
+**The tentative programme** is built in: both days of talks, panels, tutorials and demos, and the breaks, from the organisers' plan, with every speaker, panelist and room still "to be announced". It is added once, by itself, to a site that has no sessions yet, and the programme status goes from *To be announced* to *Draft*. Day 1 (15 Dec): inauguration at 9:00, three invited talks, tea, three more talks, lunch with the poster session (1:15 to 3:00 pm), panel discussion 1, three talks, panel discussion 2 (five or six panelists, 6:00 to 7:30 pm) and the networking dinner until 9:30 pm. Day 2 (16 Dec): breakfast at 8:00, five talks, tea, three talks, then five tutorials or demos side by side from 1:15 to 2:30 pm. Open a session under **Programme** to give it its title, speakers, room and description as they are confirmed, delete the ones you don't need and add the hackathon final when its time is set. (A site that already had sessions keeps them; `npm run seed` adds the plan to one whose programme is empty.)
+
 **Programme → New session**
 - Day, start and end time, title, **type** (*Keynote*, *Talk*, *Panel*, *Tutorial*, *Demo*, *Hackathon*, *Break* or *Other*), theme, room/hall.
 - **Speakers / instructors:** pick from your speakers. Add the speakers first. If a speaker isn't confirmed yet, use *Speaker text* (e.g. "Speaker to be announced").
 - **Panels:** choose the *Moderator* and *Panelists*. The panel then also appears under *Panel discussions* on the Speakers page, linked to each speaker's card.
 
 **Site settings → Programme → Schedule → Programme status**
-- *To be announced:* the website shows "Schedule to be announced" (the default).
-- *Draft:* sessions are shown with a "subject to change" note.
+- *To be announced:* the website shows "Schedule to be announced".
+- *Draft:* sessions are shown with a "subject to change" note (the default, with the tentative programme).
 - *Final:* sessions are shown without the note.
 
 The **PDF schedule** is generated automatically from the programme. To use your own PDF instead, upload it under *Schedule PDF*.

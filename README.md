@@ -42,6 +42,8 @@ Requirements: **Node.js 20.9+** (22 LTS recommended) and **MongoDB 6+**, either 
 npm install
 cp .env.example .env.local      # set MONGODB_URI, ADMIN_EMAIL, ADMIN_PASSWORD (AUTH_SECRET optional in dev)
 npm run seed                    # stores the default event content (also happens automatically on first start)
+                                # (including the tentative programme, DEFAULT_SESSIONS in src/lib/content/defaults.ts,
+                                #  added once to a site without sessions, which then shows as a draft)
 npm run dev                     # http://localhost:3000
 ```
 
