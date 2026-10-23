@@ -528,6 +528,12 @@ const section = (key: string, title: string, copy: CopyKey | undefined, fields: 
 /** Hackathon details that the Hackathon page's tabs of Site settings edit too. */
 const hackathonTagline = text("tagline", "Tagline");
 const hackathonOverview = richtext("overview", "Overview");
+const hackathonPrizePool = text("prizePool", "Prize pool", { width: "half", placeholder: "TBA" });
+const hackathonPrizes = objects("prizes", "Prizes", "Prize", [
+  text("place", "Place / award", { required: true, width: "half" }),
+  text("reward", "Reward", { width: "half", placeholder: "TBA" }),
+  textarea("description", "Description", { rows: 2 }),
+], { titleKey: "place" });
 
 const FIELDS_HELP =
   "Open a field to change its name, its guide (the line under it, and the example inside it), the type of answer and its choices, and whether it is required or shown; the arrows change the order. Built-in fields (with a padlock) can be hidden but not deleted, and the ones the site needs stay required. Add your own questions at the end: their answers appear with each response and in the CSV download.";
@@ -763,18 +769,22 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     key: "hackathon",
     title: "Hackathon",
     path: "/hackathon",
-    description: "Headings, labels and colours of the Hackathon page, team registration included, and its tagline and overview. Its title, question, rules, timeline, prizes and results are edited under Hackathon in the menu.",
+    description: "Headings, labels and colours of the Hackathon page, team registration included, and its tagline, overview and prizes. Its title, question, rules, timeline and results are edited under Hackathon in the menu.",
     sections: [
       section("hero", "Hero", "hackathonHero", [], {
         hackathon: [{ ...hackathonTagline, help: "The line under the title. It also shows with the hackathon on the home page and the Programme page, and is the same text as Hackathon → Overview → Tagline." }],
       }),
       section("overview", "At a glance", "hackathonOverview", [], {
-        description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview.",
+        description: "Team size, who can join, dates, location and mode are edited under Hackathon → Overview; the prize pool and prizes in the Prize money tab.",
         hackathon: [{ ...hackathonOverview, help: `The text under the title. The same text as Hackathon → Overview → Overview. ${hackathonOverview.help}` }],
       }),
       section("prizes", "Prize money", "hackathonPrizes", [], {
         description: "A panel beside the At a glance facts, so both fit on one screen. The first three prizes stand on a small podium; any others are listed below it as special awards.",
         within: "overview",
+        hackathon: [
+          { ...hackathonPrizePool, help: "The amount under the pool's label. The same as Hackathon → Overview → Prize pool." },
+          { ...hackathonPrizes, help: "In order: the first three stand on the podium, the rest are the special awards. The same list as Hackathon → Prizes & judging → Prizes." },
+        ],
       }),
       section("timeline", "Timeline", "hackathonTimeline"),
       section("register", "Registration form", "hackathonRegisterForm", [], {
@@ -978,7 +988,7 @@ export const HACKATHON_DEF: SingletonDef = {
         text("dates", "Dates", { width: "half", help: "Leave blank to show the workshop's dates (Site settings → Site-wide → Event details)." }),
         text("location", "Location", { width: "half", help: "Leave blank to show the workshop's venue." }),
         text("mode", "Mode", { width: "half", placeholder: "On-site / hybrid, to be announced" }),
-        text("prizePool", "Prize pool", { width: "half", placeholder: "TBA" }),
+        { ...hackathonPrizePool, help: "Also editable in Site settings → Hackathon → Prize money." },
         list("eligibility", "Eligibility", { itemLabel: "Rule" }),
         textarea("registrationNote", "Registration note"),
       ],
@@ -1014,11 +1024,7 @@ export const HACKATHON_DEF: SingletonDef = {
       key: "prizes",
       title: "Prizes & judging",
       fields: [
-        objects("prizes", "Prizes", "Prize", [
-          text("place", "Place / award", { required: true, width: "half" }),
-          text("reward", "Reward", { width: "half", placeholder: "TBA" }),
-          textarea("description", "Description", { rows: 2 }),
-        ], { titleKey: "place" }),
+        { ...hackathonPrizes, help: "Also editable in Site settings → Hackathon → Prize money." },
         objects("judgingCriteria", "Judging criteria", "Criterion", [
           text("name", "Criterion", { required: true, width: "half" }),
           num("weight", "Weight (%)", { min: 0, max: 100, width: "half" }),

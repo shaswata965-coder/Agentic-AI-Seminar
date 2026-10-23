@@ -74,7 +74,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "hackathon",
     title: "Hackathon",
     steps: [
-      "Hackathon → Overview, the question, rules, timeline, prizes and judging criteria. The tagline and the overview can also be changed beside the live preview, in Site settings → Hackathon → Hero and At a glance.",
+      "Hackathon → Overview, the question, rules, timeline, prizes and judging criteria. The tagline, the overview and the prizes can also be changed beside the live preview, in Site settings → Hackathon → Hero, At a glance and Prize money.",
       "There is one hackathon with one track: every team answers the same question (Hackathon → The question), so teams don't pick a theme. The three themes are the workshop's, for its talks, panels and tutorials.",
       "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",
       "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Site-wide → Features & post-event.",
