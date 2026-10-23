@@ -1,7 +1,6 @@
 import { CalendarDays, MapPin } from "lucide-react";
 import type { ReactNode } from "react";
 import { NetworkCanvas } from "@/components/effects/NetworkCanvas";
-import { InstituteLogo } from "@/components/layout/InstituteLogo";
 import { Img } from "@/components/ui/Img";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
@@ -82,16 +81,8 @@ export function Hero({ s }: { s: SiteSettings }) {
         {/* hero-copy makes the text as tall as Aura beside it; the space is shared evenly around the text. */}
         <div className="hero-copy flex flex-col justify-evenly gap-8">
           <div>
-            {/* IIT Delhi, large: its emblem on a white seal in a slowly turning ring, with the institute's name. */}
-            <div data-graph-avoid="" className="mb-7 flex items-center gap-4 sm:gap-5">
-              <span className="relative shrink-0">
-                <span aria-hidden className="absolute -inset-2 animate-spin-slow rounded-full border border-dashed border-border-strong opacity-70" />
-                <span className="relative flex rounded-full bg-[conic-gradient(from_210deg,var(--azure),var(--lilac),var(--blush),var(--mint),var(--azure))] p-[3px] shadow-card-lg">
-                  <span className="flex rounded-full bg-white p-1.5">
-                    <InstituteLogo kind="iitd" upload={s.logoIITD} decorative className="h-16 sm:h-20 lg:h-[5.5rem]" />
-                  </span>
-                </span>
-              </span>
+            {/* Who organises it, above the title (the emblem is in the navigation bar). */}
+            <div data-graph-avoid="" className="mb-7">
               <p className="min-w-0 leading-snug">
                 {c.organisedBy ? <span className="block text-[11px] font-bold tracking-[0.18em] text-subtle uppercase">{c.organisedBy}</span> : null}
                 <span className="mt-1 block font-display text-lg font-bold text-fg sm:text-xl">{c.institute}</span>

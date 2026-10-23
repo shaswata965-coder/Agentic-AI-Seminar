@@ -163,7 +163,7 @@ Mentors and judges are added under **Organisers & volunteers** (section 7).
 All under **Site settings → Site-wide**.
 
 - **Contact & social:** official e-mail, phone (optional), LinkedIn, X, Instagram, YouTube, and the address that is e-mailed about new hackathon teams and enquiries (workshop registrations are listed under **Registrations**).
-- **Logos & images:** the **IIT Delhi** emblem (left corner of the navigation bar, and large at the top of the home page beside *Organised by*, whose words are under *Home → Hero*) and the **ScAI** logo (right corner) are built in; Aura wears the emblem as a badge on every page but the home page, where the IIT Delhi building and its sign stand behind her; upload a file only to replace one (PNG or SVG with a transparent background is best). Also: an event logo and a custom social-media preview image (1200 × 630 px).
+- **Logos & images:** the **IIT Delhi** emblem (left corner of the navigation bar; the words *Organised by* and the institute above the home page title are under *Home → Hero*) and the **ScAI** logo (right corner) are built in; Aura wears the emblem as a badge on every page but the home page, where the IIT Delhi building and its sign stand behind her; upload a file only to replace one (PNG or SVG with a transparent background is best). Also: an event logo and a custom social-media preview image (1200 × 630 px).
 - **Colours:** the **brand colour** (e.g. `#3b5bdb`) for buttons and highlights, and the seven accent colours the sections use (see section 3).
 - **SEO & analytics:** the Google Analytics ID (`G-…`) and search keywords.
 - **Banner:** a site-wide notice (e.g. "Registration closes on 30 November"), its link and colour.

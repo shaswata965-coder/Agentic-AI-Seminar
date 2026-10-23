@@ -83,7 +83,7 @@ How the website meets each section of the *Website Requirements Brief — Agenti
 
 | Requirement | How |
 | --- | --- |
-| Clean, modern, tech-forward; IIT Delhi / ScAI branding; subtle network / node graphics | Light pastel palette with an adjustable brand colour, official logos (the IIT Delhi emblem built in as a vector, large in the header and the home hero, and as a badge on Aura across the site, except on the home page, where the IIT Delhi building stands behind her), animated node network in the hero, agent-loop diagram, Aura the guide robot in a different pose in each section |
+| Clean, modern, tech-forward; IIT Delhi / ScAI branding; subtle network / node graphics | Light pastel palette with an adjustable brand colour, official logos (the IIT Delhi emblem built in as a vector, large in the header, and as a badge on Aura across the site, except on the home page, where the IIT Delhi building stands behind her), animated node network in the hero, agent-loop diagram, Aura the guide robot in a different pose in each section |
 | Responsive, mobile-friendly | Mobile-first layouts and a full-screen mobile menu; checked at phone, tablet and desktop widths |
 | Accessibility | Semantic headings and landmarks, skip link, keyboard-operable menus, tabs and dialogs, visible focus, labelled fields with inline errors, alt text, reduced-motion support, light and dark modes |
 | Performance (under 3 s, compressed images, no heavy animation on mobile) | Pre-rendered and cached pages, self-hosted fonts, WebP uploads, lazy map and video embeds; the node network and most Aura animations are switched off on phones and touch devices |
