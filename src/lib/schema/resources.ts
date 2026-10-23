@@ -20,7 +20,7 @@ import {
 } from "@/lib/content/constants";
 import type { Tone } from "@/lib/content/constants";
 import { copyFields, type CopyKey } from "./page-copy";
-import { isOrderPage, orderField, SECTION_ORDER } from "./section-order";
+import { HIDEABLE_SECTIONS, hiddenField, isHidePage, isOrderPage, orderField, SECTION_ORDER } from "./section-order";
 import {
   bool,
   color,
@@ -31,6 +31,7 @@ import {
   formFieldList,
   image,
   list,
+  multiselect,
   num,
   objects,
   order as orderList,
@@ -496,8 +497,10 @@ export interface SettingsSection extends FieldSection {
   anchor?: string;
   /** The page to preview, when it isn't the tab's own page. */
   path?: string;
-  /** For a part of a movable section with a tab of its own: that section's key, so the tab moves with it. */
+  /** For a part of a section with a tab of its own: that section's key, so the tab moves (and hides) with it. */
   within?: string;
+  /** Hackathon details (Admin → Hackathon) shown on this section and edited in its tab too; they are saved there. */
+  hackathon?: FieldDef[];
 }
 
 /** A tab of Site settings: one page of the site, or the parts shared by every page. */
@@ -507,6 +510,8 @@ export interface SettingsPage {
   path: string;
   description?: string;
   sections: SettingsSection[];
+  /** For a page with sections that can be hidden: the field listing the hidden ones (see section-order.ts). */
+  hidden?: FieldDef;
 }
 
 const statusOptions = [
@@ -519,6 +524,10 @@ const statusOptions = [
 export const PALETTE_DEFAULTS: Record<Tone, string> = { azure: "#8cc8ff", lilac: "#c3b1ff", mint: "#8fe0c0", peach: "#ffbf99", blush: "#ffa9c1", butter: "#ffdc73", aqua: "#67e3f9" };
 
 const section = (key: string, title: string, copy: CopyKey | undefined, fields: FieldDef[] = [], extra: Partial<SettingsSection> = {}): SettingsSection => ({ key, title, copy, fields, ...extra });
+
+/** Hackathon details that the Hackathon page's tabs of Site settings edit too. */
+const hackathonTagline = text("tagline", "Tagline");
+const hackathonOverview = richtext("overview", "Overview");
 
 const FIELDS_HELP =
   "Open a field to change its name, its guide (the line under it, and the example inside it), the type of answer and its choices, and whether it is required or shown; the arrows change the order. Built-in fields (with a padlock) can be hidden but not deleted, and the ones the site needs stay required. Add your own questions at the end: their answers appear with each response and in the CSV download.";
@@ -754,10 +763,15 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     key: "hackathon",
     title: "Hackathon",
     path: "/hackathon",
-    description: "Headings, labels and colours of the Hackathon page, team registration included. Its title, question, rules, timeline, prizes and results are edited under Hackathon in the menu.",
+    description: "Headings, labels and colours of the Hackathon page, team registration included, and its tagline and overview. Its title, question, rules, timeline, prizes and results are edited under Hackathon in the menu.",
     sections: [
-      section("hero", "Hero", "hackathonHero"),
-      section("overview", "At a glance", "hackathonOverview", [], { description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview." }),
+      section("hero", "Hero", "hackathonHero", [], {
+        hackathon: [{ ...hackathonTagline, help: "The line under the title. It also shows with the hackathon on the home page and the Programme page, and is the same text as Hackathon → Overview → Tagline." }],
+      }),
+      section("overview", "At a glance", "hackathonOverview", [], {
+        description: "Team size, who can join, dates, location, mode and prize pool are edited under Hackathon → Overview.",
+        hackathon: [{ ...hackathonOverview, help: `The text under the title. The same text as Hackathon → Overview → Overview. ${hackathonOverview.help}` }],
+      }),
       section("prizes", "Prize money", "hackathonPrizes", [], {
         description: "A panel beside the At a glance facts, so both fit on one screen. The first three prizes stand on a small podium; any others are listed below it as special awards.",
         within: "overview",
@@ -793,6 +807,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("form", "Form & status", "registerForm", [], { description: "Whether registration is open, and an external form link, are set under Site-wide → Registration." }),
       section("fields", "Form fields", "registerFormText", [formFieldList("registerFields", "Fields", "register", { help: FIELDS_HELP })], {
         description: "The workshop registration form's fields, in three steps, and its texts. The preview shows the form even while registration isn't open.",
+        within: "form",
         anchor: "register.form",
       }),
       section("fees", "Fees", "registerFees", [
@@ -913,10 +928,17 @@ for (const p of SETTINGS_PAGES) {
   p.sections.push(
     section("order", "Section order", undefined, [orderList(orderField(p.key), "Order of sections", options, { pinned: [titleOf("hero")] })], {
       description:
-        "Move the sections up or down the page by dragging them or with their arrows; the preview follows. The hero always stays at the top. A section that isn't showing right now (one with nothing in it yet, say) keeps its place for when it appears. Each section's background is set in its own tab, so after a move you may want to check that tinted and plain sections still take turns.",
+        "Move the sections up or down the page by dragging them or with their arrows; the preview follows. The hero always stays at the top. A section that isn't showing right now (one with nothing in it yet, say, or one switched off at the top of its tab) keeps its place for when it appears. Each section's background is set in its own tab, so after a move you may want to check that tinted and plain sections still take turns.",
       anchor: "",
     }),
   );
+}
+
+// Pages with sections that can be hidden list the hidden ones in one field, switched in each section's tab (see section-order.ts).
+for (const p of SETTINGS_PAGES) {
+  if (!isHidePage(p.key)) continue;
+  const titleOf = (key: string) => p.sections.find((s) => s.key === key)?.title ?? key;
+  p.hidden = multiselect(hiddenField(p.key), `${p.title}: hidden sections`, HIDEABLE_SECTIONS[p.key].map((key) => ({ value: key, label: titleOf(key) })));
 }
 
 // Each section previews itself at `[data-edit="<page>.<section>"]` unless it names another place.
@@ -932,7 +954,10 @@ export const SETTINGS_DEF: SingletonDef = {
   label: "Site settings",
   description: "Every page of the site, section by section: texts, colours and settings, with a live preview.",
   tags: ["settings"],
-  sections: SETTINGS_PAGES.flatMap((p) => p.sections.map((s) => ({ key: `${p.key}.${s.key}`, title: `${p.title} › ${s.title}`, fields: settingsSectionFields(p, s) }))),
+  sections: SETTINGS_PAGES.flatMap((p) => [
+    ...p.sections.map((s) => ({ key: `${p.key}.${s.key}`, title: `${p.title} › ${s.title}`, fields: settingsSectionFields(p, s) })),
+    ...(p.hidden ? [{ key: `${p.key}.hidden`, title: `${p.title} › Hidden sections`, fields: [p.hidden] }] : []),
+  ]),
 };
 
 export const HACKATHON_DEF: SingletonDef = {
@@ -946,8 +971,8 @@ export const HACKATHON_DEF: SingletonDef = {
       title: "Overview",
       fields: [
         text("title", "Title", { required: true }),
-        text("tagline", "Tagline"),
-        richtext("overview", "Overview"),
+        { ...hackathonTagline, help: "Also editable in Site settings → Hackathon → Hero." },
+        { ...hackathonOverview, help: `Also editable in Site settings → Hackathon → At a glance. ${hackathonOverview.help}` },
         text("teamSize", "Team size", { width: "half", placeholder: "2 to 4 members" }),
         text("teamType", "Who can join", { width: "half", help: "The kind of teams you're looking for, in a line." }),
         text("dates", "Dates", { width: "half", help: "Leave blank to show the workshop's dates (Site settings → Site-wide → Event details)." }),

@@ -25,7 +25,7 @@ import { venueLine } from "@/lib/event";
 import { formatDateRange, formatDateTime } from "@/lib/format";
 import { eventJsonLd, JsonLd } from "@/lib/jsonld";
 import { absoluteUrl } from "@/lib/paths";
-import { sectionOrder } from "@/lib/schema/section-order";
+import { isShown, sectionOrder } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await getHackathon();
@@ -46,6 +46,8 @@ export default async function HackathonPage() {
   // Teams register in the Registration section below, or on an external platform when one is set.
   const external = Boolean(s.hackathonUrl);
   const registerHref = s.hackathonUrl || "#register";
+  // The Register buttons jump to that section, so they go when it is switched off in Site settings.
+  const canRegister = external || isShown(s, "hackathon", "register");
   const hero = copy(s, "hackathonHero", { platform: s.hackathonPlatform || "the platform" });
   const ov = copy(s, "hackathonOverview");
   const tr = copy(s, "hackathonTracks");
@@ -88,9 +90,11 @@ export default async function HackathonPage() {
     <TagScope style="tab">
       <JsonLd data={eventJsonLd(s, { "@type": "Event", name: h.title, description: h.tagline, url: absoluteUrl("/hackathon") })} />
       <PageHero edit="hackathon.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={h.title} aura="hackathon" description={h.tagline}>
-        <ButtonLink href={registerHref} size="lg" icon={<Trophy size={19} aria-hidden />} iconRight={external ? <ExternalLink size={16} aria-hidden /> : undefined}>
-          {registerLabel}
-        </ButtonLink>
+        {canRegister ? (
+          <ButtonLink href={registerHref} size="lg" icon={<Trophy size={19} aria-hidden />} iconRight={external ? <ExternalLink size={16} aria-hidden /> : undefined}>
+            {registerLabel}
+          </ButtonLink>
+        ) : null}
         {statusBadge}
       </PageHero>
 
@@ -184,7 +188,7 @@ export default async function HackathonPage() {
                       </ul>
                     </div>
                   ) : null}
-                  {rf.tracksLink && h.question ? (
+                  {rf.tracksLink && h.question && isShown(s, "hackathon", "tracks") ? (
                     <a href="#challenge" className="group mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-ink">
                       <span className="mi-underline">{rf.tracksLink}</span>
                       <TracksArrow size={15} aria-hidden className={`transition-transform duration-300 ${TracksArrow === ArrowUp ? "group-hover:-translate-y-0.5" : "group-hover:translate-y-0.5"}`} />
@@ -408,9 +412,11 @@ export default async function HackathonPage() {
                     <p className="font-display text-2xl font-bold text-fg sm:text-3xl">{cta.title}</p>
                     <p className="mt-2 text-muted">{h.registrationNote}</p>
                   </div>
-                  <ButtonLink href={registerHref} size="lg">
-                    {registerLabel}
-                  </ButtonLink>
+                  {canRegister ? (
+                    <ButtonLink href={registerHref} size="lg">
+                      {registerLabel}
+                    </ButtonLink>
+                  ) : null}
                 </div>
               </div>
             </section>

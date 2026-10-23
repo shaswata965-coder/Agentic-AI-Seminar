@@ -10,6 +10,7 @@ import { copy } from "@/lib/copy";
 import { formatDateRange } from "@/lib/format";
 import { explorePages, homeNav, postEventNav, primaryNav, registrationNav, sectionNav } from "@/lib/nav";
 import { absoluteUrl } from "@/lib/paths";
+import { isShown } from "@/lib/schema/section-order";
 import { BrandMark } from "./BrandMark";
 
 export function SocialLinks({ s, className }: { s: SiteSettings; className?: string }) {
@@ -52,7 +53,8 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
     { href: hackathonRegistrationHref(s), label: c.hackathon },
     { href: "/programme#kiosks", label: c.exhibit },
     { href: "/partners#become-a-partner", label: c.partner },
-    { href: "/#contact", label: c.contact },
+    // The contact form is in the home page's FAQ section.
+    ...(isShown(s, "home", "faq") ? [{ href: "/#contact", label: c.contact }] : []),
   ];
   return (
     <footer data-site-footer data-edit="site.footer" className="relative mt-10 overflow-hidden border-t border-border bg-bg-soft">
@@ -108,7 +110,7 @@ export function SiteFooter({ s }: { s: SiteSettings }) {
         <nav aria-label="Explore">
           <h2 className="font-display text-sm font-bold tracking-[0.12em] text-fg uppercase">{c.exploreHeading}</h2>
           <ul className="mt-4 space-y-2.5">
-            {[...sectionNav(nav), ...postEventNav(s, nav), { href: "/meet-aura", label: nav.meetAura }].map((i) => (
+            {[...sectionNav(nav, s.homeHidden), ...postEventNav(s, nav), { href: "/meet-aura", label: nav.meetAura }].map((i) => (
               <li key={i.href}>
                 <Link className={linkCls} href={i.href}>
                   {i.label}

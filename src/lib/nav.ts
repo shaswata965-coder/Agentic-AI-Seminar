@@ -29,13 +29,18 @@ export const explorePages = (n: NavCopy): NavItem[] => [
   { href: "/organisers", label: n.organisers, description: n.organisersText },
 ];
 
-/** Sections of the single-scroll home page. */
-export const sectionNav = (n: NavCopy): NavItem[] => [
-  { href: "/#themes", label: n.themes, description: n.themesText },
-  { href: "/#venue", label: n.routeMap, description: n.routeMapText },
-  { href: "/#faq", label: n.faq, description: n.faqText },
-  { href: "/#contact", label: n.contact, description: n.contactText },
-];
+/** Sections of the single-scroll home page, by their Site settings keys (the contact form is in the FAQ), leaving out the `hidden` ones. */
+export const sectionNav = (n: NavCopy, hidden: readonly string[] = []): NavItem[] =>
+  (
+    [
+      ["themes", { href: "/#themes", label: n.themes, description: n.themesText }],
+      ["venue", { href: "/#venue", label: n.routeMap, description: n.routeMapText }],
+      ["faq", { href: "/#faq", label: n.faq, description: n.faqText }],
+      ["faq", { href: "/#contact", label: n.contact, description: n.contactText }],
+    ] as const
+  )
+    .filter(([key]) => !hidden.includes(key))
+    .map(([, item]) => item);
 
 export function postEventNav(flags: { showGallery: boolean; showTalks: boolean }, n: NavCopy): NavItem[] {
   return [

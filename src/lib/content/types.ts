@@ -9,7 +9,7 @@ import type {
 } from "./constants";
 import type { FormSettings } from "@/lib/forms";
 import type { PageCopy } from "@/lib/schema/page-copy";
-import type { SectionOrders } from "@/lib/schema/section-order";
+import type { HiddenSections, SectionOrders } from "@/lib/schema/section-order";
 import type { Tone } from "./constants";
 
 export interface IconItem {
@@ -22,7 +22,7 @@ export interface IconItem {
 export type Palette = Record<Tone, string>;
 
 /** Everything in Admin → Site settings, including every section's texts and colours (PageCopy) and the forms' fields. */
-export interface SiteSettings extends PageCopy, SectionOrders, FormSettings {
+export interface SiteSettings extends PageCopy, SectionOrders, HiddenSections, FormSettings {
   eventName: string;
   shortName: string;
   tagline: string;

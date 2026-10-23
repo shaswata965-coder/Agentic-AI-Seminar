@@ -3,7 +3,8 @@
  * their default order (the keys of the page's Site settings sections). Each page's hero stays at the
  * top; pages with a single section, or whose parts sit side by side (Registration), have nothing to
  * move. The order is stored per page in the settings as `<page>Order` (homeOrder, aboutOrder…), so a
- * volunteer given one page can move only that page's sections. Shared by client and server code.
+ * volunteer given one page can move only that page's sections. Sections can also be hidden (below).
+ * Shared by client and server code.
  */
 
 export const SECTION_ORDER = {
@@ -51,4 +52,40 @@ export function arrange<K extends string>(defaults: readonly K[], saved: unknown
 /** A page's movable sections in the order set in Site settings. */
 export function sectionOrder<P extends OrderPage>(settings: Partial<SectionOrders>, page: P): SectionKey<P>[] {
   return arrange<SectionKey<P>>(SECTION_ORDER[page], settings[orderField(page)]);
+}
+
+/*
+ * The sections of each page that can be hidden, each with the switch at the top of its tab in Site settings:
+ * every movable one, and the parts of the pages that have no Section order. The hero, which holds the page's
+ * title, always shows. The keys of a page's hidden sections are stored as `<page>Hidden` (homeHidden,
+ * speakersHidden…), so a volunteer given one page can hide only that page's sections.
+ */
+export const HIDEABLE_SECTIONS = {
+  ...SECTION_ORDER,
+  speakers: ["list"],
+  tutorials: ["list"],
+  register: ["form", "fees", "deadlines"],
+} as const;
+
+export type HidePage = keyof typeof HIDEABLE_SECTIONS;
+/** The settings field holding the keys of a page's hidden sections. */
+export type HiddenField<P extends HidePage = HidePage> = `${P}Hidden`;
+export type HiddenSections = { [P in HidePage as HiddenField<P>]: string[] };
+
+export const hiddenField = <P extends HidePage>(page: P) => `${page}Hidden` as HiddenField<P>;
+export const isHidePage = (page: string): page is HidePage => Object.hasOwn(HIDEABLE_SECTIONS, page);
+/** Whether a page's section has a switch to hide it. */
+export const canHide = (page: string, key: string) => isHidePage(page) && (HIDEABLE_SECTIONS[page] as readonly string[]).includes(key);
+
+export const HIDDEN_SECTIONS_DEFAULTS = Object.fromEntries(Object.keys(HIDEABLE_SECTIONS).map((page) => [hiddenField(page as HidePage), []])) as unknown as HiddenSections;
+
+/** Whether a section shows on its page, i.e. it isn't hidden in Site settings. */
+export function isShown(settings: Partial<HiddenSections>, page: HidePage, key: string): boolean {
+  const hidden = settings[hiddenField(page)];
+  return !(Array.isArray(hidden) && hidden.includes(key));
+}
+
+/** A page's movable sections in the order set in Site settings, without the hidden ones. */
+export function shownSections<P extends OrderPage>(settings: Partial<SectionOrders & HiddenSections>, page: P): SectionKey<P>[] {
+  return sectionOrder(settings, page).filter((key) => isShown(settings, page, key));
 }

@@ -22,6 +22,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     steps: [
       ["Site settings", "A tab for each page of the site and one for what every page shares (Site-wide). Pick a section to change its colour, background, headings, introductions, button labels and empty-state messages."],
       ["Live preview", "The real page beside the form shows your changes as you type, on desktop or phone. Visitors only see them once you press Save changes."],
+      ["Hiding a section", "Every section below a page's hero has a “Show this section on the page” switch at the top of its tab. Switch it off to take the whole section off the page; its texts are kept for when you switch it back on."],
       ["Layout check", "Each text has a counter. Too much or too little text, or a title wrapping onto many lines, text spilling out of its box or the page scrolling sideways, is flagged on the field, the tabs and in the Layout check box."],
       "In many texts you can write `{event}`, `{dates}` or `{venue}`: they are filled in from Event details.",
     ],
@@ -73,7 +74,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     id: "hackathon",
     title: "Hackathon",
     steps: [
-      "Hackathon → Overview, the question, rules, timeline, prizes and judging criteria.",
+      "Hackathon → Overview, the question, rules, timeline, prizes and judging criteria. The tagline and the overview can also be changed beside the live preview, in Site settings → Hackathon → Hero and At a glance.",
       "There is one hackathon with one track: every team answers the same question (Hackathon → The question), so teams don't pick a theme. The three themes are the workshop's, for its talks, panels and tutorials.",
       "Fill in timeline dates as they are confirmed. The timeline shows progress automatically.",
       "After the event, add winners under Hackathon → Results, then enable “Post-event: show hackathon winners” in Site settings → Site-wide → Features & post-event.",

@@ -1,6 +1,6 @@
 import { FORM_DEFAULTS, FORM_SETTINGS, formFields, type FormKey } from "@/lib/forms";
 import { PAGE_COPY_DEFAULTS } from "@/lib/schema/page-copy";
-import { SECTION_ORDER_DEFAULTS } from "@/lib/schema/section-order";
+import { HIDDEN_SECTIONS_DEFAULTS, SECTION_ORDER_DEFAULTS } from "@/lib/schema/section-order";
 import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
 
 /*
@@ -12,6 +12,7 @@ import type { Faq, HackathonInfo, Person, SiteSettings } from "./types";
 export const DEFAULT_SETTINGS: SiteSettings = {
   ...PAGE_COPY_DEFAULTS,
   ...SECTION_ORDER_DEFAULTS,
+  ...HIDDEN_SECTIONS_DEFAULTS,
   ...FORM_DEFAULTS,
   eventName: "Agentic AI Workshop 2026",
   shortName: "AAIW 2026",

@@ -6,6 +6,7 @@ import { TagScope } from "@/components/ui/Tag";
 import { getDemos, getSettings, getTutorials } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
+import { isShown } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -19,25 +20,28 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function TutorialsPage() {
   const [s, tutorials, demos] = await Promise.all([getSettings(), getTutorials(), getDemos()]);
   const hero = copy(s, "tutorialsHero");
+  const showList = isShown(s, "tutorials", "list");
   return (
     <TagScope style="tab">
       <PageHero edit="tutorials.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="tutorials" description={hero.description}>
-        {hero.tutorialsButton ? (
+        {showList && hero.tutorialsButton ? (
           <ButtonLink href="#tutorials" variant="soft">
             {hero.tutorialsButton}
           </ButtonLink>
         ) : null}
-        {hero.demosButton ? (
+        {showList && hero.demosButton ? (
           <ButtonLink href="#demos" variant="outline">
             {hero.demosButton}
           </ButtonLink>
         ) : null}
       </PageHero>
-      <div data-edit="tutorials.list" className={`tone-${s.tutorialsList.tone} py-12 sm:py-16`}>
-        <div className="container-site">
-          <TutorialsView tutorials={tutorials} demos={demos} />
+      {showList ? (
+        <div data-edit="tutorials.list" className={`tone-${s.tutorialsList.tone} py-12 sm:py-16`}>
+          <div className="container-site">
+            <TutorialsView tutorials={tutorials} demos={demos} />
+          </div>
         </div>
-      </div>
+      ) : null}
     </TagScope>
   );
 }

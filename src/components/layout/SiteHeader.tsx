@@ -21,6 +21,8 @@ export interface SiteHeaderProps {
   /** Names from Site settings → Site-wide → Navigation and Header. */
   nav: NavCopy;
   text: PageCopy["siteHeader"];
+  /** The home page's sections switched off in Site settings → Home, left out of the Explore menu. */
+  homeHidden: string[];
 }
 
 function isActive(pathname: string, href: string) {
@@ -28,7 +30,7 @@ function isActive(pathname: string, href: string) {
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
-export function SiteHeader({ logos, registerHref, extraNav, nav, text }: SiteHeaderProps) {
+export function SiteHeader({ logos, registerHref, extraNav, nav, text, homeHidden }: SiteHeaderProps) {
   const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -37,7 +39,7 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text }: SiteHea
   const exploreRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const explorePages = [...explorePagesOf(nav), ...extraNav];
-  const homeSections = sectionNav(nav);
+  const homeSections = sectionNav(nav, homeHidden);
   const exploreItems = [...explorePages, ...homeSections];
   const pages = [homeNav(nav), ...primaryNav(nav), registrationNav(nav)];
   const exploreActive = explorePages.some((item) => isActive(pathname, item.href));
@@ -182,17 +184,19 @@ export function SiteHeader({ logos, registerHref, extraNav, nav, text }: SiteHea
             {exploreOpen ? (
               <div
                 id="explore-menu"
-                className="absolute top-full left-1/2 mt-3 w-[40rem] -translate-x-1/2 origin-top animate-pop rounded-3xl border border-border bg-surface p-3 shadow-card-lg"
+                className={cn("absolute top-full left-1/2 mt-3 -translate-x-1/2 origin-top animate-pop rounded-3xl border border-border bg-surface p-3 shadow-card-lg", homeSections.length ? "w-[40rem]" : "w-[18rem]")}
               >
-                <div className="mi-stagger grid grid-cols-[0.85fr_1.15fr] gap-2">
+                <div className={cn("mi-stagger grid gap-2", homeSections.length && "grid-cols-[0.85fr_1.15fr]")}>
                   <div className="rounded-2xl bg-surface-2 p-1">
                     <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">{text.pagesHeading}</p>
                     {explorePages.map((item, i) => exploreLink(item, i))}
                   </div>
-                  <div>
-                    <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">{text.sectionsHeading}</p>
-                    <div className="grid grid-cols-2">{homeSections.map((item, i) => exploreLink(item, explorePages.length + i))}</div>
-                  </div>
+                  {homeSections.length ? (
+                    <div>
+                      <p className="px-3 pt-2 pb-1 text-[11px] font-bold tracking-[0.14em] text-subtle uppercase">{text.sectionsHeading}</p>
+                      <div className="grid grid-cols-2">{homeSections.map((item, i) => exploreLink(item, explorePages.length + i))}</div>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ) : null}

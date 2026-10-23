@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, ArrowUp, GripVertical, Lock, RotateCcw } from "lucide-react";
+import { ArrowDown, ArrowUp, EyeOff, GripVertical, Lock, RotateCcw } from "lucide-react";
 import { useLayoutEffect, useRef, useState, type DragEvent } from "react";
 import { cn } from "@/lib/cn";
 import type { OrderField } from "@/lib/schema/fields";
@@ -15,8 +15,23 @@ const moveItem = (list: string[], from: number, to: number) => {
 /**
  * An "order" field: its items as a list to drag into place, or to move one step at a time with the arrows
  * (keyboard and touch). Pinned items sit above it and don't move. `onMove` hears which item was moved.
+ * Items in `hidden` (sections switched off) are marked, and keep their place.
  */
-export function OrderInput({ field: f, value, onChange, onMove, error }: { field: OrderField; value: unknown; onChange: (v: string[]) => void; onMove?: (key: string) => void; error?: string }) {
+export function OrderInput({
+  field: f,
+  value,
+  onChange,
+  onMove,
+  error,
+  hidden = [],
+}: {
+  field: OrderField;
+  value: unknown;
+  onChange: (v: string[]) => void;
+  onMove?: (key: string) => void;
+  error?: string;
+  hidden?: string[];
+}) {
   const defaults = f.options.map((o) => o.value);
   const saved = arrange(defaults, value);
   const labelOf = (key: string) => f.options.find((o) => o.value === key)?.label ?? key;
@@ -114,7 +129,12 @@ export function OrderInput({ field: f, value, onChange, onMove, error }: { field
               <span aria-hidden className="w-6 font-mono text-[11px] text-subtle">
                 {String(i + 1).padStart(2, "0")}
               </span>
-              <span className="min-w-0 flex-1 truncate font-semibold text-fg">{label}</span>
+              <span className={cn("min-w-0 flex-1 truncate font-semibold", hidden.includes(key) ? "text-subtle" : "text-fg")}>{label}</span>
+              {hidden.includes(key) ? (
+                <span className="inline-flex shrink-0 items-center gap-1 text-xs font-semibold text-subtle">
+                  <EyeOff size={14} aria-hidden /> Hidden
+                </span>
+              ) : null}
               {(["up", "down"] as const).map((dir) => (
                 <button
                   key={dir}

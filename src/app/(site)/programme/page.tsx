@@ -20,7 +20,7 @@ import { copy } from "@/lib/copy";
 import { eventCalendarLinks, eventDays, registrationHref } from "@/lib/event";
 import { eventDayDate, eventDayLabel, formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
-import { sectionOrder } from "@/lib/schema/section-order";
+import { shownSections } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -59,7 +59,7 @@ export default async function ProgrammePage() {
     hackathon: { href: "#hackathon", label: s.programmeHackathon.eyebrow },
     plan: { href: "#plan", label: pl.eyebrow },
   };
-  const jumps = sectionOrder(s, "programme")
+  const jumps = shownSections(s, "programme")
     .map((key) => jumpTo[key])
     .filter((j) => j.label);
   const plan: { href: string; title: string; text: string; icon: ReactNode; tone: string }[] = [

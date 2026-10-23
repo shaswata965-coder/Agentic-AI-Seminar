@@ -13,6 +13,7 @@ import { getPeople, getSettings } from "@/lib/content/queries";
 import type { Person } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
+import { isShown } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -100,7 +101,7 @@ export default async function OrganisersPage() {
                     {vo.emptyBadge ? <p className="tag tag-eyebrow">{vo.emptyBadge}</p> : null}
                     <h3 className="mt-3 font-display text-2xl font-bold text-fg sm:text-3xl">{vo.emptyTitle}</h3>
                     {vo.emptyText ? <p className="mt-2 max-w-lg text-muted">{vo.emptyText}</p> : null}
-                    {vo.emptyButton ? (
+                    {vo.emptyButton && isShown(s, "home", "faq") ? (
                       <div className="mt-5">
                         <ButtonLink href="/#contact" variant="soft" icon={<HeartHandshake size={18} aria-hidden />}>
                           {vo.emptyButton}

@@ -13,9 +13,9 @@ import type { AdminUser } from "./admin-auth";
 /** Shown on every page of the site, and used by placeholders such as {event} and {dates}. */
 const PLACEHOLDER_FIELDS = ["eventName", "shortName", "startDate", "endDate", "venueName", "venueHall", "tagline", "organisedBy"];
 
-/** The top-level settings fields a page tab edits: its sections' texts and colours, and their other settings. */
+/** The top-level settings fields a page tab edits: its sections' texts and colours, their other settings, and which are hidden. */
 export function pageFields(page: SettingsPage): string[] {
-  return page.sections.flatMap((s) => [...(s.copy ? [s.copy] : []), ...s.fields.map((f) => f.name)]);
+  return [...page.sections.flatMap((s) => [...(s.copy ? [s.copy] : []), ...s.fields.map((f) => f.name)]), ...(page.hidden ? [page.hidden.name] : [])];
 }
 
 /** Whether the user may edit every page (administrators, editors, and volunteers given all of them). */

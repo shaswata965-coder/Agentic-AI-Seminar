@@ -1,8 +1,8 @@
 "use client";
 
-import { ArrowUpDown, CircleCheck, ExternalLink, Info, Save, TriangleAlert } from "lucide-react";
+import { ArrowUpDown, CircleCheck, ExternalLink, EyeOff, Info, Save, TriangleAlert } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/components/ui/Toast";
 import { cn } from "@/lib/cn";
@@ -10,11 +10,11 @@ import type { SiteSettings } from "@/lib/content/types";
 import { siteVars } from "@/lib/copy";
 import { formatDateTime } from "@/lib/format";
 import { withBase } from "@/lib/paths";
-import { settingsPagesFor } from "@/lib/permissions";
+import { can, settingsPagesFor } from "@/lib/permissions";
 import type { OrderField } from "@/lib/schema/fields";
 import { PAGE_COPY, type CopyField, type CopyKey } from "@/lib/schema/page-copy";
 import { SETTINGS_PAGES, type SettingsPage, type SettingsSection } from "@/lib/schema/resources";
-import { arrange, isOrderPage, orderField, SECTION_ORDER } from "@/lib/schema/section-order";
+import { arrange, canHide, isOrderPage, orderField, SECTION_ORDER } from "@/lib/schema/section-order";
 import { PageTitle, useMe } from "../AdminShell";
 import { api, ApiError, useApi } from "../api";
 import { OrderInput } from "../OrderInput";
@@ -32,6 +32,22 @@ function sectionOf(key: string): { page: SettingsPage; section: SettingsSection 
   for (const page of SETTINGS_PAGES) for (const section of page.sections) if (section.copy === top || section.fields.some((f) => f.name === top)) return { page, section };
   return null;
 }
+
+/** The section and page showing a hackathon detail that didn't save ("tagline"). */
+function hackathonSectionOf(key: string): { page: SettingsPage; section: SettingsSection } | null {
+  const top = key.split(".")[0];
+  for (const page of SETTINGS_PAGES) for (const section of page.sections) if (section.hackathon?.some((f) => f.name === top)) return { page, section };
+  return null;
+}
+
+/** The keys of a page's hidden sections (see section-order.ts). */
+function hiddenOf(page: SettingsPage, value: Values | null): string[] {
+  const list = page.hidden ? value?.[page.hidden.name] : null;
+  return Array.isArray(list) ? list.filter((k): k is string => typeof k === "string") : [];
+}
+
+/** Whether a section is hidden on its page, itself or with the section it is part of. */
+const isHidden = (s: SettingsSection, hidden: string[]) => hidden.includes(s.key) || (s.within !== undefined && hidden.includes(s.within));
 
 /** A Section order tab's field. */
 const orderOf = (s: SettingsSection) => (s.fields[0]?.type === "order" ? (s.fields[0] as OrderField) : null);
@@ -84,27 +100,37 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
   // On a Section order tab, the preview goes to the section last moved.
   const [moved, setMoved] = useState<{ page: string; anchor: string } | null>(null);
   const hadDraft = useRef(false);
+  // The hackathon details some tabs show (the Hackathon page's tagline and overview), for those who may edit them; saved under Hackathon.
+  const me = useMe();
+  const editsHackathon = can(me, "hackathon") && pages.some((p) => p.sections.some((s) => s.hackathon?.length));
+  const hackathon = useApi<{ data: Values; updatedAt: string | null }>(editsHackathon ? "/singleton/hackathon" : null);
+  const [hackathonDraft, setHackathonDraft] = useState<Values | null>(null);
+  const [hackathonErrors, setHackathonErrors] = useState<Record<string, string>>({});
 
   const value = draft ?? data?.data ?? null;
-  const dirty = draft !== null;
+  const hackathonValue = hackathonDraft ?? hackathon.data?.data ?? null;
+  const dirty = draft !== null || hackathonDraft !== null;
   const page = pages.find((p) => p.key === pageKey) ?? pages[0];
   const section = page.sections.find((s) => s.key === sectionKey) ?? page.sections[0];
   const ordering = orderOf(section);
   const anchor = ordering ? (moved?.page === page.key ? moved.anchor : null) : (section.anchor ?? null);
+  const hidden = hiddenOf(page, value);
   const vars = useMemo(() => (value ? siteVars(value as unknown as SiteSettings) : {}), [value]);
 
   // Unsaved changes go to the preview a moment after typing stops.
   useEffect(() => {
-    if (!draft) return;
+    if (!draft && !hackathonDraft) return;
     hadDraft.current = true;
     const t = setTimeout(() => {
-      api("/preview", { method: "POST", json: draft })
+      Promise.allSettled([
+        draft ? api("/preview", { method: "POST", json: draft }) : null,
+        hackathonDraft ? api("/preview?key=hackathon", { method: "POST", json: hackathonDraft }) : null,
+      ])
         .then(() => setRevision((r) => r + 1))
-        .catch(() => {})
         .finally(() => setSyncing(false));
     }, 450);
     return () => clearTimeout(t);
-  }, [draft]);
+  }, [draft, hackathonDraft]);
 
   // A draft left behind by an editor that closed without cleaning up (a crash, a lost connection)
   // must not show up in this preview: clear it before the preview opens.
@@ -145,23 +171,43 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
     if (!value) return;
     setSaving(true);
     setErrors({});
+    setHackathonErrors({});
+    // Open the tab of the first field that didn't save.
+    const show = (where: { page: SettingsPage; section: SettingsSection } | null | undefined) => {
+      if (!where) return;
+      setPageKey(where.page.key);
+      setSectionKey(where.section.key);
+    };
     try {
-      const res = await api<{ data: Values; updatedAt: string }>("/singleton/settings", { method: "PUT", json: value });
-      setData(res);
-      setDraft(null);
+      if (hackathonDraft) {
+        try {
+          hackathon.setData(await api<{ data: Values; updatedAt: string }>("/singleton/hackathon", { method: "PUT", json: hackathonDraft }));
+          setHackathonDraft(null);
+        } catch (e) {
+          if (e instanceof ApiError) {
+            setHackathonErrors(e.fieldErrors);
+            show(Object.keys(e.fieldErrors).map(hackathonSectionOf).find(Boolean));
+          }
+          throw e;
+        }
+      }
+      if (draft) {
+        try {
+          setData(await api<{ data: Values; updatedAt: string }>("/singleton/settings", { method: "PUT", json: value }));
+          setDraft(null);
+        } catch (e) {
+          if (e instanceof ApiError) {
+            setErrors(e.fieldErrors);
+            show(Object.keys(e.fieldErrors).map(sectionOf).find(Boolean));
+          }
+          throw e;
+        }
+      }
       await clearPreview();
       router.refresh(); // the admin sidebar shows the event name too
       toast("Saved. The website now shows your changes.", "success");
     } catch (e) {
-      if (e instanceof ApiError) {
-        setErrors(e.fieldErrors);
-        const first = Object.keys(e.fieldErrors).map(sectionOf).find(Boolean);
-        if (first) {
-          setPageKey(first.page.key);
-          setSectionKey(first.section.key);
-        }
-        toast(e.message, "error");
-      } else toast("Could not save.", "error");
+      toast(e instanceof ApiError ? e.message : "Could not save.", "error");
     } finally {
       setSaving(false);
     }
@@ -169,7 +215,9 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
 
   async function discard() {
     setDraft(null);
+    setHackathonDraft(null);
     setErrors({});
+    setHackathonErrors({});
     await clearPreview();
   }
 
@@ -177,6 +225,14 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
   const edit = (v: Values) => {
     setDraft(v);
     setSyncing(true);
+  };
+  const editHackathon = (v: Values) => {
+    setHackathonDraft(v);
+    setSyncing(true);
+  };
+  const setShown = (key: string, shown: boolean) => {
+    if (!page.hidden || !value) return;
+    edit({ ...value, [page.hidden.name]: shown ? hidden.filter((k) => k !== key) : [...hidden.filter((k) => k !== key), key] });
   };
 
   // Pages and sections whose texts are likely to break the layout.
@@ -196,6 +252,8 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
   const lengthNotes = section.copy && value ? copyIssues(section.copy, value[section.copy] as Record<string, string>, vars).filter((x) => x.issue.level === "warn") : [];
   const domNotes = report && report.anchor === section.anchor ? report.issues : [];
   const missing = report && report.anchor === section.anchor && !report.found;
+  const sectionHidden = isHidden(section, hidden);
+  const partOf = section.within ? page.sections.find((x) => x.key === section.within) : undefined;
   const path = section.path ?? page.path;
 
   return (
@@ -257,6 +315,7 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                       >
                         {orderOf(s) ? <ArrowUpDown size={14} aria-hidden /> : null}
                         {s.title}
+                        {isHidden(s, hidden) ? <EyeOff size={14} role="img" aria-label="hidden" className="text-subtle" /> : null}
                         {flagged.has(`${page.key}.${s.key}`) ? <span className="h-2 w-2 rounded-full bg-butter-ink" aria-label="has layout warnings" /> : null}
                         {Object.keys(errors).some((k) => sectionOf(k)?.section === s) ? <span className="h-2 w-2 rounded-full bg-blush-ink" aria-label="has errors" /> : null}
                       </button>
@@ -273,7 +332,12 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                   </h3>
                   {missing ? (
                     <p className="mt-2 flex items-start gap-2 text-sm text-muted">
-                      <Info size={15} aria-hidden className="mt-0.5 shrink-0" /> This section isn&apos;t on the page right now (for example, it appears once something is added or switched on), so it can&apos;t be measured.
+                      <Info size={15} aria-hidden className="mt-0.5 shrink-0" />
+                      {sectionHidden ? (
+                        <span>This section is hidden, so it isn&apos;t on the page and can&apos;t be measured.</span>
+                      ) : (
+                        <span>This section isn&apos;t on the page right now (for example, it appears once something is added or switched on), so it can&apos;t be measured.</span>
+                      )}
                     </p>
                   ) : null}
                   {lengthNotes.length || domNotes.length ? (
@@ -311,8 +375,27 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                   {page.title} <span className="text-subtle">›</span> {section.title}
                 </h2>
                 {section.description ? <p className="mt-1 text-sm text-muted">{section.description}</p> : null}
+                {canHide(page.key, section.key) ? (
+                  <ShowSection shown={!hidden.includes(section.key)} onChange={(shown) => setShown(section.key, shown)} />
+                ) : partOf && sectionHidden ? (
+                  <p className="mt-4 flex items-start gap-2 rounded-2xl bg-surface-2 px-4 py-3 text-sm text-muted">
+                    <EyeOff size={15} aria-hidden className="mt-0.5 shrink-0" /> Hidden with {partOf.title}, which is switched off in its own tab.
+                  </p>
+                ) : null}
 
                 <div className="mt-5 grid gap-6">
+                  {/* The section's main text from the hackathon details comes first, above its labels and colours. */}
+                  {section.hackathon?.length ? (
+                    <div className={cn(section.copy && "border-b border-border pb-6")}>
+                      {hackathonValue ? (
+                        <RecordForm fields={section.hackathon} value={hackathonValue} onChange={editHackathon} errors={hackathonErrors} />
+                      ) : (
+                        <p className="text-sm text-muted">
+                          {editsHackathon ? (hackathon.error ?? "Loading…") : `${section.hackathon.map((f) => f.label).join(" and ")}: edited under Hackathon, which your account can't open.`}
+                        </p>
+                      )}
+                    </div>
+                  ) : null}
                   {section.copy ? (
                     <CopyForm
                       key={section.copy}
@@ -326,6 +409,7 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
                   {ordering ? (
                     <OrderInput
                       field={ordering}
+                      hidden={hidden}
                       value={value[ordering.name]}
                       onChange={(v) => edit({ ...value, [ordering.name]: v })}
                       onMove={(key) => setMoved({ page: page.key, anchor: `${page.key}.${key}` })}
@@ -375,6 +459,28 @@ function Studio({ pages, start }: { pages: SettingsPage[]; start: SettingsPage }
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/** The switch at the top of a section's tab that shows the section on its page, or hides it. */
+function ShowSection({ shown, onChange }: { shown: boolean; onChange: (shown: boolean) => void }) {
+  const id = useId();
+  return (
+    <div className="mt-4">
+      <label htmlFor={id} className="flex cursor-pointer items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 hover:border-border-strong has-[:checked]:border-brand has-[:checked]:bg-brand-soft">
+        <input id={id} type="checkbox" checked={shown} onChange={(e) => onChange(e.target.checked)} className="peer sr-only" />
+        <span aria-hidden className="relative h-6 w-11 shrink-0 rounded-full bg-border-strong transition peer-checked:bg-brand peer-focus-visible:ring-4 peer-focus-visible:ring-[color-mix(in_oklab,var(--brand)_25%,transparent)] after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5 after:rounded-full after:bg-white after:shadow after:transition-[translate] after:duration-300 after:ease-[cubic-bezier(0.34,1.56,0.64,1)] peer-checked:after:translate-x-5" />
+        <span className="text-sm font-semibold text-fg">Show this section on the page</span>
+        {shown ? null : (
+          <span className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-subtle">
+            <EyeOff size={14} aria-hidden /> Hidden
+          </span>
+        )}
+      </label>
+      <p className="mt-1.5 text-xs text-subtle">
+        {shown ? "Switch it off to take the whole section off the page, here and for visitors once saved." : "Visitors don't see this section. Its texts and settings are kept for when you switch it back on."}
+      </p>
     </div>
   );
 }

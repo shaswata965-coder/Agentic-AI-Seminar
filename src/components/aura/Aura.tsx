@@ -1,7 +1,7 @@
 "use client";
 
 import "./aura.css";
-import { useEffect, useId, useRef, useState, type AnimationEvent, type CSSProperties } from "react";
+import { createContext, useContext, useEffect, useId, useRef, useState, type AnimationEvent, type CSSProperties, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 import { AuraArt, AURA_H, AURA_W } from "./AuraArt";
 import { flyInOnView } from "./entrance";
@@ -23,6 +23,13 @@ function entranceKind(entrance: AuraEntrance, size: number, variant: AuraVariant
 }
 
 const FLY_ANIMATIONS = new Set(["aura-fly-in", "aura-zip-in", "aura-drift-in"]);
+
+const BadgeContext = createContext(true);
+
+/** Whether the Auras inside wear the IIT Delhi badge on their chest (they do unless told otherwise). */
+export function AuraBadge({ wear, children }: { wear: boolean; children: ReactNode }) {
+  return <BadgeContext.Provider value={wear}>{children}</BadgeContext.Provider>;
+}
 
 export interface AuraProps {
   /** Which representation of Aura to show (see presets.ts). */
@@ -87,6 +94,7 @@ export function Aura({
   const lines = tips ?? preset.tips;
   const rawId = useId();
   const uid = `aura${rawId.replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const badge = useContext(BadgeContext);
 
   const ref = useRef<HTMLElement | null>(null);
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -228,6 +236,7 @@ export function Aura({
       height={Math.round((size * AURA_H) / AURA_W)}
       placard={sign}
       placardFlip={flips}
+      badge={badge ? undefined : false}
     />
   );
 

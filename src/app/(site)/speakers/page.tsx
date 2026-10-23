@@ -10,6 +10,7 @@ import { getSessions, getSettings, getSpeakers } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
 import { eventDayLabel } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
+import { isShown } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -44,28 +45,30 @@ export default async function SpeakersPage() {
       <PageHero edit="speakers.hero" home={s.siteNav.home} tone={hero.tone} crumb={hero.crumb} eyebrow={hero.eyebrow} title={hero.title} aura="speakers" description={hero.description}>
         <Portal href="/programme" tone="azure" compact kicker={hero.portalKicker} title={hero.portalTitle} text={hero.portalText} art={<ScheduleArt />} className="w-full max-w-md" />
       </PageHero>
-      <section data-edit="speakers.list" className={`tone-${list.tone} py-12 sm:py-16`}>
-        <div className="container-site">
-          {speakers.length ? (
-            <SpeakersView speakers={speakers} sessions={slim} showMore={s.showMoreSpeakers} more={{ title: s.homeSpeakers.moreTitle, text: s.homeSpeakers.moreText }} />
-          ) : (
-            <div className="card flex flex-col items-center gap-6 p-10 text-center sm:flex-row sm:text-left">
-              <Aura variant="speakers" size={190} interactive />
-              <div>
-                <h2 className="font-display text-3xl font-bold text-fg">{list.emptyTitle}</h2>
-                {list.emptyText ? <p className="mt-3 max-w-xl text-muted">{list.emptyText}</p> : null}
-                {list.emptyButton ? (
-                  <div className="mt-5">
-                    <ButtonLink href="/#news" variant="soft">
-                      {list.emptyButton}
-                    </ButtonLink>
-                  </div>
-                ) : null}
+      {isShown(s, "speakers", "list") ? (
+        <section data-edit="speakers.list" className={`tone-${list.tone} py-12 sm:py-16`}>
+          <div className="container-site">
+            {speakers.length ? (
+              <SpeakersView speakers={speakers} sessions={slim} showMore={s.showMoreSpeakers} more={{ title: s.homeSpeakers.moreTitle, text: s.homeSpeakers.moreText }} />
+            ) : (
+              <div className="card flex flex-col items-center gap-6 p-10 text-center sm:flex-row sm:text-left">
+                <Aura variant="speakers" size={190} interactive />
+                <div>
+                  <h2 className="font-display text-3xl font-bold text-fg">{list.emptyTitle}</h2>
+                  {list.emptyText ? <p className="mt-3 max-w-xl text-muted">{list.emptyText}</p> : null}
+                  {list.emptyButton && isShown(s, "home", "news") ? (
+                    <div className="mt-5">
+                      <ButtonLink href="/#news" variant="soft">
+                        {list.emptyButton}
+                      </ButtonLink>
+                    </div>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-      </section>
+            )}
+          </div>
+        </section>
+      ) : null}
     </TagScope>
   );
 }

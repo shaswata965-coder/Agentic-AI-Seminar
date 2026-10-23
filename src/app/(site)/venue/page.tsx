@@ -17,6 +17,7 @@ import { MapEmbed } from "@/components/venue/MapEmbed";
 import { getSettings } from "@/lib/content/queries";
 import { copy } from "@/lib/copy";
 import { absoluteUrl } from "@/lib/paths";
+import { isShown } from "@/lib/schema/section-order";
 
 export async function generateMetadata(): Promise<Metadata> {
   const s = await getSettings();
@@ -205,9 +206,11 @@ export default async function VenuePage() {
                   </div>
                 ) : null}
               </div>
-              <div className="mt-10 flex">
-                <Portal href="/#faq" tone="blush" kicker={st.portalKicker} title={st.portalTitle} text={st.portalText} art={<FaqArt />} className="w-full max-w-xl" />
-              </div>
+              {isShown(s, "home", "faq") ? (
+                <div className="mt-10 flex">
+                  <Portal href="/#faq" tone="blush" kicker={st.portalKicker} title={st.portalTitle} text={st.portalText} art={<FaqArt />} className="w-full max-w-xl" />
+                </div>
+              ) : null}
             </Section>
           ),
         }}

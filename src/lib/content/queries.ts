@@ -34,9 +34,21 @@ async function load<T>(fn: () => Promise<T>): Promise<Loaded<T>> {
   }
 }
 
-/** Unsaved Site settings shown by the live preview in the admin (see /api/admin/preview). */
-export const SETTINGS_DRAFT_KEY = "settings-draft";
+/**
+ * Unsaved changes shown by the live preview in the admin (see /api/admin/preview): Site settings, and the
+ * hackathon details its Hackathon tab edits too.
+ */
+export const DRAFT_KEYS = { settings: "settings-draft", hackathon: "hackathon-draft" } as const;
 const DRAFT_MAX_AGE = 2 * 60 * 60_000;
+
+/** A singleton as saved or, in the admin's preview, as its draft (while it is fresh). */
+async function findSingleton(key: keyof typeof DRAFT_KEYS, preview: boolean) {
+  if (preview) {
+    const draft = await Singleton.findOne({ key: DRAFT_KEYS[key] }).lean();
+    if (draft?.updatedAt && Date.now() - new Date(draft.updatedAt).getTime() < DRAFT_MAX_AGE) return draft;
+  }
+  return Singleton.findOne({ key }).lean();
+}
 
 export async function getSettings(): Promise<SiteSettings> {
   "use cache";
@@ -67,13 +79,7 @@ export async function getSavedSettings(): Promise<SiteSettings> {
 }
 
 async function readSettings(preview: boolean): Promise<SiteSettings> {
-  const res = await load(async () => {
-    if (preview) {
-      const draft = await Singleton.findOne({ key: SETTINGS_DRAFT_KEY }).lean();
-      if (draft?.updatedAt && Date.now() - new Date(draft.updatedAt).getTime() < DRAFT_MAX_AGE) return draft;
-    }
-    return Singleton.findOne({ key: "settings" }).lean();
-  });
+  const res = await load(() => findSingleton("settings", preview));
   if (!res.ok) {
     cacheLife("fallback");
     return DEFAULT_SETTINGS;
@@ -85,7 +91,9 @@ async function readSettings(preview: boolean): Promise<SiteSettings> {
 export async function getHackathon(): Promise<HackathonInfo> {
   "use cache";
   cacheTag("hackathon", CONTENT_TAG);
-  const res = await load(() => Singleton.findOne({ key: "hackathon" }).lean());
+  // Like getSettings: the draft in the admin's preview, the saved details for visitors.
+  const { isEnabled: preview } = await draftMode();
+  const res = await load(() => findSingleton("hackathon", preview));
   if (!res.ok) {
     cacheLife("fallback");
     return DEFAULT_HACKATHON;
