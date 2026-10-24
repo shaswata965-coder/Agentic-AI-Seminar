@@ -859,8 +859,12 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         textarea("feeNote", "Fee note", { placeholder: "Fee details will be announced soon." }),
       ]),
       section("deadlines", "Deadlines", "registerDeadlines"),
-      section("posters", "Call for posters", "registerPosters", [], {
-        description: "Under the form: arXiv preprints and submitted or accepted papers are welcome as posters at the poster session. Registrants say whether they'd like to present one with the form's “Would you like to present a poster?” (Form fields).",
+      section("posters", "Call for posters", "registerPosters", [
+        image("postersPhoto", "Picture", {
+          help: "Leave it empty for the built-in picture of a poster session (the same as on the home page's poster). An uploaded landscape picture (16:9, e.g. 1920×1080) replaces it; beside the text it is shown taller, keeping its right side.",
+        }),
+      ], {
+        description: "Under the form: arXiv preprints and papers currently under submission, on the broader theme of agentic AI, are welcome as posters at the poster session, beside a picture. Registrants say whether they'd like to present one with the form's “Would you like to present a poster?” (Form fields).",
       }),
     ],
   },

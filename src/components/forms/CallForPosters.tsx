@@ -1,9 +1,12 @@
 import { ArrowUp, CircleCheck, Sparkles } from "lucide-react";
-import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
+import { Img } from "@/components/ui/Img";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
+
+/** The built-in picture (a poster session, as on the home page's poster), shown until another is uploaded in Site settings → Registration → Call for posters. */
+const PHOTO = "/posters/registration.webp";
 
 /** The call for posters on the Registration page: arXiv preprints and papers under submission, on agentic AI, are welcome at the poster session. */
 export function CallForPosters({ s, formShown }: { s: SiteSettings; formShown: boolean }) {
@@ -12,8 +15,9 @@ export function CallForPosters({ s, formShown }: { s: SiteSettings; formShown: b
   return (
     <Section id="posters" edit="register.posters" tone={c.tone} bg={c.background} labelledBy="posters-title" tags="stamp">
       <div className="grid items-center gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-14">
-        <div className="flex justify-center">
-          <Aura variant="lecturer" size={320} interactive className="max-w-[80vw]" />
+        {/* Wider on phones; beside the text, taller and kept to its right side, where the people are. */}
+        <div className="overflow-hidden rounded-[2rem] border border-border shadow-card-lg">
+          <Img src={s.postersPhoto || PHOTO} alt="" width={1600} height={900} className="aspect-[16/9] w-full object-cover lg:aspect-[4/3] lg:object-right" />
         </div>
         <div>
           <SectionHeading id="posters-title" eyebrow={c.eyebrow} title={c.title} description={c.description} className="mb-6 sm:mb-8" />

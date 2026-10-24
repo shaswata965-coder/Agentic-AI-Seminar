@@ -43,6 +43,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   heroPhoto: "",
   invitePhoto: "",
   hackathonPosterPhoto: "",
+  postersPhoto: "",
   highlights: [
     { label: "Speakers", value: "TBA", icon: "mic" },
     { label: "Tutorials", value: "TBA", icon: "graduation" },

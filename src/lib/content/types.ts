@@ -56,6 +56,8 @@ export interface SiteSettings extends PageCopy, SectionOrders, HiddenSections, F
   invitePhoto: string;
   /** The picture at the top of the hackathon's coming-soon poster: an upload, or empty for the built-in one. */
   hackathonPosterPhoto: string;
+  /** The picture beside the call for posters on the Registration page: an upload, or empty for the built-in one. */
+  postersPhoto: string;
   highlights: { label: string; value: string; icon: string }[];
   featuredSpeakers: number;
 
