@@ -68,6 +68,7 @@ export function Invite({ s }: { s: SiteSettings }) {
         </div>
         <Poster
           tone={c.tone}
+          photo={s.invitePhoto}
           kicker={c.posterKicker}
           badge={c.posterBadge}
           title={c.posterTitle}

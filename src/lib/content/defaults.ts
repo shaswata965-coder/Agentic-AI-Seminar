@@ -41,6 +41,8 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   showLoader: true,
   showHeroPhoto: true,
   heroPhoto: "",
+  invitePhoto: "",
+  hackathonPosterPhoto: "",
   highlights: [
     { label: "Speakers", value: "TBA", icon: "mic" },
     { label: "Tutorials", value: "TBA", icon: "graduation" },

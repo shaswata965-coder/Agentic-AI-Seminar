@@ -52,6 +52,10 @@ export interface SiteSettings extends PageCopy, SectionOrders, HiddenSections, F
   /** The photo of the IIT Delhi building behind the home hero: an upload, or empty for the built-in one. */
   showHeroPhoto: boolean;
   heroPhoto: string;
+  /** The picture at the top of the home page's registration poster: an upload, or empty for Aura. */
+  invitePhoto: string;
+  /** The picture at the top of the hackathon's coming-soon poster: an upload, or empty for Aura. */
+  hackathonPosterPhoto: string;
   highlights: { label: string; value: string; icon: string }[];
   featuredSpeakers: number;
 

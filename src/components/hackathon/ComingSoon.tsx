@@ -19,6 +19,7 @@ export function HackathonComingSoon({ s, h }: { s: SiteSettings; h: HackathonInf
           as="h1"
           titleId="hackathon-poster-title"
           tone={c.tone}
+          photo={s.hackathonPosterPhoto}
           kicker={h.title}
           badge={c.badge}
           title={c.title}

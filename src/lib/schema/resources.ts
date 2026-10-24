@@ -689,7 +689,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("register", "Registration choice", "homeRegister", [], {
         description: "The heading and two compact cards along the foot of the hero, one for each registration. Their status comes from Site-wide → Registration.",
       }),
-      section("invite", "Registration open", "homeInvite", [], {
+      section("invite", "Registration open", "homeInvite", [image("invitePhoto", "Poster image", { help: "Leave it empty for Aura as a professor. An uploaded landscape picture (16:9, e.g. 1920×1080) fills the top of the poster instead, under its label and badge, and fades into the poster below." })], {
         description:
           "Under the hero: that registration is open, that places are limited and confirmed by the organising committee, what to expect, the call to bring your research to the poster session, and the poster with Aura. Its dates and venue come from Site-wide → Event details, and the date in {replyBy} from Site-wide → Registration.",
       }),
@@ -797,7 +797,7 @@ export const SETTINGS_PAGES: SettingsPage[] = [
     path: "/hackathon",
     description: "Headings, labels and colours of the Hackathon page, team registration included, and its tagline, overview and prizes. Its title, question, rules, timeline and results are edited under Hackathon in the menu.",
     sections: [
-      section("poster", "Coming-soon poster", "hackathonPoster", [], {
+      section("poster", "Coming-soon poster", "hackathonPoster", [image("hackathonPosterPhoto", "Poster image", { help: "Leave it empty for Aura as a professor. An uploaded landscape picture (16:9, e.g. 1920×1080) fills the top of the poster instead, under its label and badge, and fades into the poster below." })], {
         description:
           "While the hackathon is hidden (Site-wide → Features → Show the hackathon is off), its page shows only this poster, and nothing else on the site links to it. The preview shows the poster above the full page, so both can be edited.",
       }),

@@ -4,6 +4,7 @@ import { Aura } from "@/components/aura/Aura";
 import { cn } from "@/lib/cn";
 import type { Tone } from "@/lib/content/constants";
 import { Badge } from "./Badge";
+import { Img } from "./Img";
 
 export interface PosterFact {
   icon: ReactNode;
@@ -13,11 +14,13 @@ export interface PosterFact {
 
 /**
  * A printed-looking poster (registration on the home page, the hackathon's "details coming soon"): a tinted head with the
- * kicker and a badge, Aura as a professor unfurling a poster and pointing at it with a laser pointer, a large
- * title, a few points with ticks, and the facts (dates, venue) along its foot. `as="h1"` when it is the page's title.
+ * kicker and a badge, Aura as a professor unfurling a poster and pointing at it with a laser pointer (or, given a
+ * `photo`, that picture across the top instead), a large title, a few points with ticks, and the facts (dates,
+ * venue) along its foot. `as="h1"` when it is the page's title.
  */
 export function Poster({
   tone,
+  photo,
   kicker,
   badge,
   title,
@@ -32,6 +35,8 @@ export function Poster({
   className,
 }: {
   tone: Tone;
+  /** An uploaded picture (16:9) for the head, in place of Aura. */
+  photo?: string;
   kicker?: string;
   badge?: string;
   title: string;
@@ -46,23 +51,39 @@ export function Poster({
   className?: string;
 }) {
   const list = points.filter(Boolean);
+  const labels = (
+    <div className="relative flex flex-wrap items-center justify-between gap-3">
+      {kicker ? (
+        <p className={cn("font-mono text-[11px] font-bold tracking-[0.2em] text-accent-ink uppercase", photo && "rounded-full bg-surface/85 px-2.5 py-1 backdrop-blur")}>{kicker}</p>
+      ) : (
+        <span />
+      )}
+      {badge ? (
+        <Badge tone={tone} dot className={photo ? "bg-surface/85 backdrop-blur" : undefined}>
+          {badge}
+        </Badge>
+      ) : null}
+    </div>
+  );
   return (
     <article className={cn(`tone-${tone} relative isolate flex flex-col overflow-hidden rounded-[2rem] border border-border bg-surface shadow-card-lg`, className)}>
-      {/* The head: a tint in the poster's colour, dotted like the hero, with Aura giving her lecture in front of it. */}
-      <div className="relative bg-[linear-gradient(160deg,color-mix(in_oklab,var(--accent)_38%,var(--surface)),color-mix(in_oklab,var(--lilac)_22%,var(--surface))_70%)] px-6 pt-6 sm:px-8 sm:pt-8">
-        <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
-        <div className="relative flex flex-wrap items-center justify-between gap-3">
-          {kicker ? <p className="font-mono text-[11px] font-bold tracking-[0.2em] text-accent-ink uppercase">{kicker}</p> : <span />}
-          {badge ? (
-            <Badge tone={tone} dot>
-              {badge}
-            </Badge>
-          ) : null}
+      {photo ? (
+        // The head: the picture, fading out at the bottom into the poster, a little lighter at the top behind the labels.
+        <div className="relative aspect-[16/9] shrink-0 overflow-hidden px-6 pt-6 [mask-image:linear-gradient(to_bottom,black_72%,transparent)] sm:px-8 sm:pt-8">
+          <Img src={photo} alt="" width={1920} height={1080} className="absolute inset-0 h-full w-full object-cover" />
+          <div aria-hidden className="absolute inset-0 bg-[linear-gradient(180deg,color-mix(in_oklab,var(--surface)_55%,transparent),transparent_30%)]" />
+          {labels}
         </div>
-        <div className="relative -mb-6 flex justify-center pt-2">
-          <Aura variant="lecturer" size={250} className="max-w-[72%]" />
+      ) : (
+        // The head: a tint in the poster's colour, dotted like the hero, with Aura giving her lecture in front of it.
+        <div className="relative bg-[linear-gradient(160deg,color-mix(in_oklab,var(--accent)_38%,var(--surface)),color-mix(in_oklab,var(--lilac)_22%,var(--surface))_70%)] px-6 pt-6 sm:px-8 sm:pt-8">
+          <div aria-hidden className="bg-dots pointer-events-none absolute inset-0 opacity-60 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
+          {labels}
+          <div className="relative -mb-6 flex justify-center pt-2">
+            <Aura variant="lecturer" size={250} className="max-w-[72%]" />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="relative flex flex-1 flex-col gap-5 px-6 pt-8 pb-6 sm:px-8 sm:pb-8">
         <div>
