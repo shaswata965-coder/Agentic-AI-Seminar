@@ -24,8 +24,9 @@ export const themePhoto = (t: Theme): string | undefined => t.image || THEME_PHO
 
 /**
  * The workshop's three themes as cards, each with its photo across the top and Aura, dressed for the theme, stepping
- * out of its lower edge across from the theme's number. A theme without a photo shows Aura on her own. Under them, a
- * note sets the hackathon apart: it doesn't split into themes, every team answers one question.
+ * out of its lower edge across from the theme's number. A theme without a photo shows Aura on her own. Side by side,
+ * the cards share one grid's rows (subgrid), so their titles, texts and links line up however long each one is.
+ * Under them, a note sets the hackathon apart: it doesn't split into themes, every team answers one question.
  */
 export function Themes({ s }: { s: SiteSettings }) {
   const c = copy(s, "homeThemes");
@@ -38,16 +39,17 @@ export function Themes({ s }: { s: SiteSettings }) {
         description={c.description}
         align="center"
       />
-      <ul className="grid gap-6 lg:grid-cols-3">
+      {/* Side by side, each card spans five rows: photo, Aura, title, text, links. */}
+      <ul className="grid gap-6 lg:grid-cols-3 lg:gap-y-0">
         {s.themes.map((t, i) => {
           const meta = THEME_META[t.key] ?? THEME_META.general;
           const tag = <span className="tag tag-eyebrow">{c.theme ? `${c.theme} ${i + 1}` : i + 1}</span>;
           const bubbleSide = i === 2 ? "left" : "right";
           const photo = themePhoto(t);
           return (
-            <li key={t.key} data-reveal style={{ ["--reveal-delay" as string]: `${i * 110}ms` }}>
-              <Tilt className="h-full">
-                <article className={`tone-${meta.tone} card group relative flex h-full flex-col overflow-hidden`}>
+            <li key={t.key} data-reveal style={{ ["--reveal-delay" as string]: `${i * 110}ms` }} className="lg:row-span-5 lg:grid lg:grid-rows-subgrid">
+              <Tilt className="h-full lg:row-span-5 lg:grid lg:grid-rows-subgrid">
+                <article className={`tone-${meta.tone} card group relative flex h-full flex-col overflow-hidden lg:row-span-5 lg:grid lg:grid-rows-subgrid`}>
                   <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_var(--mx,70%)_var(--my,0%),color-mix(in_oklab,var(--accent)_30%,transparent),transparent_70%)]" />
                   {photo ? (
                     // The photo fades out at the bottom, so it melts into the card.
@@ -58,7 +60,7 @@ export function Themes({ s }: { s: SiteSettings }) {
                       <div className="absolute top-0 left-0 p-5">{tag}</div>
                     </div>
                   ) : null}
-                  <div className={cn("relative flex flex-1 flex-col p-6 sm:p-7", photo && "pt-0 sm:pt-0")}>
+                  <div className={cn("relative flex flex-1 flex-col p-6 sm:p-7 lg:grid lg:grid-rows-subgrid", photo ? "pt-0 sm:pt-0 lg:row-span-4" : "lg:row-span-5")}>
                     {photo ? (
                       // Aura and the number sit across from each other where the photo fades out, clear of what it shows.
                       <div className="relative -mt-16 mb-1 flex items-end justify-between gap-4">
@@ -68,7 +70,7 @@ export function Themes({ s }: { s: SiteSettings }) {
                         </span>
                       </div>
                     ) : (
-                      <>
+                      <div className="flex flex-col lg:row-span-2">
                         <div className="relative flex items-start justify-between gap-4">
                           {tag}
                           <span aria-hidden className="font-display text-6xl leading-none font-black text-[color-mix(in_oklab,var(--accent)_45%,transparent)]">
@@ -78,7 +80,7 @@ export function Themes({ s }: { s: SiteSettings }) {
                         <div className="relative mx-auto my-4">
                           <Aura variant={meta.aura} size={168} interactive bubbleSide={bubbleSide} />
                         </div>
-                      </>
+                      </div>
                     )}
                     <h3 className="relative font-display text-2xl font-bold text-fg">{t.title}</h3>
                     <p className="relative mt-3 text-[15.5px] leading-relaxed text-muted">{t.description}</p>
