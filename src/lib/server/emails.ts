@@ -1,6 +1,7 @@
 import "server-only";
 import { buildIcs } from "@/lib/calendar";
 import type { HackathonInfo, SiteSettings } from "@/lib/content/types";
+import { replyBy } from "@/lib/copy";
 import { eventDays, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { absoluteUrl } from "@/lib/paths";
@@ -43,24 +44,25 @@ export function workshopIcs(s: SiteSettings) {
 
 export function registrationEmail(s: SiteSettings, r: { name: string; email: string; regId: string }): MailInput {
   const dates = formatDateRange(s.startDate, s.endDate);
+  const review = `Places are limited, so the organising committee reviews every registration: you'll hear from us ${replyBy(s)} on whether we can offer you a place.`;
   const body = `<p>Hi ${esc(r.name)},</p>
-<p>Thank you for registering for the <strong>${esc(s.eventName)}</strong>. We're delighted you'll be joining us!</p>
+<p>Thank you for registering for the <strong>${esc(s.eventName)}</strong>. ${esc(review)}</p>
 ${box(`<p style="margin:0;font-size:13px;color:#64748b">Your registration ID</p><p style="margin:4px 0 0;font-size:22px;font-weight:700;letter-spacing:.06em;color:#3b5bdb">${esc(r.regId)}</p>`)}
 <p><strong>When:</strong> ${esc(dates)}<br/><strong>Where:</strong> ${esc(venueLine(s))}</p>
-<p>Please carry a valid photo ID and this registration ID for campus entry. The exact hall and any updates will be shared on the website and by e-mail.</p>
+<p>Keep this registration ID: once your place is confirmed, carry it and a valid photo ID for campus entry. The exact hall and any updates will be shared on the website and by e-mail.</p>
 ${s.confirmationNote ? `<p>${esc(s.confirmationNote)}</p>` : ""}
-<p>We've attached a calendar file so you can add the workshop to your calendar. To build your own agenda of sessions, sign in on the website with this e-mail address and your registration ID.</p>
+<p>We've attached a calendar file so you can keep the dates free. To build your own agenda of sessions, sign in on the website with this e-mail address and your registration ID.</p>
 <p>${button(absoluteUrl("/programme"), "View the programme")}</p>
-<p style="margin-top:24px">See you at IIT Delhi!<br/>The organising team</p>`;
+<p style="margin-top:24px">Best wishes,<br/>The organising team</p>`;
   const text = `Hi ${r.name},
 
-Thank you for registering for the ${s.eventName}.
+Thank you for registering for the ${s.eventName}. ${review}
 
 Your registration ID: ${r.regId}
 When: ${dates}
 Where: ${venueLine(s)}
 
-Please carry a valid photo ID and this registration ID for campus entry.
+Keep this registration ID: once your place is confirmed, carry it and a valid photo ID for campus entry.
 ${s.confirmationNote ? `\n${s.confirmationNote}\n` : ""}
 To build your own agenda, sign in on the website with this e-mail address and your registration ID.
 Programme: ${absoluteUrl("/programme")}
@@ -68,8 +70,8 @@ Programme: ${absoluteUrl("/programme")}
 The organising team`;
   return {
     to: r.email,
-    subject: `You're registered: ${s.eventName} (${r.regId})`,
-    html: layout(s, "Your registration is confirmed", body),
+    subject: `Registration received: ${s.eventName} (${r.regId})`,
+    html: layout(s, "We've received your registration", body),
     text,
     replyTo: s.contactEmail || undefined,
     attachments: [{ filename: "agentic-ai-workshop-2026.ics", content: workshopIcs(s), contentType: "text/calendar; charset=utf-8; method=PUBLISH" }],

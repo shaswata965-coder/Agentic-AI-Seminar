@@ -12,7 +12,7 @@ export interface PosterFact {
 }
 
 /**
- * A printed-looking poster (the invitation, the hackathon's "details coming soon"): a tinted head with the
+ * A printed-looking poster (registration on the home page, the hackathon's "details coming soon"): a tinted head with the
  * kicker and a badge, Aura as a professor unfurling a poster and pointing at it with a laser pointer, a large
  * title, a few points with ticks, and the facts (dates, venue) along its foot. `as="h1"` when it is the page's title.
  */

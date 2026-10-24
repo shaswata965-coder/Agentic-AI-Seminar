@@ -86,6 +86,7 @@ const SECTIONS: { id: string; title: string; steps: (string | [string, string])[
     title: "Registrations & enquiries",
     steps: [
       "Registrations lists everyone who registered on the website. Change a status (e.g. confirmed / waitlisted), add notes, or download a CSV for Excel.",
+      "Places are limited, so registrations are reviewed: new ones are “registered” until the organising committee sets them to confirmed or waitlisted. Registrants are told they'll hear by the date in Site settings → Site-wide → Registration → Places confirmed by (or “by e-mail” while it is blank).",
       "Enquiries collects contact-form messages, exhibitor and sponsorship requests. Use “Reply” to answer by e-mail.",
       "Confirmation e-mails are sent automatically when e-mail (SMTP) is configured on the server.",
     ],

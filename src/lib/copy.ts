@@ -1,12 +1,12 @@
 import type { SiteSettings } from "@/lib/content/types";
 import { venueLine } from "@/lib/event";
-import { formatDateRange } from "@/lib/format";
+import { formatDate, formatDateRange } from "@/lib/format";
 import type { CopyKey, PageCopy } from "@/lib/schema/page-copy";
 
 /*
  * Section texts from Site settings (src/lib/schema/page-copy.ts), with their
  * placeholders filled in: {event}, {short}, {dates}, {venue}, {venueName},
- * {tagline}, {organiser}, plus any a section passes itself (e.g. {count}).
+ * {tagline}, {organiser}, {replyBy}, plus any a section passes itself (e.g. {count}).
  */
 
 export type Vars = Record<string, string | number>;
@@ -25,7 +25,14 @@ export function siteVars(s: SiteSettings): Vars {
     venueName: s.venueName,
     tagline: s.tagline,
     organiser: s.organisedBy.includes("IIT Delhi") ? "IIT Delhi · Yardi School of Artificial Intelligence" : s.organisedBy,
+    replyBy: replyBy(s),
   };
+}
+
+/** When registrants hear whether they have a place: "by 20 November 2026", or "by e-mail" before the date is set. */
+export function replyBy(s: SiteSettings) {
+  const date = formatDate(s.workshopReplyBy);
+  return date ? `by ${date}` : "by e-mail";
 }
 
 /** One section's texts and colours, placeholders filled in. */

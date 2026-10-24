@@ -1,11 +1,11 @@
-import { ArrowUp, CircleCheck } from "lucide-react";
+import { ArrowUp, CircleCheck, Sparkles } from "lucide-react";
 import { Aura } from "@/components/aura/Aura";
 import { ButtonLink } from "@/components/ui/Button";
 import { Section, SectionHeading } from "@/components/ui/Section";
 import type { SiteSettings } from "@/lib/content/types";
 import { copy } from "@/lib/copy";
 
-/** The call for posters on the Registration page: arXiv preprints and submitted papers are welcome at the poster session. */
+/** The call for posters on the Registration page: arXiv preprints and papers under submission, on agentic AI, are welcome at the poster session. */
 export function CallForPosters({ s, formShown }: { s: SiteSettings; formShown: boolean }) {
   const c = copy(s, "registerPosters");
   const welcome = [c.welcome1, c.welcome2, c.welcome3].filter(Boolean);
@@ -18,17 +18,25 @@ export function CallForPosters({ s, formShown }: { s: SiteSettings; formShown: b
         <div>
           <SectionHeading id="posters-title" eyebrow={c.eyebrow} title={c.title} description={c.description} className="mb-6 sm:mb-8" />
           <div className="grid gap-5 sm:grid-cols-2">
-            {welcome.length ? (
+            {welcome.length || c.theme ? (
               <div className="card p-5 sm:p-6">
                 {c.welcomeTitle ? <h3 className="font-display text-lg font-bold text-fg">{c.welcomeTitle}</h3> : null}
-                <ul className="mt-3 grid gap-2.5">
-                  {welcome.map((w) => (
-                    <li key={w} className="flex items-start gap-2.5 text-[15px] text-fg">
-                      <CircleCheck size={18} aria-hidden className="mt-0.5 shrink-0 text-accent-ink" />
-                      {w}
-                    </li>
-                  ))}
-                </ul>
+                {welcome.length ? (
+                  <ul className="mt-3 grid gap-2.5">
+                    {welcome.map((w) => (
+                      <li key={w} className="flex items-start gap-2.5 text-[15px] text-fg">
+                        <CircleCheck size={18} aria-hidden className="mt-0.5 shrink-0 text-accent-ink" />
+                        {w}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                {c.theme ? (
+                  <p className="mt-4 flex items-start gap-2 rounded-xl bg-accent-soft px-3 py-2 text-[15px] font-semibold text-accent-ink">
+                    <Sparkles size={17} aria-hidden className="mt-0.5 shrink-0" />
+                    {c.theme}
+                  </p>
+                ) : null}
               </div>
             ) : null}
             {c.how ? (

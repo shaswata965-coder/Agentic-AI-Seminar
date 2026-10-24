@@ -36,6 +36,8 @@ export interface SiteSettings extends PageCopy, SectionOrders, HiddenSections, F
 
   workshopStatus: RegistrationStatus;
   workshopDeadline: string;
+  /** When the organising committee will have told registrants whether they have a place; empty for “by e-mail”. */
+  workshopReplyBy: string;
   workshopUrl: string;
   fees: { category: string; amount: string; note: string }[];
   feeNote: string;

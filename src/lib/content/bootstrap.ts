@@ -13,19 +13,25 @@ import { DEFAULT_FAQS, DEFAULT_HACKATHON, DEFAULT_PEOPLE, DEFAULT_SESSIONS, DEFA
 
 /** Marks that the tentative programme was offered to this site, so it is added at most once. */
 const PROGRAMME_PLAN_KEY = "programme-plan";
-/** Marks that the FAQ answers below were brought up to date once. */
-const INVITE_FAQS_KEY = "faqs-invitation";
+/** Marks that the FAQ answers below were brought up to date once (free registration, places confirmed by the committee). */
+const PLACES_FAQS_KEY = "faqs-places";
 
-/** FAQ answers stored by sites set up earlier: updated once where never edited (invitation-only, free registration). */
+/** FAQ answers stored by sites set up earlier, oldest first: updated once where never edited. */
 const RETIRED_FAQ_ANSWERS: { question: string; answer: string }[] = [
   {
     question: "Who can attend the workshop?",
     answer: "The workshop is open to researchers, faculty, students, industry practitioners, startups and investors interested in agentic AI. Registration is required.",
   },
   { question: "Is there a registration fee?", answer: "Fee details (if any) will be announced on the Registration page. Register early: seats may be limited." },
+  // While the workshop was by invitation.
+  {
+    question: "Who can attend the workshop?",
+    answer: "The workshop is by invitation, for researchers, faculty, students, industry practitioners, startups and investors working on agentic AI. Every invitee must register to get entry.",
+  },
+  { question: "Is there a registration fee?", answer: "No. Registration is free, but it is mandatory: invitees need to register to get entry." },
 ];
 
-async function insertSingleton(key: "settings" | "hackathon" | typeof PROGRAMME_PLAN_KEY | typeof INVITE_FAQS_KEY, data: object): Promise<boolean> {
+async function insertSingleton(key: "settings" | "hackathon" | typeof PROGRAMME_PLAN_KEY | typeof PLACES_FAQS_KEY, data: object): Promise<boolean> {
   try {
     const res = await Singleton.updateOne({ key }, { $setOnInsert: { key, data } }, { upsert: true });
     return res.upsertedCount > 0;
@@ -56,7 +62,7 @@ export async function ensureDefaultContent({ fillEmpty = false }: { fillEmpty?: 
     }
   }
 
-  if (await insertSingleton(INVITE_FAQS_KEY, { at: new Date().toISOString() })) {
+  if (await insertSingleton(PLACES_FAQS_KEY, { at: new Date().toISOString() })) {
     const Faqs = getCollectionModel("faqs");
     for (const old of RETIRED_FAQ_ANSWERS) {
       const current = DEFAULT_FAQS.find((f) => f.question === old.question);

@@ -86,6 +86,7 @@ export function RegistrationForm({ fields, text, calendar, shareUrl, eventName }
             </>
           ) : null}
           <p className="mt-4 max-w-md text-sm text-muted">{fill(!done.regId ? text.doneQueued : done.emailSent ? text.doneMailed : text.doneNoMail, vars)}</p>
+          {text.doneReview ? <p className="mt-3 max-w-md text-sm font-semibold text-fg">{text.doneReview}</p> : null}
           <div className="mt-6 flex flex-wrap justify-center gap-3">
             <AddToCalendar links={calendar} />
           </div>

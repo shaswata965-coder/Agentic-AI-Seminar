@@ -581,6 +581,10 @@ export const SETTINGS_PAGES: SettingsPage[] = [
         [
           select("workshopStatus", "Workshop registration", statusOptions, { width: "half", help: "Also shown under the title on the home page." }),
           datetime("workshopDeadline", "Workshop registration deadline", { width: "half" }),
+          datetime("workshopReplyBy", "Places confirmed by", {
+            width: "half",
+            help: "The date by which the organising committee tells registrants whether they have a place. Texts that say {replyBy} show “by” and this date; leave it blank for “by e-mail”.",
+          }),
           url("workshopUrl", "External workshop form (optional)", { help: "Leave blank to use the built-in registration form." }),
           textarea("confirmationNote", "Extra text for the confirmation e-mail"),
           select("hackathonStatus", "Hackathon registration", statusOptions, { width: "half" }),
@@ -685,8 +689,9 @@ export const SETTINGS_PAGES: SettingsPage[] = [
       section("register", "Registration choice", "homeRegister", [], {
         description: "The heading and two compact cards along the foot of the hero, one for each registration. Their status comes from Site-wide → Registration.",
       }),
-      section("invite", "Invitation", "homeInvite", [], {
-        description: "The invitation, under the hero: that the workshop is by invitation, that registering is free but required for entry, and the invitation poster with Aura. Its dates and venue come from Site-wide → Event details.",
+      section("invite", "Registration open", "homeInvite", [], {
+        description:
+          "Under the hero: that registration is open, that places are limited and confirmed by the organising committee, what to expect, the call to bring your research to the poster session, and the poster with Aura. Its dates and venue come from Site-wide → Event details, and the date in {replyBy} from Site-wide → Registration.",
       }),
       section("highlights", "Highlight strip", "homeHighlights", [
         objects("highlights", "Highlights", "Highlight", [

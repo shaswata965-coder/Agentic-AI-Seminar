@@ -18,7 +18,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   shortName: "AAIW 2026",
   tagline: "Where autonomous AI agents meet healthcare, science and enterprise.",
   description:
-    "A two-day, invitation-only workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a poster session. 15–16 December 2026.",
+    "A two-day workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a poster session. 15–16 December 2026.",
   organisedBy: "Indian Institute of Technology Delhi and Yardi School of Artificial Intelligence (ScAI), IIT Delhi",
   startDate: "2026-12-15T09:00:00+05:30",
   endDate: "2026-12-16T18:00:00+05:30",
@@ -28,9 +28,10 @@ export const DEFAULT_SETTINGS: SiteSettings = {
 
   workshopStatus: "open",
   workshopDeadline: "",
+  workshopReplyBy: "",
   workshopUrl: "",
-  fees: [{ category: "Every invitee", amount: "Free", note: "Registration is mandatory for entry" }],
-  feeNote: "The workshop is by invitation. Registration is free but mandatory: invitees need it to get entry.",
+  fees: [{ category: "Everyone", amount: "Free", note: "Places are limited" }],
+  feeNote: "Registration is free. Places are limited, so registrations are reviewed and confirmed by the organising committee.",
   confirmationNote: "",
   hackathonStatus: "soon",
   hackathonDeadline: "",
@@ -286,8 +287,8 @@ export const DEFAULT_PEOPLE: NewDoc<Person>[] = [
 ];
 
 export const DEFAULT_FAQS: NewDoc<Faq>[] = [
-  { category: "general", question: "Who can attend the workshop?", answer: "The workshop is by invitation, for researchers, faculty, students, industry practitioners, startups and investors working on agentic AI. Every invitee must register to get entry." },
-  { category: "registration", question: "Is there a registration fee?", answer: "No. Registration is free, but it is mandatory: invitees need to register to get entry." },
+  { category: "general", question: "Who can attend the workshop?", answer: "The workshop is for researchers, faculty, students, industry practitioners, startups and investors working on agentic AI. Places are limited, so registrations are reviewed and confirmed by the organising committee." },
+  { category: "registration", question: "Is there a registration fee?", answer: "No, registration is free. Places are limited, so register early: the organising committee reviews every registration and lets you know whether we can offer you a place." },
   { category: "registration", question: "Do I need to register separately for the hackathon?", answer: "Yes. Workshop registration and hackathon registration are separate. Hackathon registration is done per team on the Hackathon page." },
   { category: "programme", question: "When will the detailed programme be available?", answer: "The schedule is published on the Programme page as sessions are confirmed. You can download it as a PDF and add sessions to your calendar." },
   { category: "programme", question: "What should I bring to the tutorials?", answer: "Most tutorials need a laptop. Check each tutorial's prerequisites (software, accounts) on the Tutorials & Demos page." },
@@ -383,18 +384,41 @@ const RETIRED: { settings: Retired; hackathon: Retired } = {
       // Texts that mentioned the hackathon in passing, from before it was hidden until announced.
       description: [
         "A two-day workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a hackathon. 15–16 December 2026.",
+        "A two-day, invitation-only workshop at IIT Delhi on agentic AI: invited talks, panel discussions, hands-on tutorials, live demos, industry kiosks and a poster session. 15–16 December 2026.",
       ],
       "siteNav.faqText": ["Registration, travel, the hackathon and more"],
-      // Registration became invitation-only, free but mandatory.
+      // Registration became invitation-only, free but mandatory; then open, with places confirmed by the organising committee.
       fees: [
         [
           { category: "Students", amount: "To be announced", note: "" },
           { category: "Academia & researchers", amount: "To be announced", note: "" },
           { category: "Industry & startups", amount: "To be announced", note: "" },
         ],
+        [{ category: "Every invitee", amount: "Free", note: "Registration is mandatory for entry" }],
       ],
-      feeNote: ["Registration fees (if any) and deadlines will be announced soon."],
-      "registerHero.description": ["{dates} · {venue}. Registering takes about two minutes."],
+      feeNote: [
+        "Registration fees (if any) and deadlines will be announced soon.",
+        "The workshop is by invitation. Registration is free but mandatory: invitees need it to get entry.",
+      ],
+      "registerHero.description": [
+        "{dates} · {venue}. Registering takes about two minutes.",
+        "{dates} · {venue}. The workshop is by invitation: every invitee must register to get entry. Registration is free but mandatory, and takes about two minutes.",
+      ],
+      "homeRegister.soloDescription": ["The workshop is by invitation. Registration is free but mandatory: every invitee registers to get entry."],
+      "homeInvite.eyebrow": ["By invitation"],
+      "homeInvite.title": ["You're invited"],
+      "homeInvite.description": ["The {event} is by invitation. Every invitee must register to get entry: registration is free but mandatory."],
+      "homeInvite.posterKicker": ["Invitation"],
+      "homeInvite.posterBadge": ["Free · registration required"],
+      "registerFormText.doneTitle": ["You're registered!"],
+      "registerFormText.doneMailed": ["A confirmation e-mail is on its way to {email}."],
+      "registerFormText.doneQueued": [
+        "Your registration ID and details are on their way to {email}. If this address was already registered, your earlier registration stands and we've sent its confirmation again.",
+      ],
+      "registerFormText.shareText": ["I'm attending the {event} at IIT Delhi!"],
+      "registerPosters.welcome1": ["arXiv preprints on agentic AI and its uses"],
+      "registerPosters.welcome2": ["Papers submitted to, or accepted at, a conference or journal"],
+      "registerPosters.welcome3": ["Work in progress from your lab, startup or team"],
       "homeNews.description": ["Updates about registration, speakers, the programme and the hackathon appear here first."],
       "programmeHero.description": [
         "{dates} at {venueName}. Keynotes, talks, panels, hands-on tutorials and live demos, with industry kiosks and the hackathon final alongside.",
@@ -428,6 +452,10 @@ const RETIRED: { settings: Retired; hackathon: Retired } = {
       },
       audience: { "Learn hands-on in tutorials, meet mentors and build in the hackathon.": "Learn hands-on in tutorials, present your work at the poster session and meet researchers." },
       keywords: { "AI entrepreneurship": "AI in enterprise" },
+      registerFields: {
+        "arXiv preprints and submitted or accepted papers are welcome at the poster session. The organisers will write to you with the details.":
+          "The poster session is open to arXiv preprints and papers currently under submission, on the broader theme of agentic AI. The organisers will write to you with the details.",
+      },
     },
   },
   hackathon: {

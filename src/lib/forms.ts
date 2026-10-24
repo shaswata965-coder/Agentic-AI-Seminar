@@ -128,7 +128,7 @@ export const FORMS: Record<FormKey, FormSpec> = {
       {
         key: "presentPoster",
         label: "Would you like to present a poster?",
-        help: "arXiv preprints and submitted or accepted papers are welcome at the poster session. The organisers will write to you with the details.",
+        help: "The poster session is open to arXiv preprints and papers currently under submission, on the broader theme of agentic AI. The organisers will write to you with the details.",
         type: "radio",
         types: ["radio", "select"],
         options: ["Yes", "No"],

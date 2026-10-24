@@ -25,8 +25,8 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     tips: [
       "Hi! I'm Aura, your agentic guide to the workshop.",
       "Two days of talks, tutorials, demos and a poster session, 15–16 Dec at IIT Delhi.",
-      "It's by invitation: registering is free, and you need it to get in.",
-      "Tap Register to save your seat. I'll keep it warm!",
+      "Registering is free, and places are limited: the organising committee confirms them.",
+      "Tap Register to ask for your seat. I'll keep my fingers crossed!",
     ],
   },
   guide: {
@@ -340,7 +340,7 @@ export const AURA_PRESETS: Record<AuraVariant, AuraPreset> = {
     wear: "professor",
     emblem: "bulb",
     eyeColor: AURA_EYES.amber,
-    tips: ["Ahem! As you can see on this poster…", "Bring your arXiv preprint or submitted paper: I'll point the laser at it!", "Posters are up all through lunch on Day 1."],
+    tips: ["Ahem! As you can see on this poster…", "Bring your agentic AI preprint or paper under submission: I'll point the laser at it!", "Posters are up all through lunch on Day 1."],
   },
   error: {
     label: "Aura looking puzzled after an error",
