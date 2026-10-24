@@ -9,6 +9,9 @@ import { registrationHref, venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { isShown } from "@/lib/schema/section-order";
 
+/** The poster's built-in picture (a poster session), shown until another is uploaded in Site settings → Home → Registration open. */
+const POSTER_PHOTO = "/posters/registration.webp";
+
 /**
  * Registration is open: places are limited and confirmed by the organising committee. The button, what to expect
  * and the call to bring your research to the poster session, beside the poster.
@@ -68,7 +71,7 @@ export function Invite({ s }: { s: SiteSettings }) {
         </div>
         <Poster
           tone={c.tone}
-          photo={s.invitePhoto}
+          photo={s.invitePhoto || POSTER_PHOTO}
           kicker={c.posterKicker}
           badge={c.posterBadge}
           title={c.posterTitle}

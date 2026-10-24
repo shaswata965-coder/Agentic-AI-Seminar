@@ -7,6 +7,9 @@ import { venueLine } from "@/lib/event";
 import { formatDateRange } from "@/lib/format";
 import { isShown } from "@/lib/schema/section-order";
 
+/** The poster's built-in picture (a team at work), shown until another is uploaded in Site settings → Hackathon → Coming-soon poster. */
+const POSTER_PHOTO = "/posters/hackathon.webp";
+
 /** The Hackathon page while the hackathon is hidden: only its "details coming soon" poster, with why to join. */
 export function HackathonComingSoon({ s, h }: { s: SiteSettings; h: HackathonInfo }) {
   const c = copy(s, "hackathonPoster", { hackathon: h.title });
@@ -19,7 +22,7 @@ export function HackathonComingSoon({ s, h }: { s: SiteSettings; h: HackathonInf
           as="h1"
           titleId="hackathon-poster-title"
           tone={c.tone}
-          photo={s.hackathonPosterPhoto}
+          photo={s.hackathonPosterPhoto || POSTER_PHOTO}
           kicker={h.title}
           badge={c.badge}
           title={c.title}
